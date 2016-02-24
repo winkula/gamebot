@@ -22,6 +22,7 @@
 using GameBot.Core;
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
@@ -43,6 +44,8 @@ namespace GameBot.Emulator
         private Bitmap bitmap;
 
         public bool Running { get; private set; }
+        public int Frames { get; private set; }
+        public TimeSpan Time { get { return TimeSpan.FromSeconds((double)Frames / FramesPerSecond); } }
         public Bitmap Display { get { return bitmap; } }
         public Game Game { get; private set; }
         private Size DisplaySize { get { return new Size(DisplayWidth, DisplayHeight); } }
@@ -52,9 +55,9 @@ namespace GameBot.Emulator
             cpu = new X80();
 
             graphics = Graphics.FromImage(new Bitmap(DisplayWidth, DisplayHeight));
-            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-            graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            graphics.CompositingQuality = CompositingQuality.HighSpeed;
+            graphics.CompositingMode = CompositingMode.SourceCopy;
+            graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 
             // init image
             for (int i = 0; i < pixels.Length; i++) { pixels[i] = 0xFF000000; }
@@ -70,11 +73,14 @@ namespace GameBot.Emulator
             cpu.PowerUp();
 
             Running = true;
-            Execute(4); // strange effects in the first few frames 
+
+            // strange effects appear in the first few frames , skip them
+            Execute(4);
         }
 
         private void UpdateModel(bool updateBitmap)
         {
+            Frames++;
             if (updateBitmap)
             {
                 uint[] backgroundPalette = cpu.backgroundPalette;
@@ -385,13 +391,13 @@ namespace GameBot.Emulator
         {
             graphics.DrawImage(Display, 0, 0, DisplayWidth, DisplayHeight);
         }
-        
+
         public void Execute(TimeSpan time)
         {
             int frames = (int)(time.TotalSeconds * FramesPerSecond);
             Execute(frames);
         }
-        
+
         private void Execute(int frames)
         {
             if (frames > 0)

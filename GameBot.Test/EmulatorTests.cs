@@ -4,6 +4,8 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 
 namespace GameBot.Test
 {
@@ -33,6 +35,8 @@ namespace GameBot.Test
 
         private void RunSimulation(GameBoyEmulator emulator, IEnumerable<Buttons> buttons)
         {
+            Clean();
+
             SaveImage(emulator.Display);
 
             emulator.Execute(TimeSpan.FromSeconds(3));
@@ -45,9 +49,18 @@ namespace GameBot.Test
             }
         }
 
+        private void Clean()
+        {
+            foreach (var file in new DirectoryInfo(@"C:\Users\Winkler\Desktop\out").GetFiles())
+            {
+                file.Delete();
+            }
+        }
+
         private void SaveImage(Image image)
         {
-            image.Save(string.Format(@"C:\Users\Winkler\Desktop\out\{0}display.bmp", DateTime.Now.Ticks));
+            string filename = string.Format(@"C:\Users\Winkler\Desktop\out\{0}display.png", DateTime.Now.Ticks);
+            image.Save(filename, ImageFormat.Png);
         }
     }
 }

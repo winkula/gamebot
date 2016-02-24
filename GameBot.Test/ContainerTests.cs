@@ -13,11 +13,12 @@ using GameBot.Game.Tetris;
 using GameBot.Core.Extractors;
 using SimpleInjector;
 using GameBot.Robot;
+using System.Reflection;
 
 namespace GameBot.Test
 {
     [TestFixture]
-    public class Main
+    public class ContainerTests
     {
         [Test]
         public void DependencyInjection()
@@ -27,14 +28,25 @@ namespace GameBot.Test
 
             // 2. Configure the container (register)
             container.Register<IImageProcessor, DefaultImageProcessor>();
-            container.Register<IGameStateExtractor<TetrisGameState>, TetrisGameStateExtractor>();
-            container.Register<IDecider<TetrisGameState>, TetrisDecider>();
             container.Register<ICommandController, DefaultCommandController>();
 
+            //container.Register<IGameStateExtractor<TetrisGameState>, TetrisGameStateExtractor>();
+            //container.Register<IDecider<TetrisGameState>, TetrisDecider>();
+
+            var assemblies = new[] { "GameBot.Game.Tetris" };
+            foreach (var assemblyName in assemblies)
+            {
+                var assembly = Assembly.Load(assemblyName);
+                container.Register(typeof(IGameStateExtractor<>), new[] { assembly });
+                container.Register(typeof(IDecider<>), new[] { assembly });
+            }
+            
             // 3. Optionally verify the container's configuration.
             container.Verify();
+        }
 
-
+        public void Process(Container container)
+        {
             // download image of display
             // in real: get image as photo of the gameboy screen (input)
             const string url = "https://lifeculturegeekstuff.files.wordpress.com/2011/01/tetris-2.jpg";

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{99DD5DF9-BE92-4704-83E6-36554B296A90}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GameBot.Emulator</RootNamespace>
     <AssemblyName>GameBot.Emulator</AssemblyName>
@@ -48,7 +48,6 @@
     <Compile Include="GameBoyEmulatorAsync.cs" />
     <Compile Include="GameBoyEmulator.cs" />
     <Compile Include="ICartridge.cs" />
-    <Compile Include="Launcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Rom.cs" />
