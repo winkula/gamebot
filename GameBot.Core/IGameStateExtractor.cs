@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace GameBot.Core.Extractors
 {
-    public interface IGameStateExtractor<T> where T : IGameState, new()
+    public interface IGameStateExtractor
+    {
+    }
+
+    public interface IGameStateExtractor<T> : IGameStateExtractor where T : IGameState, new()
     {
         T Extract(IDisplayState input);
     }

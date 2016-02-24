@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace GameBot.Core
 {
-    public interface IDecider<T> where T : IGameState, new()
+    public interface IDecider
+    {
+    }
+
+    public interface IDecider<T> : IDecider where T : IGameState, new()
     {
         ICommand Decide(T gameState);
     }

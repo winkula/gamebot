@@ -41,8 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands.cs" />
-    <Compile Include="DisplayState.cs" />
+    <Compile Include="Buttons.cs" />
+    <Compile Include="Data\DefaultCommand.cs" />
+    <Compile Include="Data\DefaultDisplayState.cs" />
+    <Compile Include="ICommandController.cs" />
     <Compile Include="IDecider.cs" />
     <Compile Include="IGameState.cs" />
     <Compile Include="IGameStateExtractor.cs" />

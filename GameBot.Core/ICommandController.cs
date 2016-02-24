@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameBot.Robot
+namespace GameBot.Core
 {
-    public class Main
+    public interface ICommandController
     {
-        public Main()
-        {
-        }
+        void Execute(ICommand command);
     }
 }

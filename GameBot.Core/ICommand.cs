@@ -8,8 +8,8 @@ namespace GameBot.Core
 {
     public interface ICommand
     {
-        Commands GetCommands();
-
+        Buttons GetButtons();
+        bool Press(Buttons button);
         bool PressUp();
         bool PressDown();
         bool PressLeft();

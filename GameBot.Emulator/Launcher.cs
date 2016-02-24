@@ -10,7 +10,8 @@ namespace GameBot.Emulator
         [STAThread]
         static void Main(string[] args)
         {
-            var emulator = new Emulator();
+            /*
+            var emulator = new GameBoyEmulatorAsync();
             
             emulator.Init(@"C:\Users\Winkler\Desktop\gb_output.bmp");
             emulator.Open(@"C:\Users\Winkler\Documents\Visual Studio 2015\Projects\GameBot\Roms\tetris.gb");
@@ -28,7 +29,7 @@ namespace GameBot.Emulator
                 {
                     Console.WriteLine(emulator.GetCatridgeInfo());
                 }
-            });
+            });*/
         }
     }
 }

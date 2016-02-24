@@ -19,102 +19,101 @@
  * 
  */
 
+using GameBot.Core;
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace GameBot.Emulator
 {
-    public class Emulator
+    public class GameBoyEmulator
     {
-        [StructLayout(LayoutKind.Sequential)]
-        public struct PeekMsg
+        private const int FramesPerSecond = 60;
+        private const int MaxFramesSkipped = 10;
+
+        private const int DisplayWidth = 160;
+        private const int DisplayHeight = 144;
+
+        private readonly X80 cpu;
+        private double scanLineTicks;
+        private uint[] pixels = new uint[DisplayWidth * DisplayHeight];
+
+        private Graphics graphics;
+        private Bitmap bitmap;
+
+        public bool Running { get; private set; }
+        public Bitmap Display { get { return bitmap; } }
+        public Game Game { get; private set; }
+        private Size DisplaySize { get { return new Size(DisplayWidth, DisplayHeight); } }
+
+        public GameBoyEmulator()
         {
-            public IntPtr hWnd;
-            public IntPtr wParam;
-            public IntPtr lParam;
-            public uint time;
-            public Point p;
+            cpu = new X80();
+
+            graphics = Graphics.FromImage(new Bitmap(DisplayWidth, DisplayHeight));
+            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+            graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+
+            // init image
+            for (int i = 0; i < pixels.Length; i++) { pixels[i] = 0xFF000000; }
+            GCHandle handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+            IntPtr pointer = Marshal.UnsafeAddrOfPinnedArrayElement(pixels, 0);
+            bitmap = new Bitmap(DisplayWidth, DisplayHeight, DisplayWidth * 4, PixelFormat.Format32bppPArgb, pointer);
         }
 
-        public bool Running;
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern bool PeekMessage(out PeekMsg msg, IntPtr hWnd, uint messageFilterMin, uint messageFilterMax, uint flags);
-
-        const int FRAMES_PER_SECOND = 60;
-        const int MAX_FRAMES_SKIPPED = 10;
-
-        const int WIDTH = 160;
-        const int HEIGHT = 144;
-
-        private string output;
-        public long FREQUENCY = Stopwatch.Frequency;
-        public long TICKS_PER_FRAME = Stopwatch.Frequency / FRAMES_PER_SECOND;
-        private Bitmap bitmap;
-        public Stopwatch stopwatch = new Stopwatch();
-        public long nextFrameStart;
-        private X80 x80;
-        private Rectangle rect;
-        private double scanLineTicks;
-        private uint[] pixels = new uint[WIDTH * HEIGHT];
-        private Game game;
-        private Size ClientSize = new Size(WIDTH, HEIGHT);
-        public Graphics graphics;
-
-        public Emulator()
+        public void Load(Game game)
         {
-            rect = new Rectangle(0, 0, 160, 144);
+            Game = game;
+            cpu.cartridge = Game.cartridge;
+            cpu.PowerUp();
+
+            Running = true;
+            Execute(4); // strange effects in the first few frames 
         }
 
         private void UpdateModel(bool updateBitmap)
         {
             if (updateBitmap)
             {
-                uint[] backgroundPalette = x80.backgroundPalette;
-                uint[] objectPalette0 = x80.objectPalette0;
-                uint[] objectPalette1 = x80.objectPalette1;
-                uint[,] backgroundBuffer = x80.backgroundBuffer;
-                uint[,] windowBuffer = x80.windowBuffer;
-                byte[] oam = x80.oam;
+                uint[] backgroundPalette = cpu.backgroundPalette;
+                uint[] objectPalette0 = cpu.objectPalette0;
+                uint[] objectPalette1 = cpu.objectPalette1;
+                uint[,] backgroundBuffer = cpu.backgroundBuffer;
+                uint[,] windowBuffer = cpu.windowBuffer;
+                byte[] oam = cpu.oam;
 
                 for (int y = 0, pixelIndex = 0; y < 144; y++)
                 {
-                    x80.ly = y;
-                    x80.lcdcMode = LcdcModeType.SearchingOamRam;
-                    if (x80.lcdcInterruptEnabled
-                        && (x80.lcdcOamInterruptEnabled
-                            || (x80.lcdcLycLyCoincidenceInterruptEnabled && x80.lyCompare == y)))
+                    cpu.ly = y;
+                    cpu.lcdcMode = LcdcModeType.SearchingOamRam;
+                    if (cpu.lcdcInterruptEnabled && (cpu.lcdcOamInterruptEnabled || (cpu.lcdcLycLyCoincidenceInterruptEnabled && cpu.lyCompare == y)))
                     {
-                        x80.lcdcInterruptRequested = true;
+                        cpu.lcdcInterruptRequested = true;
                     }
                     ExecuteProcessor(800);
-                    x80.lcdcMode = LcdcModeType.TransferingData;
+                    cpu.lcdcMode = LcdcModeType.TransferingData;
                     ExecuteProcessor(1720);
 
-                    x80.UpdateWindow();
-                    x80.UpdateBackground();
-                    x80.UpdateSpriteTiles();
+                    cpu.UpdateWindow();
+                    cpu.UpdateBackground();
+                    cpu.UpdateSpriteTiles();
 
-                    bool backgroundDisplayed = x80.backgroundDisplayed;
-                    bool backgroundAndWindowTileDataSelect = x80.backgroundAndWindowTileDataSelect;
-                    bool backgroundTileMapDisplaySelect = x80.backgroundTileMapDisplaySelect;
-                    int scrollX = x80.scrollX;
-                    int scrollY = x80.scrollY;
-                    bool windowDisplayed = x80.windowDisplayed;
-                    bool windowTileMapDisplaySelect = x80.windowTileMapDisplaySelect;
-                    int windowX = x80.windowX - 7;
-                    int windowY = x80.windowY;
+                    bool backgroundDisplayed = cpu.backgroundDisplayed;
+                    bool backgroundAndWindowTileDataSelect = cpu.backgroundAndWindowTileDataSelect;
+                    bool backgroundTileMapDisplaySelect = cpu.backgroundTileMapDisplaySelect;
+                    int scrollX = cpu.scrollX;
+                    int scrollY = cpu.scrollY;
+                    bool windowDisplayed = cpu.windowDisplayed;
+                    bool windowTileMapDisplaySelect = cpu.windowTileMapDisplaySelect;
+                    int windowX = cpu.windowX - 7;
+                    int windowY = cpu.windowY;
 
                     int windowPointY = windowY + y;
 
                     for (int x = 0; x < 160; x++, pixelIndex++)
                     {
-
                         uint intensity = 0;
 
                         if (backgroundDisplayed)
@@ -122,8 +121,7 @@ namespace GameBot.Emulator
                             intensity = backgroundBuffer[0xFF & (scrollY + y), 0xFF & (scrollX + x)];
                         }
 
-                        if (windowDisplayed && y >= windowY && y < windowY + 144 && x >= windowX && x < windowX + 160
-                            && windowX >= -7 && windowX <= 159 && windowY >= 0 && windowY <= 143)
+                        if (windowDisplayed && y >= windowY && y < windowY + 144 && x >= windowX && x < windowX + 160 && windowX >= -7 && windowX <= 159 && windowY >= 0 && windowY <= 143)
                         {
                             intensity = windowBuffer[y - windowY, x - windowX];
                         }
@@ -131,10 +129,10 @@ namespace GameBot.Emulator
                         pixels[pixelIndex] = intensity;
                     }
 
-                    if (x80.spritesDisplayed)
+                    if (cpu.spritesDisplayed)
                     {
-                        uint[,,,] spriteTile = x80.spriteTile;
-                        if (x80.largeSprites)
+                        uint[,,,] spriteTile = cpu.spriteTile;
+                        if (cpu.largeSprites)
                         {
                             for (int address = 0; address < 160; address += 4)
                             {
@@ -208,9 +206,7 @@ namespace GameBot.Emulator
                                         int screenX = spriteX + x;
                                         if (screenX >= 0 && screenX < 160)
                                         {
-                                            uint color = spriteTile[spriteTileIndex1,
-                                                spriteYFlipped ? 7 - spriteRow : spriteRow,
-                                                spriteXFlipped ? 7 - x : x, spritePalette];
+                                            uint color = spriteTile[spriteTileIndex1, spriteYFlipped ? 7 - spriteRow : spriteRow, spriteXFlipped ? 7 - x : x, spritePalette];
                                             if (color > 0)
                                             {
                                                 if (spritePriority)
@@ -261,9 +257,7 @@ namespace GameBot.Emulator
                                     int screenX = spriteX + x;
                                     if (screenX >= 0 && screenX < 160)
                                     {
-                                        uint color = spriteTile[spriteTileIndex,
-                                            spriteYFlipped ? 7 - spriteRow : spriteRow,
-                                            spriteXFlipped ? 7 - x : x, spritePalette];
+                                        uint color = spriteTile[spriteTileIndex, spriteYFlipped ? 7 - spriteRow : spriteRow, spriteXFlipped ? 7 - x : x, spritePalette];
                                         if (color > 0)
                                         {
                                             if (spritePriority)
@@ -284,10 +278,10 @@ namespace GameBot.Emulator
                         }
                     }
 
-                    x80.lcdcMode = LcdcModeType.HBlank;
-                    if (x80.lcdcInterruptEnabled && x80.lcdcHBlankInterruptEnabled)
+                    cpu.lcdcMode = LcdcModeType.HBlank;
+                    if (cpu.lcdcInterruptEnabled && cpu.lcdcHBlankInterruptEnabled)
                     {
-                        x80.lcdcInterruptRequested = true;
+                        cpu.lcdcInterruptRequested = true;
                     }
                     ExecuteProcessor(2040);
                     AddTicksPerScanLine();
@@ -297,44 +291,41 @@ namespace GameBot.Emulator
             {
                 for (int y = 0; y < 144; y++)
                 {
-
-                    x80.ly = y;
-                    x80.lcdcMode = LcdcModeType.SearchingOamRam;
-                    if (x80.lcdcInterruptEnabled
-                        && (x80.lcdcOamInterruptEnabled
-                            || (x80.lcdcLycLyCoincidenceInterruptEnabled && x80.lyCompare == y)))
+                    cpu.ly = y;
+                    cpu.lcdcMode = LcdcModeType.SearchingOamRam;
+                    if (cpu.lcdcInterruptEnabled && (cpu.lcdcOamInterruptEnabled || (cpu.lcdcLycLyCoincidenceInterruptEnabled && cpu.lyCompare == y)))
                     {
-                        x80.lcdcInterruptRequested = true;
+                        cpu.lcdcInterruptRequested = true;
                     }
                     ExecuteProcessor(800);
-                    x80.lcdcMode = LcdcModeType.TransferingData;
+                    cpu.lcdcMode = LcdcModeType.TransferingData;
                     ExecuteProcessor(1720);
-                    x80.lcdcMode = LcdcModeType.HBlank;
-                    if (x80.lcdcInterruptEnabled && x80.lcdcHBlankInterruptEnabled)
+                    cpu.lcdcMode = LcdcModeType.HBlank;
+                    if (cpu.lcdcInterruptEnabled && cpu.lcdcHBlankInterruptEnabled)
                     {
-                        x80.lcdcInterruptRequested = true;
+                        cpu.lcdcInterruptRequested = true;
                     }
                     ExecuteProcessor(2040);
                     AddTicksPerScanLine();
                 }
             }
 
-            x80.lcdcMode = LcdcModeType.VBlank;
-            if (x80.vBlankInterruptEnabled)
+            cpu.lcdcMode = LcdcModeType.VBlank;
+            if (cpu.vBlankInterruptEnabled)
             {
-                x80.vBlankInterruptRequested = true;
+                cpu.vBlankInterruptRequested = true;
             }
-            if (x80.lcdcInterruptEnabled && x80.lcdcVBlankInterruptEnabled)
+            if (cpu.lcdcInterruptEnabled && cpu.lcdcVBlankInterruptEnabled)
             {
-                x80.lcdcInterruptRequested = true;
+                cpu.lcdcInterruptRequested = true;
             }
             for (int y = 144; y <= 153; y++)
             {
-                x80.ly = y;
-                if (x80.lcdcInterruptEnabled && x80.lcdcLycLyCoincidenceInterruptEnabled
-                    && x80.lyCompare == y)
+                cpu.ly = y;
+                if (cpu.lcdcInterruptEnabled && cpu.lcdcLycLyCoincidenceInterruptEnabled
+                    && cpu.lyCompare == y)
                 {
-                    x80.lcdcInterruptRequested = true;
+                    cpu.lcdcInterruptRequested = true;
                 }
                 ExecuteProcessor(4560);
                 AddTicksPerScanLine();
@@ -343,7 +334,7 @@ namespace GameBot.Emulator
 
         private void AddTicksPerScanLine()
         {
-            switch (x80.timerFrequency)
+            switch (cpu.timerFrequency)
             {
                 case TimerFrequencyType.hz4096:
                     scanLineTicks += 0.44329004329004329004329004329004;
@@ -361,17 +352,17 @@ namespace GameBot.Emulator
             while (scanLineTicks >= 1.0)
             {
                 scanLineTicks -= 1.0;
-                if (x80.timerCounter == 0xFF)
+                if (cpu.timerCounter == 0xFF)
                 {
-                    x80.timerCounter = x80.timerModulo;
-                    if (x80.lcdcInterruptEnabled && x80.timerOverflowInterruptEnabled)
+                    cpu.timerCounter = cpu.timerModulo;
+                    if (cpu.lcdcInterruptEnabled && cpu.timerOverflowInterruptEnabled)
                     {
-                        x80.timerOverflowInterruptRequested = true;
+                        cpu.timerOverflowInterruptRequested = true;
                     }
                 }
                 else
                 {
-                    x80.timerCounter++;
+                    cpu.timerCounter++;
                 }
             }
         }
@@ -380,112 +371,67 @@ namespace GameBot.Emulator
         {
             do
             {
-                x80.Step();
-                if (x80.halted)
+                cpu.Step();
+                if (cpu.halted)
                 {
-                    x80.ticks = ((maxTicks - x80.ticks) & 0x03);
+                    cpu.ticks = ((maxTicks - cpu.ticks) & 0x03);
                     return;
                 }
-            } while (x80.ticks < maxTicks);
-            x80.ticks -= maxTicks;
+            } while (cpu.ticks < maxTicks);
+            cpu.ticks -= maxTicks;
         }
 
-        private void RenderFrame(Graphics g)
+        private void RenderFrame()
         {
-            g.DrawImage(bitmap, 0, 0, WIDTH, HEIGHT);
+            graphics.DrawImage(Display, 0, 0, DisplayWidth, DisplayHeight);
         }
-
-        private void Init(Graphics g)
+        
+        public void Execute(TimeSpan time)
         {
-            graphics = g;
-
-            // init image
-            for (int i = 0; i < pixels.Length; i++)
+            int frames = (int)(time.TotalSeconds * FramesPerSecond);
+            Execute(frames);
+        }
+        
+        private void Execute(int frames)
+        {
+            if (frames > 0)
             {
-                pixels[i] = 0xFF000000;
-            }
-            GCHandle handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
-            IntPtr pointer = Marshal.UnsafeAddrOfPinnedArrayElement(pixels, 0);
-            bitmap = new Bitmap(160, 144, 160 * 4, PixelFormat.Format32bppPArgb, pointer);
-
-            // start loop
-            stopwatch.Start();
-            nextFrameStart = stopwatch.ElapsedTicks;
-            Running = true;
-        }
-
-        public void Init(string output)
-        {
-            this.output = output;
-
-            Bitmap bitmap = new Bitmap(160, 144);
-
-            Graphics g = Graphics.FromImage(bitmap);
-            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-            g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-
-            Init(g);
-        }
-
-        public void Run(Action callback)
-        {
-            if (x80 == null || !Running)
-            {
-                return;
-            }
-            PeekMsg msg;
-            while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
-            {
-                int updates = 0;
-                bool updateBitmap = true;
-                do
+                for (int i = 0; i < frames - 1; i++)
                 {
-                    if (callback != null)
-                    {
-                        callback();
-                    }
-
-                    UpdateModel(updateBitmap);
-                    updateBitmap = false;
-                    nextFrameStart += TICKS_PER_FRAME;
-                } while (nextFrameStart < stopwatch.ElapsedTicks && ++updates < MAX_FRAMES_SKIPPED);
-                RenderFrame(graphics);
-                bitmap.Save(output);
-                long remainingTicks = nextFrameStart - stopwatch.ElapsedTicks;
-                if (remainingTicks > 0)
-                {
-                    Thread.Sleep((int)(1000 * remainingTicks / FREQUENCY));
+                    UpdateModel(false);
                 }
-                else if (updates == MAX_FRAMES_SKIPPED)
-                {
-                    nextFrameStart = stopwatch.ElapsedTicks;
-                }
+                UpdateModel(true);
+                RenderFrame();
             }
         }
 
-        public void KeyDown(Keys key)
+        public void KeyPressed(Buttons button)
         {
-            x80.KeyChanged(key, true);
+            if (Running)
+            {
+                cpu.KeyChanged(button, true);
+            }
         }
 
-        public void KeyUp(Keys key)
+        public void KeyReleased(Buttons button)
         {
-            x80.KeyChanged(key, false);
+            if (Running)
+            {
+                cpu.KeyChanged(button, false);
+            }
         }
 
-        public void Open(string filename)
+        public void KeyTyped(Buttons button)
         {
-            RomLoader romLoader = new RomLoader();
-            game = romLoader.Load(filename);
-            x80 = new X80();
-            x80.cartridge = game.cartridge;
-            x80.PowerUp();
-        }
+            if (Running)
+            {
+                KeyPressed(button);
+                Execute(5);
+                KeyReleased(button);
+                Execute(1);
 
-        public string GetCatridgeInfo()
-        {
-            return game.ToString();
+                RenderFrame();
+            }
         }
     }
 }

@@ -19,6 +19,7 @@
  * 
  */
 
+using GameBot.Core;
 using System;
 
 namespace GameBot.Emulator
@@ -3379,32 +3380,32 @@ namespace GameBot.Emulator
             return 0;
         }
 
-        public void KeyChanged(Keys keyCode, bool pressed)
+        public void KeyChanged(Buttons keyCode, bool pressed)
         {
             switch (keyCode)
             {
-                case Keys.D:
+                case Buttons.B:
                     bButtonPressed = pressed;
                     break;
-                case Keys.F:
+                case Buttons.A:
                     aButtonPressed = pressed;
                     break;
-                case Keys.Enter:
+                case Buttons.Start:
                     startButtonPressed = pressed;
                     break;
-                case Keys.Shift:
+                case Buttons.Select:
                     selectButtonPressed = pressed;
                     break;
-                case Keys.Up:
+                case Buttons.Up:
                     upKeyPressed = pressed;
                     break;
-                case Keys.Down:
+                case Buttons.Down:
                     downKeyPressed = pressed;
                     break;
-                case Keys.Left:
+                case Buttons.Left:
                     leftKeyPressed = pressed;
                     break;
-                case Keys.Right:
+                case Buttons.Right:
                     rightKeyPressed = pressed;
                     break;
             }
@@ -3417,8 +3418,7 @@ namespace GameBot.Emulator
 
         public override string ToString()
         {
-            return String.Format(
-                "PC={8:X} A={0:X} B={1:X} C={2:X} D={3:X} E={4:X} H={5:X} L={6:X} halted={7} SP={9:X} FZ={10} FH={11} FC={12} FN={13} IV={14} IL={15} IK={16} IT={17} INT={18} scrollX={19} scrollY={20} ly={21} lyCompare={22} LHIE={23} LYIE={24} LOIE={25}",
+            return string.Format("PC={8:X} A={0:X} B={1:X} C={2:X} D={3:X} E={4:X} H={5:X} L={6:X} halted={7} SP={9:X} FZ={10} FH={11} FC={12} FN={13} IV={14} IL={15} IK={16} IT={17} INT={18} scrollX={19} scrollY={20} ly={21} lyCompare={22} LHIE={23} LYIE={24} LOIE={25}",
                 A, B, C, D, E, H, L, halted, PC, SP, FZ, FH, FC, FN, vBlankInterruptEnabled, lcdcInterruptEnabled, keyPressedInterruptEnabled,
                 timerOverflowInterruptEnabled, interruptsEnabled, scrollX, scrollY, ly, lyCompare,
                 lcdcHBlankInterruptEnabled, lcdcLycLyCoincidenceInterruptEnabled, lcdcOamInterruptEnabled);
@@ -3426,8 +3426,7 @@ namespace GameBot.Emulator
 
         public void CheckForBadState()
         {
-            if (A > 0xFF || A < 0 || B > 0xFF || B < 0 || C > 0xFF || C < 0 || D > 0xFF || D < 0
-                || E > 0xFF || E < 0 || H > 0xFF || H < 0 || SP > 0xFFFF || SP < 0 || PC > 0xFFFF || PC < 0)
+            if (A > 0xFF || A < 0 || B > 0xFF || B < 0 || C > 0xFF || C < 0 || D > 0xFF || D < 0 || E > 0xFF || E < 0 || H > 0xFF || H < 0 || SP > 0xFFFF || SP < 0 || PC > 0xFFFF || PC < 0)
             {
                 throw new Exception(ToString());
             }
@@ -3435,7 +3434,6 @@ namespace GameBot.Emulator
 
         public void UpdateSpriteTiles()
         {
-
             for (int i = 0; i < 256; i++)
             {
                 if (spriteTileInvalidated[i] || invalidateAllSpriteTilesRequest)
@@ -3471,7 +3469,6 @@ namespace GameBot.Emulator
 
         public void UpdateWindow()
         {
-
             int tileMapAddress = windowTileMapDisplaySelect ? 0x1C00 : 0x1800;
 
             if (backgroundAndWindowTileDataSelect)

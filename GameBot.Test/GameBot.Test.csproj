@@ -30,8 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.0.5813.39031, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.0.1\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SimpleInjector, Version=3.1.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.3.1.2\lib\net45\SimpleInjector.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -45,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmulatorTests.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -56,14 +61,22 @@
       <Project>{290c4c98-1bd9-46f1-af52-5ddea956f146}</Project>
       <Name>GameBot.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GameBot.Emulator\GameBot.Emulator.csproj">
+      <Project>{99dd5df9-be92-4704-83e6-36554b296a90}</Project>
+      <Name>GameBot.Emulator</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GameBot.Game.Tetris\GameBot.Game.Tetris.csproj">
       <Project>{f2a4ec65-2edc-4edc-810d-0f755243e289}</Project>
       <Name>GameBot.Game.Tetris</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GameBot.Robot\GameBot.Robot.csproj">
+      <Project>{a889b0a7-c49b-4688-a8be-81a23c0d7421}</Project>
+      <Name>GameBot.Robot</Name>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Core\" />
-    <Folder Include="Tetris\" />
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

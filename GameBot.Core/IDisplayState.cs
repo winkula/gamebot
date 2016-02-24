@@ -9,9 +9,8 @@ namespace GameBot.Core
     public interface IDisplayState
     {
         byte[] GetPixels();
-
         byte GetPixel(int x, int y);
-
+        byte[] GetTile(int x, int y);
         TimeSpan GetTimestamp();
     }
 }
