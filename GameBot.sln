@@ -13,6 +13,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Game.Tetris", "Game
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Test", "GameBot.Test\GameBot.Test.csproj", "{3215B6C9-D709-4786-B90C-B8772967FE7C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{DBA13D83-0209-46AB-B5F1-C854BE8C950A}"
+	ProjectSection(SolutionItems) = preProject
+		Documents\first_idea.jpg = Documents\first_idea.jpg
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Roms", "Roms", "{A0DC8FE0-EAC8-4033-9FFE-56A694F0C4CD}"
+	ProjectSection(SolutionItems) = preProject
+		Roms\tetris.gb = Roms\tetris.gb
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
