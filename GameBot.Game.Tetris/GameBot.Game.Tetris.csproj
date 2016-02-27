@@ -40,10 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TetrisAgent.cs" />
     <Compile Include="TetrisDecider.cs" />
     <Compile Include="TetrisGameState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TetrisGameStateExtractor.cs" />
+    <Compile Include="TetrisExtractor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameBot.Core\GameBot.Core.csproj">

@@ -1,19 +1,15 @@
 ﻿using NUnit.Framework;
 using GameBot.Core;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using GameBot.Core.ImageProcessing;
 using GameBot.Game.Tetris;
-using GameBot.Core.Extractors;
 using SimpleInjector;
-using GameBot.Robot;
 using System.Reflection;
+using GameBot.Core.Data;
+using GameBot.Robot.Actors;
+using System.Linq;
 
 namespace GameBot.Test
 {
@@ -23,26 +19,34 @@ namespace GameBot.Test
         [Test]
         public void DependencyInjection()
         {
-            // set up dependency injection container
+            // 1. Set up dependency injection container
             var container = new Container();
 
             // 2. Configure the container (register)
-            container.Register<IImageProcessor, DefaultImageProcessor>();
-            container.Register<ICommandController, DefaultCommandController>();
-
-            //container.Register<IGameStateExtractor<TetrisGameState>, TetrisGameStateExtractor>();
-            //container.Register<IDecider<TetrisGameState>, TetrisDecider>();
+            container.Register<IQuantizer, Quantizer>();
+            container.Register<IExecuter, Executer>();
 
             var assemblies = new[] { "GameBot.Game.Tetris" };
             foreach (var assemblyName in assemblies)
             {
                 var assembly = Assembly.Load(assemblyName);
-                container.Register(typeof(IGameStateExtractor<>), new[] { assembly });
+                container.Register(typeof(IExtractor<>), new[] { assembly });
                 container.Register(typeof(IDecider<>), new[] { assembly });
+                container.RegisterCollection(typeof(IAgent), assembly);
+                container.RegisterCollection(typeof(IGameState), assembly);
             }
-            
+
             // 3. Optionally verify the container's configuration.
             container.Verify();
+
+            Assert.NotNull(container.GetInstance<IQuantizer>());
+            Assert.NotNull(container.GetInstance<IExecuter>());
+            Assert.NotNull(container.GetInstance<IExtractor<TetrisGameState>>());
+            Assert.NotNull(container.GetInstance<IDecider<TetrisGameState>>());
+            Assert.NotNull(container.GetAllInstances<IAgent>());
+            Assert.NotNull(container.GetAllInstances<IGameState>());
+            Assert.AreEqual(1, container.GetAllInstances<IAgent>().ToList().Count);
+            Assert.AreEqual(1, container.GetAllInstances<IGameState>().ToList().Count);
         }
 
         public void Process(Container container)
@@ -53,20 +57,20 @@ namespace GameBot.Test
             Image image = DownloadImage(url);
 
             // process image and get display data
-            IImageProcessor imageProcessor = container.GetInstance<IImageProcessor>();
-            IDisplayState display = imageProcessor.Process(image);
+            IQuantizer imageProcessor = container.GetInstance<IQuantizer>();
+            IScreenshot screenshot = imageProcessor.Quantize(image);
 
             // extract game state
-            IGameStateExtractor<TetrisGameState> extractor = container.GetInstance<IGameStateExtractor<TetrisGameState>>();
-            TetrisGameState gameState = extractor.Extract(display);
+            IExtractor<TetrisGameState> extractor = container.GetInstance<IExtractor<TetrisGameState>>();
+            TetrisGameState gameState = extractor.Extract(screenshot);
 
             // decide which commands to press
             IDecider<TetrisGameState> decider = container.GetInstance<IDecider<TetrisGameState>>();
-            ICommand command = decider.Decide(gameState);
+            ICommands commands = decider.Decide(gameState);
 
             // give commands to command controller (output)
-            ICommandController commandController = container.GetInstance<ICommandController>();
-            commandController.Execute(command);
+            IExecuter commandController = container.GetInstance<IExecuter>();
+            commandController.Execute(commands);
         }
 
         /// <summary>

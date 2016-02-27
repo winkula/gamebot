@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Emulator", "GameBot.Emulator\GameBot.Emulator.csproj", "{99DD5DF9-BE92-4704-83E6-36554B296A90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Emulation", "GameBot.Emulation\GameBot.Emulation.csproj", "{99DD5DF9-BE92-4704-83E6-36554B296A90}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Core", "GameBot.Core\GameBot.Core.csproj", "{290C4C98-1BD9-46F1-AF52-5DDEA956F146}"
 EndProject
@@ -21,6 +21,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Roms", "Roms", "{A0DC8FE0-EAC8-4033-9FFE-56A694F0C4CD}"
 	ProjectSection(SolutionItems) = preProject
 		Roms\tetris.gb = Roms\tetris.gb
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Screenshots", "Screenshots", "{E0A43A0F-42AB-477B-B844-D61E5D13E692}"
+	ProjectSection(SolutionItems) = preProject
+		Screenshots\tetris_credits.png = Screenshots\tetris_credits.png
+		Screenshots\tetris_menu.png = Screenshots\tetris_menu.png
+		Screenshots\tetris_menu_atype.png = Screenshots\tetris_menu_atype.png
+		Screenshots\tetris_play_1.png = Screenshots\tetris_play_1.png
+		Screenshots\tetris_start.png = Screenshots\tetris_start.png
 	EndProjectSection
 EndProject
 Global
