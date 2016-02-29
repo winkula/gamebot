@@ -42,7 +42,7 @@ namespace GameBot.Test
         [Test]
         public void ConstructorImage()
         {
-            var image = Image.FromFile(@"../../../Screenshots/tetris_start.png");
+            var image = Image.FromFile("Screenshots/tetris_start.png");
             Assert.NotNull(image);
             
             var width = image.Width;
