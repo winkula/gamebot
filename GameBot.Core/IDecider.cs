@@ -19,7 +19,8 @@ namespace GameBot.Core
         /// Decides, which commands to press on the device for a given game state.
         /// </summary>
         /// <param name="gameState">The game state.</param>
+        /// <param name="context">The context of the game state.</param>
         /// <returns>A collection of commands to execute on the device.</returns>
-        ICommands Decide(T gameState);
+        ICommands Decide(T gameState, IContext<T> context);
     }
 }

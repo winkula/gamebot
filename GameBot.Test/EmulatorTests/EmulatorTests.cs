@@ -25,7 +25,7 @@ namespace GameBot.Test
             list.Add(Button.Down);
 
             var loader = new RomLoader();
-            var game = loader.Load(@"../../../Roms/tetris.gb");
+            var game = loader.Load(@"../../../Roms/battleship.gb");
 
             var emulator = new Emulator();
             emulator.Load(game);

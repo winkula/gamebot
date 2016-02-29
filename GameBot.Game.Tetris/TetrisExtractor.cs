@@ -6,7 +6,7 @@ namespace GameBot.Game.Tetris
 {
     public class TetrisExtractor : IExtractor<TetrisGameState>
     {
-        public TetrisGameState Extract(IScreenshot input)
+        public TetrisGameState Extract(IScreenshot screenshot, IContext<TetrisGameState> context)
         {
             throw new NotImplementedException();
         }

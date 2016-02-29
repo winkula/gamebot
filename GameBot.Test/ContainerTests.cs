@@ -61,12 +61,13 @@ namespace GameBot.Test
             IScreenshot screenshot = imageProcessor.Quantize(image);
 
             // extract game state
+            IContext<TetrisGameState> context = new Context<TetrisGameState>();
             IExtractor<TetrisGameState> extractor = container.GetInstance<IExtractor<TetrisGameState>>();
-            TetrisGameState gameState = extractor.Extract(screenshot);
+            TetrisGameState gameState = extractor.Extract(screenshot, context);
 
             // decide which commands to press
             IDecider<TetrisGameState> decider = container.GetInstance<IDecider<TetrisGameState>>();
-            ICommands commands = decider.Decide(gameState);
+            ICommands commands = decider.Decide(gameState, context);
 
             // give commands to command controller (output)
             IExecuter commandController = container.GetInstance<IExecuter>();

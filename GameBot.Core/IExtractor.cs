@@ -19,7 +19,8 @@ namespace GameBot.Core
         /// Extracts the game state from a screenshot.
         /// </summary>
         /// <param name="screenshot">Screenshot of the device's display.</param>
+        /// <param name="context">The context of the game state.</param>
         /// <returns>The extracted game state.</returns>
-        T Extract(IScreenshot screenshot);
+        T Extract(IScreenshot screenshot, IContext<T> context);
     }
 }
