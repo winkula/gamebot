@@ -124,6 +124,10 @@
       <HintPath>..\packages\EmguCV.3.0.0\lib\net451\Emgu.Util.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SimpleInjector, Version=3.1.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.3.1.2\lib\net45\SimpleInjector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -141,6 +145,11 @@
   <ItemGroup>
     <Compile Include="Actors\Executer.cs" />
     <Compile Include="Engine.cs" />
+    <Compile Include="IEngine.cs" />
+    <Compile Include="Rendering\EmguRenderer.cs" />
+    <Compile Include="Rendering\IRenderer.cs" />
+    <Compile Include="Sensors\Camera.cs" />
+    <Compile Include="Sensors\ICamera.cs" />
     <Compile Include="Sensors\Quantizer.cs" />
     <Compile Include="Launcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -150,6 +159,14 @@
     <ProjectReference Include="..\GameBot.Core\GameBot.Core.csproj">
       <Project>{290c4c98-1bd9-46f1-af52-5ddea956f146}</Project>
       <Name>GameBot.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameBot.Emulation\GameBot.Emulation.csproj">
+      <Project>{99dd5df9-be92-4704-83e6-36554b296a90}</Project>
+      <Name>GameBot.Emulation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameBot.Game.Tetris\GameBot.Game.Tetris.csproj">
+      <Project>{f2a4ec65-2edc-4edc-810d-0f755243e289}</Project>
+      <Name>GameBot.Game.Tetris</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

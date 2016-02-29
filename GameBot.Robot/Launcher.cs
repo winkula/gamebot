@@ -1,16 +1,12 @@
 ﻿using GameBot.Core;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using GameBot.Core.Data;
+using GameBot.Core.ImageProcessing;
+using GameBot.Emulation;
+using GameBot.Game.Tetris;
+using GameBot.Robot.Actors;
+using GameBot.Robot.Rendering;
+using SimpleInjector;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
-using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-using System.Threading;
 
 namespace GameBot.Robot
 {
@@ -18,44 +14,43 @@ namespace GameBot.Robot
     {
         static void Main(string[] args)
         {
-            String win1 = "Test Window"; //The name of the window
-            CvInvoke.NamedWindow(win1); //Create the window using the specific name
+            var container = BuildContainer();
 
-            Mat img = new Mat(200, 400, DepthType.Cv8U, 3); //Create a 3 channel image of 400x200
-            img.SetTo(new Bgr(255, 77, 0).MCvScalar); // set it to Blue color
+            var engine = container.GetInstance<IEngine>();
+            engine.Run();
+        }
 
-            int key = 0;
-            for (int i = 0; i < 10 * 60; i++)
-            {
-                img.SetTo(new Bgr(255, 77, 0).MCvScalar); // set it to Blue color
-                //Draw "Hello, world." on the image using the specific font
-                CvInvoke.PutText(
-                   img,
-                   string.Format("Frame = {0}. Key = {1}", i, key),
-                   new System.Drawing.Point(10, 80),
-                   FontFace.HersheySimplex,
-                   1.0,
-                   new Bgr(key % 255, key % (6*255), key % (2)).MCvScalar);
+        static Container BuildContainer()
+        {
+            var container = new Container();
 
-
-                CvInvoke.Imshow(win1, img); //Show the image
-                //Thread.Sleep(300);
-                var pressedKey = CvInvoke.WaitKey(1);  //Wait for the key pressing event
-                if (pressedKey != -1)
-                {
-                    key = pressedKey;
-                }
-            }
-            CvInvoke.WaitKey(0);  //Wait for the key pressing event
-            CvInvoke.DestroyWindow(win1); //Destroy the window if key is pressed
-
-            // async emulator example:
-            /*
-            var emulator = new GameBoyEmulatorAsync();
+            container.Register<Emulator>();
             
-            emulator.Init(@"C:\Users\Winkler\Desktop\gb_output.bmp");
-            emulator.Open(@"C:\Users\Winkler\Documents\Visual Studio 2015\Projects\GameBot\Roms\tetris.gb");
-            emulator.Run(() => { });*/
+            container.Register<IEngine, Engine>();
+
+            container.Register<IQuantizer, Quantizer>();
+            container.Register<IExecuter, Executer>();
+
+            container.Register<IRenderer, EmguRenderer>();
+
+            var assemblies = new[] { "GameBot.Game.Tetris" };
+            foreach (var assemblyName in assemblies)
+            {
+                var assembly = Assembly.Load(assemblyName);
+                container.Register(typeof(IExtractor<>), new[] { assembly });
+                container.Register(typeof(IDecider<>), new[] { assembly });
+
+                //container.RegisterCollection(typeof(IAgent), assembly);
+                //container.RegisterCollection(typeof(IGameState), assembly);
+
+                // TODO: find dynamic in assembly
+                container.Register<IAgent, TetrisAgent>();
+                container.Register<IGameState, TetrisGameState>();
+            }
+
+            container.Verify();
+
+            return container;
         }
     }
 }

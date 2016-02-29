@@ -393,6 +393,11 @@ namespace GameBot.Emulation
             graphics.DrawImage(Display, 0, 0, DisplayWidth, DisplayHeight);
         }
 
+        public void ExecuteFrame()
+        {
+            Execute(1);
+        }
+
         public void Execute(TimeSpan time)
         {
             int frames = (int)(time.TotalSeconds * FramesPerSecond);
