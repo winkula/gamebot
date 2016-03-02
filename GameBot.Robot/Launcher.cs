@@ -2,11 +2,12 @@
 using GameBot.Core.Data;
 using GameBot.Core.ImageProcessing;
 using GameBot.Emulation;
-using GameBot.Game.Tetris;
 using GameBot.Robot.Actors;
 using GameBot.Robot.Rendering;
 using SimpleInjector;
 using System.Reflection;
+using System.Linq;
+using System;
 
 namespace GameBot.Robot
 {
@@ -25,7 +26,7 @@ namespace GameBot.Robot
             var container = new Container();
 
             container.Register<Emulator>();
-            
+
             container.Register<IEngine, Engine>();
 
             container.Register<IQuantizer, Quantizer>();
@@ -33,24 +34,29 @@ namespace GameBot.Robot
 
             container.Register<IRenderer, EmguRenderer>();
 
-            var assemblies = new[] { "GameBot.Game.Tetris" };
-            foreach (var assemblyName in assemblies)
-            {
-                var assembly = Assembly.Load(assemblyName);
-                container.Register(typeof(IExtractor<>), new[] { assembly });
-                container.Register(typeof(IDecider<>), new[] { assembly });
+            // TODO: remove build-dependency to the "GameBot.Game.Tetris" and load
+            // the assembly with "LoadFrom"
+            //var assembly = Assembly.LoadFrom(@"C:\Users\Winkler\Documents\visual studio 2015\Projects\GameBot\GameBot.Game.Tetris\bin\x86\Debug\GameBot.Game.Tetris.dll"); //Assembly.Load(assemblyName);
 
-                //container.RegisterCollection(typeof(IAgent), assembly);
-                //container.RegisterCollection(typeof(IGameState), assembly);
+            var assemblyName = "GameBot.Game.Tetris";
+            var assembly = Assembly.Load(assemblyName);
 
-                // TODO: find dynamic in assembly
-                container.Register<IAgent, TetrisAgent>();
-                container.Register<IGameState, TetrisGameState>();
-            }
+            container.Register(typeof(IGameState), GetSingleImplementation<IGameState>(assembly));
+            container.Register(typeof(IAgent), GetSingleImplementation<IAgent>(assembly));
+            container.Register(typeof(IExtractor<>), new[] { assembly });
+            container.Register(typeof(IDecider<>), new[] { assembly });
 
             container.Verify();
 
             return container;
+        }
+
+        static Type GetSingleImplementation<T>(Assembly assembly)
+        {
+            return assembly
+                .GetExportedTypes()
+                .Where(x => x.GetInterfaces().Any(y => y == typeof(T)))
+                .Single();
         }
     }
 }

@@ -8,6 +8,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Core", "GameBot.Core\GameBot.Core.csproj", "{290C4C98-1BD9-46F1-AF52-5DDEA956F146}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Robot", "GameBot.Robot\GameBot.Robot.csproj", "{A889B0A7-C49B-4688-A8BE-81A23C0D7421}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F2A4EC65-2EDC-4EDC-810D-0F755243E289} = {F2A4EC65-2EDC-4EDC-810D-0F755243E289}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Game.Tetris", "GameBot.Game.Tetris\GameBot.Game.Tetris.csproj", "{F2A4EC65-2EDC-4EDC-810D-0F755243E289}"
 EndProject
