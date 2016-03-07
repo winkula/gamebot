@@ -33,6 +33,50 @@ namespace GameBot.Test
             RunSimulation(emulator, list, false);
         }
 
+        [Test]
+        public void Rotate()
+        {
+            var list = new List<dynamic>();
+            list.Add(new { Button = Button.Start, Duration = 2.5 });
+            list.Add(new { Button = Button.Start, Duration = 2.7 });
+            list.Add(new { Button = Button.Start, Duration = 0 });
+            for (int i = 0; i < 4; i++)
+            {
+                list.Add(new { Button = Button.A, Duration = 0 });
+            }
+
+            var loader = new RomLoader();
+            var game = loader.Load("Roms/tetris.gb");
+
+            var emulator = new Emulator();
+            emulator.Load(game);
+
+            RunSimulation(emulator, list, false);
+        }
+
+        private void RunSimulation(Emulator emulator, IEnumerable<dynamic> inputs, bool saveImages)
+        {
+            if (saveImages)
+            {
+                Clean();
+                SaveImage(emulator.Display);
+            }
+
+            emulator.Execute(TimeSpan.FromSeconds(3));
+
+            if (saveImages) { SaveImage(emulator.Display); }
+
+            foreach (var input in inputs)
+            {
+                emulator.KeyTyped(input.Button);
+                emulator.Execute(TimeSpan.FromSeconds(input.Duration));
+                if (saveImages)
+                {
+                    SaveImage(emulator.Display);
+                }
+            }
+        }
+
         private void RunSimulation(Emulator emulator, IEnumerable<Button> buttons, bool saveImages)
         {
             if (saveImages)

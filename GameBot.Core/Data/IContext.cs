@@ -14,7 +14,7 @@ namespace GameBot.Core
     /// Represents the context of a specific Game Boy game state.
     /// </summary>
     /// <typeparam name="T">Type of the game state.</typeparam>
-    public interface IContext<T> : IContext where T : IGameState, new()
+    public interface IContext<T> : IContext where T : class, IGameState
     {
         /// <summary>
         /// Gets the last few extracted game states.

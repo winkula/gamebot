@@ -1,6 +1,5 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Data;
-using GameBot.Core.ImageProcessing;
 using GameBot.Emulation;
 using GameBot.Robot.Actors;
 using GameBot.Robot.Rendering;
@@ -8,12 +7,41 @@ using SimpleInjector;
 using System.Reflection;
 using System.Linq;
 using System;
+using GameBot.Robot.Sensors;
+using System.Drawing;
+using System.Diagnostics;
 
 namespace GameBot.Robot
 {
     public class Launcher
     {
         static void Main(string[] args)
+        {
+            try
+            {
+                Quantizer();
+                // Engine();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+        }
+
+        static void Quantizer()
+        {
+            var quantizer = new Quantizer(true);
+            var image = Image.FromFile("Images/tetris_1.jpg");
+
+            var w = new Stopwatch();
+            w.Start();
+            var screenshot = quantizer.Quantize(image);
+            w.Stop();
+
+            Debug.WriteLine("Elapsed miliseconds: " + w.ElapsedMilliseconds);
+        }
+
+        static void Engine()
         {
             var container = BuildContainer();
 
@@ -41,7 +69,7 @@ namespace GameBot.Robot
             var assemblyName = "GameBot.Game.Tetris";
             var assembly = Assembly.Load(assemblyName);
 
-            container.Register(typeof(IGameState), GetSingleImplementation<IGameState>(assembly));
+            //container.Register(typeof(IGameState), GetSingleImplementation<IGameState>(assembly));
             container.Register(typeof(IAgent), GetSingleImplementation<IAgent>(assembly));
             container.Register(typeof(IExtractor<>), new[] { assembly });
             container.Register(typeof(IDecider<>), new[] { assembly });

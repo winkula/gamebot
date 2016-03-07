@@ -8,7 +8,14 @@ namespace GameBot.Game.Tetris
     {
         public ICommands Decide(TetrisGameState gameState, IContext<TetrisGameState> context)
         {
-            throw new NotImplementedException();
+            var commands = new Commands();
+
+            if (new Random().NextDouble() < 0.01)
+            {
+                commands.AddCommand(new Command(Button.Start, new TimeSpan(), new TimeSpan()));
+            }
+
+            return commands;
         }
     }
 }

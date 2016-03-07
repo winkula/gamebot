@@ -23,7 +23,7 @@ namespace GameBot.Test
         }
 
         [Test]
-        public void ConstructorEmpty()
+        public void ConstructorDefault()
         {
             ICommands commands = new Commands();
 

@@ -13,7 +13,7 @@ namespace GameBot.Core
     /// Represents a extractor for a specific type of game states from a screenshot of a Game Boy display.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IExtractor<T> : IExtractor where T : IGameState, new()
+    public interface IExtractor<T> : IExtractor where T : class, IGameState
     {
         /// <summary>
         /// Extracts the game state from a screenshot.

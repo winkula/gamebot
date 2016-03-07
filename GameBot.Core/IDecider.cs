@@ -13,7 +13,7 @@ namespace GameBot.Core
     /// Represents a decider for a specific Game Boy game.
     /// </summary>
     /// <typeparam name="T">Type of the game state.</typeparam>
-    public interface IDecider<T> : IDecider where T : IGameState, new()
+    public interface IDecider<T> : IDecider where T : class, IGameState
     {
         /// <summary>
         /// Decides, which commands to press on the device for a given game state.

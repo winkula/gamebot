@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoreTests\DepthFirstSearchTests.cs" />
     <Compile Include="CoreTests\ContextTests.cs" />
     <Compile Include="CoreTests\ScreenshotTests.cs" />
     <Compile Include="CoreTests\CommandsTests.cs" />
@@ -97,6 +98,10 @@
     <Compile Include="EmulatorTests\EmulatorTests.cs" />
     <Compile Include="ContainerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RobotTests\QuantizerTests.cs" />
+    <Compile Include="TetrisTests\PieceTests.cs" />
+    <Compile Include="TetrisTests\BoardTests.cs" />
+    <Compile Include="TetrisTests\TetrominoTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -128,7 +133,9 @@
     <PreBuildEvent>mkdir "$(TargetDir)Roms"
 xcopy /y "$(SolutionDir)Roms" "$(TargetDir)Roms"
 mkdir "$(TargetDir)Screenshots"
-xcopy /y "$(SolutionDir)Screenshots" "$(TargetDir)Screenshots"</PreBuildEvent>
+xcopy /y "$(SolutionDir)Screenshots" "$(TargetDir)Screenshots"
+mkdir "$(TargetDir)Images"
+xcopy /y "$(SolutionDir)Images" "$(TargetDir)Images"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

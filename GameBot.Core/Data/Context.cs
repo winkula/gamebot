@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GameBot.Core
 {
-    public class Context<T> : IContext<T> where T : IGameState, new()
+    public class Context<T> : IContext<T> where T : class, IGameState
     {
         public ICollection<T> GameStates { get; private set; }
 

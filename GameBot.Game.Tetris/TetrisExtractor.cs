@@ -8,7 +8,9 @@ namespace GameBot.Game.Tetris
     {
         public TetrisGameState Extract(IScreenshot screenshot, IContext<TetrisGameState> context)
         {
-            throw new NotImplementedException();
+            var gameState = new TetrisGameState();
+
+            return gameState;
         }
     }
 }

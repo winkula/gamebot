@@ -3,13 +3,13 @@ using GameBot.Core;
 using System.Drawing;
 using System.IO;
 using System.Net;
-using GameBot.Core.ImageProcessing;
 using GameBot.Game.Tetris;
 using SimpleInjector;
 using System.Reflection;
 using GameBot.Core.Data;
 using GameBot.Robot.Actors;
 using System.Linq;
+using GameBot.Robot.Sensors;
 
 namespace GameBot.Test
 {
@@ -33,7 +33,7 @@ namespace GameBot.Test
                 container.Register(typeof(IExtractor<>), new[] { assembly });
                 container.Register(typeof(IDecider<>), new[] { assembly });
                 container.RegisterCollection(typeof(IAgent), assembly);
-                container.RegisterCollection(typeof(IGameState), assembly);
+                //container.RegisterCollection(typeof(IGameState), assembly);
             }
 
             // 3. Optionally verify the container's configuration.
@@ -44,9 +44,9 @@ namespace GameBot.Test
             Assert.NotNull(container.GetInstance<IExtractor<TetrisGameState>>());
             Assert.NotNull(container.GetInstance<IDecider<TetrisGameState>>());
             Assert.NotNull(container.GetAllInstances<IAgent>());
-            Assert.NotNull(container.GetAllInstances<IGameState>());
+            //Assert.NotNull(container.GetAllInstances<IGameState>());
             Assert.AreEqual(1, container.GetAllInstances<IAgent>().ToList().Count);
-            Assert.AreEqual(1, container.GetAllInstances<IGameState>().ToList().Count);
+            //Assert.AreEqual(1, container.GetAllInstances<IGameState>().ToList().Count);
         }
 
         public void Process(Container container)
@@ -57,8 +57,8 @@ namespace GameBot.Test
             Image image = DownloadImage(url);
 
             // process image and get display data
-            IQuantizer imageProcessor = container.GetInstance<IQuantizer>();
-            IScreenshot screenshot = imageProcessor.Quantize(image);
+            IQuantizer quantizer = container.GetInstance<IQuantizer>();
+            IScreenshot screenshot = quantizer.Quantize(image);
 
             // extract game state
             IContext<TetrisGameState> context = new Context<TetrisGameState>();

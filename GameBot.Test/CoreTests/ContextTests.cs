@@ -2,6 +2,7 @@
 using GameBot.Core.Data;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 
 namespace GameBot.Test
 {

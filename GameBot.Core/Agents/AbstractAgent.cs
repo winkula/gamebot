@@ -2,7 +2,7 @@
 
 namespace GameBot.Core.Agents
 {
-    public abstract class AbstractAgent<T> : IAgent where T : IGameState, new()
+    public abstract class AbstractAgent<T> : IAgent where T : class, IGameState
     {
         protected readonly IExtractor<T> Extractor;
         protected readonly IDecider<T> Decider;
