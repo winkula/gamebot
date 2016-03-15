@@ -39,6 +39,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{CA14972B-6D28-420A-81A2-AC24B3D70F78}"
 	ProjectSection(SolutionItems) = preProject
 		Images\tetris_1.jpg = Images\tetris_1.jpg
+		Images\tetris_2.jpg = Images\tetris_2.jpg
 	EndProjectSection
 EndProject
 Global
