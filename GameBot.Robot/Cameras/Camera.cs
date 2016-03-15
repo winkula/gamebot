@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GameBot.Core;
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GameBot.Robot.Sensors
+namespace GameBot.Robot.Cameras
 {
     public class Camera : ICamera
     {
         public Image Capture()
         {
+            // TODO: implement
             throw new NotImplementedException();
         }
     }

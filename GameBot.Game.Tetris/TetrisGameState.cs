@@ -1,11 +1,9 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
-using System;
-using System.Collections.Generic;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisGameState : AbstractGameState
+    public class TetrisGameState
     {
         public Board Board { get; private set; }
         public Piece Piece { get; private set; }

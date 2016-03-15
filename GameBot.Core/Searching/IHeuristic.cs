@@ -6,7 +6,7 @@ namespace GameBot.Core.Searching
     {
     }
 
-    public interface IHeuristic<T> : IHeuristic where T : class, IGameState
+    public interface IHeuristic<T> : IHeuristic
     {
         double Score(T gameState);
     }

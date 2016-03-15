@@ -7,36 +7,47 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 
-namespace GameBot.Robot.Sensors
+namespace GameBot.Robot.Quantizers
 {
-    public class Quantizer : IQuantizer
+    public class BinarizeQuantizer : IQuantizer
     {
         private bool adjust;
+        private int c = 5;
+        private int block = 13;
+        private float[,] keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
 
-        public Quantizer(bool adjust = false)
+        public BinarizeQuantizer(bool adjust = false)
         {
             this.adjust = adjust;
         }
 
-        public IScreenshot Quantize(Image image)
+        public BinarizeQuantizer(bool adjust, float[,] keypoints, int c, int block)
+        {
+            this.adjust = adjust;
+            this.keypoints = keypoints;
+            this.c = c;
+            this.block = block;
+        }
+
+        public IScreenshot Quantize(Image image, TimeSpan timestamp)
         {
             Image<Gray, Byte> sourceImage = new Image<Gray, Byte>(new Bitmap(image));
             Image<Gray, Byte> destImage = new Image<Gray, Byte>(160, 144);
             Image<Gray, Byte> destImageBin = new Image<Gray, Byte>(160, 144);
 
-            Matrix<float> sourceMat = new Matrix<float>(new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } });
+            Matrix<float> sourceMat = new Matrix<float>(keypoints);
             Matrix<float> destMat = new Matrix<float>(new float[,] { { 0, 0 }, { 160, 0 }, { 0, 144 }, { 160, 144 } });
             
             var transform = CvInvoke.GetPerspectiveTransform(sourceMat, destMat);
             CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(160, 144), Inter.Linear, Warp.Default);
-
+           
             int c = 5;
             int block = 13;
-            CvInvoke.AdaptiveThreshold(destImage, destImageBin, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, block, c);
+            CvInvoke.Threshold(destImage, destImageBin, c, 255, ThresholdType.Binary);
             
             while (adjust)
             {
-                CvInvoke.AdaptiveThreshold(destImage, destImageBin, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, block, c);
+                CvInvoke.Threshold(destImage, destImageBin, c, 255, ThresholdType.Binary);
 
                 CvInvoke.NamedWindow("Test");
                 CvInvoke.Imshow("Test", destImageBin);

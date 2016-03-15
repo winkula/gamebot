@@ -4,7 +4,7 @@ using Emgu.CV.Structure;
 using System;
 using System.Drawing;
 
-namespace GameBot.Robot.Rendering
+namespace GameBot.Robot.Renderers
 {
     public class EmguRenderer : IRenderer
     {

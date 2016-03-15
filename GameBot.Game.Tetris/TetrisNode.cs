@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisNode : Node
+    public class TetrisNode : Node<TetrisGameState>
     {
         private readonly IHeuristic<TetrisGameState> heuristic = new TetrisHeuristic(); // TODO: inject?
         private readonly TetrisGameState gameState;

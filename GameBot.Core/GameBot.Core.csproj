@@ -88,7 +88,8 @@
     <Compile Include="Data\IContext.cs" />
     <Compile Include="Data\IGameState.cs" />
     <Compile Include="Data\Screenshot.cs" />
-    <Compile Include="IExecuter.cs" />
+    <Compile Include="ICamera.cs" />
+    <Compile Include="IExecutor.cs" />
     <Compile Include="IDecider.cs" />
     <Compile Include="IAgent.cs" />
     <Compile Include="IExtractor.cs" />

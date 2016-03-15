@@ -1,4 +1,5 @@
 ﻿using GameBot.Core.Data;
+using System;
 using System.Drawing;
 
 namespace GameBot.Core
@@ -12,7 +13,8 @@ namespace GameBot.Core
         /// Quantizes a noisy image or photo of the device's display.
         /// </summary>
         /// <param name="image">Noisy image or photos of the device's display.</param>
+        /// <param name="timestamp">The current timestamp.</param>
         /// <returns>A quantized screenshot of the device's display.</returns>
-        IScreenshot Quantize(Image image);
+        IScreenshot Quantize(Image image, TimeSpan timestamp);
     }
 }

@@ -4,9 +4,9 @@ using GameBot.Core.Data;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisDecider : IDecider<TetrisGameState>
+    public class TetrisDecider : IDecider<TetrisGameStateFull>
     {
-        public ICommands Decide(TetrisGameState gameState, IContext<TetrisGameState> context)
+        public ICommands Decide(TetrisGameStateFull gameState, IContext<TetrisGameStateFull> context)
         {
             var commands = new Commands();
 

@@ -1,11 +1,8 @@
-﻿using GameBot.Core.Data;
-using GameBot.Core.Searching;
+﻿using GameBot.Core.Searching;
 using GameBot.Game.Tetris;
 using GameBot.Game.Tetris.Data;
 using NUnit.Framework;
-using System;
 using System.Diagnostics;
-using System.Linq;
 
 namespace GameBot.Test
 {

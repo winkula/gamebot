@@ -4,11 +4,11 @@ using GameBot.Core.Data;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisExtractor : IExtractor<TetrisGameState>
+    public class TetrisExtractor : IExtractor<TetrisGameStateFull>
     {
-        public TetrisGameState Extract(IScreenshot screenshot, IContext<TetrisGameState> context)
+        public TetrisGameStateFull Extract(IScreenshot screenshot, IContext<TetrisGameStateFull> context)
         {
-            var gameState = new TetrisGameState();
+            var gameState = new TetrisGameStateFull();
 
             return gameState;
         }

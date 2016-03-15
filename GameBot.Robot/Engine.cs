@@ -1,13 +1,9 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Emulation;
-using GameBot.Robot.Rendering;
+using GameBot.Robot.Renderers;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 
 namespace GameBot.Robot
 {
@@ -15,17 +11,26 @@ namespace GameBot.Robot
     {
         private TimeSpan time;
 
-        private readonly List<ICommand> commandQueue;
-        private readonly IRenderer renderer;
+        private readonly ICamera camera;
+        private readonly IQuantizer quantizer;
         private readonly IAgent agent;
+        private readonly IExecutor executor;
+
+        private readonly IRenderer renderer;
+
         private readonly Emulator emulator;
 
-        public Engine(IRenderer renderer, IAgent agent, Emulator emulator)
+        public Engine(ICamera camera, IQuantizer quantizer, IAgent agent, IExecutor executor, IRenderer renderer, Emulator emulator)
         {
-            this.commandQueue = new List<ICommand>();
             this.time = TimeSpan.Zero;
-            this.renderer = renderer;
+
+            this.camera = camera;
+            this.quantizer = quantizer;
             this.agent = agent;
+            this.executor = executor;
+
+            this.renderer = renderer;
+
             this.emulator = emulator;
 
             var loader = new RomLoader();
@@ -42,66 +47,49 @@ namespace GameBot.Robot
 
             renderer.End();
         }
-        
+
         protected void Loop()
         {
             var start = DateTime.Now;
             while (true)
             {
                 time = DateTime.Now - start;
-                try
-                {
-                    Update();
-                    Render();
-                }
-                catch (TimeoutException)
-                {
-                    break;
-                }
+
+                if (IsEscape) break;
+
+                Update();
+                Render();
             }
         }
 
         protected void Update()
         {
-            ReadKey();
-            //Play();
+            // get image as photo of the gameboy screen (input)
+            Image image = camera.Capture();
 
-            emulator.ExecuteFrame();
+            // process image and get display data
+            IScreenshot screenshot = quantizer.Quantize(image, time);
+
+            // handle input to the agent which
+            //  - extracts the game state
+            //  - decides which commands to press
+            ICommands commands = agent.Act(screenshot);
+
+            // give commands to command controller (output)
+            executor.Execute(commands, time);
         }
 
-        private void ReadKey()
+        private bool IsEscape
         {
-            var key = renderer.Key(1);
-            if (key.HasValue)
+            get
             {
-                if (key == 27) throw new TimeoutException(); // Escape
-                if (key == 2490368) emulator.KeyTyped(Button.Up);
-                if (key == 2621440) emulator.KeyTyped(Button.Down);
-                if (key == 2424832) emulator.KeyTyped(Button.Left);
-                if (key == 2555904) emulator.KeyTyped(Button.Right);
-                if (key == 121) emulator.KeyTyped(Button.A);
-                if (key == 120) emulator.KeyTyped(Button.B);
-                if (key == 13) emulator.KeyTyped(Button.Start);
-                if (key == 32) emulator.KeyTyped(Button.Select);
+                var key = renderer.Key(1);
+                if (key.HasValue)
+                {
+                    if (key == 27) return true; // Escape
+                }
+                return false;
             }
-        }
-
-        private void Play()
-        {
-            ICommands commands = agent.Act(new Screenshot(emulator.Display, time));
-
-            foreach (var command in commands)
-            {
-                commandQueue.Add(command);
-            }
-
-            var toExecute = commandQueue.Where(x => x.Timestamp <= time).ToList();
-            foreach (var ex in toExecute)
-            {
-                emulator.KeyTyped(ex.Button);
-            }
-            
-            commandQueue.RemoveAll(x => x.Timestamp <= time);
         }
 
         protected void Render()

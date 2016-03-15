@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 namespace GameBot.Core.Searching
 {
-    public abstract class Node : INode
+    public abstract class Node<T> : INode
     {
-        public IGameState GameState { get; private set; }
+        public T GameState { get; private set; }
         public INode Parent { get; private set; }
         public int Depth { get; private set; }
 
-        public Node(IGameState gameState, INode parent)
+        public Node(T gameState, INode parent)
         {
             if (gameState == null) throw new ArgumentNullException("state is null");
 
@@ -23,7 +23,7 @@ namespace GameBot.Core.Searching
             }
         }
         
-        public Node(IGameState gameState) : this(gameState, null)
+        public Node(T gameState) : this(gameState, null)
         {            
         }
         
