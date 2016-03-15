@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameBot.Core.Data;
 using GameBot.Emulation;
+using System.Diagnostics;
 
 namespace GameBot.Robot.Executors
 {
@@ -36,9 +37,11 @@ namespace GameBot.Robot.Executors
         private void Execute(TimeSpan timestamp)
         {
             var pending = queue.Where(x => x.Timestamp <= timestamp).ToList();
-            foreach (var ex in pending)
+            var buttons = pending.Select(x => x.Button).ToList();
+            foreach (var button in buttons)
             {
-                emulator.KeyTyped(ex.Button);
+                Debug.WriteLine("Press key " + button);
+                emulator.KeyTyped(button);
             }
 
             queue.RemoveAll(x => x.Timestamp <= timestamp);

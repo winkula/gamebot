@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,9 +19,24 @@ namespace GameBot.Core.Data
             this.commands = commands.ToList();
         }
 
-        public void AddCommand(ICommand command)
+        public void Add(ICommand command)
         {
             commands.Add(command);
+        }
+
+        public void Add(Button button, double timestamp)
+        {
+            commands.Add(new Command(button, timestamp.ToTimestamp()));
+        }
+
+        public void Add(Button button, TimeSpan timestamp)
+        {
+            commands.Add(new Command(button, timestamp));
+        }
+
+        public void Add(Button button, TimeSpan timestamp, TimeSpan duration)
+        {
+            commands.Add(new Command(button, timestamp, duration));
         }
 
         public IEnumerator<ICommand> GetEnumerator()

@@ -413,8 +413,8 @@ namespace GameBot.Emulation
                     UpdateModel(false);
                 }
                 UpdateModel(true);
-                RenderFrame();
             }
+            RenderFrame();
         }
 
         public void KeyPressed(Button button)
@@ -440,9 +440,7 @@ namespace GameBot.Emulation
                 KeyPressed(button);
                 Execute(5);
                 KeyReleased(button);
-                Execute(1);
-
-                RenderFrame();
+                Execute(5);
             }
         }
     }
