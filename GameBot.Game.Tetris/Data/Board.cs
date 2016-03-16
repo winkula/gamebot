@@ -7,6 +7,9 @@ using System.Drawing;
 
 namespace GameBot.Game.Tetris.Data
 {
+    /// <summary>
+    /// The origin of the board is bottom left.
+    /// </summary>
     public class Board
     {
         public static Point Origin = new Point(4, 16);
@@ -14,52 +17,12 @@ namespace GameBot.Game.Tetris.Data
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int Pieces { get; private set; }
+
+        /// <summary>
+        /// true means occupied, false means free.
+        /// </summary>
         private bool[] squares;
-
-        public int AggregateHeight
-        {
-            get
-            {
-                int aggregateHeight = 0;
-                for (int x = 0; x < Width; x++)
-                {
-                    for (int y = Height - 1; y >= 0; y--)
-                    {
-                        if (GetSquare(x, y))
-                        {
-                            aggregateHeight += (y + 1);
-                            break;
-                        }
-                    }
-                }
-                return aggregateHeight;
-            }
-        }
-
-        public int CompleteLines
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public int Holes
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public int Bumpiness
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
+        
         public Board(int width, int height)
         {
             Width = width;
@@ -81,13 +44,13 @@ namespace GameBot.Game.Tetris.Data
             Array.Copy(board.squares, squares, board.squares.Length);
         }
 
-        public bool GetSquare(int x, int y)
+        public bool IsOccupied(int x, int y)
         {
             if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
             return squares[Width * y + x];
         }
 
-        public void SetSquare(int x, int y)
+        public void Occupy(int x, int y)
         {
             if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
             squares[Width * y + x] = true;
@@ -110,7 +73,7 @@ namespace GameBot.Game.Tetris.Data
                     {
                         int positionX = Origin.X + piece.X + x;
                         int positionY = Origin.Y + piece.Y + y;
-                        SetSquare(positionX, positionY);
+                        Occupy(positionX, positionY);
 
                         // TODO: remove
                         /*
@@ -137,7 +100,7 @@ namespace GameBot.Game.Tetris.Data
                         int positionY = Origin.Y + piece.Y + y;
                         if (SquareExists(positionX, positionY))
                         {
-                            if (GetSquare(positionX, positionY))
+                            if (IsOccupied(positionX, positionY))
                             {
                                 // intersection with already placed pieces
                                 return true;
@@ -165,7 +128,7 @@ namespace GameBot.Game.Tetris.Data
                 builder.Append("|");
                 for (int x = 0; x < Width; x++)
                 {
-                    if (GetSquare(x, y)) builder.Append('#');
+                    if (IsOccupied(x, y)) builder.Append('#');
                     else builder.Append(' ');
                 }
                 builder.AppendLine("|");

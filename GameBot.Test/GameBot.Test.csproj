@@ -149,6 +149,7 @@
     <Compile Include="ContainerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RobotTests\QuantizerTests.cs" />
+    <Compile Include="TetrisTests\HeuristicTests.cs" />
     <Compile Include="TetrisTests\PieceTests.cs" />
     <Compile Include="TetrisTests\BoardTests.cs" />
     <Compile Include="TetrisTests\TetrominoTests.cs" />
