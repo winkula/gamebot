@@ -10,7 +10,7 @@ namespace GameBot.Test
     [TestFixture]
     class QuantizerTests
     {
-        private const bool adjust = false;
+        private const bool adjust = true;
 
         [Test]
         public void UnwarpAndAdaptiveThreshold1()
@@ -18,7 +18,7 @@ namespace GameBot.Test
             string path = "Images/tetris_1.jpg";
             var keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
 
-            TestQuantizer(path, new TestQuantizer(adjust, keypoints, 5, 13));
+            TestQuantizer(path, new AdaptiveThresholdQuantizer(adjust, keypoints, 5, 13));
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace GameBot.Test
             string path = "Images/tetris_1.jpg";
             var keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
 
-            TestQuantizer(path, new BinarizeQuantizer(adjust, keypoints, 135));
+            TestQuantizer(path, new ThresholdQuantizer(adjust, keypoints, 135));
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace GameBot.Test
             string path = "Images/tetris_2.jpg";
             var keypoints = new float[,] { { 321, 1677 }, { 2484, 1722 }, { 48, 3740 }, { 2826, 3758 } };
 
-            TestQuantizer(path, new TestQuantizer(adjust, keypoints, 5, 13));
+            TestQuantizer(path, new AdaptiveThresholdQuantizer(adjust, keypoints, 5, 13));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace GameBot.Test
             string path = "Images/tetris_2.jpg";
             var keypoints = new float[,] { { 321, 1677 }, { 2484, 1722 }, { 48, 3740 }, { 2826, 3758 } };
 
-            TestQuantizer(path, new BinarizeQuantizer(adjust, keypoints, 50));
+            TestQuantizer(path, new ThresholdQuantizer(adjust, keypoints, 50));
         }
 
         private void TestQuantizer(string path, IQuantizer quantizer)

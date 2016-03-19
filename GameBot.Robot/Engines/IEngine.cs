@@ -1,4 +1,4 @@
-﻿namespace GameBot.Robot
+﻿namespace GameBot.Robot.Engines
 {
     public interface IEngine
     {

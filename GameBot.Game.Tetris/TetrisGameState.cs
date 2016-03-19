@@ -54,7 +54,7 @@ namespace GameBot.Game.Tetris
             {
                 Piece.Fall();
             }
-            Board.Apply(Piece);
+            Board.Place(Piece);
             Piece = null;
 
             if (NextPiece != null)

@@ -5,7 +5,7 @@ using GameBot.Robot.Renderers;
 using System;
 using System.Drawing;
 
-namespace GameBot.Robot
+namespace GameBot.Robot.Engines
 {
     public class Engine : IEngine
     {

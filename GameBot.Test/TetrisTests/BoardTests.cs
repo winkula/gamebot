@@ -33,14 +33,14 @@ namespace GameBot.Test
         }
 
         [Test]
-        public void Apply()
+        public void Place()
         {
             var board = new Board();
             var piece = new Piece(Tetromino.I);
-            //piece.RotateClockwise();
+            piece.Rotate();
 
-            board.Apply(piece);
-
+            board.Place(piece);
+                    
             Assert.AreEqual(10, board.Width);
             Assert.AreEqual(19, board.Height);
 

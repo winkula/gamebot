@@ -1,4 +1,6 @@
-﻿namespace GameBot.Robot
+﻿using GameBot.Robot.Engines;
+
+namespace GameBot.Robot
 {
     public class Launcher
     {

@@ -61,26 +61,17 @@ namespace GameBot.Game.Tetris.Data
             return x >= 0 && x < Width && y >= 0 && y < Height;
         }
 
-        public void Apply(Piece piece)
+        public void Place(Piece piece)
         {
-            // TODO: use constants
             for (int x = Piece.CoordinateMin; x <= Piece.CoordinateMax; x++)
             {
                 for (int y = Piece.CoordinateMin; y <= Piece.CoordinateMax; y++)
                 {
-                    bool occupied = piece.IsSquareOccupied(x, y);
-                    if (occupied)
+                    if (piece.IsSquareOccupied(x, y))
                     {
                         int positionX = Origin.X + piece.X + x;
                         int positionY = Origin.Y + piece.Y + y;
                         Occupy(positionX, positionY);
-
-                        // TODO: remove
-                        /*
-                        if (SquareExists(positionX, positionY))
-                        {
-                            SetSquare(positionX, positionY);
-                        }*/
                     }
                 }
             }

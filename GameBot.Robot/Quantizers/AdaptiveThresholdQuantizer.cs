@@ -9,18 +9,18 @@ using System.Drawing;
 
 namespace GameBot.Robot.Quantizers
 {
-    public class TestQuantizer : IQuantizer
+    public class AdaptiveThresholdQuantizer : IQuantizer
     {
         private bool adjust;
         private int c = 5;
         private int block = 13;
         private float[,] keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
 
-        public TestQuantizer()
+        public AdaptiveThresholdQuantizer()
         {
         }
 
-        public TestQuantizer(bool adjust, float[,] keypoints, int c, int block)
+        public AdaptiveThresholdQuantizer(bool adjust, float[,] keypoints, int c, int block)
         {
             this.adjust = adjust;
             this.keypoints = keypoints;
@@ -55,6 +55,8 @@ namespace GameBot.Robot.Quantizers
                 if (key == 2424832) c++;
                 if (key == 2555904) c--;
                 if (key == 27) break;
+
+                if (block < 3) block = 3;
 
                 Debug.WriteLine("Constant: " + c);
                 Debug.WriteLine("Block size: " + block);

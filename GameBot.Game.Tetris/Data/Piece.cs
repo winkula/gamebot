@@ -56,6 +56,13 @@ namespace GameBot.Game.Tetris.Data
             return this;
         }
 
+        public Piece Fall(int times)
+        {
+            if (times < 0) throw new ArgumentException(nameof(times));
+            Y -= times;
+            return this;
+        }
+
         public Piece Left()
         {
             X--;

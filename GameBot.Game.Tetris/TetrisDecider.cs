@@ -16,22 +16,23 @@ namespace GameBot.Game.Tetris
                 // Initialization
 
                 // skip credits
-                commands.Add(Button.Start, 4.0);
+                double waitingTime = 5.0;
+                
                 // start 1 player mode
-                commands.Add(Button.Start, 4.5);
+                commands.Add(Button.Start, waitingTime);
 
                 // choose a-type
-                commands.Add(Button.A, 5.0);
+                commands.Add(Button.A, waitingTime + 1);
 
                 // switch music off
-                commands.Add(Button.Right, 6.0);
-                commands.Add(Button.Down, 6.5);
-                commands.Add(Button.A, 7.0);
+                commands.Add(Button.Right, waitingTime + 2);
+                commands.Add(Button.Down, waitingTime + 2.5);
+                commands.Add(Button.A, waitingTime + 3);
 
                 // choose level
-                commands.Add(Button.Right, 8.0);
-                commands.Add(Button.Right, 8.5);
-                commands.Add(Button.A, 9.0);
+                commands.Add(Button.Right, waitingTime + 4);
+                commands.Add(Button.Right, waitingTime + 4.5);
+                commands.Add(Button.A, waitingTime + 5);
 
                 started = true;
             }

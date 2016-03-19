@@ -9,17 +9,17 @@ using System.Drawing;
 
 namespace GameBot.Robot.Quantizers
 {
-    public class BinarizeQuantizer : IQuantizer
+    public class ThresholdQuantizer : IQuantizer
     {
         private bool adjust;
         private int threshold = 50;
         private float[,] keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
 
-        public BinarizeQuantizer()
+        public ThresholdQuantizer()
         {
         }
 
-        public BinarizeQuantizer(bool adjust, float[,] keypoints, int threshold)
+        public ThresholdQuantizer(bool adjust, float[,] keypoints, int threshold)
         {
             this.adjust = adjust;
             this.keypoints = keypoints;
@@ -51,7 +51,7 @@ namespace GameBot.Robot.Quantizers
                 if (key == 2424832) threshold++;
                 if (key == 2555904) threshold--;
                 if (key == 27) break;
-
+                
                 Debug.WriteLine("Threshold: " + threshold);
             }
 

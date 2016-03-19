@@ -2,6 +2,7 @@
 using GameBot.Core.Data;
 using GameBot.Emulation;
 using GameBot.Robot.Cameras;
+using GameBot.Robot.Engines;
 using GameBot.Robot.Executors;
 using GameBot.Robot.Quantizers;
 using GameBot.Robot.Renderers;
