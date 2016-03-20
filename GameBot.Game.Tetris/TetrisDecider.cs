@@ -100,16 +100,15 @@ namespace GameBot.Game.Tetris
                             commands.Add(Button.Right);
                         }
                     }
-
-                    /*
+                                        
                     if (fall > 0)
                     {
-                        for (int i = 0; i < fall; i++)
+                        int slip = fall / 2 + 1;
+                        for (int i = 0; i < fall - slip; i++)
                         {
                             commands.Add(Button.Down);
                         }
-                    }
-                    */
+                    }                    
 
                     lastGameState = gameState.State;
                 }

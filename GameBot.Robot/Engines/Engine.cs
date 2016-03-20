@@ -51,11 +51,9 @@ namespace GameBot.Robot.Engines
         protected void Loop()
         {
             var start = DateTime.Now;
-            while (true)
+            while (!IsEscape)
             {
                 time = DateTime.Now - start;
-
-                if (IsEscape) break;
 
                 Update();
                 Render();
@@ -74,9 +72,18 @@ namespace GameBot.Robot.Engines
             //  - extracts the game state
             //  - decides which commands to press
             ICommands commands = agent.Act(screenshot);
-
+            
             // give commands to command controller (output)
             executor.Execute(commands, time);
+            
+            /*
+            foreach (var command in commands)
+            {
+                // give command to command controller (output)
+                executor.Execute(command, time);
+
+                //Render();
+            }*/
         }
 
         private bool IsEscape

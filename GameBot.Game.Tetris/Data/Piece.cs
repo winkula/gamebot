@@ -15,8 +15,8 @@ namespace GameBot.Game.Tetris.Data
             0x00F0, 0x2222, 0x00F0, 0x2222, // I
             0x0063, 0x0132, 0x0063, 0x0132, // S
             0x0036, 0x0231, 0x0036, 0x0231, // Z
-            0x0322, 0x0470, 0x0226, 0x0071, // L
-            0x0223, 0x0170, 0x0622, 0x0074, // J
+            0x0071, 0x0322, 0x0470, 0x0226, // L
+            0x0074, 0x0223, 0x0170, 0x0622, // J
             0x0072, 0x0232, 0x0270, 0x0262  // T
         };
 
@@ -47,15 +47,15 @@ namespace GameBot.Game.Tetris.Data
             pieceDataLookup[14] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(1, 3), new Point(2, 3) };
             pieceDataLookup[15] = new List<Point> { new Point(1, 1), new Point(0, 2), new Point(1, 2), new Point(0, 3) };
             // L
-            pieceDataLookup[16] = new List<Point> { new Point(0, 1), new Point(1, 1), new Point(1, 2), new Point(1, 3) };
-            pieceDataLookup[17] = new List<Point> { new Point(2, 1), new Point(0, 2), new Point(1, 2), new Point(2, 2) };
-            pieceDataLookup[18] = new List<Point> { new Point(1, 1), new Point(1, 2), new Point(1, 3), new Point(2, 3) };
-            pieceDataLookup[19] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(2, 2), new Point(0, 3) };
+            pieceDataLookup[16] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(2, 2), new Point(0, 3) };
+            pieceDataLookup[17] = new List<Point> { new Point(0, 1), new Point(1, 1), new Point(1, 2), new Point(1, 3) };
+            pieceDataLookup[18] = new List<Point> { new Point(2, 1), new Point(0, 2), new Point(1, 2), new Point(2, 2) };
+            pieceDataLookup[19] = new List<Point> { new Point(1, 1), new Point(1, 2), new Point(1, 3), new Point(2, 3) };
             // J
-            pieceDataLookup[20] = new List<Point> { new Point(1, 1), new Point(1, 2), new Point(0, 3), new Point(1, 3) };
-            pieceDataLookup[21] = new List<Point> { new Point(0, 1), new Point(0, 2), new Point(1, 2), new Point(2, 2) };
-            pieceDataLookup[22] = new List<Point> { new Point(1, 1), new Point(2, 1), new Point(1, 2), new Point(1, 3) };
-            pieceDataLookup[23] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(2, 2), new Point(2, 3) };
+            pieceDataLookup[20] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(2, 2), new Point(2, 3) };
+            pieceDataLookup[21] = new List<Point> { new Point(1, 1), new Point(1, 2), new Point(0, 3), new Point(1, 3) };
+            pieceDataLookup[22] = new List<Point> { new Point(0, 1), new Point(0, 2), new Point(1, 2), new Point(2, 2) };
+            pieceDataLookup[23] = new List<Point> { new Point(1, 1), new Point(2, 1), new Point(1, 2), new Point(1, 3) };
             // T
             pieceDataLookup[24] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(2, 2), new Point(1, 3) };
             pieceDataLookup[25] = new List<Point> { new Point(1, 1), new Point(0, 2), new Point(1, 2), new Point(1, 3) };

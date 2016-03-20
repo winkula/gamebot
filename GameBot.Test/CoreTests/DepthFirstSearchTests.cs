@@ -19,11 +19,13 @@ namespace GameBot.Test
             Assert.AreEqual(bound, search.Bound);
         }
 
-        [Test]
-        public void Search()
+        [TestCase(Tetromino.O, Tetromino.Z)]
+        [TestCase(Tetromino.I, Tetromino.I)]
+        [TestCase(Tetromino.T, Tetromino.S)]
+        public void Search(Tetromino current, Tetromino next)
         {
             var search = new DepthFirstSearch();            
-            var gameState = new TetrisGameState(Tetromino.L, Tetromino.Z);
+            var gameState = new TetrisGameState(current, next);
 
             var node = new TetrisNode(gameState);
             

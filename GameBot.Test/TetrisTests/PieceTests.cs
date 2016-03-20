@@ -149,51 +149,51 @@ namespace GameBot.Test
         })]
         [TestCase(Tetromino.L, new[] { 0 }, new[] {
             0,0,0,0,
+            0,0,0,0,
+            1,1,1,0,
+            1,0,0,0
+        })]
+        [TestCase(Tetromino.L, new[] { 1 }, new[] {
+            0,0,0,0,
             1,1,0,0,
             0,1,0,0,
             0,1,0,0
         })]
-        [TestCase(Tetromino.L, new[] { 1 }, new[] {
+        [TestCase(Tetromino.L, new[] { 2 }, new[] {
             0,0,0,0,
             0,0,1,0,
             1,1,1,0,
             0,0,0,0
         })]
-        [TestCase(Tetromino.L, new[] { 2 }, new[] {
+        [TestCase(Tetromino.L, new[] { 3 }, new[] {
             0,0,0,0,
             0,1,0,0,
             0,1,0,0,
             0,1,1,0
         })]
-        [TestCase(Tetromino.L, new[] { 3 }, new[] {
+        [TestCase(Tetromino.J, new[] { 0 }, new[] {
             0,0,0,0,
             0,0,0,0,
             1,1,1,0,
-            1,0,0,0
+            0,0,1,0
         })]
-        [TestCase(Tetromino.J, new[] { 0 }, new[] {
+        [TestCase(Tetromino.J, new[] { 1 }, new[] {
             0,0,0,0,
             0,1,0,0,
             0,1,0,0,
             1,1,0,0
         })]
-        [TestCase(Tetromino.J, new[] { 1 }, new[] {
+        [TestCase(Tetromino.J, new[] { 2 }, new[] {
             0,0,0,0,
             1,0,0,0,
             1,1,1,0,
             0,0,0,0
         })]
-        [TestCase(Tetromino.J, new[] { 2 }, new[] {
+        [TestCase(Tetromino.J, new[] { 3 }, new[] {
             0,0,0,0,
             0,1,1,0,
             0,1,0,0,
             0,1,0,0
-        })]
-        [TestCase(Tetromino.J, new[] { 3 }, new[] {
-            0,0,0,0,
-            0,0,0,0,
-            1,1,1,0,
-            0,0,1,0
         })]
         [TestCase(Tetromino.T, new[] { 0 }, new[] {
             0,0,0,0,

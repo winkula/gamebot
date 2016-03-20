@@ -50,7 +50,8 @@ namespace GameBot.Game.Tetris
             var board = new Board();
             for (int x = 0; x < 10; x++)
             {
-                for (int y = 0; y < 18; y++)
+                // TODO: extract whole board but subtract current piece
+                for (int y = 3; y < 18; y++)
                 {
                     int sum = screenshot.GetTile(BoardTileOrigin.X + x, BoardTileOrigin.Y + y).Sum();
                     if (TileThresholdReached(sum))

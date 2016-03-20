@@ -56,10 +56,10 @@ namespace GameBot.Test
 
             Assert.AreEqual(timestamp, screenshot.Timestamp);
 
-            Assert.AreEqual(0, screenshot.GetPixel(0, 0));
-            Assert.AreEqual(1, screenshot.GetPixel(7, 12));
-            Assert.AreEqual(2, screenshot.GetPixel(3, 9));
-            Assert.AreEqual(3, screenshot.GetPixel(3, 8));
+            Assert.AreEqual(3, screenshot.GetPixel(0, 0));
+            Assert.AreEqual(2, screenshot.GetPixel(7, 12));
+            Assert.AreEqual(1, screenshot.GetPixel(3, 9));
+            Assert.AreEqual(0, screenshot.GetPixel(3, 8));
         }
     }
 }
