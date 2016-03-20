@@ -8,6 +8,10 @@ namespace GameBot.Game.Tetris
 {
     public class TetrisNode : Node<TetrisGameState>
     {
+        public int Translation { get; set; }
+        public int Orientation { get; set; }
+        public int Fall { get; set; }
+
         private readonly IHeuristic<TetrisGameState> heuristic = new TetrisHeuristic(); // TODO: inject?
         private readonly TetrisGameState gameState;
 
@@ -40,10 +44,15 @@ namespace GameBot.Game.Tetris
                         var newPiece = new Piece(gameState.Piece.Tetromino, orientation, translation);
                         if (!gameState.Board.Intersects(newPiece))
                         {
-                            var successor = new TetrisGameState(gameState, newPiece);                            
-                            successor.Drop();
+                            var successor = new TetrisGameState(gameState, newPiece);
+                            var fall = successor.Drop();
 
-                            successors.Add(new TetrisNode(successor, this));
+                            var node = new TetrisNode(successor, this);
+                            node.Orientation = orientation;
+                            node.Translation = translation;
+                            node.Fall = fall;
+
+                            successors.Add(node);
                         }
                     }
                 }
@@ -54,7 +63,11 @@ namespace GameBot.Game.Tetris
 
         public override string ToString()
         {
-            return gameState.Board.ToString();
+            if (gameState != null && gameState.Board != null)
+            {
+                return gameState.Board.ToString();
+            }
+            return base.ToString();
         }
     }
 }

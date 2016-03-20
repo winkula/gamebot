@@ -34,6 +34,13 @@ namespace GameBot.Game.Tetris
             NextPiece = nextPiece;
         }
 
+        public TetrisGameState(Board board, Piece piece, Piece nextPiece)
+        {
+            Board = board;
+            Piece = piece;
+            NextPiece = nextPiece;
+        }
+
         public TetrisGameState(Tetromino tetromino, Tetromino nextTetromino) : this(new Piece(tetromino), new Piece(nextTetromino))
         {
         }
@@ -47,13 +54,16 @@ namespace GameBot.Game.Tetris
             get { return Board.Intersects(new Piece(Piece).Fall()); }
         }
 
-        public void Drop()
+        public int Drop()
         {
-            // TODO: prevent infinite loop!
-            while (!IsPieceLanded)
+            int fall = 0;
+
+            while (!IsPieceLanded && fall < Board.Height)
             {
                 Piece.Fall();
+                fall++;
             }
+
             Board.Place(Piece);
             Piece = null;
 
@@ -62,6 +72,29 @@ namespace GameBot.Game.Tetris
                 Piece = new Piece(NextPiece);
                 NextPiece = null;
             }
+
+            return fall;
+        }
+
+        public override int GetHashCode()
+        {
+            // TODO: implement
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (obj == this) return true;
+            TetrisGameState other = obj as TetrisGameState;
+            if (other != null)
+            {
+                return
+                    ((Board == null && other.Board == null) || Board.Equals(other.Board)) &&
+                    ((Piece == null && other.Piece == null) || Piece.Equals(other.Piece)) &&
+                    ((NextPiece == null && other.NextPiece == null) || NextPiece.Equals(other.NextPiece));
+            }
+            return false;
         }
     }
 }

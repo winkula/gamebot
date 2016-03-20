@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 
 namespace GameBot.Game.Tetris.Data
 {
@@ -17,6 +20,49 @@ namespace GameBot.Game.Tetris.Data
             0x0072, 0x0232, 0x0270, 0x0262  // T
         };
 
+        // coordinates of occupied tiles of all possible Tetromino and rotation possibilities
+        private readonly static IEnumerable<Point>[] pieceDataLookup;
+
+        static Piece()
+        {
+            pieceDataLookup = new IEnumerable<Point>[4 * 7];
+            // O
+            pieceDataLookup[0] = new List<Point> { new Point(1, 2), new Point(2, 2), new Point(1, 3), new Point(2, 3) };
+            pieceDataLookup[1] = new List<Point> { new Point(1, 2), new Point(2, 2), new Point(1, 3), new Point(2, 3) };
+            pieceDataLookup[2] = new List<Point> { new Point(1, 2), new Point(2, 2), new Point(1, 3), new Point(2, 3) };
+            pieceDataLookup[3] = new List<Point> { new Point(1, 2), new Point(2, 2), new Point(1, 3), new Point(2, 3) };
+            // I
+            pieceDataLookup[4] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(2, 2), new Point(3, 2) };
+            pieceDataLookup[5] = new List<Point> { new Point(1, 0), new Point(1, 1), new Point(1, 2), new Point(1, 3) };
+            pieceDataLookup[6] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(2, 2), new Point(3, 2) };
+            pieceDataLookup[7] = new List<Point> { new Point(1, 0), new Point(1, 1), new Point(1, 2), new Point(1, 3) };
+            // S
+            pieceDataLookup[8] = new List<Point> { new Point(1, 2), new Point(2, 2), new Point(0, 3), new Point(1, 3) };
+            pieceDataLookup[9] = new List<Point> { new Point(0, 1), new Point(0, 2), new Point(1, 2), new Point(1, 3) };
+            pieceDataLookup[10] = new List<Point> { new Point(1, 2), new Point(2, 2), new Point(0, 3), new Point(1, 3) };
+            pieceDataLookup[11] = new List<Point> { new Point(0, 1), new Point(0, 2), new Point(1, 2), new Point(1, 3) };
+            // Z
+            pieceDataLookup[12] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(1, 3), new Point(2, 3) };
+            pieceDataLookup[13] = new List<Point> { new Point(1, 1), new Point(0, 2), new Point(1, 2), new Point(0, 3) };
+            pieceDataLookup[14] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(1, 3), new Point(2, 3) };
+            pieceDataLookup[15] = new List<Point> { new Point(1, 1), new Point(0, 2), new Point(1, 2), new Point(0, 3) };
+            // L
+            pieceDataLookup[16] = new List<Point> { new Point(0, 1), new Point(1, 1), new Point(1, 2), new Point(1, 3) };
+            pieceDataLookup[17] = new List<Point> { new Point(2, 1), new Point(0, 2), new Point(1, 2), new Point(2, 2) };
+            pieceDataLookup[18] = new List<Point> { new Point(1, 1), new Point(1, 2), new Point(1, 3), new Point(2, 3) };
+            pieceDataLookup[19] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(2, 2), new Point(0, 3) };
+            // J
+            pieceDataLookup[20] = new List<Point> { new Point(1, 1), new Point(1, 2), new Point(0, 3), new Point(1, 3) };
+            pieceDataLookup[21] = new List<Point> { new Point(0, 1), new Point(0, 2), new Point(1, 2), new Point(2, 2) };
+            pieceDataLookup[22] = new List<Point> { new Point(1, 1), new Point(2, 1), new Point(1, 2), new Point(1, 3) };
+            pieceDataLookup[23] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(2, 2), new Point(2, 3) };
+            // T
+            pieceDataLookup[24] = new List<Point> { new Point(0, 2), new Point(1, 2), new Point(2, 2), new Point(1, 3) };
+            pieceDataLookup[25] = new List<Point> { new Point(1, 1), new Point(0, 2), new Point(1, 2), new Point(1, 3) };
+            pieceDataLookup[26] = new List<Point> { new Point(1, 1), new Point(0, 2), new Point(1, 2), new Point(2, 2) };
+            pieceDataLookup[27] = new List<Point> { new Point(1, 1), new Point(1, 2), new Point(2, 2), new Point(1, 3) };
+        }
+
         public Tetromino Tetromino { get; private set; }
         public int Orientation { get; private set; }
         public int X { get; private set; }
@@ -31,7 +77,7 @@ namespace GameBot.Game.Tetris.Data
             X = x;
             Y = y;
         }
-                
+
         public Piece(Piece piece) : this(piece.Tetromino, piece.Orientation, piece.X, piece.Y)
         {
         }
@@ -68,7 +114,7 @@ namespace GameBot.Game.Tetris.Data
             X--;
             return this;
         }
-        
+
         public Piece Right()
         {
             X++;
@@ -87,6 +133,50 @@ namespace GameBot.Game.Tetris.Data
                 return (matrix & mask) != 0;
             }
             return false;
+        }
+
+        public IEnumerable<Point> GetOccupiedSquares()
+        {
+            return pieceDataLookup[((int)Tetromino) * 4 + Orientation];
+        }
+
+        // TODO: make constructor, better performance without loops, direct lookup!
+        public static Piece FromMask(ushort mask)
+        {
+            for (int i = 0; i < 7 * 4; i++)
+            {
+                var piece = pieces[i];
+                if (mask == piece)
+                {
+                    var tetromino = (Tetromino)(i / 4);
+                    var orientation = i % 4;
+                    return new Piece(tetromino, orientation);
+                }
+            }
+            return null;
+        }
+
+        public override int GetHashCode()
+        {
+            // TODO: better hash code
+            return (int)Tetromino ^ Orientation ^ X ^ Y;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (obj == this) return true;
+            Piece other = obj as Piece;
+            if (other != null)
+            {
+                return Tetromino == other.Tetromino && Orientation == other.Orientation && X == other.X && Y == other.Y;
+            }
+            return false;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Piece({0}, o:{1}, x:{2}, y:{3})", Tetromino, Orientation, X, Y);
         }
     }
 }

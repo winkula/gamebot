@@ -108,10 +108,32 @@ namespace GameBot.Game.Tetris.Data
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            // TODO: implement
+            return base.GetHashCode();
+        }
+        
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (obj == this) return true;
+            Board other = obj as Board;
+            if (other != null)
+            {
+                // TODO: implement faster!
+                return 
+                    Width == other.Width && 
+                    Height == other.Height &&
+                    squares.SequenceEqual(other.squares);
+            }
+            return false;
+        }
+        
         public override string ToString()
         {
             var builder = new StringBuilder();
-            builder.AppendFormat("Pieces: {0}\n", Pieces);
+            builder.AppendFormat("Board(p:{0})\n", Pieces);
             builder.Append(" ");
             builder.AppendLine(new string('-', Width));
             for (int y = Height - 1; y >= 0; y--)

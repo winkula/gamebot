@@ -11,7 +11,7 @@ namespace GameBot.Test
         [Test]
         public void ConstructorPixels()
         {
-            var pixels = new byte[] {
+            var pixels = new int[] {
                 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 3, 0, 0, 0, 0, 0, 0,

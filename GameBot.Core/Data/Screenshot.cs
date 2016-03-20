@@ -5,12 +5,14 @@ namespace GameBot.Core.Data
 {
     public class Screenshot : IScreenshot
     {
-        public byte[] Pixels { get; private set; }
+        private const int TileSize = 8;
+
+        public int[] Pixels { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
         public TimeSpan Timestamp { get; private set; }
 
-        public Screenshot(byte[] pixels, int width, int height, TimeSpan timestamp)
+        public Screenshot(int[] pixels, int width, int height, TimeSpan timestamp)
         {
             Pixels = pixels;
             Width = width;
@@ -22,14 +24,15 @@ namespace GameBot.Core.Data
         {
             using (Bitmap bitmap = new Bitmap(image))
             {
-                Pixels = new byte[image.Width * image.Height];
+                Pixels = new int[image.Width * image.Height];
                 Width = image.Width;
                 Height = image.Height;
                 for (int y = 0; y < Height; y++)
                 {
                     for (int x = 0; x < Width; x++)
                     {
-                        byte value = (byte)(bitmap.GetPixel(x, y).GetBrightness() * 3.99);
+                        var color = bitmap.GetPixel(x, y);
+                        int value = QuantizePixelValue(color.GetBrightness());
                         SetPixel(x, y, value);
                     }
                 }
@@ -37,30 +40,29 @@ namespace GameBot.Core.Data
             Timestamp = timestamp;
         }
 
-        private byte QuantizePixelValue(float value)
+        private int QuantizePixelValue(float brightness)
         {
-            return (byte)(value * 3.99);
+            return (byte)((1 - brightness) * 3.99);
         }
 
-        public byte GetPixel(int x, int y)
+        public int GetPixel(int x, int y)
         {
             return Pixels[Width * y + x];
         }
 
-        private void SetPixel(int x, int y, byte value)
+        private void SetPixel(int x, int y, int value)
         {
             Pixels[Width * y + x] = value;
         }
 
-        public byte[] GetTile(int x, int y)
+        public int[] GetTile(int x, int y)
         {
-            const int size = 8;
-            var tile = new byte[size * size];
-            for (int yIn = 0; yIn < size; yIn++)
+            var tile = new int[TileSize * TileSize];
+            for (int yIn = 0; yIn < TileSize; yIn++)
             {
-                for (int xIn = 0; xIn < size; xIn++)
+                for (int xIn = 0; xIn < TileSize; xIn++)
                 {
-                    tile[size * yIn + xIn] = GetPixel(size * y + yIn, size * x + xIn);
+                    tile[TileSize * yIn + xIn] = GetPixel(TileSize * x + xIn, TileSize * y + yIn);
                 }
             }
             return tile;

@@ -24,6 +24,11 @@ namespace GameBot.Core.Data
             commands.Add(command);
         }
 
+        public void Add(Button button)
+        {
+            commands.Add(new Command(button));
+        }
+
         public void Add(Button button, double timestamp)
         {
             commands.Add(new Command(button, timestamp.ToTimestamp()));

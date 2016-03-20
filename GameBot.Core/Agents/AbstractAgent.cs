@@ -19,7 +19,7 @@ namespace GameBot.Core.Agents
         public ICommands Act(IScreenshot screenshot)
         {
             var gameState = Extractor.Extract(screenshot, Context);
-            Context.Add(gameState);
+            //Context.Add(gameState);
 
             var commands = Decider.Decide(gameState, Context);
             return commands;

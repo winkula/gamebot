@@ -4,13 +4,14 @@ namespace GameBot.Core.Data
 {
     /// <summary>
     /// Represents the display state of the Game Boy device. In other words a screenshot.
+    /// The origin of the coordinate system is top left.
     /// </summary>
     public interface IScreenshot
     {
         /// <summary>
         /// Gets the pixels of the screenshot row by row.
         /// </summary>
-        byte[] Pixels { get; }
+        int[] Pixels { get; }
 
         /// <summary>
         /// Gets the width of the screenshot.
@@ -30,7 +31,7 @@ namespace GameBot.Core.Data
         /// <summary>
         /// Gets one specific pixel of the screenshot.
         /// </summary>
-        byte GetPixel(int x, int y);
+        int GetPixel(int x, int y);
 
         /// <summary>
         /// Gets a tile, i.e. an 8 by 8 pixel sqare, of the screenshot.
@@ -38,6 +39,6 @@ namespace GameBot.Core.Data
         /// <param name="x">The x coordinate of the tile (from left).</param>
         /// <param name="y">The y coordinate of the tile (from top).</param>
         /// <returns>An array, representing the pixels of the tile row by row.</returns>
-        byte[] GetTile(int x, int y);
+        int[] GetTile(int x, int y);
     }
 }

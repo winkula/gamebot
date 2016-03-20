@@ -12,6 +12,8 @@ namespace GameBot.Test
     [TestFixture]
     class EmulatorTests
     {
+        private readonly bool saveImages = false;
+
         [Test]
         public void Simulate()
         {
@@ -30,7 +32,7 @@ namespace GameBot.Test
             var emulator = new Emulator();
             emulator.Load(game);
 
-            RunSimulation(emulator, list, false);
+            RunSimulation(emulator, list, saveImages);
         }
 
         [Test]
@@ -51,7 +53,7 @@ namespace GameBot.Test
             var emulator = new Emulator();
             emulator.Load(game);
 
-            RunSimulation(emulator, list, false);
+            RunSimulation(emulator, list, saveImages);
         }
 
         private void RunSimulation(Emulator emulator, IEnumerable<dynamic> inputs, bool saveImages)

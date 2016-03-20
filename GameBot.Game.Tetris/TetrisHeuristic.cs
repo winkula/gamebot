@@ -6,10 +6,17 @@ namespace GameBot.Game.Tetris
 {
     public class TetrisHeuristic : IHeuristic<TetrisGameState>
     {
+        // Heuristic from here: https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
         public double Score(TetrisGameState gameState)
         {
             var board = gameState.Board;
-            return 1.0 / AggregateHeight(board);
+
+            var a = AggregateHeight(board);
+            var c = CompleteLines(board);
+            var h = Holes(board);
+            var b = Bumpiness(board);
+
+            return -0.510066 * a + 0.760666 * c - 0.35663 * h - 0.184483 * b;
         }
 
         // top down

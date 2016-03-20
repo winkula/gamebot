@@ -18,5 +18,9 @@ namespace GameBot.Core.Data
         public Command(Button button, TimeSpan timestamp) : this(button, timestamp, TimeSpan.Zero)
         {
         }
+
+        public Command(Button button) : this(button, TimeSpan.Zero, TimeSpan.Zero)
+        {
+        }
     }
 }
