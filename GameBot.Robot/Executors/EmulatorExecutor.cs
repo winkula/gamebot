@@ -38,12 +38,13 @@ namespace GameBot.Robot.Executors
         {
             var pending = queue.Where(x => x.Timestamp <= timestamp).ToList();
             var buttons = pending.Select(x => x.Button).ToList();
-            foreach (var button in buttons)
-            {
-                Debug.WriteLine("Press key " + button);
-            }
-            emulator.KeysTyped(buttons);
             
+            emulator.KeysTyped(buttons);
+            if (buttons.Any())
+            {
+                Debug.WriteLine("Press key " + string.Join(", ", buttons));
+            }
+
             queue.RemoveAll(x => x.Timestamp <= timestamp);
 
             // emulate one frame

@@ -31,6 +31,7 @@ namespace GameBot.Robot
             else
             {
                 container.Register<IEngine, Engine>();
+                //container.Register<IEngine, FastEngine>();
             }
 
             if (emulator)

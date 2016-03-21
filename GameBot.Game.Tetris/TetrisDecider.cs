@@ -39,16 +39,16 @@ namespace GameBot.Game.Tetris
                     var node = new TetrisNode(gameState.State);
                     var winner = (TetrisNode)search.Search(node);
 
-                    Debug.WriteLine(winner.Parent);
-
                     var orientation = ((TetrisNode)(winner.Parent)).Orientation;
                     var translation = ((TetrisNode)(winner.Parent)).Translation;
                     var fall = ((TetrisNode)(winner.Parent)).Fall;
 
-                    Debug.WriteLine("======= Act! ======= ");
+                    Debug.WriteLine("======= Next state ======= ");
                     Debug.WriteLine("Orientation: " + orientation);
                     Debug.WriteLine("Translation: " + translation);
                     Debug.WriteLine("Fall: " + fall);
+
+                    Debug.WriteLine(winner.Parent);
 
                     for (int i = 0; i < orientation; i++)
                     {
