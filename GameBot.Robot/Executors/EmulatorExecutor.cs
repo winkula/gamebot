@@ -41,12 +41,12 @@ namespace GameBot.Robot.Executors
             foreach (var button in buttons)
             {
                 Debug.WriteLine("Press key " + button);
-                emulator.KeyTyped(button);
             }
-
+            emulator.KeysTyped(buttons);
+            
             queue.RemoveAll(x => x.Timestamp <= timestamp);
 
-            // next frame
+            // emulate one frame
             emulator.ExecuteFrame();
         }
     }

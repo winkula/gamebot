@@ -21,38 +21,8 @@ namespace GameBot.Game.Tetris
             {
                 // Initialization mode
 
-                // skip credits
-                double waitingTime = 5.0;
-
-                /*
-                // start 1 player mode
-                commands.Add(Button.Start, waitingTime);
-
-                // choose a-type
-                commands.Add(Button.A, waitingTime + 1);
-
-                // switch music off
-                commands.Add(Button.Right, waitingTime + 2);
-                commands.Add(Button.Down, waitingTime + 2.5);
-                commands.Add(Button.A, waitingTime + 3);
-
-                // choose level
-                commands.Add(Button.Right, waitingTime + 4);
-                commands.Add(Button.Right, waitingTime + 4.5);
-                commands.Add(Button.A, waitingTime + 5);
-                */
-
-                // start 1 player mode
-                commands.Add(Button.Start, waitingTime);
-
-                // choose a-type
-                commands.Add(Button.A, waitingTime + 1);
-
-                // choose music
-                commands.Add(Button.A, waitingTime + 1.5);
-
-                // choose level
-                commands.Add(Button.A, waitingTime + 2);
+                //Start(commands);
+                QuickStart(commands);
 
                 started = true;
             }
@@ -68,9 +38,8 @@ namespace GameBot.Game.Tetris
                 {
                     var node = new TetrisNode(gameState.State);
                     var winner = (TetrisNode)search.Search(node);
-                    
-                    Debug.WriteLine(winner.Parent);
 
+                    Debug.WriteLine(winner.Parent);
 
                     var orientation = ((TetrisNode)(winner.Parent)).Orientation;
                     var translation = ((TetrisNode)(winner.Parent)).Translation;
@@ -100,21 +69,60 @@ namespace GameBot.Game.Tetris
                             commands.Add(Button.Right);
                         }
                     }
-                                        
+
                     if (fall > 0)
                     {
-                        int slip = fall / 2 + 1;
+                        int slip = 0;//= fall*3/4;
                         for (int i = 0; i < fall - slip; i++)
                         {
                             commands.Add(Button.Down);
                         }
-                    }                    
+                    }
 
                     lastGameState = gameState.State;
                 }
-
             }
             return commands;
+        }
+
+        private void Start(Commands commands)
+        {
+            // skip credits
+            double waitingTime = 5.0;
+
+            // start 1 player mode
+            commands.Add(Button.Start, waitingTime);
+
+            // choose a-type
+            commands.Add(Button.A, waitingTime + 1);
+
+            // switch music off
+            commands.Add(Button.Right, waitingTime + 2);
+            commands.Add(Button.Down, waitingTime + 2.5);
+            commands.Add(Button.A, waitingTime + 3);
+
+            // choose level
+            commands.Add(Button.Right, waitingTime + 4);
+            commands.Add(Button.Right, waitingTime + 4.5);
+            commands.Add(Button.A, waitingTime + 5);
+        }
+
+        private void QuickStart(Commands commands)
+        {
+            // skip credits
+            double waitingTime = 5.0;
+
+            // start 1 player mode
+            commands.Add(Button.Start, waitingTime);
+
+            // choose a-type
+            commands.Add(Button.A, waitingTime + 1);
+
+            // choose music
+            commands.Add(Button.A, waitingTime + 1.5);
+
+            // choose level
+            commands.Add(Button.A, waitingTime + 2);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Drawing;
 using GameBot.Game.Tetris.Data;
+using System.IO;
 
 namespace GameBot.Game.Tetris
 {
@@ -30,9 +31,8 @@ namespace GameBot.Game.Tetris
 
             if (gameState.State.Piece != null && gameState.State.NextPiece != null)
             {
-                Debug.WriteLine("State:");
-                Debug.WriteLine(gameState.State.Piece);
-                Debug.WriteLine(gameState.State.NextPiece);
+                string text = string.Format("{0}\n", gameState.State.Piece.Tetromino);
+                File.AppendAllText(string.Format(@"{0}\tetris_extractor_log.txt", Environment.GetFolderPath(Environment.SpecialFolder.Desktop)), text);
             }
 
             return gameState;

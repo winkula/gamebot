@@ -22,6 +22,7 @@
 using GameBot.Core;
 using GameBot.Core.Data;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -417,6 +418,17 @@ namespace GameBot.Emulation
             RenderFrame();
         }
 
+        private void ExecuteWithoutRendering(int frames)
+        {
+            if (frames > 0)
+            {
+                for (int i = 0; i < frames; i++)
+                {
+                    UpdateModel(false);
+                }
+            }
+        }
+
         public void KeyPressed(Button button)
         {
             if (Running)
@@ -441,6 +453,31 @@ namespace GameBot.Emulation
                 Execute(5);
                 KeyReleased(button);
                 Execute(5);
+            }
+        }
+
+        public void KeyTypedFor(Button button, int frames)
+        {
+            if (Running)
+            {
+                KeyPressed(button);
+                Execute(frames);
+                KeyReleased(button);
+                Execute(2);
+            }
+        }
+
+        public void KeysTyped(IEnumerable<Button> buttons)
+        {
+            if (Running)
+            {
+                foreach (var button in buttons)
+                {
+                    KeyPressed(button);
+                    ExecuteWithoutRendering(2);
+                    KeyReleased(button);
+                    ExecuteWithoutRendering(2);
+                }
             }
         }
     }
