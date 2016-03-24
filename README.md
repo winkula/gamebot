@@ -1,31 +1,12 @@
 # GameBot #
 
-This README would normally document whatever steps are necessary to get your application up and running.
-
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
-
 ### TODO ###
+
+* Generic interface for searching classes?
+* Remove completed lines from board to improve the AI, but still count the completed lines to the heuristic
+* Extract level and score from screenshot
+* Calculate press duration for "hard drop", use the provided table from here <http://harddrop.com/wiki/Tetris_(Game_Boy)> or make own measurements
+* Executer can press button for the specified duration
+* Next piece in the game state is only generated if really needed
+* Improve performance by optimizing game state transformations
+* Precalculate AI decisions?

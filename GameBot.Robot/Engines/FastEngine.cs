@@ -1,98 +1,71 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Data;
-using GameBot.Emulation;
-using GameBot.Robot.Renderers;
+using GameBot.Game.Tetris;
 using System;
-using System.Drawing;
+using System.Diagnostics;
+using System.Linq;
 
 namespace GameBot.Robot.Engines
 {
     public class FastEngine : IEngine
     {
-        private TimeSpan time;
+        private readonly IDecider<TetrisGameStateFull> decider;        
+        private readonly TetrisEmulator emulator;
 
-        private readonly ICamera camera;
-        private readonly IQuantizer quantizer;
-        private readonly IAgent agent;
-        private readonly IExecutor executor;
-
-        private readonly IRenderer renderer;
-
-        private readonly Emulator emulator;
-
-        public FastEngine(ICamera camera, IQuantizer quantizer, IAgent agent, IExecutor executor, IRenderer renderer, Emulator emulator)
+        public FastEngine(IDecider<TetrisGameStateFull> decider, TetrisEmulator emulator)
         {
-            this.time = TimeSpan.Zero;
-
-            this.camera = camera;
-            this.quantizer = quantizer;
-            this.agent = agent;
-            this.executor = executor;
-
-            this.renderer = renderer;
-
+            this.decider = decider;
             this.emulator = emulator;
-
-            var loader = new RomLoader();
-            var game = loader.Load("Roms/tetris.gb");
-            this.emulator.Load(game);
         }
 
         public void Run()
         {
-            //renderer.OpenWindow("Game Bot");
-            //renderer.CreateImage(160, 144);
+            // TODO: remove initialization
+            ICommands commands = decider.Decide(emulator.GameState, new Context<TetrisGameStateFull>());
 
             Loop();
-
-            //renderer.End();
         }
 
         protected void Loop()
         {
-            var start = DateTime.Now;
-            while (!IsEscape)
+            int limit = 1000;
+            while (limit > 0 && !emulator.GameState.State.IsEnd)
             {
-                time = DateTime.Now - start;
-
                 Update();
-                //Render();
+                Render();
+                limit--;
             }
         }
 
         protected void Update()
         {
-            // get image as photo of the gameboy screen (input)
-            Image image = camera.Capture();
-
-            // process image and get display data
-            IScreenshot screenshot = quantizer.Quantize(image, time);
-
-            // handle input to the agent which
-            //  - extracts the game state
-            //  - decides which commands to press
-            ICommands commands = agent.Act(screenshot);
-            
-            // give commands to command controller (output)
-            executor.Execute(commands, time);
-        }
-
-        private bool IsEscape
-        {
-            get
+            ICommands commands = decider.Decide(emulator.GameState, new Context<TetrisGameStateFull>());
+            if (commands.Any())
             {
-                var key = renderer.Key(1);
-                if (key.HasValue)
+                foreach (var command in commands)
                 {
-                    if (key == 27) return true; // Escape
+                    if (command.Button != Button.Down)
+                    {
+                        emulator.Execute(command);
+                        Debug.WriteLine(command.Button);
+                        //Render();
+                    }
                 }
-                return false;
+                // drop
+                emulator.Execute(new Command(Button.Down, TimeSpan.Zero, TimeSpan.FromSeconds(1)));
+                Debug.WriteLine("Drop");
+                //Render();
+            }
+            else
+            {
+                emulator.Execute(new Command(Button.Down));
+                Render();
             }
         }
 
         protected void Render()
         {
-            renderer.Render(emulator.Display);
+            Debug.WriteLine(emulator.GameState.State);
         }
     }
 }

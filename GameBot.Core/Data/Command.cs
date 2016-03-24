@@ -22,5 +22,10 @@ namespace GameBot.Core.Data
         public Command(Button button) : this(button, TimeSpan.Zero, TimeSpan.Zero)
         {
         }
+
+        public override string ToString()
+        {
+            return string.Format("Command {{ Button: {0}, Timestamp: {1}, Duration: {2} }}", Button, Timestamp, Duration);
+        }
     }
 }

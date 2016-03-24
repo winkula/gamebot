@@ -22,7 +22,7 @@ namespace GameBot.Game.Tetris.Data
         /// true means occupied, false means free.
         /// </summary>
         private bool[] squares;
-        
+
         public Board(int width, int height)
         {
             Width = width;
@@ -46,14 +46,29 @@ namespace GameBot.Game.Tetris.Data
 
         public bool IsOccupied(int x, int y)
         {
+            return Get(x, y) == true;
+        }
+
+        public bool IsFree(int x, int y)
+        {
+            return Get(x, y) == false;
+        }
+
+        private bool Get(int x, int y)
+        {
             if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
             return squares[Width * y + x];
         }
 
         public void Occupy(int x, int y)
         {
+            Set(x, y, true);
+        }
+
+        private void Set(int x, int y, bool value)
+        {
             if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
-            squares[Width * y + x] = true;
+            squares[Width * y + x] = value;
         }
 
         public bool SquareExists(int x, int y)
@@ -76,6 +91,48 @@ namespace GameBot.Game.Tetris.Data
                 }
             }
             Pieces++;
+        }
+
+        // TODO: merge with drop?
+        public void RemoveLines()
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                if (HasLine(y))
+                {
+                    CopySquaresDown(y);
+                    y--;
+                }
+            }
+        }
+
+        private bool HasLine(int y)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                if (!IsOccupied(x, y)) return false;
+            }
+            return true;
+        }
+
+        private void CopySquaresDown(int yCompleteLine)
+        {
+            for (int y = yCompleteLine; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    if (y == Height - 1)
+                    {
+                        // fill with empty squares
+                        Set(x, y, false);
+                    }
+                    else
+                    {
+                        // copy from above
+                        Set(x, y, Get(x, y + 1));
+                    }
+                }
+            }
         }
 
         public bool Intersects(Piece piece)
@@ -113,7 +170,7 @@ namespace GameBot.Game.Tetris.Data
             // TODO: implement
             return base.GetHashCode();
         }
-        
+
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -122,14 +179,14 @@ namespace GameBot.Game.Tetris.Data
             if (other != null)
             {
                 // TODO: implement faster!
-                return 
-                    Width == other.Width && 
+                return
+                    Width == other.Width &&
                     Height == other.Height &&
                     squares.SequenceEqual(other.squares);
             }
             return false;
         }
-        
+
         public override string ToString()
         {
             var builder = new StringBuilder();

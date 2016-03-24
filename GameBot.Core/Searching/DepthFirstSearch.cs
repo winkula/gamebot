@@ -12,7 +12,7 @@ namespace GameBot.Core.Searching
             Bound = bound;
         }
 
-        public DepthFirstSearch() : this(int.MaxValue)
+        public DepthFirstSearch() : this(1)
         {
         }
 

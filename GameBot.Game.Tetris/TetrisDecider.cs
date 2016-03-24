@@ -9,6 +9,7 @@ namespace GameBot.Game.Tetris
     public class TetrisDecider : IDecider<TetrisGameStateFull>
     {
         private readonly DepthFirstSearch search = new DepthFirstSearch();
+        private readonly ISearch<TetrisNode> tetrisSearch = new TetrisSearch(new TetrisHeuristic());
 
         private bool started = false;
 
@@ -36,50 +37,47 @@ namespace GameBot.Game.Tetris
                     (lastGameState == null || !lastGameState.Equals(gameState.State))
                     )
                 {
-                    var node = new TetrisNode(gameState.State);
-                    var winner = (TetrisNode)search.Search(node);
+                    var start = new TetrisNode(new TetrisGameState(gameState.State));
+                    var result = tetrisSearch.Search(start);
 
-                    var orientation = ((TetrisNode)(winner.Parent)).Orientation;
-                    var translation = ((TetrisNode)(winner.Parent)).Translation;
-                    var fall = ((TetrisNode)(winner.Parent)).Fall;
+                    var goal = result.Parent;
+                    var move = result.Parent.Move;
+                    
+                    Debug.WriteLine("======= Goal state ======= ");
+                    Debug.WriteLine(move);
+                    Debug.WriteLine(goal);
+                    Debug.WriteLine("========================== ");
 
-                    Debug.WriteLine("======= Next state ======= ");
-                    Debug.WriteLine("Orientation: " + orientation);
-                    Debug.WriteLine("Translation: " + translation);
-                    Debug.WriteLine("Fall: " + fall);
-
-                    Debug.WriteLine(winner.Parent);
-
-                    for (int i = 0; i < orientation; i++)
+                    for (int i = 0; i < move.Rotation; i++)
                     {
                         commands.Add(Button.A);
                     }
 
-                    if (translation < 0)
+                    if (move.Translation < 0)
                     {
-                        for (int i = 0; i < -translation; i++)
+                        for (int i = 0; i < -move.Translation; i++)
                         {
                             commands.Add(Button.Left);
                         }
                     }
-                    else if (translation > 0)
+                    else if (move.Translation > 0)
                     {
-                        for (int i = 0; i < translation; i++)
+                        for (int i = 0; i < move.Translation; i++)
                         {
                             commands.Add(Button.Right);
                         }
                     }
 
-                    if (fall > 0)
+                    if (move.Fall > 0)
                     {
                         int slip = 0;//= fall*3/4;
-                        for (int i = 0; i < fall - slip; i++)
+                        for (int i = 0; i < move.Fall - slip; i++)
                         {
                             commands.Add(Button.Down);
                         }
                     }
 
-                    lastGameState = gameState.State;
+                    lastGameState = new TetrisGameState(gameState.State);
                 }
             }
             return commands;
@@ -88,7 +86,7 @@ namespace GameBot.Game.Tetris
         private void Start(Commands commands)
         {
             // skip credits
-            double waitingTime = 5.0;
+            double waitingTime = 6.0;
 
             // start 1 player mode
             commands.Add(Button.Start, waitingTime);

@@ -78,9 +78,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Board.cs" />
+    <Compile Include="Data\Move.cs" />
     <Compile Include="Data\Piece.cs" />
     <Compile Include="Data\TetrisGameType.cs" />
     <Compile Include="Data\TetrisScreen.cs" />
+    <Compile Include="TetrisEmulator.cs" />
     <Compile Include="TetrisGameState.cs" />
     <Compile Include="TetrisGameStateFull.cs" />
     <Compile Include="TetrisNode.cs" />

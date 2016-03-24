@@ -1,73 +1,53 @@
-﻿using GameBot.Core.Searching;
-using GameBot.Game.Tetris.Data;
-using System;
+﻿using GameBot.Game.Tetris.Data;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisNode : Node<TetrisGameState>
+    public class TetrisNode
     {
-        public int Translation { get; set; }
-        public int Orientation { get; set; }
-        public int Fall { get; set; }
+        public TetrisNode Parent { get; set; }
+        public TetrisGameState GameState { get; set; }
+        public Move Move { get; set; }
+        public double Score { get; set; }
 
-        private readonly IHeuristic<TetrisGameState> heuristic = new TetrisHeuristic(); // TODO: inject?
-        private readonly TetrisGameState gameState;
-
-        public TetrisNode(TetrisGameState gameState, INode parent) : base(gameState, parent)
+        public TetrisNode(TetrisGameState gameState, TetrisNode parent)
         {
-            this.gameState = gameState;
+            GameState = gameState;
+            Parent = parent;
         }
 
-        public TetrisNode(TetrisGameState gameState) : base(gameState)
+        public TetrisNode(TetrisGameState gameState) : this(gameState, null)
         {
-            this.gameState = gameState;
         }
 
-        public override double GetScore()
+        public IEnumerable<TetrisNode> GetSuccessors()
         {
-            return heuristic.Score(gameState);
-        }
-
-        public override IEnumerable<INode> GetSuccessors()
-        {
-            var successors = new List<INode>();
-
-            if (gameState.Piece != null)
+            if (GameState.Piece != null)
             {
                 // TODO: use constants
                 for (int translation = -4; translation < 6; translation++)
                 {
                     for (int orientation = 0; orientation < 4; orientation++)
                     {
-                        var newPiece = new Piece(gameState.Piece.Tetromino, orientation, translation);
-                        if (!gameState.Board.Intersects(newPiece))
+                        var newPiece = new Piece(GameState.Piece.Tetromino, orientation, translation);
+                        if (!GameState.Board.Intersects(newPiece))
                         {
-                            var successor = new TetrisGameState(gameState, newPiece);
+                            var successor = new TetrisGameState(GameState, newPiece);
                             var fall = successor.Drop();
 
                             var node = new TetrisNode(successor, this);
-                            node.Orientation = orientation;
-                            node.Translation = translation;
-                            node.Fall = fall;
+                            node.Move = new Move(orientation, translation, fall);
 
-                            successors.Add(node);
+                            yield return node;
                         }
                     }
                 }
             }
-
-            return successors;
         }
 
         public override string ToString()
         {
-            if (gameState != null && gameState.Board != null)
-            {
-                return gameState.Board.ToString();
-            }
-            return base.ToString();
+            return string.Format("Node {{ State: \n{0} }}", GameState);
         }
     }
 }

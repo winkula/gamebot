@@ -1,5 +1,7 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
+using System.Collections.Generic;
+using System.Text;
 
 namespace GameBot.Game.Tetris
 {
@@ -8,21 +10,25 @@ namespace GameBot.Game.Tetris
         public Board Board { get; private set; }
         public Piece Piece { get; private set; }
         public Piece NextPiece { get; private set; }
-
+        public Move Move { get; set; }
+        
         public TetrisGameState()
         {
+            Board = new Board();
+            Piece = new Piece();
+            NextPiece = new Piece();
         }
 
         public TetrisGameState(TetrisGameState old)
         {
-            if (old.Board != null) Board = new Board(old.Board);
+            Board = new Board(old.Board);
             if (old.Piece != null) Piece = new Piece(old.Piece);
             if (old.NextPiece != null) NextPiece = new Piece(old.NextPiece);
         }
 
         public TetrisGameState(TetrisGameState old, Piece piece)
         {
-            if (old.Board != null) Board = new Board(old.Board);
+            Board = new Board(old.Board);
             Piece = piece;
             if (old.NextPiece != null) NextPiece = new Piece(old.NextPiece);
         }
@@ -49,12 +55,42 @@ namespace GameBot.Game.Tetris
         {
         }
 
+        public bool IsEnd
+        {
+            get { return Board.Intersects(NextPiece); }
+        }
+
         public bool IsPieceLanded
         {
             get { return Board.Intersects(new Piece(Piece).Fall()); }
         }
 
-        public int Drop()
+        public bool Fall(Piece next = null)
+        {
+            bool fallen = false;
+
+            if (!IsPieceLanded)
+            {
+                Piece.Fall();
+                fallen = true;
+            }
+
+            if (IsPieceLanded)
+            {
+                Board.Place(Piece);
+                Piece = null;
+
+                if (NextPiece != null)
+                {
+                    Piece = new Piece(NextPiece);
+                    NextPiece = next ?? new Piece();
+                }
+            }
+
+            return fallen;
+        }
+
+        public int Drop(Piece next = null)
         {
             int fall = 0;
 
@@ -70,10 +106,44 @@ namespace GameBot.Game.Tetris
             if (NextPiece != null)
             {
                 Piece = new Piece(NextPiece);
-                NextPiece = null;
+                NextPiece = next ?? new Piece();
             }
 
             return fall;
+        }
+
+        // TODO: merge with drop?
+        public void RemoveLines()
+        {
+            Board.RemoveLines();
+        }
+
+        public IEnumerable<TetrisGameState> GetSuccessors()
+        {
+            var successors = new List<TetrisGameState>();
+
+            if (Piece != null)
+            {
+                // TODO: use constants
+                for (int translation = -4; translation < 6; translation++)
+                {
+                    for (int rotation = 0; rotation < 4; rotation++)
+                    {
+                        var newPiece = new Piece(Piece.Tetromino, rotation, translation);
+
+                        if (!Board.Intersects(newPiece))
+                        {
+                            var successor = new TetrisGameState(this, newPiece);
+                            var fall = successor.Drop();
+                            
+                            successor.Move = new Move(rotation, translation, fall);                                                        
+                            successors.Add(successor);
+                        }
+                    }
+                }
+            }
+
+            return successors;
         }
 
         public override int GetHashCode()
@@ -95,6 +165,41 @@ namespace GameBot.Game.Tetris
                     ((NextPiece == null && other.NextPiece == null) || NextPiece.Equals(other.NextPiece));
             }
             return false;
+        }
+
+        public override string ToString()
+        {
+            /*
+            var sb = new StringBuilder();
+            sb.AppendLine(Piece.ToString());
+            sb.AppendLine(NextPiece.ToString());
+            sb.Append(Board.ToString());
+            return sb.ToString();*/
+
+            var builder = new StringBuilder();
+            //builder.AppendFormat("Board(p:{0})\n", Pieces);
+            builder.Append(" ");
+            builder.AppendLine(new string('-', Board.Width));
+            for (int y = Board.Height - 1; y >= 0; y--)
+            {
+                builder.Append("|");
+                for (int x = 0; x < Board.Width; x++)
+                {
+                    if (Piece.IsSquareOccupiedRegardTranslation(x - Board.Origin.X, y - Board.Origin.Y))
+                    {
+                        builder.Append('*');
+                    }
+                    else
+                    {
+                        if (Board.IsOccupied(x, y)) builder.Append('#');
+                        else builder.Append(' ');
+                    }
+                }
+                builder.AppendLine("|");
+            }
+            builder.Append(" ");
+            builder.Append(new string('-', Board.Width));
+            return builder.ToString();
         }
     }
 }

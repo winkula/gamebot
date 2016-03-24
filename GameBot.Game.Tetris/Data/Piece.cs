@@ -7,6 +7,8 @@ namespace GameBot.Game.Tetris.Data
 {
     public class Piece
     {
+        private static readonly Random random = new Random();
+
         public static int CoordinateMin = -1;
         public static int CoordinateMax = 2;
         public static int CoordinateSize = CoordinateMax - CoordinateMin + 1;
@@ -19,7 +21,7 @@ namespace GameBot.Game.Tetris.Data
             0x0074, 0x0223, 0x0170, 0x0622, // J
             0x0072, 0x0232, 0x0270, 0x0262  // T
         };
-
+        
         // coordinates of occupied tiles of all possible Tetromino and rotation possibilities
         private readonly static IEnumerable<Point>[] pieceDataLookup;
 
@@ -82,6 +84,22 @@ namespace GameBot.Game.Tetris.Data
         {
         }
 
+        public Piece() : this(GetPseudoRandom(), 0, 0, 0)
+        {
+        }
+        
+        private static Tetromino GetPseudoRandom()
+        {
+            var p = random.NextDouble();
+            if (p < 0.089) return Tetromino.Z;
+            if (p < 0.199) return Tetromino.L;
+            if (p < 0.330) return Tetromino.I;
+            if (p < 0.473) return Tetromino.O;
+            if (p < 0.617) return Tetromino.J;
+            if (p < 0.799) return Tetromino.T;
+            return Tetromino.S;
+        }
+
         // A button
         public Piece Rotate()
         {
@@ -133,6 +151,11 @@ namespace GameBot.Game.Tetris.Data
                 return (matrix & mask) != 0;
             }
             return false;
+        }
+        
+        public bool IsSquareOccupiedRegardTranslation(int x, int y)
+        {
+            return IsSquareOccupied(x - X, y - Y);
         }
 
         public IEnumerable<Point> GetOccupiedSquares()

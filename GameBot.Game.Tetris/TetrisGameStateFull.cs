@@ -16,5 +16,15 @@ namespace GameBot.Game.Tetris
         public int? High { get; set; }
         public int? Score { get; set; }
         public bool? IsPause { get; set; }
+
+        public TetrisGameStateFull()
+        {
+            State = new TetrisGameState();
+        }
+
+        public override string ToString()
+        {
+            return State.ToString();
+        }
     }
 }

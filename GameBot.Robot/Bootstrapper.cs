@@ -1,6 +1,7 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Emulation;
+using GameBot.Game.Tetris;
 using GameBot.Robot.Cameras;
 using GameBot.Robot.Engines;
 using GameBot.Robot.Executors;
@@ -32,10 +33,11 @@ namespace GameBot.Robot
             {
                 container.Register<IEngine, Engine>();
                 //container.Register<IEngine, FastEngine>();
+                //container.Register<IEngine, BlindEngine>();
             }
 
             if (emulator)
-            {
+            {                
                 container.RegisterSingleton(new Emulator());
 
                 container.Register<ICamera, EmulatorCamera>();
@@ -62,6 +64,7 @@ namespace GameBot.Robot
             container.Register(typeof(IAgent), GetSingleImplementation<IAgent>(assembly));
             container.Register(typeof(IExtractor<>), new[] { assembly });
             container.Register(typeof(IDecider<>), new[] { assembly });
+            container.Register(typeof(IEmulator<>), new[] { assembly });
 
             container.Verify();
 

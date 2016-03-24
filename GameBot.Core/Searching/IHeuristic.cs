@@ -1,6 +1,4 @@
-﻿using GameBot.Core.Data;
-
-namespace GameBot.Core.Searching
+﻿namespace GameBot.Core.Searching
 {
     public interface IHeuristic
     {

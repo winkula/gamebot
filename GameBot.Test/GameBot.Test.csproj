@@ -139,7 +139,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CoreTests\DepthFirstSearchTests.cs" />
+    <Compile Include="TetrisTests\TetrisSearchTests.cs" />
     <Compile Include="CoreTests\ContextTests.cs" />
     <Compile Include="CoreTests\ScreenshotTests.cs" />
     <Compile Include="CoreTests\CommandsTests.cs" />
@@ -149,6 +149,7 @@
     <Compile Include="ContainerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RobotTests\QuantizerTests.cs" />
+    <Compile Include="TetrisTests\TetrisEmulatorTests.cs" />
     <Compile Include="TetrisTests\DeciderTests.cs" />
     <Compile Include="TetrisTests\ExtractorTests.cs" />
     <Compile Include="TetrisTests\HeuristicTests.cs" />

@@ -146,6 +146,7 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Engines\FastEngine.cs" />
+    <Compile Include="Engines\BlindEngine.cs" />
     <Compile Include="Executors\EmulatorExecutor.cs" />
     <Compile Include="Executors\Executor.cs" />
     <Compile Include="Engines\InteractiveEngine.cs" />

@@ -1,18 +1,16 @@
 ﻿using GameBot.Core.Searching;
+using GameBot.Game.Tetris.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameBot.Game.Tetris
 {
-    // TODO: implement
     public class TetrisSearch : ISearch<TetrisNode>
     {
-        private readonly IHeuristic heuristic;
+        private readonly IHeuristic<TetrisGameState> heuristic;
 
-        public TetrisSearch(IHeuristic heuristic)
+        public TetrisSearch(IHeuristic<TetrisGameState> heuristic)
         {
             this.heuristic = heuristic;
         }
@@ -23,46 +21,80 @@ namespace GameBot.Game.Tetris
 
             return SearchCurrentPiece(node);
         }
-        
+
         protected TetrisNode SearchCurrentPiece(TetrisNode parent)
         {
-            throw new NotImplementedException();
-            /*
-            var successors = parent.GetSuccessors();
-            if (successors.Any())
-            {
-                TetrisNode winner = null;
-                var bestScore = double.NegativeInfinity;
-                foreach (var successor in successors)
-                {
-                    var child = Search((TetrisNode)successor);
-                    var score = child.GetScore();
-                    if (winner == null || score > bestScore)
-                    {
-                        winner = child;
-                        bestScore = score;
-                    }
-                }
+            TetrisNode goal = null;
+            var bestScore = double.NegativeInfinity;
 
-                return winner;
+            foreach (var successor in parent.GetSuccessors())
+            {
+                var best = SearchNextPiece(successor);
+                if (best.Score > bestScore)
+                {
+                    goal = best;
+                    bestScore = best.Score;
+                }
             }
 
-            return parent;*/
+            return goal;
         }
 
         protected TetrisNode SearchNextPiece(TetrisNode parent)
         {
-            throw new NotImplementedException();
+            TetrisNode goal = null;
+            var bestScore = double.NegativeInfinity;
+
+            foreach (var successor in parent.GetSuccessors())
+            {
+                //var score = ScoreProbabilistic(successor);
+                var score = ScoreSimple(successor);
+                if (score > bestScore)
+                {
+                    goal = successor;
+                    goal.Score = score;
+                    bestScore = score;
+                }
+            }
+
+            return goal;
         }
 
-        protected TetrisNode SearchGuessedPiece(TetrisNode parent)
+        protected double ScoreSimple(TetrisNode parent)
         {
-            throw new NotImplementedException();
+            return heuristic.Score(parent.GameState);
         }
 
-        protected double RateBoard(TetrisNode parent)
+        protected double ScoreProbabilistic(TetrisNode parent)
         {
-            throw new NotImplementedException();
+            var tetrominos = Enum.GetValues(typeof(Tetromino)).Cast<Tetromino>();
+            double expectation = 0;
+
+            foreach (var tetromino in tetrominos)
+            {
+                double chance = tetromino.GetChance();
+
+                var child = new TetrisGameState(parent.GameState.Board, new Piece(tetromino), null);
+                var successors = child.GetSuccessors();
+                var score = GetBestScore(successors);
+
+                expectation += chance * score;
+            }
+
+            return expectation;
+        }
+                
+        protected double GetBestScore(IEnumerable<TetrisGameState> successors)
+        {
+            var bestScore = double.NegativeInfinity;
+
+            foreach (var successor in successors)
+            {
+                var score = heuristic.Score(successor);
+                bestScore = Math.Max(bestScore, score);
+            }
+
+            return bestScore;
         }
     }
 }

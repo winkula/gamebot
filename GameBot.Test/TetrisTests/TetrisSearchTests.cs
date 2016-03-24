@@ -7,16 +7,16 @@ using System.Diagnostics;
 namespace GameBot.Test
 {
     [TestFixture]
-    public class DepthFirstSearchTest
+    public class TetrisSearchTests
     {
-        [Test]
-        public void Constructor()
+        private IHeuristic<TetrisGameState> heuristic;
+        private TetrisSearch search;
+
+        [SetUp]
+        public void Setup()
         {
-            int bound = 2;
-
-            var search = new DepthFirstSearch(bound);
-
-            Assert.AreEqual(bound, search.Bound);
+            heuristic = new TetrisHeuristic();
+            search = new TetrisSearch(heuristic);
         }
 
         [TestCase(Tetromino.O, Tetromino.Z)]
@@ -24,13 +24,11 @@ namespace GameBot.Test
         [TestCase(Tetromino.T, Tetromino.S)]
         public void Search(Tetromino current, Tetromino next)
         {
-            var search = new DepthFirstSearch();            
             var gameState = new TetrisGameState(current, next);
-
             var node = new TetrisNode(gameState);
             
-            var winner = search.Search(node);
-            Debug.WriteLine(winner);
+            var result = search.Search(node);
+            Debug.WriteLine(result.GameState);
         }
     }
 }
