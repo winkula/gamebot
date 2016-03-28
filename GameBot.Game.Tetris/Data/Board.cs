@@ -18,6 +18,20 @@ namespace GameBot.Game.Tetris.Data
         public int Height { get; private set; }
         public int Pieces { get; private set; }
 
+        protected bool this[int x, int y]
+        {
+            get
+            {
+                if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
+                return squares[Width * y + x];
+            }
+            set
+            {
+                if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
+                squares[Width * y + x] = value;
+            }
+        }
+
         /// <summary>
         /// true means occupied, false means free.
         /// </summary>
@@ -46,29 +60,17 @@ namespace GameBot.Game.Tetris.Data
 
         public bool IsOccupied(int x, int y)
         {
-            return Get(x, y) == true;
+            return this[x, y] == true;
         }
 
         public bool IsFree(int x, int y)
         {
-            return Get(x, y) == false;
-        }
-
-        private bool Get(int x, int y)
-        {
-            if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
-            return squares[Width * y + x];
+            return this[x, y] == false;
         }
 
         public void Occupy(int x, int y)
         {
-            Set(x, y, true);
-        }
-
-        private void Set(int x, int y, bool value)
-        {
-            if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
-            squares[Width * y + x] = value;
+            this[x, y] = true;
         }
 
         public bool SquareExists(int x, int y)
@@ -78,17 +80,11 @@ namespace GameBot.Game.Tetris.Data
 
         public void Place(Piece piece)
         {
-            for (int x = Piece.CoordinateMin; x <= Piece.CoordinateMax; x++)
+            foreach (var block in piece.Shape.Body)
             {
-                for (int y = Piece.CoordinateMin; y <= Piece.CoordinateMax; y++)
-                {
-                    if (piece.IsSquareOccupied(x, y))
-                    {
-                        int positionX = Origin.X + piece.X + x;
-                        int positionY = Origin.Y + piece.Y + y;
-                        Occupy(positionX, positionY);
-                    }
-                }
+                int positionX = Origin.X + piece.X + block.X;
+                int positionY = Origin.Y + piece.Y + block.Y;
+                Occupy(positionX, positionY);
             }
             Pieces++;
         }
@@ -124,12 +120,12 @@ namespace GameBot.Game.Tetris.Data
                     if (y == Height - 1)
                     {
                         // fill with empty squares
-                        Set(x, y, false);
+                        this[x, y] = false;
                     }
                     else
                     {
                         // copy from above
-                        Set(x, y, Get(x, y + 1));
+                        this[x, y] = this[x, y + 1];
                     }
                 }
             }
@@ -137,29 +133,22 @@ namespace GameBot.Game.Tetris.Data
 
         public bool Intersects(Piece piece)
         {
-            for (int x = Piece.CoordinateMin; x <= Piece.CoordinateMax; x++)
+            foreach (var block in piece.Shape.Body)
             {
-                for (int y = Piece.CoordinateMin; y <= Piece.CoordinateMax; y++)
+                int positionX = Origin.X + piece.X + block.X;
+                int positionY = Origin.Y + piece.Y + block.Y;
+                if (SquareExists(positionX, positionY))
                 {
-                    bool occupied = piece.IsSquareOccupied(x, y);
-                    if (occupied)
+                    if (IsOccupied(positionX, positionY))
                     {
-                        int positionX = Origin.X + piece.X + x;
-                        int positionY = Origin.Y + piece.Y + y;
-                        if (SquareExists(positionX, positionY))
-                        {
-                            if (IsOccupied(positionX, positionY))
-                            {
-                                // intersection with already placed pieces
-                                return true;
-                            }
-                        }
-                        else
-                        {
-                            // intersection with border of the board
-                            return true;
-                        }
+                        // intersection with already placed pieces
+                        return true;
                     }
+                }
+                else
+                {
+                    // intersection with border of the board
+                    return true;
                 }
             }
             return false;

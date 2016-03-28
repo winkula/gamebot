@@ -11,7 +11,7 @@ namespace GameBot.Robot
         {
             // Create dependency injection container
             var container = Bootstrapper.GetInitializedContainer(IsInteractive, UseEmulator);
-
+            
             // Run the engine
             var engine = container.GetInstance<IEngine>();
             engine.Run();

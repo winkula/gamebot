@@ -19,9 +19,14 @@ namespace GameBot.Test
             search = new TetrisSearch(heuristic);
         }
 
-        [TestCase(Tetromino.O, Tetromino.Z)]
-        [TestCase(Tetromino.I, Tetromino.I)]
-        [TestCase(Tetromino.T, Tetromino.S)]
+        [TestCase(Tetromino.O, Tetromino.S)]
+        [TestCase(Tetromino.I, Tetromino.L)]
+        [TestCase(Tetromino.S, Tetromino.Z)]
+        [TestCase(Tetromino.Z, Tetromino.I)]
+        [TestCase(Tetromino.L, Tetromino.O)]
+        [TestCase(Tetromino.J, Tetromino.T)]
+        [TestCase(Tetromino.T, Tetromino.J)]
+        // Performance without probabilistic search before optimization: ~
         public void Search(Tetromino current, Tetromino next)
         {
             var gameState = new TetrisGameState(current, next);

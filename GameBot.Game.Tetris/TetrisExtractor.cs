@@ -2,7 +2,6 @@
 using GameBot.Core;
 using GameBot.Core.Data;
 using System.Linq;
-using System.Diagnostics;
 using System.Drawing;
 using GameBot.Game.Tetris.Data;
 using System.IO;
