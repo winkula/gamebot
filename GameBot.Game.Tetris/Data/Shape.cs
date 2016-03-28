@@ -43,40 +43,40 @@ namespace GameBot.Game.Tetris.Data
             {
                 shapes = new Shape[7, 4];
 
-                shapes[(int)Tetromino.O, 0] = new Shape(Tetromino.O, 0, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(1, -1), new Point(1, 0) }, new List<Point> { new Point(0, -1), new Point(1, -1) });
-                shapes[(int)Tetromino.O, 1] = new Shape(Tetromino.O, 1, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(1, -1), new Point(1, 0) }, new List<Point> { new Point(0, -1), new Point(1, -1) });
-                shapes[(int)Tetromino.O, 2] = new Shape(Tetromino.O, 2, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(1, -1), new Point(1, 0) }, new List<Point> { new Point(0, -1), new Point(1, -1) });
-                shapes[(int)Tetromino.O, 3] = new Shape(Tetromino.O, 3, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(1, -1), new Point(1, 0) }, new List<Point> { new Point(0, -1), new Point(1, -1) });
+                shapes[(int)Tetromino.O, 0] = new Shape(Tetromino.O, 0, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(1, -1), new Point(1, 0) }, new List<Point> { new Point(0, -1), new Point(1, -1) }, -4, 4);
+                shapes[(int)Tetromino.O, 1] = new Shape(Tetromino.O, 1, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(1, -1), new Point(1, 0) }, new List<Point> { new Point(0, -1), new Point(1, -1) }, -4, 4);
+                shapes[(int)Tetromino.O, 2] = new Shape(Tetromino.O, 2, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(1, -1), new Point(1, 0) }, new List<Point> { new Point(0, -1), new Point(1, -1) }, -4, 4);
+                shapes[(int)Tetromino.O, 3] = new Shape(Tetromino.O, 3, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(1, -1), new Point(1, 0) }, new List<Point> { new Point(0, -1), new Point(1, -1) }, -4, 4);
 
-                shapes[(int)Tetromino.I, 0] = new Shape(Tetromino.I, 0, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0) });
-                shapes[(int)Tetromino.I, 1] = new Shape(Tetromino.I, 1, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(0, 1), new Point(0, 2) }, new List<Point> { new Point(0, -1) });
-                shapes[(int)Tetromino.I, 2] = new Shape(Tetromino.I, 2, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0) });
-                shapes[(int)Tetromino.I, 3] = new Shape(Tetromino.I, 3, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(0, 1), new Point(0, 2) }, new List<Point> { new Point(0, -1) });
+                shapes[(int)Tetromino.I, 0] = new Shape(Tetromino.I, 0, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0) }, -3, 3);
+                shapes[(int)Tetromino.I, 1] = new Shape(Tetromino.I, 1, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(0, 1), new Point(0, 2) }, new List<Point> { new Point(0, -1) }, -4, 5);
+                shapes[(int)Tetromino.I, 2] = new Shape(Tetromino.I, 2, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0) }, -3, 3);
+                shapes[(int)Tetromino.I, 3] = new Shape(Tetromino.I, 3, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(0, 1), new Point(0, 2) }, new List<Point> { new Point(0, -1) }, -4, 5);
 
-                shapes[(int)Tetromino.S, 0] = new Shape(Tetromino.S, 0, new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(0, 0), new Point(1, 0) }, new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(1, 0) });
-                shapes[(int)Tetromino.S, 1] = new Shape(Tetromino.S, 1, new List<Point> { new Point(-1, 0), new Point(-1, 1), new Point(0, -1), new Point(0, 0) }, new List<Point> { new Point(-1, 0), new Point(0, -1) });
-                shapes[(int)Tetromino.S, 2] = new Shape(Tetromino.S, 2, new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(0, 0), new Point(1, 0) }, new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(1, 0) });
-                shapes[(int)Tetromino.S, 3] = new Shape(Tetromino.S, 3, new List<Point> { new Point(-1, 0), new Point(-1, 1), new Point(0, -1), new Point(0, 0) }, new List<Point> { new Point(-1, 0), new Point(0, -1) });
+                shapes[(int)Tetromino.S, 0] = new Shape(Tetromino.S, 0, new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(0, 0), new Point(1, 0) }, new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(1, 0) }, -3, 4);
+                shapes[(int)Tetromino.S, 1] = new Shape(Tetromino.S, 1, new List<Point> { new Point(-1, 0), new Point(-1, 1), new Point(0, -1), new Point(0, 0) }, new List<Point> { new Point(-1, 0), new Point(0, -1) }, -3, 5);
+                shapes[(int)Tetromino.S, 2] = new Shape(Tetromino.S, 2, new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(0, 0), new Point(1, 0) }, new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(1, 0) }, -3, 4);
+                shapes[(int)Tetromino.S, 3] = new Shape(Tetromino.S, 3, new List<Point> { new Point(-1, 0), new Point(-1, 1), new Point(0, -1), new Point(0, 0) }, new List<Point> { new Point(-1, 0), new Point(0, -1) }, -3, 5);
 
-                shapes[(int)Tetromino.Z, 0] = new Shape(Tetromino.Z, 0, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(0, 0), new Point(1, -1) }, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(1, -1) });
-                shapes[(int)Tetromino.Z, 1] = new Shape(Tetromino.Z, 1, new List<Point> { new Point(-1, -1), new Point(-1, 0), new Point(0, 0), new Point(0, 1) }, new List<Point> { new Point(-1, -1), new Point(0, 0) });
-                shapes[(int)Tetromino.Z, 2] = new Shape(Tetromino.Z, 2, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(0, 0), new Point(1, -1) }, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(1, -1) });
-                shapes[(int)Tetromino.Z, 3] = new Shape(Tetromino.Z, 3, new List<Point> { new Point(-1, -1), new Point(-1, 0), new Point(0, 0), new Point(0, 1) }, new List<Point> { new Point(-1, -1), new Point(0, 0) });
+                shapes[(int)Tetromino.Z, 0] = new Shape(Tetromino.Z, 0, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(0, 0), new Point(1, -1) }, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(1, -1) }, -3, 4);
+                shapes[(int)Tetromino.Z, 1] = new Shape(Tetromino.Z, 1, new List<Point> { new Point(-1, -1), new Point(-1, 0), new Point(0, 0), new Point(0, 1) }, new List<Point> { new Point(-1, -1), new Point(0, 0) }, -3, 5);
+                shapes[(int)Tetromino.Z, 2] = new Shape(Tetromino.Z, 2, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(0, 0), new Point(1, -1) }, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(1, -1) }, -3, 4);
+                shapes[(int)Tetromino.Z, 3] = new Shape(Tetromino.Z, 3, new List<Point> { new Point(-1, -1), new Point(-1, 0), new Point(0, 0), new Point(0, 1) }, new List<Point> { new Point(-1, -1), new Point(0, 0) }, -3, 5);
 
-                shapes[(int)Tetromino.L, 0] = new Shape(Tetromino.L, 0, new List<Point> { new Point(-1, -1), new Point(-1, 0), new Point(0, 0), new Point(1, 0) }, new List<Point> { new Point(-1, -1), new Point(0, 0), new Point(1, 0) });
-                shapes[(int)Tetromino.L, 1] = new Shape(Tetromino.L, 1, new List<Point> { new Point(-1, 1), new Point(0, -1), new Point(0, 0), new Point(0, 1) }, new List<Point> { new Point(-1, 1), new Point(0, -1) });
-                shapes[(int)Tetromino.L, 2] = new Shape(Tetromino.L, 2, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(1, 1) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0) });
-                shapes[(int)Tetromino.L, 3] = new Shape(Tetromino.L, 3, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(0, 1), new Point(1, -1) }, new List<Point> { new Point(0, -1), new Point(1, -1) });
+                shapes[(int)Tetromino.L, 0] = new Shape(Tetromino.L, 0, new List<Point> { new Point(-1, -1), new Point(-1, 0), new Point(0, 0), new Point(1, 0) }, new List<Point> { new Point(-1, -1), new Point(0, 0), new Point(1, 0) }, -3, 4);
+                shapes[(int)Tetromino.L, 1] = new Shape(Tetromino.L, 1, new List<Point> { new Point(-1, 1), new Point(0, -1), new Point(0, 0), new Point(0, 1) }, new List<Point> { new Point(-1, 1), new Point(0, -1) }, -3, 5);
+                shapes[(int)Tetromino.L, 2] = new Shape(Tetromino.L, 2, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(1, 1) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0) }, -3, 4);
+                shapes[(int)Tetromino.L, 3] = new Shape(Tetromino.L, 3, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(0, 1), new Point(1, -1) }, new List<Point> { new Point(0, -1), new Point(1, -1) }, -4, 4);
 
-                shapes[(int)Tetromino.J, 0] = new Shape(Tetromino.J, 0, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, -1), new Point(1, 0) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, -1) });
-                shapes[(int)Tetromino.J, 1] = new Shape(Tetromino.J, 1, new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(0, 0), new Point(0, 1) }, new List<Point> { new Point(-1, -1), new Point(0, -1) });
-                shapes[(int)Tetromino.J, 2] = new Shape(Tetromino.J, 2, new List<Point> { new Point(-1, 0), new Point(-1, 1), new Point(0, 0), new Point(1, 0) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0) });
-                shapes[(int)Tetromino.J, 3] = new Shape(Tetromino.J, 3, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(0, 1), new Point(1, 1) }, new List<Point> { new Point(0, -1), new Point(1, 1) });
+                shapes[(int)Tetromino.J, 0] = new Shape(Tetromino.J, 0, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, -1), new Point(1, 0) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, -1) }, -3, 4);
+                shapes[(int)Tetromino.J, 1] = new Shape(Tetromino.J, 1, new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(0, 0), new Point(0, 1) }, new List<Point> { new Point(-1, -1), new Point(0, -1) }, -3, 5);
+                shapes[(int)Tetromino.J, 2] = new Shape(Tetromino.J, 2, new List<Point> { new Point(-1, 0), new Point(-1, 1), new Point(0, 0), new Point(1, 0) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0) }, -3, 4);
+                shapes[(int)Tetromino.J, 3] = new Shape(Tetromino.J, 3, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(0, 1), new Point(1, 1) }, new List<Point> { new Point(0, -1), new Point(1, 1) }, -4, 4);
 
-                shapes[(int)Tetromino.T, 0] = new Shape(Tetromino.T, 0, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(0, 0), new Point(1, 0) }, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(1, 0) });
-                shapes[(int)Tetromino.T, 1] = new Shape(Tetromino.T, 1, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(0, 0), new Point(0, 1) }, new List<Point> { new Point(-1, 0), new Point(0, -1) });
-                shapes[(int)Tetromino.T, 2] = new Shape(Tetromino.T, 2, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(0, 1), new Point(1, 0) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0) });
-                shapes[(int)Tetromino.T, 3] = new Shape(Tetromino.T, 3, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(0, 1), new Point(1, 0) }, new List<Point> { new Point(0, -1), new Point(1, 0) });
+                shapes[(int)Tetromino.T, 0] = new Shape(Tetromino.T, 0, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(0, 0), new Point(1, 0) }, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(1, 0) }, -3, 4);
+                shapes[(int)Tetromino.T, 1] = new Shape(Tetromino.T, 1, new List<Point> { new Point(-1, 0), new Point(0, -1), new Point(0, 0), new Point(0, 1) }, new List<Point> { new Point(-1, 0), new Point(0, -1) }, -3, 5);
+                shapes[(int)Tetromino.T, 2] = new Shape(Tetromino.T, 2, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(0, 1), new Point(1, 0) }, new List<Point> { new Point(-1, 0), new Point(0, 0), new Point(1, 0) }, -3, 4);
+                shapes[(int)Tetromino.T, 3] = new Shape(Tetromino.T, 3, new List<Point> { new Point(0, -1), new Point(0, 0), new Point(0, 1), new Point(1, 0) }, new List<Point> { new Point(0, -1), new Point(1, 0) }, -4, 4);
             }
             return shapes[(int)tetromino, orientation];
         }
@@ -104,12 +104,17 @@ namespace GameBot.Game.Tetris.Data
 
         public IEnumerable<Point> Head { get; }
 
-        public Shape(Tetromino tetromino, int orientation, IEnumerable<Point> body, IEnumerable<Point> head)
+        public int TranslationMin { get; }
+        public int TranslationMax { get; }
+
+        public Shape(Tetromino tetromino, int orientation, IEnumerable<Point> body, IEnumerable<Point> head, int translationMin, int translationMax)
         {
             Tetromino = tetromino;
             Orientation = orientation;
             Body = body;
             Head = head;
+            TranslationMin = translationMin;
+            TranslationMax = translationMax;
         }
 
         // Local coordinates are used (relative to origin of the piece)

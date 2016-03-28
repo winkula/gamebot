@@ -73,6 +73,19 @@ namespace GameBot.Game.Tetris.Data
             this[x, y] = true;
         }
 
+        // TODO: implement with lookup table
+        public int ColumnHeight(int x)
+        {
+            for (int y = Height - 1; y >= 0; y--)
+            {
+                if (IsOccupied(x, y))
+                {
+                    return y + 1;
+                }
+            }
+            return 0;
+        }
+
         public bool SquareExists(int x, int y)
         {
             return x >= 0 && x < Width && y >= 0 && y < Height;
@@ -84,22 +97,27 @@ namespace GameBot.Game.Tetris.Data
             {
                 int positionX = Origin.X + piece.X + block.X;
                 int positionY = Origin.Y + piece.Y + block.Y;
+                if (IsOccupied(positionX, positionY)) throw new ArgumentException("Square is already occupied");
+
                 Occupy(positionX, positionY);
             }
             Pieces++;
         }
 
-        // TODO: merge with drop?
-        public void RemoveLines()
+        // TODO: merge with drop? implement faster (bit operations)
+        public int RemoveLines()
         {
+            int lines = 0;
             for (int y = 0; y < Height; y++)
             {
                 if (HasLine(y))
                 {
+                    lines++;
                     CopySquaresDown(y);
                     y--;
                 }
             }
+            return lines;
         }
 
         private bool HasLine(int y)

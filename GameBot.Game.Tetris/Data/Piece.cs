@@ -79,10 +79,10 @@ namespace GameBot.Game.Tetris.Data
             return this;
         }
 
-        public Piece Fall(int times)
+        public Piece Fall(int distance)
         {
-            if (times < 0) throw new ArgumentException(nameof(times));
-            Y -= times;
+            if (distance < 0) throw new ArgumentException(nameof(distance));
+            Y -= distance;
             return this;
         }
 

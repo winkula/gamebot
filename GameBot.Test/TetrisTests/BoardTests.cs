@@ -40,11 +40,56 @@ namespace GameBot.Test
             piece.Rotate();
 
             board.Place(piece);
-                    
+
             Assert.AreEqual(10, board.Width);
             Assert.AreEqual(19, board.Height);
 
             Debug.WriteLine(board.ToString());
+        }
+
+        [Test]
+        public void ColumnHeight()
+        {
+            int[] state = new[] {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,1,0,0,0,0,0,0,0,
+                0,0,1,0,0,1,0,0,0,0,
+                0,1,1,0,0,1,1,0,0,0,
+                0,1,1,1,0,1,1,0,1,0,
+                1,1,1,1,0,1,1,0,1,0,
+                0,1,1,1,0,0,1,0,1,0,
+                1,1,0,1,0,0,1,0,1,0
+            };
+
+            var board = new Board();
+            for (int x = 0; x < 10; x++)
+            {
+                for (int y = 0; y < 18; y++)
+                {
+                    if (state[10 * (18 - 1 - y) + x] == 1) { board.Occupy(x, y); }
+                }
+            }
+
+            Assert.AreEqual(3, board.ColumnHeight(0));
+            Assert.AreEqual(5, board.ColumnHeight(1));
+            Assert.AreEqual(7, board.ColumnHeight(2));
+            Assert.AreEqual(4, board.ColumnHeight(3));
+            Assert.AreEqual(0, board.ColumnHeight(4));
+            Assert.AreEqual(6, board.ColumnHeight(5));
+            Assert.AreEqual(5, board.ColumnHeight(6));
+            Assert.AreEqual(0, board.ColumnHeight(7));
+            Assert.AreEqual(4, board.ColumnHeight(8));
+            Assert.AreEqual(0, board.ColumnHeight(9));
         }
 
         [Test]

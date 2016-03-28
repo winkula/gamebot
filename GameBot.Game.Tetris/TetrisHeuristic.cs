@@ -1,6 +1,7 @@
 ﻿using GameBot.Core.Searching;
 using GameBot.Game.Tetris.Data;
 using System;
+using System.Diagnostics;
 
 namespace GameBot.Game.Tetris
 {
@@ -12,10 +13,10 @@ namespace GameBot.Game.Tetris
             var board = gameState.Board;
 
             var a = AggregateHeight(board);
-            var c = CompleteLines(board);
+            var c = gameState.Lines;
             var h = Holes(board);
             var b = Bumpiness(board);
-
+            
             return -0.510066 * a + 0.760666 * c - 0.35663 * h - 0.184483 * b;
         }
 

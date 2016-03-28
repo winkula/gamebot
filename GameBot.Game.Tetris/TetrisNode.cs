@@ -24,24 +24,23 @@ namespace GameBot.Game.Tetris
         {
             if (GameState.Piece != null)
             {
-                // TODO: use constants
-                for (int translation = -4; translation < 6; translation++)
+                foreach (var setting in Move.GetAllSettings(GameState.Piece.Tetromino))
                 {
-                    for (int orientation = 0; orientation < 4; orientation++)
+                    var orientation = setting.Rotation;
+                    var translation = setting.Translation;
+
+                    var newPiece = new Piece(GameState.Piece.Tetromino, orientation, translation);
+                    if (!GameState.Board.Intersects(newPiece))
                     {
-                        var newPiece = new Piece(GameState.Piece.Tetromino, orientation, translation);
-                        if (!GameState.Board.Intersects(newPiece))
-                        {
-                            var successor = new TetrisGameState(GameState, newPiece);
-                            var fall = successor.Drop();
+                        var successor = new TetrisGameState(GameState, newPiece);
+                        var fall = successor.Drop();
 
-                            var node = new TetrisNode(successor, this);
-                            node.Move = new Move(orientation, translation, fall);
+                        var node = new TetrisNode(successor, this);
+                        node.Move = new Move(orientation, translation, fall);
 
-                            yield return node;
-                        }
+                        yield return node;
                     }
-                }
+                }                
             }
         }
 

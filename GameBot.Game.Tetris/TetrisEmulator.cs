@@ -23,7 +23,6 @@ namespace GameBot.Game.Tetris
                     if (command.Duration > TimeSpan.Zero)
                     {
                         GameState.State.Drop();
-                        GameState.State.RemoveLines();
                     }
                     else
                     {

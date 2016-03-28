@@ -26,7 +26,6 @@ namespace GameBot.Test
         [TestCase(Tetromino.L, Tetromino.O)]
         [TestCase(Tetromino.J, Tetromino.T)]
         [TestCase(Tetromino.T, Tetromino.J)]
-        // Performance without probabilistic search before optimization: ~
         public void Search(Tetromino current, Tetromino next)
         {
             var gameState = new TetrisGameState(current, next);

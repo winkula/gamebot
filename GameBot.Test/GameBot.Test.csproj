@@ -140,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TetrisTests\ShapeTests.cs" />
+    <Compile Include="TetrisTests\TetrisGameStateTests.cs" />
     <Compile Include="TetrisTests\TetrisSearchTests.cs" />
     <Compile Include="CoreTests\ContextTests.cs" />
     <Compile Include="CoreTests\ScreenshotTests.cs" />

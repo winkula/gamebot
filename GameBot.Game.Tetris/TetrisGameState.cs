@@ -1,6 +1,8 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace GameBot.Game.Tetris
@@ -11,7 +13,8 @@ namespace GameBot.Game.Tetris
         public Piece Piece { get; private set; }
         public Piece NextPiece { get; private set; }
         public Move Move { get; set; }
-        
+        public int Lines { get; set; }
+
         public TetrisGameState()
         {
             Board = new Board();
@@ -24,6 +27,7 @@ namespace GameBot.Game.Tetris
             Board = new Board(old.Board);
             if (old.Piece != null) Piece = new Piece(old.Piece);
             if (old.NextPiece != null) NextPiece = new Piece(old.NextPiece);
+            Lines += old.Lines;
         }
 
         public TetrisGameState(TetrisGameState old, Piece piece)
@@ -31,6 +35,7 @@ namespace GameBot.Game.Tetris
             Board = new Board(old.Board);
             Piece = piece;
             if (old.NextPiece != null) NextPiece = new Piece(old.NextPiece);
+            Lines += old.Lines;
         }
 
         public TetrisGameState(Piece piece, Piece nextPiece)
@@ -92,58 +97,35 @@ namespace GameBot.Game.Tetris
 
         public int Drop(Piece next = null)
         {
-            int fall = 0;
+            if (Board.Intersects(Piece)) throw new ArgumentException("Piece already intersects the board");
 
-            while (!IsPieceLanded && fall < Board.Height)
+            int distance = int.MaxValue;
+
+            // calculate minimum falling distance
+            var head = Piece.Shape.Head;
+            foreach (var block in head)
             {
-                Piece.Fall();
-                fall++;
+                var distanceTest = (Board.Origin.Y + block.Y + Piece.Y) - Board.ColumnHeight(Board.Origin.X + block.X + Piece.X);
+                distance = Math.Min(distance, distanceTest);
             }
 
+            // let piece fall
+            Piece.Fall(distance);
             Board.Place(Piece);
             Piece = null;
 
+            // remove lines
+            int lines = Board.RemoveLines();
+            Lines += lines;
+
             if (NextPiece != null)
             {
+                // TODO: only generate new pice if this is explicitly wanted!
                 Piece = new Piece(NextPiece);
                 NextPiece = next ?? new Piece();
             }
 
-            return fall;
-        }
-
-        // TODO: merge with drop?
-        public void RemoveLines()
-        {
-            Board.RemoveLines();
-        }
-
-        public IEnumerable<TetrisGameState> GetSuccessors()
-        {
-            var successors = new List<TetrisGameState>();
-
-            if (Piece != null)
-            {
-                // TODO: use constants
-                for (int translation = -4; translation < 6; translation++)
-                {
-                    for (int rotation = 0; rotation < 4; rotation++)
-                    {
-                        var newPiece = new Piece(Piece.Tetromino, rotation, translation);
-
-                        if (!Board.Intersects(newPiece))
-                        {
-                            var successor = new TetrisGameState(this, newPiece);
-                            var fall = successor.Drop();
-                            
-                            successor.Move = new Move(rotation, translation, fall);                                                        
-                            successors.Add(successor);
-                        }
-                    }
-                }
-            }
-
-            return successors;
+            return distance;
         }
 
         public override int GetHashCode()
@@ -169,15 +151,7 @@ namespace GameBot.Game.Tetris
 
         public override string ToString()
         {
-            /*
-            var sb = new StringBuilder();
-            sb.AppendLine(Piece.ToString());
-            sb.AppendLine(NextPiece.ToString());
-            sb.Append(Board.ToString());
-            return sb.ToString();*/
-
             var builder = new StringBuilder();
-            //builder.AppendFormat("Board(p:{0})\n", Pieces);
             builder.Append(" ");
             builder.AppendLine(new string('-', Board.Width));
             for (int y = Board.Height - 1; y >= 0; y--)

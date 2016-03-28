@@ -74,7 +74,8 @@ namespace GameBot.Game.Tetris
             {
                 double chance = tetromino.GetChance();
 
-                var child = new TetrisGameState(parent.GameState.Board, new Piece(tetromino), null);
+                var newState = new TetrisGameState(parent.GameState, new Piece(tetromino));
+                var child = new TetrisNode(newState);
                 var successors = child.GetSuccessors();
                 var score = GetBestScore(successors);
 
@@ -84,13 +85,13 @@ namespace GameBot.Game.Tetris
             return expectation;
         }
                 
-        protected double GetBestScore(IEnumerable<TetrisGameState> successors)
+        protected double GetBestScore(IEnumerable<TetrisNode> successors)
         {
             var bestScore = double.NegativeInfinity;
 
             foreach (var successor in successors)
             {
-                var score = heuristic.Score(successor);
+                var score = heuristic.Score(successor.GameState);
                 bestScore = Math.Max(bestScore, score);
             }
 
