@@ -10,3 +10,4 @@
 * Next piece in the game state is only generated if really needed
 * Improve performance by optimizing game state transformations
 * Precalculate AI decisions?
+* Implement possible start settings of the Tetrominos as lookup table instead of a switch case (maybe a little performance boost?)
