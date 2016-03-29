@@ -10,6 +10,8 @@ namespace GameBot.Game.Tetris
         // Heuristic from here: https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
         public double Score(TetrisGameState gameState)
         {
+            //return 10.0; // TODO: remove dummy lookup test
+
             var board = gameState.Board;
 
             var a = AggregateHeight(board);

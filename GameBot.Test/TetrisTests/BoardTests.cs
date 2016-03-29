@@ -19,6 +19,16 @@ namespace GameBot.Test
 
             Assert.AreEqual(width, board.Width);
             Assert.AreEqual(height, board.Height);
+            Assert.AreEqual(0, board.Pieces);
+
+            for (int x = 0; x < board.Width; x++)
+            {
+                for (int y = 0; y < board.Height; y++)
+                {
+                    Assert.True(board.IsFree(x, y));
+                    Assert.False(board.IsOccupied(x, y));
+                }
+            }
         }
 
         [Test]
@@ -28,21 +38,103 @@ namespace GameBot.Test
 
             Assert.AreEqual(10, board.Width);
             Assert.AreEqual(19, board.Height);
+            Assert.AreEqual(0, board.Pieces);
 
             Debug.WriteLine(board.ToString());
+
+            for (int x = 0; x < board.Width; x++)
+            {
+                for (int y = 0; y < board.Height; y++)
+                {
+                    Assert.True(board.IsFree(x, y));
+                    Assert.False(board.IsOccupied(x, y));
+                }
+            }
+        }
+
+        [Test]
+        public void SquareExists()
+        {
+            var board = new Board();
+
+            Assert.True(board.SquareExists(0, 0));
+            Assert.True(board.SquareExists(board.Width - 1, board.Height - 1));
+            Assert.True(board.SquareExists(board.Width / 2, board.Height / 2));
+            Assert.False(board.SquareExists(board.Width, board.Height));
+            Assert.False(board.SquareExists(0, board.Height));
+            Assert.False(board.SquareExists(board.Width, 0));
+            Assert.False(board.SquareExists(-1, -1));
+            Assert.False(board.SquareExists(-1, 0));
+            Assert.False(board.SquareExists(0, -1));
+        }
+
+        [TestCase(1, 5)]
+        [TestCase(3, 12)]
+        [TestCase(9, 2)]
+        [TestCase(5, 17)]
+        [TestCase(0, 0)]
+        [TestCase(9, 18)]
+        public void Occupy(int x, int y)
+        {
+            var board = new Board();
+
+            Assert.True(board.IsFree(x, y));
+
+            board.Occupy(x, y);
+
+            for (int _x = 0; _x < board.Width; _x++)
+            {
+                for (int _y = 0; _y < board.Height; _y++)
+                {
+                    if (_x == x && _y == y)
+                    {
+                        Assert.True(board.IsOccupied(_x, _y));
+                    }
+                    else
+                    {
+                        Assert.True(board.IsFree(_x, _y));
+                    }
+                }
+            }
+
+            Assert.True(board.IsOccupied(x, y));
         }
 
         [Test]
         public void Place()
         {
+            var expected = Build(new[] {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,1,0,0,0,0,0,
+                0,0,0,0,1,0,0,0,0,0,
+                0,0,0,0,1,0,0,0,0,0,
+                0,0,0,0,1,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0
+            });
             var board = new Board();
             var piece = new Piece(Tetromino.I);
             piece.Rotate();
+            piece.Fall();
 
             board.Place(piece);
 
             Assert.AreEqual(10, board.Width);
             Assert.AreEqual(19, board.Height);
+            Assert.AreEqual(1, board.Pieces);
+            Assert.AreEqual(expected, board);
 
             Debug.WriteLine(board.ToString());
         }
@@ -50,7 +142,8 @@ namespace GameBot.Test
         [Test]
         public void ColumnHeight()
         {
-            int[] state = new[] {
+            var board = Build(new[] {
+                0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
@@ -69,16 +162,7 @@ namespace GameBot.Test
                 1,1,1,1,0,1,1,0,1,0,
                 0,1,1,1,0,0,1,0,1,0,
                 1,1,0,1,0,0,1,0,1,0
-            };
-
-            var board = new Board();
-            for (int x = 0; x < 10; x++)
-            {
-                for (int y = 0; y < 18; y++)
-                {
-                    if (state[10 * (18 - 1 - y) + x] == 1) { board.Occupy(x, y); }
-                }
-            }
+            });
 
             Assert.AreEqual(3, board.ColumnHeight(0));
             Assert.AreEqual(5, board.ColumnHeight(1));
@@ -93,7 +177,98 @@ namespace GameBot.Test
         }
 
         [Test]
-        public void Equals()
+        public void RemoveLines()
+        {
+            var board = Build(new[] {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,1,0,0,1,0,0,0,0,
+                1,1,1,1,0,1,1,1,1,1,
+                0,0,1,0,0,1,0,0,1,0,
+                1,1,1,1,0,1,1,1,1,1,
+                1,0,0,1,0,1,0,1,0,0,
+                0,1,0,1,1,1,1,0,0,0,
+                1,0,1,1,0,1,0,0,1,0,
+                0,0,1,1,0,1,1,1,0,1
+            });
+            var expected = Build(new[] {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,1,0,0,1,0,0,0,0,
+                0,0,1,0,1,1,0,0,1,0,
+                1,0,0,1,1,1,0,1,0,0,
+                0,1,0,1,1,1,1,0,0,0,
+                1,0,1,1,0,1,0,0,1,0,
+                0,0,1,1,0,1,1,1,0,1
+            });
+            
+            var piece = new Piece(Tetromino.I).Rotate().Fall(12);
+            board.Place(piece);
+            board.RemoveLines();
+            
+            Assert.True(SquaresEqual(expected, board));
+        }
+
+        [Test]
+        public void Intersects()
+        {
+            var board = Build(new[] {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,1,1,0,0,0,0,
+                0,0,0,0,1,1,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,
+                0,0,1,0,0,1,0,0,0,0,
+                0,0,1,0,1,1,0,0,1,0,
+                1,0,0,1,1,1,0,1,0,0,
+                0,1,0,1,1,1,1,0,0,0,
+                1,0,1,1,0,1,0,0,1,0,
+                0,0,1,1,0,1,1,1,0,1
+            });
+            var piece = new Piece(Tetromino.O).Fall(6);
+
+            Assert.True(board.Intersects(piece));
+        }
+
+        [Test]
+        public void NotIntersects()
+        {
+            var board = new Board();
+            var piece = new Piece(Tetromino.Z).Rotate();
+
+            Assert.False(board.Intersects(piece));
+        }
+
+        [Test]
+        public void Equal()
         {
             var board1 = new Board();
             var board2 = new Board();
@@ -108,7 +283,7 @@ namespace GameBot.Test
         }
 
         [Test]
-        public void NotEquals()
+        public void NotEqual()
         {
             var board1 = new Board();
             var board2 = new Board();
@@ -120,6 +295,37 @@ namespace GameBot.Test
             board2.Occupy(6, 10);
 
             Assert.AreNotEqual(board1, board2);
+        }
+
+        private Board Build(int[] squares)
+        {
+            var board = new Board();
+            for (int x = 0; x < board.Width; x++)
+            {
+                for (int y = 0; y < board.Height; y++)
+                {
+                    if (squares[board.Width * (board.Height - 1 - y) + (x)] > 0)
+                    {
+                        board.Occupy(x, y);
+                    }
+                }
+            }
+            return board;
+        }
+
+        private bool SquaresEqual(Board expected, Board board)
+        {
+            for (int x = 0; x < expected.Width; x++)
+            {
+                for (int y = 0; y < expected.Height; y++)
+                {
+                    if (expected.IsFree(x, y) && !board.IsFree(x, y))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }

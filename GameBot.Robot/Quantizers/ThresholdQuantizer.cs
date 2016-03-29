@@ -28,17 +28,22 @@ namespace GameBot.Robot.Quantizers
 
         public IScreenshot Quantize(Image image, TimeSpan timestamp)
         {
-            Image<Gray, Byte> sourceImage = new Image<Gray, Byte>(new Bitmap(image));
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            Image<Gray, Byte> sourceImage = new Image<Gray, Byte>(new Bitmap(image));            
             Image<Gray, Byte> destImage = new Image<Gray, Byte>(160, 144);
             Image<Gray, Byte> destImageBin = new Image<Gray, Byte>(160, 144);
 
             Matrix<float> sourceMat = new Matrix<float>(keypoints);
             Matrix<float> destMat = new Matrix<float>(new float[,] { { 0, 0 }, { 160, 0 }, { 0, 144 }, { 160, 144 } });
-
-            var transform = CvInvoke.GetPerspectiveTransform(sourceMat, destMat);
-            CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(160, 144), Inter.Linear, Warp.Default);
             
+            var transform = CvInvoke.GetPerspectiveTransform(sourceMat, destMat);
+
             CvInvoke.Threshold(destImage, destImageBin, threshold, 255, ThresholdType.Binary);
+
+            stopwatch.Stop();
+            Debug.WriteLine("WarpPerspective: " + stopwatch.ElapsedMilliseconds);
 
             while (adjust)
             {
