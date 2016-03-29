@@ -17,41 +17,7 @@ namespace GameBot.Test.TetrisTests
         {
             var heuristic = new TetrisHeuristic();
         }
-
-        [TestCase(0, 0, new int[] {
-            0,0,0,0,
-            0,1,0,0,
-            0,1,0,1,
-            0,1,1,1
-        })]
-        [TestCase(3, 1, new int[] {
-            0,0,0,0,
-            0,1,0,0,
-            0,1,0,1,
-            0,1,1,1
-        })]
-        [TestCase(1, 2, new int[] {
-            0,0,0,0,
-            0,1,0,0,
-            0,1,0,1,
-            0,1,1,1
-        })]
-        [TestCase(2, 3, new int[] {
-            0,0,0,0,
-            0,1,0,0,
-            0,1,0,1,
-            0,1,1,1
-        })]
-        public void Height(int expected, int x, int[] squares)
-        {
-            var heuristic = new TetrisHeuristic();
-            var board = Build(4, 4, squares);
-
-            var height = heuristic.Height(board, x);
-
-            Assert.AreEqual(expected, height);
-        }
-
+        
         [TestCase(6, new int[] {
             0,0,0,0,
             0,1,0,0,

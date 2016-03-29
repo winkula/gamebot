@@ -82,22 +82,67 @@ namespace GameBot.Test
 
             board.Occupy(x, y);
 
+            Assert.True(board.IsOccupied(x, y));
+
             for (int _x = 0; _x < board.Width; _x++)
             {
                 for (int _y = 0; _y < board.Height; _y++)
                 {
-                    if (_x == x && _y == y)
-                    {
-                        Assert.True(board.IsOccupied(_x, _y));
-                    }
-                    else
+                    if (_x != x || _y != y)
                     {
                         Assert.True(board.IsFree(_x, _y));
                     }
                 }
             }
+        }
+
+        [TestCase(1, 5)]
+        [TestCase(3, 12)]
+        [TestCase(9, 2)]
+        [TestCase(5, 17)]
+        [TestCase(0, 0)]
+        [TestCase(9, 18)]
+        public void Free(int x, int y)
+        {
+            var board = Build(new[] {
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1
+            });
 
             Assert.True(board.IsOccupied(x, y));
+
+            board.Free(x, y);
+
+            Assert.True(board.IsFree(x, y));
+
+            for (int _x = 0; _x < board.Width; _x++)
+            {
+                for (int _y = 0; _y < board.Height; _y++)
+                {
+                    Debug.WriteLine(_x + "," + _y);
+                    if (_x != x || _y != y)
+                    {
+                        Assert.True(board.IsOccupied(_x, _y));
+                    }
+                }
+            }
         }
 
         [Test]
@@ -125,18 +170,42 @@ namespace GameBot.Test
                 0,0,0,0,0,0,0,0,0,0
             });
             var board = new Board();
-            var piece = new Piece(Tetromino.I);
-            piece.Rotate();
-            piece.Fall();
+            var piece = new Piece(Tetromino.I).Rotate().Fall();
 
             board.Place(piece);
 
             Assert.AreEqual(10, board.Width);
             Assert.AreEqual(19, board.Height);
             Assert.AreEqual(1, board.Pieces);
-            Assert.AreEqual(expected, board);
+            Assert.True(SquaresEqual(expected, board));
+        }
 
-            Debug.WriteLine(board.ToString());
+        [Test]
+        public void CompletedLines()
+        {
+            var board = Build(new[] {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,1,1,0,0,0,0,
+                0,0,0,0,1,1,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,
+                1,1,1,1,1,1,1,1,1,1,
+                0,0,0,0,0,1,0,0,0,0,
+                0,1,1,1,1,1,1,1,1,1,
+                0,0,1,0,1,1,0,0,1,0,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,0,
+                1,1,1,1,1,1,1,1,1,1
+            });
+
+            Assert.AreEqual(4, board.CompletedLines);
         }
 
         [Test]
@@ -173,7 +242,44 @@ namespace GameBot.Test
             Assert.AreEqual(5, board.ColumnHeight(6));
             Assert.AreEqual(0, board.ColumnHeight(7));
             Assert.AreEqual(4, board.ColumnHeight(8));
-            Assert.AreEqual(0, board.ColumnHeight(9));
+            Assert.AreEqual(0, board.ColumnHeight(9));            
+        }
+
+        [Test]
+        public void ColumnHoles()
+        {
+            var board = Build(new[] {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,1,0,0,0,0,0,0,1,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,1,0,0,0,0,0,0,0,
+                0,0,1,0,0,0,0,0,0,0,
+                0,0,0,0,1,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,1,1,0,0,0,0,0,0,
+                0,0,1,1,1,1,1,1,0,0,
+                0,1,1,1,0,1,1,0,1,0,
+                0,1,1,1,0,1,1,0,0,0,
+                1,1,1,1,0,1,1,1,1,0,
+                0,1,1,1,0,0,1,0,1,0,
+                1,1,0,1,0,0,1,0,1,0
+            });
+
+            Assert.AreEqual(1, board.ColumnHoles(0));
+            Assert.AreEqual(0, board.ColumnHoles(1));
+            Assert.AreEqual(5, board.ColumnHoles(2));
+            Assert.AreEqual(0, board.ColumnHoles(3));
+            Assert.AreEqual(7, board.ColumnHoles(4));
+            Assert.AreEqual(2, board.ColumnHoles(5));
+            Assert.AreEqual(0, board.ColumnHoles(6));
+            Assert.AreEqual(4, board.ColumnHoles(7));
+            Assert.AreEqual(1, board.ColumnHoles(8));
+            Assert.AreEqual(13, board.ColumnHoles(9));
         }
 
         [Test]
@@ -224,8 +330,14 @@ namespace GameBot.Test
             
             var piece = new Piece(Tetromino.I).Rotate().Fall(12);
             board.Place(piece);
+
+            Debug.WriteLine(board.ToString());
+
             board.RemoveLines();
             
+            Debug.WriteLine(board.ToString());
+            //Debug.WriteLine(expected.ToString());
+
             Assert.True(SquaresEqual(expected, board));
         }
 

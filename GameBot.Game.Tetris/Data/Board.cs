@@ -13,36 +13,120 @@ namespace GameBot.Game.Tetris.Data
     public class Board
     {
         public static Point Origin = new Point(4, 16);
+        private static int[] columnHeights;
+        private static int[] columnHoles;
+
+        private static void CalculateLookupTables()
+        {
+            columnHeights = new int[0x7FFFF + 1];
+            columnHoles = new int[0x7FFFF + 1];
+            for (int i = 1; i < 0x7FFFF + 1; i++)
+            {
+                // calculate heights
+                columnHeights[i] = 1 + (int)Math.Log(i, 2);
+
+                // calculate holes
+                int holes = 0;
+                int tempCount = 0;
+                for (int y = 0; y < 32; y++)
+                {
+                    if ((i & (1 << y)) > 0)
+                    {
+                        holes += tempCount;
+                        tempCount = 0;
+                    }
+                    else
+                    {
+                        tempCount++;
+                    }
+                }
+                columnHoles[i] = holes;
+            }
+        }
+
+        private static int GetColumnHeight(int column)
+        {
+            if (columnHeights == null)
+            {
+                CalculateLookupTables();
+            }
+            return columnHeights[column];
+        }
+
+        private static int GetColumnHoles(int column)
+        {
+            if (columnHeights == null)
+            {
+                CalculateLookupTables();
+            }
+            return columnHoles[column];
+        }
 
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int Pieces { get; private set; }
+
+        /// <summary>
+        /// Every column is represented by an integer. Every bit represents a square. 1 true means occupied, 0 means free.
+        /// The least significant bit is the square with the coordinate y = 0.
+        /// This implementation allows fast lookups of the column height or other values relevant to the board heuristic.
+        /// </summary>
+        private int[] Columns { get; }
 
         protected bool this[int x, int y]
         {
             get
             {
                 if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
-                return squares[Width * y + x];
+                return (Columns[x] & (1 << y)) > 0;
             }
             set
             {
                 if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
-                squares[Width * y + x] = value;
+                if (value)
+                {
+                    // set one bit
+                    Columns[x] |= (1 << y);
+                }
+                else
+                {
+                    // clear one bit
+                    Columns[x] &= ~(1 << y);
+                }
             }
         }
 
-        /// <summary>
-        /// true means occupied, false means free.
-        /// </summary>
-        private bool[] squares;
+        public int CompletedLines
+        {
+            get
+            {
+                // AND every column
+                int mask = ~0;
+                for (int x = 0; x < Width; x++)
+                {
+                    mask &= Columns[x];
+                    if (mask == 0) return 0; // no lines
+                }
+
+                // count bits on mask
+                int count = 0;
+                while (mask != 0)
+                {
+                    count++;
+                    mask &= (mask - 1);
+                }
+                return count;
+            }
+        }
 
         public Board(int width, int height)
         {
+            if (height > 30) throw new ArgumentException("height must be not greater than 30");
+
             Width = width;
             Height = height;
             Pieces = 0;
-            squares = new bool[width * height];
+            Columns = new int[width];
         }
 
         public Board() : this(10, 19)
@@ -54,8 +138,8 @@ namespace GameBot.Game.Tetris.Data
             Width = board.Width;
             Height = board.Height;
             Pieces = board.Pieces;
-            squares = new bool[board.Width * board.Height];
-            Array.Copy(board.squares, squares, board.squares.Length);
+            Columns = new int[board.Width];
+            Array.Copy(board.Columns, Columns, board.Columns.Length);
         }
 
         public bool IsOccupied(int x, int y)
@@ -73,17 +157,23 @@ namespace GameBot.Game.Tetris.Data
             this[x, y] = true;
         }
 
-        // TODO: implement with lookup table
+        public void Free(int x, int y)
+        {
+            this[x, y] = false;
+        }
+        
         public int ColumnHeight(int x)
         {
-            for (int y = Height - 1; y >= 0; y--)
-            {
-                if (IsOccupied(x, y))
-                {
-                    return y + 1;
-                }
-            }
-            return 0;
+            if (x >= Width) throw new ArgumentException("x must be lower than the width of the board");
+            
+            return GetColumnHeight(Columns[x]);
+        }
+
+        public int ColumnHoles(int x)
+        {
+            if (x >= Width) throw new ArgumentException("x must be lower than the width of the board");
+
+            return GetColumnHoles(Columns[x]);
         }
 
         public bool SquareExists(int x, int y)
@@ -189,7 +279,8 @@ namespace GameBot.Game.Tetris.Data
                 return
                     Width == other.Width &&
                     Height == other.Height &&
-                    squares.SequenceEqual(other.squares);
+                    Pieces == other.Pieces &&
+                    Columns.SequenceEqual(other.Columns);
             }
             return false;
         }
