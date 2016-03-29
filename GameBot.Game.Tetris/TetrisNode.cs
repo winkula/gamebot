@@ -40,7 +40,7 @@ namespace GameBot.Game.Tetris
 
                         yield return node;
                     }
-                }                
+                }
             }
         }
 

@@ -9,7 +9,7 @@ namespace GameBot.Robot.Engines
 {
     public class FastEngine : IEngine
     {
-        private readonly IDecider<TetrisGameStateFull> decider;        
+        private readonly IDecider<TetrisGameStateFull> decider;
         private readonly TetrisEmulator emulator;
 
         public FastEngine(IDecider<TetrisGameStateFull> decider, TetrisEmulator emulator)
@@ -28,13 +28,25 @@ namespace GameBot.Robot.Engines
 
         protected void Loop()
         {
-            int limit = 1000;
-            while (limit > 0 && !emulator.GameState.State.IsEnd)
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            int games = 10000;
+            for (int i = 0; i < games; i++)
             {
+                Debug.WriteLine("Play round " + i + "...");
+
+                if (emulator.GameState.State.IsEnd)
+                {
+                    Debug.WriteLine("Lost!");
+                    return;
+                }
+
                 Update();
-                Render();
-                limit--;
+                //Render();
             }
+            stopwatch.Stop();
+            Debug.WriteLine("Successfully played " + games + " rounds!");
+            Debug.WriteLine("Elapsed time in ms: " + stopwatch.ElapsedMilliseconds);
         }
 
         protected void Update()
@@ -47,13 +59,13 @@ namespace GameBot.Robot.Engines
                     if (command.Button != Button.Down)
                     {
                         emulator.Execute(command);
-                        Debug.WriteLine(command.Button);
+                        //Debug.WriteLine(command.Button);
                         //Render();
                     }
                 }
                 // drop
                 emulator.Execute(new Command(Button.Down, TimeSpan.Zero, TimeSpan.FromSeconds(1)));
-                Debug.WriteLine("Drop");
+                //Debug.WriteLine("Drop");
                 //Render();
             }
             else

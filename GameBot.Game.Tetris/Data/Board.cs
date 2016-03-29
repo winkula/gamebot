@@ -15,11 +15,13 @@ namespace GameBot.Game.Tetris.Data
         public static Point Origin = new Point(4, 16);
         private static int[] columnHeights;
         private static int[] columnHoles;
+        private static int[] linePosition;
 
         private static void CalculateLookupTables()
         {
             columnHeights = new int[0x7FFFF + 1];
             columnHoles = new int[0x7FFFF + 1];
+            linePosition = new int[0x7FFFF + 1];
             for (int i = 1; i < 0x7FFFF + 1; i++)
             {
                 // calculate heights
@@ -41,6 +43,17 @@ namespace GameBot.Game.Tetris.Data
                     }
                 }
                 columnHoles[i] = holes;
+
+                // calculate line position
+                linePosition[i] = -1;
+                for (int y = 0; y < 32; y++)
+                {
+                    if ((i & (1 << y)) > 0)
+                    {
+                        linePosition[i] = y;
+                        break;
+                    }
+                }
             }
         }
 
@@ -55,11 +68,20 @@ namespace GameBot.Game.Tetris.Data
 
         private static int GetColumnHoles(int column)
         {
-            if (columnHeights == null)
+            if (columnHoles == null)
             {
                 CalculateLookupTables();
             }
             return columnHoles[column];
+        }
+
+        private static int GetLinePosition(int columns)
+        {
+            if (linePosition == null)
+            {
+                CalculateLookupTables();
+            }
+            return linePosition[columns];
         }
 
         public int Width { get; private set; }
@@ -161,11 +183,11 @@ namespace GameBot.Game.Tetris.Data
         {
             this[x, y] = false;
         }
-        
+
         public int ColumnHeight(int x)
         {
             if (x >= Width) throw new ArgumentException("x must be lower than the width of the board");
-            
+
             return GetColumnHeight(Columns[x]);
         }
 
@@ -194,48 +216,40 @@ namespace GameBot.Game.Tetris.Data
             Pieces++;
         }
 
-        // TODO: merge with drop? implement faster (bit operations)
+        // TODO: merge with drop?
         public int RemoveLines()
         {
-            int lines = 0;
-            for (int y = 0; y < Height; y++)
+            int removed = 0;
+            for (int i = 0; i < Height; i++) // TODO: replace with simple while-true-loop?
             {
-                if (HasLine(y))
+                // AND every column
+                int mask = ~0;
+                for (int x = 0; x < Width; x++)
                 {
-                    lines++;
-                    CopySquaresDown(y);
-                    y--;
+                    mask &= Columns[x];
+                    if (mask == 0) return removed; // no lines
                 }
-            }
-            return lines;
-        }
 
-        private bool HasLine(int y)
+                int y = GetLinePosition(mask);
+                removed++;
+                CopySquaresDown(y);
+            }
+            return removed;
+        }
+        
+        private void CopySquaresDown(int yCompleteLine)
         {
             for (int x = 0; x < Width; x++)
             {
-                if (!IsOccupied(x, y)) return false;
-            }
-            return true;
-        }
+                // clear square on completed line
+                this[x, yCompleteLine] = false;
 
-        private void CopySquaresDown(int yCompleteLine)
-        {
-            for (int y = yCompleteLine; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    if (y == Height - 1)
-                    {
-                        // fill with empty squares
-                        this[x, y] = false;
-                    }
-                    else
-                    {
-                        // copy from above
-                        this[x, y] = this[x, y + 1];
-                    }
-                }
+                // copy from above
+                var maskTop = ~0 << (yCompleteLine + 1);
+                var maskBottom = ~maskTop;
+                var top = (maskTop & Columns[x]) >> 1;
+                var bottom = maskBottom & Columns[x];
+                Columns[x] = top | bottom;
             }
         }
 

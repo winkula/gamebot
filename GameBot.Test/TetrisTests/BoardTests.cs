@@ -1,8 +1,6 @@
 ﻿using GameBot.Game.Tetris.Data;
 using NUnit.Framework;
-using System;
 using System.Diagnostics;
-using System.Linq;
 
 namespace GameBot.Test
 {
@@ -283,7 +281,7 @@ namespace GameBot.Test
         }
 
         [Test]
-        public void RemoveLines()
+        public void RemoveLines1()
         {
             var board = Build(new[] {
                 0,0,0,0,0,0,0,0,0,0,
@@ -326,17 +324,67 @@ namespace GameBot.Test
                 0,1,0,1,1,1,1,0,0,0,
                 1,0,1,1,0,1,0,0,1,0,
                 0,0,1,1,0,1,1,1,0,1
-            });
-            
+            });            
             var piece = new Piece(Tetromino.I).Rotate().Fall(12);
-            board.Place(piece);
 
-            Debug.WriteLine(board.ToString());
-
+            board.Place(piece);            
             board.RemoveLines();
             
+            Assert.True(SquaresEqual(expected, board));
+        }
+        
+        [Test]
+        public void RemoveLines2()
+        {
+            var board = Build(new[] {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                1,1,1,1,0,1,1,1,1,1
+            });
+            var expected = Build(new[] {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,1,0,0,0,0,0,
+                0,0,0,0,1,0,0,0,0,0,
+                0,0,0,0,1,0,0,0,0,0
+            });
+            var piece = new Piece(Tetromino.I).Rotate().Fall(15);
+
+            board.Place(piece);
+            board.RemoveLines();
+
             Debug.WriteLine(board.ToString());
-            //Debug.WriteLine(expected.ToString());
+            Debug.WriteLine(expected.ToString());
 
             Assert.True(SquaresEqual(expected, board));
         }
@@ -431,6 +479,10 @@ namespace GameBot.Test
             {
                 for (int y = 0; y < expected.Height; y++)
                 {
+                    if (expected.IsOccupied(x, y) && !board.IsOccupied(x, y))
+                    {
+                        return false;
+                    }
                     if (expected.IsFree(x, y) && !board.IsFree(x, y))
                     {
                         return false;

@@ -47,7 +47,7 @@ namespace GameBot.Game.Tetris
                     Debug.WriteLine(move);
                     Debug.WriteLine(goal);
                     Debug.WriteLine("========================== ");
-
+                    
                     for (int i = 0; i < move.Rotation; i++)
                     {
                         commands.Add(Button.A);
