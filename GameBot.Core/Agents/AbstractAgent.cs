@@ -5,24 +5,27 @@ namespace GameBot.Core.Agents
     public abstract class AbstractAgent<T> : IAgent where T : class, IGameState
     {
         protected readonly IExtractor<T> Extractor;
-        protected readonly IDecider<T> Decider;
+        protected readonly ISolver<T> Solver;
 
-        protected readonly IContext<T> Context;
-
-        public AbstractAgent(IExtractor<T> extractor, IDecider<T> decider)
+        public AbstractAgent(IExtractor<T> extractor, ISolver<T> solver)
         {
             Extractor = extractor;
-            Decider = decider;
-            Context = new Context<T>();
+            Solver = solver;
         }
 
         public ICommands Act(IScreenshot screenshot)
         {
-            var gameState = Extractor.Extract(screenshot, Context);
-            //Context.Add(gameState);
+            var gameState = Extractor.Extract(screenshot);
+            if (MustSolve(gameState))
+            {
+                return Solver.Solve(gameState);
+            }
+            return new Commands();
+        }
 
-            var commands = Decider.Decide(gameState, Context);
-            return commands;
+        protected virtual bool MustSolve(T gameState)
+        {
+            return true;
         }
     }
 }

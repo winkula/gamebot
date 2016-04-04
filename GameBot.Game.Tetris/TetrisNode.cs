@@ -30,7 +30,7 @@ namespace GameBot.Game.Tetris
                     var translation = setting.Translation;
 
                     var newPiece = new Piece(GameState.Piece.Tetromino, orientation, translation);
-                    if (!GameState.Board.Intersects(newPiece))
+                    if (GameState.Board.CanDrop(newPiece))
                     {
                         var successor = new TetrisGameState(GameState, newPiece);
                         var fall = successor.Drop();

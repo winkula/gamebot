@@ -84,15 +84,14 @@
     <Compile Include="Data\Commands.cs" />
     <Compile Include="Data\ICommand.cs" />
     <Compile Include="Data\ICommands.cs" />
-    <Compile Include="Data\Context.cs" />
-    <Compile Include="Data\IContext.cs" />
     <Compile Include="Data\IGameState.cs" />
     <Compile Include="Data\Screenshot.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="IActor.cs" />
     <Compile Include="ICamera.cs" />
     <Compile Include="IEmulator.cs" />
     <Compile Include="IExecutor.cs" />
-    <Compile Include="IDecider.cs" />
+    <Compile Include="ISolver.cs" />
     <Compile Include="IAgent.cs" />
     <Compile Include="IExtractor.cs" />
     <Compile Include="IQuantizer.cs" />

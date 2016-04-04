@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisDecider : IDecider<TetrisGameStateFull>
+    public class TetrisSolver : ISolver<TetrisGameState>
     {
         private readonly DepthFirstSearch search = new DepthFirstSearch();
         private readonly ISearch<TetrisNode> tetrisSearch = new TetrisSearch(new TetrisHeuristic());
@@ -15,7 +15,7 @@ namespace GameBot.Game.Tetris
 
         private TetrisGameState lastGameState;
 
-        public ICommands Decide(TetrisGameStateFull gameState, IContext<TetrisGameStateFull> context)
+        public ICommands Solve(TetrisGameState gameState)
         {
             var commands = new Commands();
             if (!started)
@@ -32,22 +32,22 @@ namespace GameBot.Game.Tetris
                 // Play mode
 
                 if (
-                    gameState.State.Piece != null &&
-                    gameState.State.NextPiece != null &&
-                    (lastGameState == null || !lastGameState.Equals(gameState.State))
+                    gameState.Piece != null &&
+                    gameState.NextPiece != null &&
+                    (lastGameState == null || !lastGameState.Equals(gameState))
                     )
                 {
-                    var start = new TetrisNode(new TetrisGameState(gameState.State));
+                    var start = new TetrisNode(new TetrisGameState(gameState));
                     var result = tetrisSearch.Search(start);
 
                     var goal = result.Parent;
                     var move = result.Parent.Move;
-                    
+
                     Debug.WriteLine("======= Goal state ======= ");
                     Debug.WriteLine(move);
                     Debug.WriteLine(goal);
                     Debug.WriteLine("========================== ");
-                    
+
                     for (int i = 0; i < move.Rotation; i++)
                     {
                         commands.Add(Button.A);
@@ -70,6 +70,11 @@ namespace GameBot.Game.Tetris
 
                     if (move.Fall > 0)
                     {
+                        // TODO: set start level
+                        //var command = new Command(Button.Down, TimeSpan.Zero, Level.GetDuration(0, gameState.Level));
+                        //commands.Add(command);
+                        
+                        // TODO: drop with press duration (level dependent)
                         int slip = 0;//= fall*3/4;
                         for (int i = 0; i < move.Fall - slip; i++)
                         {
@@ -77,7 +82,7 @@ namespace GameBot.Game.Tetris
                         }
                     }
 
-                    lastGameState = new TetrisGameState(gameState.State);
+                    lastGameState = new TetrisGameState(gameState);
                 }
             }
             return commands;

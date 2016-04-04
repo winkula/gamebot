@@ -8,7 +8,7 @@ using System.IO;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisExtractor : IExtractor<TetrisGameStateFull>
+    public class TetrisExtractor : IExtractor<TetrisGameState>
     {
         private static Point BoardTileOrigin = new Point(2, 0);
         private static Point CurrentTileOrigin = new Point(5, 0);
@@ -16,21 +16,19 @@ namespace GameBot.Game.Tetris
 
         private IScreenshot screenshot;
 
-        public TetrisGameStateFull Extract(IScreenshot screenshot, IContext<TetrisGameStateFull> context)
+        public TetrisGameState Extract(IScreenshot screenshot)
         {
             this.screenshot = screenshot;
-
-            var gameState = new TetrisGameStateFull();
 
             var board = ExtractBoard();
             var currentPiece = ExtractCurrentPiece();
             var nextPiece = ExtractNextPiece();
 
-            gameState.State = new TetrisGameState(board, currentPiece, nextPiece);
+            var gameState = new TetrisGameState(board, currentPiece, nextPiece);
 
-            if (gameState.State.Piece != null && gameState.State.NextPiece != null)
+            if (gameState.Piece != null && gameState.NextPiece != null)
             {
-                string text = string.Format("{0}\n", gameState.State.Piece.Tetromino);
+                string text = string.Format("{0}\n", gameState.Piece.Tetromino);
                 File.AppendAllText(string.Format(@"{0}\tetris_extractor_log.txt", Environment.GetFolderPath(Environment.SpecialFolder.Desktop)), text);
             }
 

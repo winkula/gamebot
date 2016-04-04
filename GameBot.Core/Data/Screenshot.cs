@@ -5,7 +5,7 @@ namespace GameBot.Core.Data
 {
     public class Screenshot : IScreenshot
     {
-        private const int TileSize = 8;
+        public const int TileSize = 8;
 
         public int[] Pixels { get; private set; }
         public int Width { get; private set; }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace GameBot.Test.TetrisTests
 {
     [TestFixture]
-    public class HeuristicTests
+    public class TetrisHeuristicTests
     {
         [Test]
         public void Constructor()

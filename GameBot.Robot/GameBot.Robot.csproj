@@ -145,6 +145,7 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Cameras\Camera.cs" />
+    <Compile Include="Data\EmguScreenshot.cs" />
     <Compile Include="Engines\FastEngine.cs" />
     <Compile Include="Engines\BlindEngine.cs" />
     <Compile Include="Executors\EmulatorExecutor.cs" />

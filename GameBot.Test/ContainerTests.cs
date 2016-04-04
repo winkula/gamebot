@@ -20,11 +20,10 @@ namespace GameBot.Test
             Assert.NotNull(container.GetInstance<IQuantizer>());
             Assert.NotNull(container.GetInstance<IExecutor>());
 
-            Assert.NotNull(container.GetInstance<IExtractor<TetrisGameStateFull>>());
-            Assert.NotNull(container.GetInstance<IDecider<TetrisGameStateFull>>());
+            Assert.NotNull(container.GetInstance<IExtractor<TetrisGameState>>());
+            Assert.NotNull(container.GetInstance<ISolver<TetrisGameState>>());
 
             Assert.NotNull(container.GetInstance<IAgent>());
-            Assert.NotNull(container.GetInstance<IGameState>());
         }        
     }
 }

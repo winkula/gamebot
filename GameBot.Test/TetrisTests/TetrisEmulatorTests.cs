@@ -6,7 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 
-namespace GameBot.Test
+namespace GameBot.Test.TetrisTests
 {
     [TestFixture]
     public class TetrisEmulatorTests

@@ -3,7 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 
-namespace GameBot.Test
+namespace GameBot.Test.TetrisTests
 {
     [TestFixture]
     public class TetrominoTests

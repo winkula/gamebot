@@ -1,6 +1,6 @@
 ﻿namespace GameBot.Game.Tetris.Data
 {
-    public enum TetrisGameType
+    public enum GameType
     {
         AType,
         BType

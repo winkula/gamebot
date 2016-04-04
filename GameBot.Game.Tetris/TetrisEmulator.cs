@@ -4,16 +4,16 @@ using GameBot.Core.Data;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisEmulator : IEmulator<TetrisGameStateFull>
+    public class TetrisEmulator : IEmulator<TetrisGameState>
     {
         private readonly Random random = new Random();
 
         public TetrisEmulator()
         {
-            GameState = new TetrisGameStateFull();
+            GameState = new TetrisGameState();
         }
 
-        public TetrisGameStateFull GameState { get; }
+        public TetrisGameState GameState { get; }
         
         public void Execute(ICommand command)
         {
@@ -22,28 +22,28 @@ namespace GameBot.Game.Tetris
                 case Button.Down:
                     if (command.Duration > TimeSpan.Zero)
                     {
-                        GameState.State.Drop();
+                        GameState.Drop();
                     }
                     else
                     {
-                        GameState.State.Fall();
+                        GameState.Fall();
                     }
                     break;
 
                 case Button.Left:
-                    GameState.State.Piece.Left();
+                    GameState.Piece.Left();
                     break;
 
                 case Button.Right:
-                    GameState.State.Piece.Right();
+                    GameState.Piece.Right();
                     break;
 
                 case Button.A:
-                    GameState.State.Piece.Rotate();
+                    GameState.Piece.Rotate();
                     break;
 
                 case Button.B:
-                    GameState.State.Piece.RotateCounterclockwise();
+                    GameState.Piece.RotateCounterclockwise();
                     break;
 
                 default:
@@ -53,7 +53,7 @@ namespace GameBot.Game.Tetris
         
         public override string ToString()
         {
-            return GameState.State.ToString();
+            return GameState.ToString();
         }
     }
 }

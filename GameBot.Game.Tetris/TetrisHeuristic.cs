@@ -6,8 +6,13 @@ namespace GameBot.Game.Tetris
 {
     public class TetrisHeuristic : IHeuristic<TetrisGameState>
     {
-        // Heuristic from here: https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
         public double Score(TetrisGameState gameState)
+        {
+            return ScoreNearPerfect(gameState);
+        }
+
+        // Heuristic from here: https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
+        private double ScoreNearPerfect(TetrisGameState gameState)
         {
             var board = gameState.Board;
 
@@ -15,8 +20,25 @@ namespace GameBot.Game.Tetris
             var c = gameState.Lines;
             var h = Holes(board);
             var b = Bumpiness(board);
-            
+
             return -0.510066 * a + 0.760666 * c - 0.35663 * h - 0.184483 * b;
+        }
+
+        private double ScoreTest(TetrisGameState gameState)
+        {
+            var board = gameState.Board;
+            var maxHeight = MaximumHeight(board);
+
+            var m = maxHeight < 10 ? 0 : maxHeight - 10;
+            var l = gameState.Lines == 0 ? 0 : gameState.Lines - 3;
+            var h = Holes(board);          
+
+            return -100 * m + 100 * l - 100 * h;
+        }
+
+        public int MaximumHeight(Board board)
+        {
+            return board.MaximumHeight;
         }
 
         // top down

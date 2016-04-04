@@ -7,13 +7,25 @@ using System.Text;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisGameState
+    public class TetrisGameState : AbstractGameState
     {
         public Board Board { get; private set; }
-        public Piece Piece { get; private set; }
-        public Piece NextPiece { get; private set; }
+        public Piece Piece { get; set; }
+        public Piece NextPiece { get; set; }
         public Move Move { get; set; }
         public int Lines { get; set; }
+        public int Level { get { return Tetris.Level.GetLevelAType(0, Lines); } }
+
+        //public int? Player { get; set; }
+        //public GameType? GameType { get; set; }
+        //public int? MusicType { get; set; }
+        //public int? Level
+        //{
+        //    get { return State?.Board.CompletedLines; }
+        //}
+        //public int? High { get; set; }
+        //public int? Score { get; set; }
+        //public bool? IsPause { get; set; }
 
         public TetrisGameState()
         {
@@ -97,17 +109,8 @@ namespace GameBot.Game.Tetris
 
         public int Drop(Piece next = null)
         {
-            if (Board.Intersects(Piece)) throw new ArgumentException("Piece already intersects the board");
-
-            int distance = int.MaxValue;
-
-            // calculate minimum falling distance
-            var head = Piece.Shape.Head;
-            foreach (var block in head)
-            {
-                var distanceTest = (Board.Origin.Y + block.Y + Piece.Y) - Board.ColumnHeight(Board.Origin.X + block.X + Piece.X);
-                distance = Math.Min(distance, distanceTest);
-            }
+            int distance = Board.DropDistance(Piece);
+            if (distance < 0) throw new ArgumentException("Piece can't be dropped");
 
             // let piece fall
             Piece.Fall(distance);
@@ -142,9 +145,9 @@ namespace GameBot.Game.Tetris
             if (other != null)
             {
                 return
-                    ((Board == null && other.Board == null) || Board.Equals(other.Board)) &&
-                    ((Piece == null && other.Piece == null) || Piece.Equals(other.Piece)) &&
-                    ((NextPiece == null && other.NextPiece == null) || NextPiece.Equals(other.NextPiece));
+                    ((Board == null && other.Board == null) || (Board != null && Board.Equals(other.Board))) &&
+                    ((Piece == null && other.Piece == null) || (Piece != null && Piece.Equals(other.Piece))) &&
+                    ((NextPiece == null && other.NextPiece == null) || (NextPiece != null && NextPiece.Equals(other.NextPiece)));
             }
             return false;
         }

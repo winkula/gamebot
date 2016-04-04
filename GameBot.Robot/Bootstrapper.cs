@@ -38,7 +38,7 @@ namespace GameBot.Robot
 
             if (emulator)
             {                
-                container.RegisterSingleton(new Emulator());
+                container.RegisterSingleton(new Emulation.Emulator());
 
                 container.Register<ICamera, EmulatorCamera>();
                 container.Register<IQuantizer, PassthroughQuantizer>();
@@ -59,11 +59,10 @@ namespace GameBot.Robot
 
             var assemblyName = "GameBot.Game.Tetris";
             var assembly = Assembly.Load(assemblyName);
-
-            container.Register(typeof(IGameState), GetSingleImplementation<IGameState>(assembly));
+            
             container.Register(typeof(IAgent), GetSingleImplementation<IAgent>(assembly));
             container.Register(typeof(IExtractor<>), new[] { assembly });
-            container.Register(typeof(IDecider<>), new[] { assembly });
+            container.Register(typeof(ISolver<>), new[] { assembly });
             container.Register(typeof(IEmulator<>), new[] { assembly });
 
             container.Verify();

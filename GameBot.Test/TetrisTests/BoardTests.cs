@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using System.Diagnostics;
 
-namespace GameBot.Test
+namespace GameBot.Test.TetrisTests
 {
     [TestFixture]
     public class BoardTests

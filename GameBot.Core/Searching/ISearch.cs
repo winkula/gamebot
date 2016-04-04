@@ -1,7 +1,7 @@
 ﻿namespace GameBot.Core.Searching
 {
-    public interface ISearch<TNode>
+    public interface ISearch<T>
     {
-        TNode Search(TNode node);
+        T Search(T node);
     }
 }

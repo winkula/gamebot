@@ -1,6 +1,6 @@
 ﻿namespace GameBot.Game.Tetris.Data
 {
-    public enum TetrisScreen
+    public enum Screen
     {
         Credits,
         Menu,

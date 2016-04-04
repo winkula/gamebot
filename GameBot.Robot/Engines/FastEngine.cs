@@ -9,19 +9,19 @@ namespace GameBot.Robot.Engines
 {
     public class FastEngine : IEngine
     {
-        private readonly IDecider<TetrisGameStateFull> decider;
+        private readonly ISolver<TetrisGameState> solver;
         private readonly TetrisEmulator emulator;
 
-        public FastEngine(IDecider<TetrisGameStateFull> decider, TetrisEmulator emulator)
+        public FastEngine(ISolver<TetrisGameState> solver, TetrisEmulator emulator)
         {
-            this.decider = decider;
+            this.solver = solver;
             this.emulator = emulator;
         }
 
         public void Run()
         {
             // TODO: remove initialization
-            ICommands commands = decider.Decide(emulator.GameState, new Context<TetrisGameStateFull>());
+            ICommands commands = solver.Solve(emulator.GameState);
 
             Loop();
         }
@@ -35,7 +35,7 @@ namespace GameBot.Robot.Engines
             {
                 Debug.WriteLine("Play round " + i + "...");
 
-                if (emulator.GameState.State.IsEnd)
+                if (emulator.GameState.IsEnd)
                 {
                     Debug.WriteLine("Lost!");
                     return;
@@ -51,7 +51,7 @@ namespace GameBot.Robot.Engines
 
         protected void Update()
         {
-            ICommands commands = decider.Decide(emulator.GameState, new Context<TetrisGameStateFull>());
+            ICommands commands = solver.Solve(emulator.GameState);
             if (commands.Any())
             {
                 foreach (var command in commands)
@@ -77,7 +77,7 @@ namespace GameBot.Robot.Engines
 
         protected void Render()
         {
-            Debug.WriteLine(emulator.GameState.State);
+            Debug.WriteLine(emulator.GameState);
         }
     }
 }

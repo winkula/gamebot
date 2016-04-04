@@ -5,7 +5,7 @@ using NUnit.Framework;
 using System;
 using System.Diagnostics;
 
-namespace GameBot.Test
+namespace GameBot.Test.TetrisTests
 {
     [TestFixture]
     public class TetrisSearchTests
@@ -29,7 +29,7 @@ namespace GameBot.Test
         [TestCase(Tetromino.T, Tetromino.J)]
         public void Search(Tetromino current, Tetromino next)
         {
-            var gameState = new TetrisGameState(current, next);
+            var gameState = new TetrisGameState(new Piece(current), new Piece(next));
             var node = new TetrisNode(gameState);
             
             var result = search.Search(node);

@@ -141,6 +141,20 @@ namespace GameBot.Game.Tetris.Data
             }
         }
 
+        public int MaximumHeight
+        {
+            get
+            {
+                // AND every column
+                int mask = ~0;
+                for (int x = 0; x < Width; x++)
+                {
+                    mask &= Columns[x];
+                }
+                return columnHeights[mask];
+            }
+        }
+
         public Board(int width, int height)
         {
             if (height > 30) throw new ArgumentException("height must be not greater than 30");
@@ -236,7 +250,7 @@ namespace GameBot.Game.Tetris.Data
             }
             return removed;
         }
-        
+
         private void CopySquaresDown(int yCompleteLine)
         {
             for (int x = 0; x < Width; x++)
@@ -275,7 +289,25 @@ namespace GameBot.Game.Tetris.Data
             }
             return false;
         }
+        
+        public int DropDistance(Piece piece)
+        {
+            int distance = int.MaxValue;
+            
+            foreach (var block in piece.Shape.Head)
+            {
+                var distanceTest = (Origin.Y + block.Y + piece.Y) - ColumnHeight(Origin.X + block.X + piece.X);
+                distance = Math.Min(distance, distanceTest);
+            }
 
+            return distance;
+        }
+
+        public bool CanDrop(Piece piece)
+        {
+            return DropDistance(piece) >= 0;
+        }
+        
         public override int GetHashCode()
         {
             // TODO: implement

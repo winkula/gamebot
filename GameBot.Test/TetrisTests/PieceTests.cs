@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 
-namespace GameBot.Test
+namespace GameBot.Test.TetrisTests
 {
     [TestFixture]
     public class PieceTests

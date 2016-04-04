@@ -9,10 +9,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 
-namespace GameBot.Test
+namespace GameBot.Test.TetrisTests
 {
     [TestFixture]
-    public class ExtractorTests
+    public class TetrisExtractorTests
     {
         [Test]
         public void Constructor()
@@ -27,18 +27,17 @@ namespace GameBot.Test
             var image = Image.FromFile("Screenshots/tetris_play_1.png");
             var screenshot = new Screenshot(image, TimeSpan.Zero);
             
-            var gameState = extractor.Extract(screenshot, new Context<TetrisGameStateFull>());
+            var gameState = extractor.Extract(screenshot);
 
             Assert.NotNull(gameState);
-            Assert.NotNull(gameState.State);
-            Assert.NotNull(gameState.State.Board);
-            Assert.NotNull(gameState.State.Piece);
-            Assert.NotNull(gameState.State.NextPiece);
+            Assert.NotNull(gameState.Board);
+            Assert.NotNull(gameState.Piece);
+            Assert.NotNull(gameState.NextPiece);
 
-            Debug.WriteLine(gameState.State.Piece);
-            Debug.WriteLine(gameState.State.NextPiece);
+            Debug.WriteLine(gameState.Piece);
+            Debug.WriteLine(gameState.NextPiece);
 
-            Debug.WriteLine(gameState.State.Board);
+            Debug.WriteLine(gameState.Board);
         }
     }
 }

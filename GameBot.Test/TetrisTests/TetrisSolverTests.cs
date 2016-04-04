@@ -9,25 +9,24 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 
-namespace GameBot.Test
+namespace GameBot.Test.TetrisTests
 {
     [TestFixture]
-    public class DeciderTests
+    public class TetrisSolverTests
     {
         [Test]
         public void Constructor()
         {
-            var decider = new TetrisDecider();
+            var solver = new TetrisSolver();
         }
 
         [Test]
-        public void Decide()
+        public void Solve()
         {
-            var decider = new TetrisDecider();
-            var gameState = new TetrisGameStateFull();
-            gameState.State = new TetrisGameState(Tetromino.L, Tetromino.Z);
+            var solver = new TetrisSolver();
+            var gameState = new TetrisGameState(Tetromino.L, Tetromino.Z);
 
-            var decision = decider.Decide(gameState, new Context<TetrisGameStateFull>());
+            var decision = solver.Solve(gameState);
 
             Assert.NotNull(decision);
         }

@@ -3,6 +3,7 @@ using GameBot.Game.Tetris.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GameBot.Game.Tetris
 {
@@ -47,8 +48,9 @@ namespace GameBot.Game.Tetris
 
             foreach (var successor in parent.GetSuccessors())
             {
-                //var score = ScoreProbabilistic(successor);
-                var score = ScoreSimple(successor);
+                //var score = ScoreProbabilisticExpectation(successor);
+                var score = ScoreProbabilisticMinimum(successor);
+                //var score = ScoreSimple(successor);
                 if (score > bestScore)
                 {
                     goal = successor;
@@ -65,28 +67,52 @@ namespace GameBot.Game.Tetris
             return heuristic.Score(parent.GameState);
         }
 
-        protected double ScoreProbabilistic(TetrisNode parent)
+        protected double ScoreProbabilisticExpected(TetrisNode parent)
         {
             var tetrominos = Enum.GetValues(typeof(Tetromino)).Cast<Tetromino>();
             double expectation = 0;
+            
+            foreach (var tetromino in tetrominos)
+            {
+                expectation += ScoreByChance(parent, tetromino);
+            }
+
+            return expectation;
+        }
+
+        protected double ScoreProbabilisticMinimum(TetrisNode parent)
+        {
+            var tetrominos = Enum.GetValues(typeof(Tetromino)).Cast<Tetromino>();
+            double minimum = 0;
 
             foreach (var tetromino in tetrominos)
             {
-                double chance = tetromino.GetChance();
-
                 var newState = new TetrisGameState(parent.GameState, new Piece(tetromino));
                 var child = new TetrisNode(newState);
                 var successors = child.GetSuccessors();
                 var score = GetBestScore(successors);
 
-                expectation += chance * score;
+                minimum = Math.Min(minimum, score);
             }
 
-            return expectation;
+            return minimum;
         }
-                
+
+        protected double ScoreByChance(TetrisNode parent, Tetromino tetromino)
+        {
+            double chance = tetromino.GetChance();
+
+            var newState = new TetrisGameState(parent.GameState, new Piece(tetromino));
+            var child = new TetrisNode(newState);
+            var successors = child.GetSuccessors();
+            var score = GetBestScore(successors);
+
+            return chance * score;
+        }
+
         protected double GetBestScore(IEnumerable<TetrisNode> successors)
         {
+            // TODO: dont take NegativeInfinity for a totally lost game?
             var bestScore = double.NegativeInfinity;
 
             foreach (var successor in successors)
