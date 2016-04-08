@@ -20,7 +20,7 @@ namespace GameBot.Game.Tetris
             switch (command.Button)
             {
                 case Button.Down:
-                    if (command.Duration > TimeSpan.Zero)
+                    if (command.Press.HasValue && command.Release.HasValue)
                     {
                         GameState.Drop();
                     }

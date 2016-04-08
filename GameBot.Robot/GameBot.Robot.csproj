@@ -147,12 +147,10 @@
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Data\EmguScreenshot.cs" />
     <Compile Include="Engines\FastEngine.cs" />
-    <Compile Include="Engines\BlindEngine.cs" />
     <Compile Include="Executors\EmulatorExecutor.cs" />
     <Compile Include="Executors\Executor.cs" />
     <Compile Include="Engines\InteractiveEngine.cs" />
     <Compile Include="Engines\Engine.cs" />
-    <Compile Include="Engines\IEngine.cs" />
     <Compile Include="Quantizers\PassthroughQuantizer.cs" />
     <Compile Include="Quantizers\Quantizer.cs" />
     <Compile Include="Quantizers\AdaptiveThresholdQuantizer.cs" />
@@ -163,6 +161,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ExamplesTinkerforge.cs" />
     <Compile Include="Quantizers\ThresholdQuantizer.cs" />
+    <Compile Include="TimeProviders\EmulatorTimeProvider.cs" />
+    <Compile Include="TimeProviders\TimeProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameBot.Core\GameBot.Core.csproj">

@@ -28,7 +28,7 @@ namespace GameBot.Robot.Quantizers
             this.block = block;
         }
 
-        public IScreenshot Quantize(Image image, TimeSpan timestamp)
+        public IScreenshot Quantize(IImage image, TimeSpan timestamp)
         {
             var capture = new Capture();
             var stopwatch = new Stopwatch();

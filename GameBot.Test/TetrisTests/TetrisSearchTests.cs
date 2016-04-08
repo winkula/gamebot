@@ -16,7 +16,7 @@ namespace GameBot.Test.TetrisTests
         [SetUp]
         public void Setup()
         {
-            heuristic = new TetrisHeuristic();
+            heuristic = new TetrisSurviveHeuristic();
             search = new TetrisSearch(heuristic);
         }
 

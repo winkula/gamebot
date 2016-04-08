@@ -16,7 +16,7 @@ namespace GameBot.Test
             
             container.Verify();
 
-            Assert.NotNull(container.GetInstance<ICamera>());
+            Assert.NotNull(container.GetInstance<Core.ICamera>());
             Assert.NotNull(container.GetInstance<IQuantizer>());
             Assert.NotNull(container.GetInstance<IExecutor>());
 

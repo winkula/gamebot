@@ -1,4 +1,6 @@
-﻿using GameBot.Core;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using GameBot.Core;
 using GameBot.Robot.Quantizers;
 using NUnit.Framework;
 using System;
@@ -50,7 +52,7 @@ namespace GameBot.Test
 
         private void TestQuantizer(string path, IQuantizer quantizer)
         {
-            var image = Image.FromFile(path);
+            var image = new Mat(path, LoadImageType.Grayscale);
 
             Assert.NotNull(image);
 

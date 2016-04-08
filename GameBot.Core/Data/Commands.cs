@@ -24,24 +24,24 @@ namespace GameBot.Core.Data
             commands.Add(command);
         }
 
-        public void Add(Button button)
+        public void Hit(Button button)
         {
-            commands.Add(new Command(button));
+            commands.Add(new HitCommand(button));
         }
 
-        public void Add(Button button, double timestamp)
+        public void Hit(Button button, double timestamp)
         {
-            commands.Add(new Command(button, timestamp.ToTimestamp()));
+            commands.Add(new HitCommand(button, timestamp.ToTimestamp()));
         }
 
-        public void Add(Button button, TimeSpan timestamp)
+        public void Hit(Button button, TimeSpan timestamp)
         {
-            commands.Add(new Command(button, timestamp));
+            commands.Add(new HitCommand(button, timestamp));
         }
 
-        public void Add(Button button, TimeSpan timestamp, TimeSpan duration)
+        public void Hit(Button button, TimeSpan timestamp, TimeSpan duration)
         {
-            commands.Add(new Command(button, timestamp, duration));
+            commands.Add(new HitCommand(button, timestamp, duration));
         }
 
         public IEnumerator<ICommand> GetEnumerator()

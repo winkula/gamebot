@@ -64,13 +64,13 @@ namespace GameBot.Robot.Engines
                     }
                 }
                 // drop
-                emulator.Execute(new Command(Button.Down, TimeSpan.Zero, TimeSpan.FromSeconds(1)));
+                emulator.Execute(new HitCommand(Button.Down, TimeSpan.Zero, TimeSpan.FromSeconds(1)));
                 //Debug.WriteLine("Drop");
                 //Render();
             }
             else
             {
-                emulator.Execute(new Command(Button.Down));
+                emulator.Execute(new HitCommand(Button.Down));
                 Render();
             }
         }

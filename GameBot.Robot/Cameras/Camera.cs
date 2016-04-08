@@ -1,4 +1,5 @@
-﻿using GameBot.Core;
+﻿using Emgu.CV;
+using GameBot.Core;
 using System;
 using System.Drawing;
 
@@ -6,7 +7,7 @@ namespace GameBot.Robot.Cameras
 {
     public class Camera : ICamera
     {
-        public Image Capture()
+        public IImage Capture()
         {
             // TODO: implement
             throw new NotImplementedException();

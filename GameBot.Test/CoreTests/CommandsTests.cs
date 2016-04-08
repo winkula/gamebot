@@ -13,9 +13,9 @@ namespace GameBot.Test
         public void Constructor()
         {
             var collection = new List<ICommand>();
-            collection.Add(new Command(Button.Left, new TimeSpan(), new TimeSpan()));
-            collection.Add(new Command(Button.Up, new TimeSpan(), new TimeSpan()));
-            collection.Add(new Command(Button.A, new TimeSpan(), new TimeSpan()));
+            collection.Add(new HitCommand(Button.Left, new TimeSpan(), new TimeSpan()));
+            collection.Add(new HitCommand(Button.Up, new TimeSpan(), new TimeSpan()));
+            collection.Add(new HitCommand(Button.A, new TimeSpan(), new TimeSpan()));
 
             ICommands commands = new Commands(collection);
 

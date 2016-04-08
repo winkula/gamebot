@@ -26,19 +26,18 @@ namespace GameBot.Robot.Quantizers
             this.threshold = threshold;
         }
 
-        public IScreenshot Quantize(Image image, TimeSpan timestamp)
+        public IScreenshot Quantize(IImage image, TimeSpan timestamp)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            Image<Gray, Byte> sourceImage = new Image<Gray, Byte>(new Bitmap(image));            
+           
             Image<Gray, Byte> destImage = new Image<Gray, Byte>(160, 144);
             Image<Gray, Byte> destImageBin = new Image<Gray, Byte>(160, 144);
 
             Matrix<float> sourceMat = new Matrix<float>(keypoints);
             Matrix<float> destMat = new Matrix<float>(new float[,] { { 0, 0 }, { 160, 0 }, { 0, 144 }, { 160, 144 } });
             
-            var transform = CvInvoke.GetPerspectiveTransform(sourceMat, destMat);
+            var transform = CvInvoke.GetPerspectiveTransform(image, destMat);
 
             CvInvoke.Threshold(destImage, destImageBin, threshold, 255, ThresholdType.Binary);
 

@@ -9,7 +9,7 @@ namespace GameBot.Game.Tetris
     public class TetrisSolver : ISolver<TetrisGameState>
     {
         private readonly DepthFirstSearch search = new DepthFirstSearch();
-        private readonly ISearch<TetrisNode> tetrisSearch = new TetrisSearch(new TetrisHeuristic());
+        private readonly ISearch<TetrisNode> tetrisSearch = new TetrisSearch(new TetrisSurviveHeuristic());
 
         private bool started = false;
 
@@ -50,21 +50,21 @@ namespace GameBot.Game.Tetris
 
                     for (int i = 0; i < move.Rotation; i++)
                     {
-                        commands.Add(Button.A);
+                        commands.Hit(Button.A);
                     }
 
                     if (move.Translation < 0)
                     {
                         for (int i = 0; i < -move.Translation; i++)
                         {
-                            commands.Add(Button.Left);
+                            commands.Hit(Button.Left);
                         }
                     }
                     else if (move.Translation > 0)
                     {
                         for (int i = 0; i < move.Translation; i++)
                         {
-                            commands.Add(Button.Right);
+                            commands.Hit(Button.Right);
                         }
                     }
 
@@ -73,12 +73,12 @@ namespace GameBot.Game.Tetris
                         // TODO: set start level
                         //var command = new Command(Button.Down, TimeSpan.Zero, Level.GetDuration(0, gameState.Level));
                         //commands.Add(command);
-                        
+
                         // TODO: drop with press duration (level dependent)
                         int slip = 0;//= fall*3/4;
                         for (int i = 0; i < move.Fall - slip; i++)
                         {
-                            commands.Add(Button.Down);
+                            commands.Hit(Button.Down);
                         }
                     }
 
@@ -94,38 +94,39 @@ namespace GameBot.Game.Tetris
             double waitingTime = 6.0;
 
             // start 1 player mode
-            commands.Add(Button.Start, waitingTime);
+            commands.Hit(Button.Start, waitingTime);
 
             // choose a-type
-            commands.Add(Button.A, waitingTime + 1);
+            commands.Hit(Button.A, waitingTime + 1);
 
             // switch music off
-            commands.Add(Button.Right, waitingTime + 2);
-            commands.Add(Button.Down, waitingTime + 2.5);
-            commands.Add(Button.A, waitingTime + 3);
+            commands.Hit(Button.Right, waitingTime + 2);
+            commands.Hit(Button.Down, waitingTime + 2.5);
+            commands.Hit(Button.A, waitingTime + 3);
 
             // choose level
-            commands.Add(Button.Right, waitingTime + 4);
-            commands.Add(Button.Right, waitingTime + 4.5);
-            commands.Add(Button.A, waitingTime + 5);
+            commands.Hit(Button.Right, waitingTime + 4);
+            commands.Hit(Button.Right, waitingTime + 4.5);
+            commands.Hit(Button.A, waitingTime + 5);
         }
 
         private void QuickStart(Commands commands)
         {
             // skip credits
-            double waitingTime = 5.0;
+            double waitingTime = 2.5;
+            double delta = 0.25;
 
             // start 1 player mode
-            commands.Add(Button.Start, waitingTime);
+            commands.Hit(Button.Start, waitingTime);
 
             // choose a-type
-            commands.Add(Button.A, waitingTime + 1);
+            commands.Hit(Button.A, waitingTime + 1 * delta);
 
             // choose music
-            commands.Add(Button.A, waitingTime + 1.5);
+            commands.Hit(Button.A, waitingTime + 2 * delta);
 
             // choose level
-            commands.Add(Button.A, waitingTime + 2);
+            commands.Hit(Button.A, waitingTime + 3 * delta);
         }
     }
 }

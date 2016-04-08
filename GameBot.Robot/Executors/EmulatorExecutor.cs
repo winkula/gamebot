@@ -12,6 +12,7 @@ namespace GameBot.Robot.Executors
     {
         private readonly Emulator emulator;
         private readonly List<ICommand> queue;
+        public ITimeProvider TimeProvider { private get; set; }
 
         public EmulatorExecutor(Emulator emulator)
         {
@@ -19,24 +20,26 @@ namespace GameBot.Robot.Executors
             this.queue = new List<ICommand>();
         }
 
-        public void Execute(ICommands commands, TimeSpan timestamp)
+        public void Execute(ICommands commands)
         {
             foreach (var command in commands)
             {
                 queue.Add(command);
             }
-            Execute(timestamp);
+            Execute();
         }
 
-        public void Execute(ICommand command, TimeSpan timestamp)
+        public void Execute(ICommand command)
         {
             queue.Add(command);
-            Execute(timestamp);
+            Execute();
         }
 
-        private void Execute(TimeSpan timestamp)
+        private void Execute()
         {
-            var pending = queue.Where(x => x.Timestamp <= timestamp).ToList();
+            var time = TimeProvider.Time;
+
+            var pending = queue.Where(x => x.Press <= time).ToList();
             var buttons = pending.Select(x => x.Button).ToList();
             
             emulator.KeysTyped(buttons);
@@ -45,7 +48,7 @@ namespace GameBot.Robot.Executors
                 Debug.WriteLine("Press key " + string.Join(", ", buttons));
             }
 
-            queue.RemoveAll(x => x.Timestamp <= timestamp);
+            queue.RemoveAll(x => x.Press <= time);
 
             // emulate one frame
             emulator.ExecuteFrame();

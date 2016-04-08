@@ -38,19 +38,22 @@ namespace GameBot.Robot
 
             if (emulator)
             {                
-                container.RegisterSingleton(new Emulation.Emulator());
+                container.RegisterSingleton(new Emulator());
 
                 container.Register<ICamera, EmulatorCamera>();
                 container.Register<IQuantizer, PassthroughQuantizer>();
                 container.Register<IExecutor, EmulatorExecutor>();
+
+                container.RegisterSingleton<ITimeProvider, EmulatorTimeProvider>();
             }
             else
             {
                 container.Register<ICamera, Camera>();
                 container.Register<IQuantizer, Quantizer>();
                 container.Register<IExecutor, Executor>();
-            }
 
+                container.RegisterSingleton<ITimeProvider, TimeProvider>();
+            }
             container.Register<IRenderer, EmguRenderer>();
 
             // TODO: remove build-dependency to the "GameBot.Game.Tetris" and load

@@ -49,8 +49,8 @@ namespace GameBot.Game.Tetris
             foreach (var successor in parent.GetSuccessors())
             {
                 //var score = ScoreProbabilisticExpectation(successor);
-                var score = ScoreProbabilisticMinimum(successor);
-                //var score = ScoreSimple(successor);
+                //var score = ScoreProbabilisticMinimum(successor);
+                var score = ScoreSimple(successor);
                 if (score > bestScore)
                 {
                     goal = successor;

@@ -11,14 +11,14 @@ namespace GameBot.Test
         public void Constructor()
         {
             var button = Button.Down;
-            var timestamp = TimeSpan.FromSeconds(3);
+            var press = TimeSpan.FromSeconds(3);
             var duration = TimeSpan.FromMilliseconds(80);
 
-            ICommand command = new Command(button, timestamp, duration);
+            ICommand command = new HitCommand(button, press, duration);
 
             Assert.AreEqual(button, command.Button);
-            Assert.AreEqual(duration, command.Duration);
-            Assert.AreEqual(timestamp, command.Timestamp);
+            Assert.AreEqual(press, command.Press);
+            Assert.AreEqual(press + duration, command.Release);
         }
     }
 }

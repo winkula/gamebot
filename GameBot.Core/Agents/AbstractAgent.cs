@@ -15,12 +15,20 @@ namespace GameBot.Core.Agents
 
         public ICommands Act(IScreenshot screenshot)
         {
-            var gameState = Extractor.Extract(screenshot);
-            if (MustSolve(gameState))
+            if (MustExtract(screenshot))
             {
-                return Solver.Solve(gameState);
+                var gameState = Extractor.Extract(screenshot);
+                if (MustSolve(gameState))
+                {
+                    return Solver.Solve(gameState);
+                }
             }
             return new Commands();
+        }
+
+        protected virtual bool MustExtract(IScreenshot screenshot)
+        {
+            return true;
         }
 
         protected virtual bool MustSolve(T gameState)

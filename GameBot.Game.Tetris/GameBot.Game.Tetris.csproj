@@ -94,7 +94,8 @@
     <Compile Include="TetrisSolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TetrisExtractor.cs" />
-    <Compile Include="TetrisHeuristic.cs" />
+    <Compile Include="TetrisStackingHeuristic.cs" />
+    <Compile Include="TetrisSurviveHeuristic.cs" />
     <Compile Include="TetrisSearch.cs" />
   </ItemGroup>
   <ItemGroup>

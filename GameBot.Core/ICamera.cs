@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿using Emgu.CV;
 
 namespace GameBot.Core
 {
@@ -10,7 +10,7 @@ namespace GameBot.Core
         /// <summary>
         /// Captures an image.
         /// </summary>
-        /// <returns>The captured image from the camera.</returns>
-        Image Capture();
+        /// <returns>The captured image from the camera as an EmguCV Mat object.</returns>
+        IImage Capture();
     }
 }

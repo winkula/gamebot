@@ -1,6 +1,7 @@
 ﻿using GameBot.Core;
 using GameBot.Emulation;
-using System.Drawing;
+using Emgu.CV;
+using Emgu.CV.Structure;
 
 namespace GameBot.Robot.Cameras
 {
@@ -13,9 +14,9 @@ namespace GameBot.Robot.Cameras
             this.emulator = emulator;
         }
 
-        public Image Capture()
+        public IImage Capture()
         {
-            return emulator.Display;
+            return new Image<Gray, byte>(emulator.Display);
         }
     }
 }
