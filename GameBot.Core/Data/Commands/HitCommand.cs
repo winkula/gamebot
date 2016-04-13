@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GameBot.Core.Data
+namespace GameBot.Core.Data.Commands
 {
     public class HitCommand : ICommand
     {

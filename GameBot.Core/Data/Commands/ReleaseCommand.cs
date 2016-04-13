@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameBot.Core.Data
+namespace GameBot.Core.Data.Commands
 {
     public class ReleaseCommand : ICommand
     {

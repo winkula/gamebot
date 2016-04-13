@@ -1,4 +1,5 @@
 ﻿using GameBot.Core.Data;
+using GameBot.Core.Data.Commands;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace GameBot.Test
             collection.Add(new HitCommand(Button.Up, new TimeSpan(), new TimeSpan()));
             collection.Add(new HitCommand(Button.A, new TimeSpan(), new TimeSpan()));
 
-            ICommands commands = new Commands(collection);
+            IEnumerable<ICommand> commands = new CommandCollection(collection);
 
             Assert.AreEqual(collection.Count, commands.ToList().Count);
         }
@@ -25,7 +26,7 @@ namespace GameBot.Test
         [Test]
         public void ConstructorDefault()
         {
-            ICommands commands = new Commands();
+            IEnumerable<ICommand> commands = new CommandCollection();
 
             Assert.AreEqual(0, commands.ToList().Count);
         }

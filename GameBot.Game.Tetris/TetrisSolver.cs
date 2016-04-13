@@ -3,21 +3,28 @@ using System;
 using GameBot.Core.Data;
 using GameBot.Core.Searching;
 using System.Diagnostics;
+using System.Collections.Generic;
+using GameBot.Core.Data.Commands;
 
 namespace GameBot.Game.Tetris
 {
     public class TetrisSolver : ISolver<TetrisGameState>
     {
-        private readonly DepthFirstSearch search = new DepthFirstSearch();
-        private readonly ISearch<TetrisNode> tetrisSearch = new TetrisSearch(new TetrisSurviveHeuristic());
+        //private readonly DepthFirstSearch search = new DepthFirstSearch();
+        private readonly ISearch<TetrisNode> search;// = new TetrisSearch(new TetrisHolesHeuristic());
 
         private bool started = false;
 
         private TetrisGameState lastGameState;
 
-        public ICommands Solve(TetrisGameState gameState)
+        public TetrisSolver(ISearch<TetrisNode> search)
         {
-            var commands = new Commands();
+            this.search = search;
+        }
+
+        public IEnumerable<ICommand> Solve(TetrisGameState gameState)
+        {
+            var commands = new CommandCollection();
             if (!started)
             {
                 // Initialization mode
@@ -37,16 +44,19 @@ namespace GameBot.Game.Tetris
                     (lastGameState == null || !lastGameState.Equals(gameState))
                     )
                 {
+                    // release down key if still pressed
+                    commands.Add(new ReleaseCommand(Button.Down));
+
                     var start = new TetrisNode(new TetrisGameState(gameState));
-                    var result = tetrisSearch.Search(start);
+                    var result = search.Search(start);
 
                     var goal = result.Parent;
                     var move = result.Parent.Move;
 
-                    Debug.WriteLine("======= Goal state ======= ");
-                    Debug.WriteLine(move);
-                    Debug.WriteLine(goal);
-                    Debug.WriteLine("========================== ");
+                    //Debug.WriteLine("======= Goal state ======= ");
+                    //Debug.WriteLine(move);
+                    //Debug.WriteLine(goal);
+                    //Debug.WriteLine("========================== ");
 
                     for (int i = 0; i < move.Rotation; i++)
                     {
@@ -71,15 +81,15 @@ namespace GameBot.Game.Tetris
                     if (move.Fall > 0)
                     {
                         // TODO: set start level
-                        //var command = new Command(Button.Down, TimeSpan.Zero, Level.GetDuration(0, gameState.Level));
-                        //commands.Add(command);
-
+                        // Level.GetDuration(0, gameState.Level)
+                        commands.Add(new PressCommand(Button.Down));
+                        /*
                         // TODO: drop with press duration (level dependent)
                         int slip = 0;//= fall*3/4;
                         for (int i = 0; i < move.Fall - slip; i++)
                         {
                             commands.Hit(Button.Down);
-                        }
+                        }*/
                     }
 
                     lastGameState = new TetrisGameState(gameState);
@@ -88,7 +98,7 @@ namespace GameBot.Game.Tetris
             return commands;
         }
 
-        private void Start(Commands commands)
+        private void Start(CommandCollection commands)
         {
             // skip credits
             double waitingTime = 6.0;
@@ -110,10 +120,10 @@ namespace GameBot.Game.Tetris
             commands.Hit(Button.A, waitingTime + 5);
         }
 
-        private void QuickStart(Commands commands)
+        private void QuickStart(CommandCollection commands)
         {
             // skip credits
-            double waitingTime = 2.5;
+            double waitingTime = 2.2 + new Random().NextDouble();
             double delta = 0.25;
 
             // start 1 player mode

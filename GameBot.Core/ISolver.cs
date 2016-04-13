@@ -1,4 +1,5 @@
 ﻿using GameBot.Core.Data;
+using System.Collections.Generic;
 
 namespace GameBot.Core
 {
@@ -20,6 +21,6 @@ namespace GameBot.Core
         /// </summary>
         /// <param name="gameState">The game state.</param>
         /// <returns>A collection of commands to execute on the device.</returns>
-        ICommands Solve(T gameState);
+        IEnumerable<ICommand> Solve(T gameState);
     }
 }

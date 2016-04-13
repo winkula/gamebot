@@ -70,20 +70,20 @@ namespace GameBot.Robot.Engines
             if (key.HasValue)
             {
                 if (key == 27) throw new TimeoutException(); // Escape
-                if (key == 2490368) emulator.KeyTyped(Button.Up);
-                if (key == 2621440) emulator.KeyTyped(Button.Down);
-                if (key == 2424832) emulator.KeyTyped(Button.Left);
-                if (key == 2555904) emulator.KeyTyped(Button.Right);
-                if (key == 121) emulator.KeyTyped(Button.A);
-                if (key == 120) emulator.KeyTyped(Button.B);
-                if (key == 13) emulator.KeyTyped(Button.Start);
-                if (key == 32) emulator.KeyTyped(Button.Select);
+                if (key == 2490368) emulator.HitButton(Button.Up);
+                if (key == 2621440) emulator.HitButton(Button.Down);
+                if (key == 2424832) emulator.HitButton(Button.Left);
+                if (key == 2555904) emulator.HitButton(Button.Right);
+                if (key == 121) emulator.HitButton(Button.A);
+                if (key == 120) emulator.HitButton(Button.B);
+                if (key == 13) emulator.HitButton(Button.Start);
+                if (key == 32) emulator.HitButton(Button.Select);
             }
         }
 
         protected void Render()
         {
-            renderer.Render(emulator.Display);
+            renderer.Render(emulator.Display, "Game Bot");
         }
     }
 }

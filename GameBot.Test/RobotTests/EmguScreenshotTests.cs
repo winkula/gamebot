@@ -4,7 +4,7 @@ using GameBot.Robot.Data;
 using NUnit.Framework;
 using System;
 
-namespace GameBot.Test
+namespace GameBot.Test.RobotTests
 {
     [TestFixture]
     public class EmguScreenshotTests

@@ -1,4 +1,5 @@
 ﻿using GameBot.Core.Data;
+using GameBot.Core.Data.Commands;
 using NUnit.Framework;
 using System;
 

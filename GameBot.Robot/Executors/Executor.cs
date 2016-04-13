@@ -4,24 +4,27 @@ using GameBot.Core.Data;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 
 namespace GameBot.Robot.Executors
 {
     public class Executor : IExecutor
     {
         private readonly IActor actor;
+        private readonly ITimeProvider timeProvider;
         private readonly ConcurrentQueue<ICommand> queue = new ConcurrentQueue<ICommand>();
         private Queue<ICommand> queueInternal = new Queue<ICommand>();
         private Queue<ICommand> queueInternalSwap = new Queue<ICommand>();
         private Task worker;
-        public ITimeProvider TimeProvider { private get; set; }
 
-        public Executor(IActor actor)
+        public Executor(IActor actor, ITimeProvider timeProvider)
         {
             this.actor = actor;
+            this.timeProvider = timeProvider;
         }
 
-        public void Execute(ICommands commands)
+        public void Execute(IEnumerable<ICommand> commands)
         {
             foreach (var command in commands)
             {
@@ -38,8 +41,13 @@ namespace GameBot.Robot.Executors
 
         private void WorkerCode()
         {
-            CopyCommands();
-            ExecuteCommands();
+            while (queueInternal.Count > 0 || !queue.IsEmpty)
+            {
+                CopyCommands();
+                ExecuteCommands();
+
+                Thread.Sleep(20);
+            }
         }
 
         private void CopyCommands()
@@ -57,7 +65,7 @@ namespace GameBot.Robot.Executors
 
         private void ExecuteCommands()
         {
-            var time = TimeProvider.Time;
+            var time = timeProvider.Time;
             foreach (var command in queueInternal)
             {
                 HandleCommand(command, time);
@@ -76,6 +84,7 @@ namespace GameBot.Robot.Executors
             {
                 if (command.Press.Value <= time)
                 {
+                    Debug.Write("Hit " + command.Button + "\n");
                     actor.Hit(command.Button);
                 }
                 else
@@ -89,6 +98,7 @@ namespace GameBot.Robot.Executors
                 {
                     if (command.Press.Value <= time)
                     {
+                        Debug.Write("Press " + command.Button + "\n");
                         actor.Press(command.Button);
                     }
                     else
@@ -100,6 +110,7 @@ namespace GameBot.Robot.Executors
                 {
                     if (command.Release.Value <= time)
                     {
+                        Debug.Write("Release " + command.Button + "\n");
                         actor.Release(command.Button);
                     }
                     else

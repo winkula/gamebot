@@ -4,6 +4,7 @@ using GameBot.Core.Data;
 using GameBot.Emulation;
 using GameBot.Robot.Renderers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace GameBot.Robot.Engines
@@ -20,7 +21,7 @@ namespace GameBot.Robot.Engines
         private readonly IRenderer renderer;
 
         private readonly Emulator emulator;
-        
+
         public Engine(ICamera camera, IQuantizer quantizer, IAgent agent, IExecutor executor, ITimeProvider timeProvider, IRenderer renderer, Emulator emulator)
         {
             this.camera = camera;
@@ -28,7 +29,6 @@ namespace GameBot.Robot.Engines
             this.agent = agent;
             this.executor = executor;
             this.timeProvider = timeProvider;
-            executor.TimeProvider = timeProvider;
 
             this.renderer = renderer;
 
@@ -41,8 +41,8 @@ namespace GameBot.Robot.Engines
 
         public void Run()
         {
-            renderer.OpenWindow("Game Bot");
-            renderer.CreateImage(160, 144);
+            //renderer.OpenWindow("Game Bot");
+            //renderer.CreateImage(160, 144);
 
             timeProvider.Start();
 
@@ -55,37 +55,24 @@ namespace GameBot.Robot.Engines
         {
             while (!IsEscape)
             {
-                Update();
-                Render();
-                Debug.Write(timeProvider.Time + "\n");
+                // get image as photo of the gameboy screen (input)
+                IImage image = camera.Capture();
+                Render(image);
+
+                // process image and get display data
+                TimeSpan time = timeProvider.Time;
+                IScreenshot screenshot = quantizer.Quantize(image, time);
+
+                // handle input to the agent which
+                //  - extracts the game state
+                //  - decides which commands to press
+                IEnumerable<ICommand> commands = agent.Act(screenshot);
+
+                // give commands to command controller (output)
+                executor.Execute(commands);
+
+                //Debug.Write(timeProvider.Time + "\n");
             }
-        }
-
-        protected void Update()
-        {
-            // get image as photo of the gameboy screen (input)
-            IImage image = camera.Capture();
-
-            // process image and get display data
-            TimeSpan time = timeProvider.Time;
-            IScreenshot screenshot = quantizer.Quantize(image, time);
-
-            // handle input to the agent which
-            //  - extracts the game state
-            //  - decides which commands to press
-            ICommands commands = agent.Act(screenshot);
-            
-            // give commands to command controller (output)
-            executor.Execute(commands);
-            
-            /*
-            foreach (var command in commands)
-            {
-                // give command to command controller (output)
-                executor.Execute(command, time);
-
-                //Render();
-            }*/
         }
 
         private bool IsEscape
@@ -101,9 +88,9 @@ namespace GameBot.Robot.Engines
             }
         }
 
-        protected void Render()
+        protected void Render(IImage image)
         {
-            renderer.Render(emulator.Display);
+            renderer.Render(image, "Image_Captured");
         }
     }
 }

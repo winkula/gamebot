@@ -1,4 +1,5 @@
 ﻿using GameBot.Core.Data;
+using GameBot.Core.Data.Commands;
 using GameBot.Game.Tetris;
 using NUnit.Framework;
 using System.Diagnostics;
@@ -11,21 +12,21 @@ namespace GameBot.Test.TetrisTests
         [Test]
         public void Constructor()
         {
-            var emulator = new TetrisEmulator();
+            var emulator = new TetrisSimulator();
         }
 
         [Test]
         public void Press()
         {
-            var emulator = new TetrisEmulator();
+            var emulator = new TetrisSimulator();
             
             Debug.WriteLine(emulator.GameState);
 
-            emulator.Execute(new HitCommand(Button.Down));
-            emulator.Execute(new HitCommand(Button.Down));
-            emulator.Execute(new HitCommand(Button.Down));
-            emulator.Execute(new HitCommand(Button.Down));
-            emulator.Execute(new HitCommand(Button.Down));
+            emulator.Simulate(new HitCommand(Button.Down));
+            emulator.Simulate(new HitCommand(Button.Down));
+            emulator.Simulate(new HitCommand(Button.Down));
+            emulator.Simulate(new HitCommand(Button.Down));
+            emulator.Simulate(new HitCommand(Button.Down));
 
             Debug.WriteLine(emulator.GameState);
         }

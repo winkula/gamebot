@@ -2,7 +2,6 @@
 using GameBot.Core;
 using GameBot.Game.Tetris;
 using GameBot.Robot;
-using GameBot.Core.Data;
 
 namespace GameBot.Test
 {
@@ -12,11 +11,11 @@ namespace GameBot.Test
         [Test]
         public void DependencyInjection()
         {
-            var container = Bootstrapper.GetInitializedContainer();
+            var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Emulator);
             
             container.Verify();
 
-            Assert.NotNull(container.GetInstance<Core.ICamera>());
+            Assert.NotNull(container.GetInstance<ICamera>());
             Assert.NotNull(container.GetInstance<IQuantizer>());
             Assert.NotNull(container.GetInstance<IExecutor>());
 

@@ -10,7 +10,7 @@ using System.IO;
 namespace GameBot.Test
 {
     [TestFixture]
-    class EmulatorTests
+    public class EmulatorTests
     {
         private readonly bool saveImages = false;
 
@@ -70,7 +70,7 @@ namespace GameBot.Test
 
             foreach (var input in inputs)
             {
-                emulator.KeyTyped(input.Button);
+                emulator.HitButton(input.Button);
                 emulator.Execute(TimeSpan.FromSeconds(input.Duration));
                 if (saveImages)
                 {
@@ -93,7 +93,7 @@ namespace GameBot.Test
 
             foreach (var button in buttons)
             {
-                emulator.KeyTyped(button);
+                emulator.HitButton(button);
                 if (saveImages)
                 {
                     SaveImage(emulator.Display);

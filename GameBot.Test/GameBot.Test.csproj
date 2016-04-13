@@ -139,9 +139,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CoreTests\EmguScreenshotTests.cs" />
+    <Compile Include="RobotTests\EmguScreenshotTests.cs" />
     <Compile Include="RobotTests\ExecutorTests.cs" />
-    <Compile Include="TetrisTests\LevelTests.cs" />
+    <Compile Include="TetrisTests\TetrisLevelTests.cs" />
     <Compile Include="TetrisTests\ShapeTests.cs" />
     <Compile Include="TetrisTests\TetrisGameStateTests.cs" />
     <Compile Include="TetrisTests\TetrisSearchTests.cs" />
@@ -156,7 +156,7 @@
     <Compile Include="TetrisTests\TetrisEmulatorTests.cs" />
     <Compile Include="TetrisTests\TetrisSolverTests.cs" />
     <Compile Include="TetrisTests\TetrisExtractorTests.cs" />
-    <Compile Include="TetrisTests\TetrisHeuristicTests.cs" />
+    <Compile Include="TetrisTests\TetrisSurviveHeuristicTests.cs" />
     <Compile Include="TetrisTests\PieceTests.cs" />
     <Compile Include="TetrisTests\BoardTests.cs" />
     <Compile Include="TetrisTests\TetrominoTests.cs" />

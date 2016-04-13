@@ -16,7 +16,9 @@ namespace GameBot.Robot.Renderers
 
         int? Key(int delay = 0);
 
-        void Render(Image image);
+        void Render(Image image, string title);
+
+        void Render(IImage image, string title);
 
         void End();
     }

@@ -1,7 +1,6 @@
 ﻿using Emgu.CV;
 using GameBot.Core.Data;
 using System;
-using System.Drawing;
 
 namespace GameBot.Core
 {

@@ -1,20 +1,21 @@
-﻿using System;
+﻿using GameBot.Core.Extensions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GameBot.Core.Data
+namespace GameBot.Core.Data.Commands
 {
-    public class Commands : ICommands
+    public class CommandCollection : IEnumerable<ICommand>
     {
         private readonly IList<ICommand> commands;
 
-        public Commands()
+        public CommandCollection()
         {
             commands = new List<ICommand>();
         }
 
-        public Commands(IEnumerable<ICommand> commands)
+        public CommandCollection(IEnumerable<ICommand> commands)
         {
             this.commands = commands.ToList();
         }

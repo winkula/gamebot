@@ -1,31 +1,30 @@
 ﻿using GameBot.Core;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using GameBot.Core.Data;
 using GameBot.Emulation;
-using System.Diagnostics;
+using System;
 
 namespace GameBot.Robot.Executors
 {
     public class EmulatorExecutor : IExecutor
     {
         private readonly Emulator emulator;
+        private readonly IActor actor;
+        private readonly ITimeProvider timeProvider;
         private readonly List<ICommand> queue;
-        public ITimeProvider TimeProvider { private get; set; }
 
-        public EmulatorExecutor(Emulator emulator)
+        public EmulatorExecutor(Emulator emulator, IActor actor, ITimeProvider timeProvider)
         {
             this.emulator = emulator;
+            this.timeProvider = timeProvider;
+            this.actor = actor;
             this.queue = new List<ICommand>();
         }
 
-        public void Execute(ICommands commands)
+        public void Execute(IEnumerable<ICommand> commands)
         {
-            foreach (var command in commands)
-            {
-                queue.Add(command);
-            }
+            queue.AddRange(commands);            
             Execute();
         }
 
@@ -37,21 +36,32 @@ namespace GameBot.Robot.Executors
 
         private void Execute()
         {
-            var time = TimeProvider.Time;
+            var time = timeProvider.Time;
 
-            var pending = queue.Where(x => x.Press <= time).ToList();
-            var buttons = pending.Select(x => x.Button).ToList();
-            
-            emulator.KeysTyped(buttons);
-            if (buttons.Any())
+            var pending = queue.Where(x =>
+                IsHitCommand(x, time) ||
+                IsPressCommand(x, time) ||
+                IsReleaseCommand(x, time)).ToList();
+
+            foreach (var command in pending)
             {
-                Debug.WriteLine("Press key " + string.Join(", ", buttons));
+                if (IsHitCommand(command, time)) { emulator.HitButton(command.Button); }
+                else if (IsPressCommand(command, time)) { emulator.PressButton(command.Button); }
+                else if (IsReleaseCommand(command, time)) { emulator.ReleaseButton(command.Button); }
             }
 
-            queue.RemoveAll(x => x.Press <= time);
+            queue.RemoveAll(x =>
+                IsHitCommand(x, time) ||
+                IsPressCommand(x, time) ||
+                IsReleaseCommand(x, time));
 
             // emulate one frame
-            emulator.ExecuteFrame();
+            //emulator.ExecuteFrame();
+            emulator.ExecuteFrames(3);
         }
+
+        private bool IsHitCommand(ICommand command, TimeSpan time) { return command.Press <= time && command.Release != null; }
+        private bool IsPressCommand(ICommand command, TimeSpan time) { return command.Press <= time && command.Release == null; }
+        private bool IsReleaseCommand(ICommand command, TimeSpan time) { return command.Press == null && command.Release <= time; }
     }
 }

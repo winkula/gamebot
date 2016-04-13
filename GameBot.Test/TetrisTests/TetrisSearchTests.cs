@@ -1,8 +1,7 @@
-﻿using GameBot.Core.Searching;
-using GameBot.Game.Tetris;
+﻿using GameBot.Game.Tetris;
 using GameBot.Game.Tetris.Data;
+using GameBot.Game.Tetris.Heuristics;
 using NUnit.Framework;
-using System;
 using System.Diagnostics;
 
 namespace GameBot.Test.TetrisTests
@@ -10,14 +9,14 @@ namespace GameBot.Test.TetrisTests
     [TestFixture]
     public class TetrisSearchTests
     {
-        private IHeuristic<TetrisGameState> heuristic;
         private TetrisSearch search;
 
         [SetUp]
         public void Setup()
         {
-            heuristic = new TetrisSurviveHeuristic();
-            search = new TetrisSearch(heuristic);
+            //search = new TetrisSearch(new TetrisSurviveHeuristic());
+            search = new TetrisSearch(new TetrisStackingHeuristic());
+            //search = new TetrisSearch(new TetrisHolesHeuristic());
         }
 
         [TestCase(Tetromino.O, Tetromino.S)]

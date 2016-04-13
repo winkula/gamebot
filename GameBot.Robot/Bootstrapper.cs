@@ -1,7 +1,10 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Data;
+using GameBot.Core.Searching;
 using GameBot.Emulation;
 using GameBot.Game.Tetris;
+using GameBot.Game.Tetris.Heuristics;
+using GameBot.Robot.Actors;
 using GameBot.Robot.Cameras;
 using GameBot.Robot.Engines;
 using GameBot.Robot.Executors;
@@ -16,33 +19,47 @@ namespace GameBot.Robot
 {
     public class Bootstrapper
     {
-        public static Container GetInitializedContainer()
+        public enum EngineType
         {
-            return GetInitializedContainer(false, false);
+            Emulator,
+            EmulatorInteractive,
+            Fast,
+            Real
         }
 
-        public static Container GetInitializedContainer(bool interactive, bool emulator)
+        public static Container GetInitializedContainer(EngineType type)
+        {
+            return GetInitializedContainer(type, typeof(TetrisSurviveHeuristic));
+        }
+
+        public static Container GetInitializedContainer(EngineType type, Type heuristicType)
         {
             var container = new Container();
 
-            if (interactive)
+            switch (type)
             {
-                container.Register<IEngine, InteractiveEngine>();
-            }
-            else
-            {
-                container.Register<IEngine, Engine>();
-                //container.Register<IEngine, FastEngine>();
-                //container.Register<IEngine, BlindEngine>();
+                case EngineType.EmulatorInteractive:
+                    container.Register<IEngine, InteractiveEngine>();
+                    break;
+                case EngineType.Fast:
+                    container.Register<IEngine, FastEngine>();
+                    break;
+                case EngineType.Emulator:
+                case EngineType.Real:
+                    container.Register<IEngine, Engine>();
+                    break;
+                default:
+                    break;
             }
 
-            if (emulator)
+            if (type == EngineType.EmulatorInteractive || type == EngineType.Emulator)
             {                
                 container.RegisterSingleton(new Emulator());
 
                 container.Register<ICamera, EmulatorCamera>();
                 container.Register<IQuantizer, PassthroughQuantizer>();
                 container.Register<IExecutor, EmulatorExecutor>();
+                container.Register<IActor, Actor>();
 
                 container.RegisterSingleton<ITimeProvider, EmulatorTimeProvider>();
             }
@@ -51,9 +68,11 @@ namespace GameBot.Robot
                 container.Register<ICamera, Camera>();
                 container.Register<IQuantizer, Quantizer>();
                 container.Register<IExecutor, Executor>();
+                container.Register<IActor, Actor>();
 
                 container.RegisterSingleton<ITimeProvider, TimeProvider>();
             }
+
             container.Register<IRenderer, EmguRenderer>();
 
             // TODO: remove build-dependency to the "GameBot.Game.Tetris" and load
@@ -66,7 +85,11 @@ namespace GameBot.Robot
             container.Register(typeof(IAgent), GetSingleImplementation<IAgent>(assembly));
             container.Register(typeof(IExtractor<>), new[] { assembly });
             container.Register(typeof(ISolver<>), new[] { assembly });
-            container.Register(typeof(IEmulator<>), new[] { assembly });
+            container.Register(typeof(ISimulator<>), new[] { assembly });
+
+            container.Register(typeof(ISearch<>), new[] { assembly });
+            //container.Register(typeof(IHeuristic<>), new[] { assembly });
+            container.Register(typeof(IHeuristic<>), heuristicType);
 
             container.Verify();
 

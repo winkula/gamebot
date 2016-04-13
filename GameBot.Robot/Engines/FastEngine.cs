@@ -1,7 +1,9 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Data;
+using GameBot.Core.Data.Commands;
 using GameBot.Game.Tetris;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -10,9 +12,9 @@ namespace GameBot.Robot.Engines
     public class FastEngine : IEngine
     {
         private readonly ISolver<TetrisGameState> solver;
-        private readonly TetrisEmulator emulator;
+        private readonly TetrisSimulator emulator;
 
-        public FastEngine(ISolver<TetrisGameState> solver, TetrisEmulator emulator)
+        public FastEngine(ISolver<TetrisGameState> solver, TetrisSimulator emulator)
         {
             this.solver = solver;
             this.emulator = emulator;
@@ -21,7 +23,7 @@ namespace GameBot.Robot.Engines
         public void Run()
         {
             // TODO: remove initialization
-            ICommands commands = solver.Solve(emulator.GameState);
+            IEnumerable<ICommand> commands = solver.Solve(emulator.GameState);
 
             Loop();
         }
@@ -30,14 +32,22 @@ namespace GameBot.Robot.Engines
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            int games = 10000;
-            for (int i = 0; i < games; i++)
+            for (int i = 0; i < int.MaxValue; i++)
             {
-                Debug.WriteLine("Play round " + i + "...");
+                if (i % 50 == 0)
+                {
+                    Debug.WriteLine("Play round " + i + "...");
+                }
 
                 if (emulator.GameState.IsEnd)
                 {
-                    Debug.WriteLine("Lost!");
+                    Debug.WriteLine("----- Lost! -----");
+                    Debug.WriteLine("Played rounds: " + i);
+                    Debug.WriteLine("Lines: " + emulator.GameState.Lines);
+                    Debug.WriteLine("Score: " + emulator.GameState.Score);
+                    Debug.WriteLine("Level: " + emulator.GameState.Level);
+                    Debug.WriteLine("Elapsed time in ms: " + stopwatch.ElapsedMilliseconds);
+
                     return;
                 }
 
@@ -45,39 +55,37 @@ namespace GameBot.Robot.Engines
                 //Render();
             }
             stopwatch.Stop();
-            Debug.WriteLine("Successfully played " + games + " rounds!");
-            Debug.WriteLine("Elapsed time in ms: " + stopwatch.ElapsedMilliseconds);
         }
 
         protected void Update()
         {
-            ICommands commands = solver.Solve(emulator.GameState);
+            IEnumerable<ICommand> commands = solver.Solve(emulator.GameState);
             if (commands.Any())
             {
                 foreach (var command in commands)
                 {
                     if (command.Button != Button.Down)
                     {
-                        emulator.Execute(command);
+                        emulator.Simulate(command);
                         //Debug.WriteLine(command.Button);
                         //Render();
                     }
                 }
                 // drop
-                emulator.Execute(new HitCommand(Button.Down, TimeSpan.Zero, TimeSpan.FromSeconds(1)));
+                emulator.Simulate(new HitCommand(Button.Down, TimeSpan.Zero, TimeSpan.FromSeconds(1)));
                 //Debug.WriteLine("Drop");
                 //Render();
             }
             else
             {
-                emulator.Execute(new HitCommand(Button.Down));
+                emulator.Simulate(new HitCommand(Button.Down));
                 Render();
             }
         }
 
         protected void Render()
         {
-            Debug.WriteLine(emulator.GameState);
+            //Debug.WriteLine(emulator.GameState);
         }
     }
 }

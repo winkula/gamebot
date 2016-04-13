@@ -3,6 +3,7 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using GameBot.Core;
 using GameBot.Core.Data;
+using GameBot.Robot.Data;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -30,60 +31,39 @@ namespace GameBot.Robot.Quantizers
 
         public IScreenshot Quantize(IImage image, TimeSpan timestamp)
         {
-            var capture = new Capture();
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            string filename = "Images/tetris_1.jpg";
-            //var sourceImageMat = new Mat(filename, LoadImageType.Grayscale);
-            //var sourceImageMat = new Mat();
-            Mat sourceImageMat = null;
-            for (int i = 0; i < 100; i++)
-            {
-                sourceImageMat = capture.QueryFrame();
-            }
-            var destImageMat = new Mat(sourceImageMat.Size, DepthType.Default, 1);
-            var destImageBinMat = new Mat(sourceImageMat.Size, DepthType.Default, 1);
-
-            Debug.WriteLine("Load: " + stopwatch.ElapsedMilliseconds);
-            stopwatch.Restart();
+            var sourceImage = image;
+            var destImage = new Mat(sourceImage.Size, DepthType.Default, 1);
+            var destImageBin = new Mat(sourceImage.Size, DepthType.Default, 1);            
+            Matrix<float> srcKeypoints = new Matrix<float>(keypoints);
+            Matrix<float> destKeypoints = new Matrix<float>(new float[,] { { 0, 0 }, { 160, 0 }, { 0, 144 }, { 160, 144 } });
 
             // calculate transformation matrix
-            Matrix<float> sourceMat = new Matrix<float>(keypoints);
-            Matrix<float> destMat = new Matrix<float>(new float[,] { { 0, 0 }, { 160, 0 }, { 0, 144 }, { 160, 144 } });
-            var transform = CvInvoke.GetPerspectiveTransform(sourceMat, destMat);
+            var transform = CvInvoke.GetPerspectiveTransform(srcKeypoints, destKeypoints);
 
-            Debug.WriteLine("Transform: " + stopwatch.ElapsedMilliseconds);
+            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, GetPerspectiveTransform");
             stopwatch.Restart();
 
             // transform
-            CvInvoke.WarpPerspective(sourceImageMat, destImageMat, transform, new Size(160, 144), Inter.Linear, Warp.Default);
+            CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(160, 144), Inter.Linear, Warp.Default);
 
-            Debug.WriteLine("Warp: " + stopwatch.ElapsedMilliseconds);
+            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, WarpPerspective");
             stopwatch.Restart();
 
             // threshold
-            //CvInvoke.AdaptiveThreshold(destImageMat, destImageBinMat, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, block, c);
+            CvInvoke.AdaptiveThreshold(destImage, destImageBin, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, block, c);
 
-            Debug.WriteLine("AdaptiveThreshold: " + stopwatch.ElapsedMilliseconds);
+            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, AdaptiveThreshold");
             stopwatch.Restart();
-
-            //Image<Gray, Byte> sourceImage = new Image<Gray, Byte>(new Bitmap(image));
-            //Image<Gray, Byte> destImage = new Image<Gray, Byte>(160, 144);
-            //Image<Gray, Byte> destImageBin = new Image<Gray, Byte>(160, 144);
-
-
-            //CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(160, 144), Inter.Linear, Warp.Default);
-
-            //CvInvoke.AdaptiveThreshold(destImage, destImageBin, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, block, c);
 
             while (adjust)
             {
-                //CvInvoke.AdaptiveThreshold(destImage, destImageBin, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, block, c);
-                //CvInvoke.AdaptiveThreshold(destImageMat, destImageBinMat, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, block, c);
+                CvInvoke.AdaptiveThreshold(destImage, destImageBin, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, block, c);
 
                 CvInvoke.NamedWindow("Test");
-                CvInvoke.Imshow("Test", destImageMat);
+                CvInvoke.Imshow("Test", destImageBin);
 
                 int key = CvInvoke.WaitKey();
                 if (key == 2490368) block += 2;
@@ -98,7 +78,7 @@ namespace GameBot.Robot.Quantizers
                 Debug.WriteLine("Block size: " + block);
             }
 
-            var screenshot = new Screenshot(destImageBinMat.Bitmap, new TimeSpan());
+            var screenshot = new EmguScreenshot(destImageBin, TimeSpan.Zero);
             return screenshot;
         }
     }

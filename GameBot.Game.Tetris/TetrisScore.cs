@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GameBot.Game.Tetris
+﻿namespace GameBot.Game.Tetris
 {
     /// <summary>
     /// On level 0, the player gets 40 points for a Single, 100 points for a Double,
@@ -17,9 +11,9 @@ namespace GameBot.Game.Tetris
     /// The maximum Score is 999,999.
     /// http://harddrop.com/wiki/Tetris_(Game_Boy)
     /// </summary>
-    public class Score
+    public class TetrisScore
     {
-        public static int ScoreSoftDrop = 10;
+        public static int ScoreSoftDrop = 1;
         public static int ScoreSingle = 40;
         public static int ScoreDouble = 100;
         public static int ScoreTriple = 300;

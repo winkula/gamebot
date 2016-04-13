@@ -1,4 +1,6 @@
 ﻿using GameBot.Core.Data;
+using GameBot.Core.Data.Commands;
+using System.Collections.Generic;
 
 namespace GameBot.Core.Agents
 {
@@ -13,7 +15,7 @@ namespace GameBot.Core.Agents
             Solver = solver;
         }
 
-        public ICommands Act(IScreenshot screenshot)
+        public IEnumerable<ICommand> Act(IScreenshot screenshot)
         {
             if (MustExtract(screenshot))
             {
@@ -23,7 +25,7 @@ namespace GameBot.Core.Agents
                     return Solver.Solve(gameState);
                 }
             }
-            return new Commands();
+            return new CommandCollection();
         }
 
         protected virtual bool MustExtract(IScreenshot screenshot)

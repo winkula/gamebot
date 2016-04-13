@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameBot.Core
+namespace GameBot.Core.Extensions
 {
     public static class Extensions
     {

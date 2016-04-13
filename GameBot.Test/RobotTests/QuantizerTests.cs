@@ -5,12 +5,11 @@ using GameBot.Robot.Quantizers;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
-using System.Drawing;
 
-namespace GameBot.Test
+namespace GameBot.Test.RobotTests
 {
     [TestFixture]
-    class QuantizerTests
+    public class QuantizerTests
     {
         private const bool adjust = false;
 

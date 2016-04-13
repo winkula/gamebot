@@ -4,18 +4,18 @@ using GameBot.Core.Data;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisEmulator : IEmulator<TetrisGameState>
+    public class TetrisSimulator : ISimulator<TetrisGameState>
     {
         private readonly Random random = new Random();
 
-        public TetrisEmulator()
+        public TetrisSimulator()
         {
             GameState = new TetrisGameState();
         }
 
         public TetrisGameState GameState { get; }
         
-        public void Execute(ICommand command)
+        public void Simulate(ICommand command)
         {
             switch (command.Button)
             {

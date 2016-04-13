@@ -1,4 +1,5 @@
 ﻿using GameBot.Core.Data;
+using System.Collections.Generic;
 
 namespace GameBot.Core
 {
@@ -12,6 +13,6 @@ namespace GameBot.Core
         /// </summary>
         /// <param name="screenshot">The current screenshot of the device's display.</param>
         /// <returns>A collection of commands for the device.</returns>
-        ICommands Act(IScreenshot screenshot); 
+        IEnumerable<ICommand> Act(IScreenshot screenshot); 
     }
 }

@@ -1,18 +1,18 @@
 ﻿using GameBot.Core;
-using GameBot.Robot.Engines;
+using GameBot.Game.Tetris.Heuristics;
 
 namespace GameBot.Robot
 {
     public class Launcher
     {
-        static bool IsInteractive = false;
-        static bool UseEmulator = true;
-
         static void Main(string[] args)
         {
             // Create dependency injection container
-            var container = Bootstrapper.GetInitializedContainer(IsInteractive, UseEmulator);
-            
+            //var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisSurviveHeuristic));
+            //var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisHolesHeuristic));
+            //var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisStackingHeuristic));
+            var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Emulator, typeof(TetrisStackingHeuristic));
+
             // Run the engine
             var engine = container.GetInstance<IEngine>();
             engine.Run();

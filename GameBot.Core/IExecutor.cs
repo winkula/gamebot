@@ -1,5 +1,5 @@
 ﻿using GameBot.Core.Data;
-using System;
+using System.Collections.Generic;
 
 namespace GameBot.Core
 {
@@ -8,11 +8,6 @@ namespace GameBot.Core
     /// </summary>
     public interface IExecutor
     {
-        /// <summary>
-        /// Sets the time provider for this executor.
-        /// </summary>
-        ITimeProvider TimeProvider { set; }
-
         /// <summary>
         /// Executes a command on the Game Boy.
         /// </summary>
@@ -23,6 +18,6 @@ namespace GameBot.Core
         /// Executes a collection of commands on the Game Boy.
         /// </summary>
         /// <param name="commands">A collection of commands to the Game Boy.</param>
-        void Execute(ICommands commands);
+        void Execute(IEnumerable<ICommand> commands);
     }
 }

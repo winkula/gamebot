@@ -1,12 +1,11 @@
 ﻿using Emgu.CV;
 using GameBot.Core.Data;
 using System;
-using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace GameBot.Robot.Data
 {
+    // TODO: cleanup
     public class EmguScreenshot : IScreenshot
     {
         public const int TileSize = 8;

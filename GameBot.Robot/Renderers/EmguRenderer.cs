@@ -23,10 +23,15 @@ namespace GameBot.Robot.Renderers
             mat.SetTo(new Bgr(0, 0, 0).MCvScalar);
         }
 
-        public void Render(Image image)
+        public void Render(Image image, string title)
         {
             Image<Bgr, Byte> toRender = new Image<Bgr, Byte>(new Bitmap(image));           
             CvInvoke.Imshow(title, toRender);
+        }
+
+        public void Render(IImage image, string title)
+        {
+            CvInvoke.Imshow(title, image);
         }
 
         public int? Key(int delay = 0)

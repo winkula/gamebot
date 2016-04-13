@@ -18,11 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-
-using GameBot.Core;
+ 
 using GameBot.Core.Data;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -37,6 +35,8 @@ namespace GameBot.Emulation
 
         private const int DisplayWidth = 160;
         private const int DisplayHeight = 144;
+
+        private const int FramesAfterButton = 2;
 
         private readonly X80 cpu;
         private double scanLineTicks;
@@ -399,6 +399,11 @@ namespace GameBot.Emulation
             Execute(1);
         }
 
+        public void ExecuteFrames(int n)
+        {
+            Execute(n);
+        }
+
         public void Execute(TimeSpan time)
         {
             int frames = (int)(time.TotalSeconds * FramesPerSecond);
@@ -429,56 +434,92 @@ namespace GameBot.Emulation
             }
         }
 
-        public void KeyPressed(Button button)
+        private void PressButtonInternal(Button button)
+        {
+            cpu.KeyChanged(button, true);
+        }
+
+        private void ReleaseButtonInternal(Button button)
+        {
+            cpu.KeyChanged(button, false);
+        }
+
+        public void HitButton(Button button)
         {
             if (Running)
             {
-                cpu.KeyChanged(button, true);
+                PressButtonInternal(button);
+                Execute(FramesAfterButton);
+                ReleaseButtonInternal(button);
+                Execute(FramesAfterButton);
             }
         }
 
-        public void KeyReleased(Button button)
+        public void PressButton(Button button)
         {
             if (Running)
             {
-                cpu.KeyChanged(button, false);
+                PressButtonInternal(button);
+                Execute(FramesAfterButton);
             }
         }
 
-        public void KeyTyped(Button button)
+        public void ReleaseButton(Button button)
         {
             if (Running)
             {
-                KeyPressed(button);
-                Execute(5);
-                KeyReleased(button);
-                Execute(5);
+                ReleaseButtonInternal(button);
+                Execute(FramesAfterButton);
             }
         }
-
-        public void KeyTypedFor(Button button, int frames)
+        /*
+        public void HitButton(Button button, int frames)
         {
             if (Running)
             {
-                KeyPressed(button);
+                PressButtonInternal(button);
                 Execute(frames);
-                KeyReleased(button);
+                ReleaseButtonInternal(button);
                 Execute(2);
             }
-        }
-
-        public void KeysTyped(IEnumerable<Button> buttons)
+        }*/
+        /*
+        public void HitButtons(IEnumerable<Button> buttons)
         {
             if (Running)
             {
                 foreach (var button in buttons)
                 {
-                    KeyPressed(button);
+                    PressButtonInternal(button);
                     ExecuteWithoutRendering(2);
-                    KeyReleased(button);
+                    ReleaseButtonInternal(button);
                     ExecuteWithoutRendering(2);
                 }
             }
         }
+
+        public void PressButtons(IEnumerable<Button> buttons)
+        {
+            if (Running)
+            {
+                foreach (var button in buttons)
+                {
+                    PressButtonInternal(button);
+                    ExecuteWithoutRendering(FramesAfterButton);
+                }
+            }
+        }
+
+        public void ReleaseButtons(IEnumerable<Button> buttons)
+        {
+            if (Running)
+            {
+                foreach (var button in buttons)
+                {
+                    ReleaseButtonInternal(button);
+                    ExecuteWithoutRendering(FramesAfterButton);
+                }
+            }
+        }*/
     }
 }

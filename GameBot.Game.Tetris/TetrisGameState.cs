@@ -14,7 +14,8 @@ namespace GameBot.Game.Tetris
         public Piece NextPiece { get; set; }
         public Move Move { get; set; }
         public int Lines { get; set; }
-        public int Level { get { return Tetris.Level.GetLevelAType(0, Lines); } }
+        public int Score { get; set; }
+        public int Level { get { return Tetris.TetrisLevel.GetLevel(0, Lines); } }
 
         //public int? Player { get; set; }
         //public GameType? GameType { get; set; }
@@ -40,6 +41,7 @@ namespace GameBot.Game.Tetris
             if (old.Piece != null) Piece = new Piece(old.Piece);
             if (old.NextPiece != null) NextPiece = new Piece(old.NextPiece);
             Lines += old.Lines;
+            Score += old.Score;
         }
 
         public TetrisGameState(TetrisGameState old, Piece piece)
@@ -48,6 +50,7 @@ namespace GameBot.Game.Tetris
             Piece = piece;
             if (old.NextPiece != null) NextPiece = new Piece(old.NextPiece);
             Lines += old.Lines;
+            Score += old.Score;
         }
 
         public TetrisGameState(Piece piece, Piece nextPiece)
@@ -120,6 +123,10 @@ namespace GameBot.Game.Tetris
             // remove lines
             int lines = Board.RemoveLines();
             Lines += lines;
+
+            // calculate score
+            Score += Tetris.TetrisScore.GetSoftdropScore(distance);
+            Score += Tetris.TetrisScore.GetLineScore(lines, Level);
 
             if (NextPiece != null)
             {
