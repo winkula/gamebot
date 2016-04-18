@@ -23,13 +23,13 @@ namespace GameBot.Game.Tetris.Heuristics
             for (int x = 0; x < board.Width; x++)
             {
                 // check left
-                if (x > 0 && x < board.Width - 1)
+                if (x > 0)
                 {
                     for (int y = board.ColumnHeight(x); y < board.ColumnHeight(x - 1); y++)
                     {
                         if (!board.IsOccupied(x, y))
                         {
-                            value += g(y);
+                            value += g(y + 1);
                         }
                     }
                 }
@@ -41,7 +41,7 @@ namespace GameBot.Game.Tetris.Heuristics
                     {
                         if (!board.IsOccupied(x, y))
                         {
-                            value += g(y);
+                            value += g(y + 1);
                         }
                     }
                 }
@@ -51,7 +51,50 @@ namespace GameBot.Game.Tetris.Heuristics
                 {
                     if (!board.IsOccupied(x, y))
                     {
-                        value += f(y);
+                        value += f(y + 1);
+                    }
+                }
+            }
+
+            return value;
+        }
+
+        protected int HolesValueStacking(Board board, Func<int, int> f, Func<int, int> g)
+        {
+            int value = 0;
+
+            for (int x = 0; x < board.Width; x++)
+            {
+                // check left
+                if (x > 0 && x < board.Width - 1)
+                {
+                    for (int y = board.ColumnHeight(x); y < board.ColumnHeight(x - 1); y++)
+                    {
+                        if (!board.IsOccupied(x, y))
+                        {
+                            value += g(y + 1);
+                        }
+                    }
+                }
+
+                // check right
+                if (x < board.Width - 1)
+                {
+                    for (int y = board.ColumnHeight(x); y < board.ColumnHeight(x + 1); y++)
+                    {
+                        if (!board.IsOccupied(x, y))
+                        {
+                            value += g(y + 1);
+                        }
+                    }
+                }
+
+                // check current
+                for (int y = 0; y < board.ColumnHeight(x); y++)
+                {
+                    if (!board.IsOccupied(x, y))
+                    {
+                        value += f(y + 1);
                     }
                 }
             }

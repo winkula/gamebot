@@ -26,9 +26,10 @@ namespace GameBot.Robot
 
         static void RunSimulations()
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 20; i++)
             {
-                var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisSurviveHeuristic));
+                //var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisSurviveHeuristic));
+                var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisHolesHeuristic));
                 container.GetInstance<IEngine>().Run();
             }
         }

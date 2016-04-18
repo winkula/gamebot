@@ -8,7 +8,7 @@
         {
             var board = gameState.Board;
 
-            var valueHoles = -1 * HolesValue(board, (h => 10 + h), (h => 1));
+            var valueHoles = -1 * HolesValueStacking(board, (h => 10 + h), (h => 1));
             var valueLines = 100 * Threshold(gameState.Lines, 3);
             var valueMaxHeight = -100 * Threshold(MaximumHeight(board), 6);
 
