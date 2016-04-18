@@ -40,9 +40,34 @@ namespace GameBot.Core.Data.Commands
             commands.Add(new HitCommand(button, timestamp));
         }
 
-        public void Hit(Button button, TimeSpan timestamp, TimeSpan duration)
+        public void Press(Button button)
         {
-            commands.Add(new HitCommand(button, timestamp, duration));
+            commands.Add(new PressCommand(button));
+        }
+
+        public void Press(Button button, double timestamp)
+        {
+            commands.Add(new PressCommand(button, timestamp.ToTimestamp()));
+        }
+
+        public void Press(Button button, TimeSpan timestamp)
+        {
+            commands.Add(new PressCommand(button, timestamp));
+        }
+
+        public void Release(Button button)
+        {
+            commands.Add(new ReleaseCommand(button));
+        }
+
+        public void Release(Button button, double timestamp)
+        {
+            commands.Add(new ReleaseCommand(button, timestamp.ToTimestamp()));
+        }
+
+        public void Release(Button button, TimeSpan timestamp)
+        {
+            commands.Add(new ReleaseCommand(button, timestamp));
         }
 
         public IEnumerator<ICommand> GetEnumerator()

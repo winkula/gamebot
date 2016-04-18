@@ -1,29 +1,32 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
+using GameBot.Core.Exceptions;
 using GameBot.Game.Tetris;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace GameBot.Robot.Engines
 {
     public class FastEngine : IEngine
     {
-        private readonly ISolver<TetrisGameState> solver;
-        private readonly TetrisSimulator emulator;
+        private readonly IPlayer<TetrisGameState> player;
+        private readonly TetrisSimulator simulator;
 
-        public FastEngine(ISolver<TetrisGameState> solver, TetrisSimulator emulator)
+        public FastEngine(IPlayer<TetrisGameState> player, TetrisSimulator emulator)
         {
-            this.solver = solver;
-            this.emulator = emulator;
+            this.player = player;
+            this.simulator = emulator;
         }
 
         public void Run()
         {
             // TODO: remove initialization
-            IEnumerable<ICommand> commands = solver.Solve(emulator.GameState);
+            IEnumerable<ICommand> commands = player.Play(simulator.GameState);
 
             Loop();
         }
@@ -32,60 +35,65 @@ namespace GameBot.Robot.Engines
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            for (int i = 0; i < int.MaxValue; i++)
+            int round = 0;
+            while (true)
             {
-                if (i % 50 == 0)
+                try
                 {
-                    Debug.WriteLine("Play round " + i + "...");
-                }
+                    // status log
+                    if (round % 100 == 0) Debug.WriteLine("Play round " + round + "...");
 
-                if (emulator.GameState.IsEnd)
+                    Update();
+                    //Render();
+
+                    round++;
+                }
+                catch (GameOverException)
                 {
-                    Debug.WriteLine("----- Lost! -----");
-                    Debug.WriteLine("Played rounds: " + i);
-                    Debug.WriteLine("Lines: " + emulator.GameState.Lines);
-                    Debug.WriteLine("Score: " + emulator.GameState.Score);
-                    Debug.WriteLine("Level: " + emulator.GameState.Level);
-                    Debug.WriteLine("Elapsed time in ms: " + stopwatch.ElapsedMilliseconds);
-
-                    return;
+                    Log(round, stopwatch.ElapsedMilliseconds);
+                    break;
                 }
-
-                Update();
-                //Render();
             }
             stopwatch.Stop();
         }
 
         protected void Update()
         {
-            IEnumerable<ICommand> commands = solver.Solve(emulator.GameState);
+            IEnumerable<ICommand> commands = player.Play(simulator.GameState);
             if (commands.Any())
             {
                 foreach (var command in commands)
                 {
-                    if (command.Button != Button.Down)
-                    {
-                        emulator.Simulate(command);
-                        //Debug.WriteLine(command.Button);
-                        //Render();
-                    }
+                    simulator.Simulate(command);
+                    Render();
                 }
-                // drop
-                emulator.Simulate(new HitCommand(Button.Down, TimeSpan.Zero, TimeSpan.FromSeconds(1)));
-                //Debug.WriteLine("Drop");
-                //Render();
             }
             else
             {
-                emulator.Simulate(new HitCommand(Button.Down));
+                // simulate fall
+                simulator.Simulate(new HitCommand(Button.Down));
                 Render();
             }
         }
 
         protected void Render()
         {
-            //Debug.WriteLine(emulator.GameState);
+            Debug.WriteLine(simulator.GameState);
+            Thread.Sleep(200);
+        }
+
+        protected void Log(int rounds, long time)
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "/game_log.csv";
+
+            if (!File.Exists(path))
+            {
+                //File.Create(path);
+                File.AppendAllText(path, "Rounds,Lines,Score,Level,Time\n");
+            }
+
+            string message = $"{rounds},{simulator.GameState.Lines},{simulator.GameState.Score},{simulator.GameState.Level},{time}\n";
+            File.AppendAllText(path, message);
         }
     }
 }

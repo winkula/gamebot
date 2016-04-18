@@ -3,23 +3,19 @@
 namespace GameBot.Core.Data
 {
     /// <summary>
-    /// Represents a command to the Game Boy device, normally a button press.
+    /// Represents a command to the Game Boy device. Can be a button hit, press or release.
     /// </summary>
     public interface ICommand
     {
         /// <summary>
-        /// Gets the button, that must be pressed.
+        /// Gets the moment in time, when the command must be executed.
         /// </summary>
-        Button Button { get; }
+        TimeSpan Timestamp { get; }
 
         /// <summary>
-        /// Gets the moment in time, when the button must be pressed.
+        /// Executes the commands on the actuator.
         /// </summary>
-        TimeSpan? Press { get; }
-
-        /// <summary>
-        /// Gets the moment in time, when the button must be released.
-        /// </summary>
-        TimeSpan? Release { get; }
+        /// <param name="actuator">The actuator.</param>
+        void Execute(IActuator actuator);
     }
 }

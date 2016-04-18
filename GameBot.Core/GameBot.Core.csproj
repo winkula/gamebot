@@ -140,12 +140,12 @@
     <Compile Include="Data\Screenshot.cs" />
     <Compile Include="Exceptions\GameOverException.cs" />
     <Compile Include="Extensions\Extensions.cs" />
-    <Compile Include="IActor.cs" />
+    <Compile Include="IActuator.cs" />
     <Compile Include="ICamera.cs" />
     <Compile Include="IEngine.cs" />
     <Compile Include="IExecutor.cs" />
     <Compile Include="ISimulator.cs" />
-    <Compile Include="ISolver.cs" />
+    <Compile Include="IPlayer.cs" />
     <Compile Include="IAgent.cs" />
     <Compile Include="IExtractor.cs" />
     <Compile Include="IQuantizer.cs" />

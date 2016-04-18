@@ -5,22 +5,26 @@ namespace GameBot.Core.Data.Commands
     public class PressCommand : ICommand
     {
         public Button Button { get; private set; }
-        public TimeSpan? Press { get; private set; }
-        public TimeSpan? Release { get; private set; }
+        public TimeSpan Timestamp { get; private set; }
 
-        public PressCommand(Button button, TimeSpan press)
+        public PressCommand(Button button, TimeSpan timestamp)
         {
             Button = button;
-            Press = press;
+            Timestamp = timestamp;
         }
 
         public PressCommand(Button button) : this(button, TimeSpan.Zero)
         {
         }
 
+        public void Execute(IActuator actuator)
+        {
+            actuator.Press(Button);
+        }
+
         public override string ToString()
         {
-            return $"PressCommand {{ Button: {Button}, Press: {Press}, Release: {Release} }}";
+            return $"PressCommand {{ Button: {Button}, Timestamp: {Timestamp} }}";
         }
     }
 }

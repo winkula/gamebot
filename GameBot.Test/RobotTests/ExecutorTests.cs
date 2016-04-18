@@ -16,9 +16,9 @@ namespace GameBot.Test.RobotTests
         [Test]
         public void Constructor()
         {
-            var repositoryActor = new Mock<IActor>();
+            var actuatorRepo = new Mock<IActuator>();
 
-            var executor = new Executor(repositoryActor.Object, new TimeProvider());
+            var executor = new Executor(actuatorRepo.Object, new TimeProvider());
         }
 
         [Test]
@@ -26,12 +26,12 @@ namespace GameBot.Test.RobotTests
         {
             int b = 0;
 
-            var repositoryActor = new Mock<IActor>();
-            repositoryActor.Setup(x => x.Hit(It.Is<Button>(p => p == Button.A))).Callback(() => Assert.Fail());
-            repositoryActor.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => b++);
+            var actuatorRepo = new Mock<IActuator>();
+            actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.A))).Callback(() => Assert.Fail());
+            actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => b++);
 
             var timeProvider = new TimeProvider();
-            var executor = new Executor(repositoryActor.Object, timeProvider);
+            var executor = new Executor(actuatorRepo.Object, timeProvider);
 
             var command = new HitCommand(Button.B);
 
@@ -48,12 +48,12 @@ namespace GameBot.Test.RobotTests
         {
             int b = 0;
 
-            var repositoryActor = new Mock<IActor>();
-            repositoryActor.Setup(x => x.Hit(It.Is<Button>(p => p == Button.A))).Callback(() => Assert.Fail());
-            repositoryActor.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => b++);
+            var actuatorRepo = new Mock<IActuator>();
+            actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.A))).Callback(() => Assert.Fail());
+            actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => b++);
 
             var timeProvider = new TimeProvider();
-            var executor = new Executor(repositoryActor.Object, timeProvider);
+            var executor = new Executor(actuatorRepo.Object, timeProvider);
 
             var command = new HitCommand(Button.B);
             timeProvider.Start();
@@ -69,12 +69,12 @@ namespace GameBot.Test.RobotTests
         {
             int a = 0;
 
-            var repositoryActor = new Mock<IActor>();
-            repositoryActor.Setup(x => x.Hit(It.Is<Button>(p => p == Button.A))).Callback(() => a++);
-            repositoryActor.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => Assert.Fail());
+            var actuatorRepo = new Mock<IActuator>();
+            actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.A))).Callback(() => a++);
+            actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => Assert.Fail());
 
             var timeProvider = new TimeProvider();
-            var executor = new Executor(repositoryActor.Object, timeProvider);
+            var executor = new Executor(actuatorRepo.Object, timeProvider);
 
             var commands = new CommandCollection();
             commands.Add(new HitCommand(Button.A));
@@ -95,12 +95,12 @@ namespace GameBot.Test.RobotTests
             int a = 0;
             int b = 0;
 
-            var repositoryActor = new Mock<IActor>();
-            repositoryActor.Setup(x => x.Hit(It.Is<Button>(p => p == Button.A))).Callback(() => a++);
-            repositoryActor.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => b++);
+            var actuatorRepo = new Mock<IActuator>();
+            actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.A))).Callback(() => a++);
+            actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => b++);
 
             var timeProvider = new TimeProvider();
-            var executor = new Executor(repositoryActor.Object, timeProvider);
+            var executor = new Executor(actuatorRepo.Object, timeProvider);
 
             var commands = new CommandCollection();
             commands.Add(new HitCommand(Button.A, TimeSpan.FromSeconds(0.5)));

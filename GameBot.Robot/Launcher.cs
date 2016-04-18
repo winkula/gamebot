@@ -7,6 +7,12 @@ namespace GameBot.Robot
     {
         static void Main(string[] args)
         {
+            RunSimulations();
+            //RunMain();
+        }
+                 
+        static void RunMain()
+        {
             // Create dependency injection container
             //var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisSurviveHeuristic));
             //var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisHolesHeuristic));
@@ -16,6 +22,15 @@ namespace GameBot.Robot
             // Run the engine
             var engine = container.GetInstance<IEngine>();
             engine.Run();
+        }
+
+        static void RunSimulations()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisSurviveHeuristic));
+                container.GetInstance<IEngine>().Run();
+            }
         }
     }
 }

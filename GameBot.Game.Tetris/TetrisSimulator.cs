@@ -4,7 +4,7 @@ using GameBot.Core.Data;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisSimulator : ISimulator<TetrisGameState>
+    public class TetrisSimulator : ISimulator<TetrisGameState>, IActuator
     {
         private readonly Random random = new Random();
 
@@ -14,43 +14,38 @@ namespace GameBot.Game.Tetris
         }
 
         public TetrisGameState GameState { get; }
-        
+
         public void Simulate(ICommand command)
         {
-            switch (command.Button)
+            command.Execute(this);
+        }
+
+        public void Hit(Button button)
+        {
+            switch (button)
             {
-                case Button.Down:
-                    if (command.Press.HasValue && command.Release.HasValue)
-                    {
-                        GameState.Drop();
-                    }
-                    else
-                    {
-                        GameState.Fall();
-                    }
-                    break;
-
-                case Button.Left:
-                    GameState.Piece.Left();
-                    break;
-
-                case Button.Right:
-                    GameState.Piece.Right();
-                    break;
-
-                case Button.A:
-                    GameState.Piece.Rotate();
-                    break;
-
-                case Button.B:
-                    GameState.Piece.RotateCounterclockwise();
-                    break;
-
-                default:
-                    break;
+                case Button.Left: GameState.Left(); break;
+                case Button.Right: GameState.Right(); break;
+                case Button.A: GameState.Rotate(); break;
+                case Button.B: GameState.RotateCounterclockwise(); break;
+                case Button.Down: GameState.Fall(); break;
+                default: break;
             }
         }
-        
+
+        public void Press(Button button)
+        {
+            if (button == Button.Down)
+            {
+                GameState.Drop();
+            }
+        }
+
+        public void Release(Button button)
+        {
+            // ignore
+        }
+
         public override string ToString()
         {
             return GameState.ToString();

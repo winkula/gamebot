@@ -4,7 +4,7 @@ using GameBot.Core.Searching;
 using GameBot.Emulation;
 using GameBot.Game.Tetris;
 using GameBot.Game.Tetris.Heuristics;
-using GameBot.Robot.Actors;
+using GameBot.Robot.Actuators;
 using GameBot.Robot.Cameras;
 using GameBot.Robot.Engines;
 using GameBot.Robot.Executors;
@@ -59,7 +59,7 @@ namespace GameBot.Robot
                 container.Register<ICamera, EmulatorCamera>();
                 container.Register<IQuantizer, PassthroughQuantizer>();
                 container.Register<IExecutor, EmulatorExecutor>();
-                container.Register<IActor, Actor>();
+                container.Register<IActuator, Actuator>();
 
                 container.RegisterSingleton<ITimeProvider, EmulatorTimeProvider>();
             }
@@ -68,7 +68,7 @@ namespace GameBot.Robot
                 container.Register<ICamera, Camera>();
                 container.Register<IQuantizer, Quantizer>();
                 container.Register<IExecutor, Executor>();
-                container.Register<IActor, Actor>();
+                container.Register<IActuator, Actuator>();
 
                 container.RegisterSingleton<ITimeProvider, TimeProvider>();
             }
@@ -84,7 +84,7 @@ namespace GameBot.Robot
             
             container.Register(typeof(IAgent), GetSingleImplementation<IAgent>(assembly));
             container.Register(typeof(IExtractor<>), new[] { assembly });
-            container.Register(typeof(ISolver<>), new[] { assembly });
+            container.Register(typeof(IPlayer<>), new[] { assembly });
             container.Register(typeof(ISimulator<>), new[] { assembly });
 
             container.Register(typeof(ISearch<>), new[] { assembly });

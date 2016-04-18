@@ -5,10 +5,11 @@ using GameBot.Core.Searching;
 using System.Diagnostics;
 using System.Collections.Generic;
 using GameBot.Core.Data.Commands;
+using System.Linq;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisSolver : ISolver<TetrisGameState>
+    public class TetrisPlayer : IPlayer<TetrisGameState>
     {
         //private readonly DepthFirstSearch search = new DepthFirstSearch();
         private readonly ISearch<TetrisNode> search;// = new TetrisSearch(new TetrisHolesHeuristic());
@@ -17,12 +18,12 @@ namespace GameBot.Game.Tetris
 
         private TetrisGameState lastGameState;
 
-        public TetrisSolver(ISearch<TetrisNode> search)
+        public TetrisPlayer(ISearch<TetrisNode> search)
         {
             this.search = search;
         }
 
-        public IEnumerable<ICommand> Solve(TetrisGameState gameState)
+        public IEnumerable<ICommand> Play(TetrisGameState gameState)
         {
             var commands = new CommandCollection();
             if (!started)
@@ -49,47 +50,39 @@ namespace GameBot.Game.Tetris
 
                     var start = new TetrisNode(new TetrisGameState(gameState));
                     var result = search.Search(start);
-
-                    var goal = result.Parent;
-                    var move = result.Parent.Move;
-
-                    //Debug.WriteLine("======= Goal state ======= ");
-                    //Debug.WriteLine(move);
-                    //Debug.WriteLine(goal);
-                    //Debug.WriteLine("========================== ");
-
-                    for (int i = 0; i < move.Rotation; i++)
+                    var move = result?.Parent.Move;
+                    if (move != null)
                     {
-                        commands.Hit(Button.A);
-                    }
-
-                    if (move.Translation < 0)
-                    {
-                        for (int i = 0; i < -move.Translation; i++)
+                        if (move.Rotation % 4 == 3)
                         {
-                            commands.Hit(Button.Left);
+                            // counterclockwise rotation
+                            commands.Hit(Button.B);
                         }
-                    }
-                    else if (move.Translation > 0)
-                    {
-                        for (int i = 0; i < move.Translation; i++)
-                        {
-                            commands.Hit(Button.Right);
+                        else
+                        { 
+                            // clockwise rotation
+                            Enumerable.Range(0, move.Rotation % 4)
+                                .ToList()
+                                .ForEach(x => commands.Hit(Button.A));
                         }
-                    }
 
-                    if (move.Fall > 0)
-                    {
-                        // TODO: set start level
-                        // Level.GetDuration(0, gameState.Level)
+                        if (move.Translation < 0)
+                        {
+                            // move left
+                            Enumerable.Range(0, -move.Translation)
+                                .ToList()
+                                .ForEach(x => commands.Hit(Button.Left));
+                        }
+                        else if (move.Translation > 0)
+                        {
+                            // move right
+                            Enumerable.Range(0, move.Translation)
+                                .ToList()
+                                .ForEach(x => commands.Hit(Button.Right));
+                        }
+
+                        // drop
                         commands.Add(new PressCommand(Button.Down));
-                        /*
-                        // TODO: drop with press duration (level dependent)
-                        int slip = 0;//= fall*3/4;
-                        for (int i = 0; i < move.Fall - slip; i++)
-                        {
-                            commands.Hit(Button.Down);
-                        }*/
                     }
 
                     lastGameState = new TetrisGameState(gameState);

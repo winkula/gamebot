@@ -11,16 +11,16 @@ namespace GameBot.Robot.Executors
 {
     public class Executor : IExecutor
     {
-        private readonly IActor actor;
+        private readonly IActuator actuator;
         private readonly ITimeProvider timeProvider;
         private readonly ConcurrentQueue<ICommand> queue = new ConcurrentQueue<ICommand>();
         private Queue<ICommand> queueInternal = new Queue<ICommand>();
         private Queue<ICommand> queueInternalSwap = new Queue<ICommand>();
         private Task worker;
 
-        public Executor(IActor actor, ITimeProvider timeProvider)
+        public Executor(IActuator actuator, ITimeProvider timeProvider)
         {
-            this.actor = actor;
+            this.actuator = actuator;
             this.timeProvider = timeProvider;
         }
 
@@ -80,45 +80,14 @@ namespace GameBot.Robot.Executors
 
         private void HandleCommand(ICommand command, TimeSpan time)
         {
-            if (command.Press.HasValue && command.Release.HasValue)
+            if (command.Timestamp <= time)
             {
-                if (command.Press.Value <= time)
-                {
-                    Debug.Write("Hit " + command.Button + "\n");
-                    actor.Hit(command.Button);
-                }
-                else
-                {
-                    queueInternalSwap.Enqueue(command);
-                }
+                command.Execute(actuator);
             }
             else
             {
-                if (command.Press.HasValue)
-                {
-                    if (command.Press.Value <= time)
-                    {
-                        Debug.Write("Press " + command.Button + "\n");
-                        actor.Press(command.Button);
-                    }
-                    else
-                    {
-                        queueInternalSwap.Enqueue(command);
-                    }
-                }
-                else if (command.Release.HasValue)
-                {
-                    if (command.Release.Value <= time)
-                    {
-                        Debug.Write("Release " + command.Button + "\n");
-                        actor.Release(command.Button);
-                    }
-                    else
-                    {
-                        queueInternalSwap.Enqueue(command);
-                    }
-                }
-            }            
+                queueInternalSwap.Enqueue(command);
+            }
         }
 
         private void AwakeWorker()

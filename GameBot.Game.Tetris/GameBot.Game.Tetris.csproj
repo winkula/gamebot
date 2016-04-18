@@ -92,7 +92,7 @@
     <Compile Include="TetrisNode.cs" />
     <Compile Include="Data\Tetromino.cs" />
     <Compile Include="TetrisAgent.cs" />
-    <Compile Include="TetrisSolver.cs" />
+    <Compile Include="TetrisPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TetrisExtractor.cs" />
     <Compile Include="Heuristics\TetrisHolesHeuristic.cs" />

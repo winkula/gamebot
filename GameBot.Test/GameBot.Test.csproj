@@ -139,6 +139,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoreTests\CommandCollectionTests.cs" />
+    <Compile Include="CoreTests\ReleaseCommandTests.cs" />
+    <Compile Include="CoreTests\PressCommandTests.cs" />
+    <Compile Include="CoreTests\HitCommandTests.cs" />
     <Compile Include="RobotTests\EmguScreenshotTests.cs" />
     <Compile Include="RobotTests\ExecutorTests.cs" />
     <Compile Include="TetrisTests\TetrisLevelTests.cs" />
@@ -146,15 +150,13 @@
     <Compile Include="TetrisTests\TetrisGameStateTests.cs" />
     <Compile Include="TetrisTests\TetrisSearchTests.cs" />
     <Compile Include="CoreTests\ScreenshotTests.cs" />
-    <Compile Include="CoreTests\CommandsTests.cs" />
-    <Compile Include="CoreTests\CommandTests.cs" />
     <Compile Include="CoreTests\ButtonTests.cs" />
     <Compile Include="EmulatorTests\EmulatorTests.cs" />
     <Compile Include="ContainerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RobotTests\QuantizerTests.cs" />
     <Compile Include="TetrisTests\TetrisEmulatorTests.cs" />
-    <Compile Include="TetrisTests\TetrisSolverTests.cs" />
+    <Compile Include="TetrisTests\TetrisPlayerTests.cs" />
     <Compile Include="TetrisTests\TetrisExtractorTests.cs" />
     <Compile Include="TetrisTests\TetrisSurviveHeuristicTests.cs" />
     <Compile Include="TetrisTests\PieceTests.cs" />

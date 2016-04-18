@@ -30,7 +30,7 @@ namespace GameBot.Game.Tetris.Data
         {
         }
 
-        public Piece() : this(GetPseudoRandom(), 0, 0, 0)
+        public Piece() : this(Tetrominos.GetRandom(), 0, 0, 0)
         {
         }
 
@@ -42,19 +42,6 @@ namespace GameBot.Game.Tetris.Data
                 return new Piece(shape.Tetromino, shape.Orientation);
             }
             return null;
-        }
-
-        // Chances found by sampling dozens of emulator tetris game states
-        private static Tetromino GetPseudoRandom()
-        {
-            var p = random.NextDouble();
-            if (p < 0.089) return Tetromino.Z;
-            if (p < 0.199) return Tetromino.L;
-            if (p < 0.330) return Tetromino.I;
-            if (p < 0.473) return Tetromino.O;
-            if (p < 0.617) return Tetromino.J;
-            if (p < 0.799) return Tetromino.T;
-            return Tetromino.S;
         }
 
         // A button

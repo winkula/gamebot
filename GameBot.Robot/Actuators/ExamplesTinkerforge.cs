@@ -1,7 +1,7 @@
 ﻿using System;
 using Tinkerforge;
 
-namespace GameBot.Robot.Actors
+namespace GameBot.Robot.Actuators
 {
     public class ExamplesTinkerforge
     {

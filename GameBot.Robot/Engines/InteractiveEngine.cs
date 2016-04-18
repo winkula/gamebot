@@ -38,7 +38,7 @@ namespace GameBot.Robot.Engines
 
             renderer.End();
         }
-        
+
         protected void Loop()
         {
             var start = DateTime.Now;
@@ -70,14 +70,14 @@ namespace GameBot.Robot.Engines
             if (key.HasValue)
             {
                 if (key == 27) throw new TimeoutException(); // Escape
-                if (key == 2490368) emulator.HitButton(Button.Up);
-                if (key == 2621440) emulator.HitButton(Button.Down);
-                if (key == 2424832) emulator.HitButton(Button.Left);
-                if (key == 2555904) emulator.HitButton(Button.Right);
-                if (key == 121) emulator.HitButton(Button.A);
-                if (key == 120) emulator.HitButton(Button.B);
-                if (key == 13) emulator.HitButton(Button.Start);
-                if (key == 32) emulator.HitButton(Button.Select);
+                if (key == 2490368) emulator.Hit(Button.Up);
+                if (key == 2621440) emulator.Hit(Button.Down);
+                if (key == 2424832) emulator.Hit(Button.Left);
+                if (key == 2555904) emulator.Hit(Button.Right);
+                if (key == 121) emulator.Hit(Button.A);
+                if (key == 120) emulator.Hit(Button.B);
+                if (key == 13) emulator.Hit(Button.Start);
+                if (key == 32) emulator.Hit(Button.Select);
             }
         }
 

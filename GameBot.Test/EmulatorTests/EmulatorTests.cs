@@ -70,7 +70,7 @@ namespace GameBot.Test
 
             foreach (var input in inputs)
             {
-                emulator.HitButton(input.Button);
+                emulator.Hit(input.Button);
                 emulator.Execute(TimeSpan.FromSeconds(input.Duration));
                 if (saveImages)
                 {
@@ -93,7 +93,7 @@ namespace GameBot.Test
 
             foreach (var button in buttons)
             {
-                emulator.HitButton(button);
+                emulator.Hit(button);
                 if (saveImages)
                 {
                     SaveImage(emulator.Display);

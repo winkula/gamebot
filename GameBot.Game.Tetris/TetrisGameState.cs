@@ -1,8 +1,7 @@
 ﻿using GameBot.Core.Data;
+using GameBot.Core.Exceptions;
 using GameBot.Game.Tetris.Data;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 
 namespace GameBot.Game.Tetris
@@ -11,35 +10,24 @@ namespace GameBot.Game.Tetris
     {
         public Board Board { get; private set; }
         public Piece Piece { get; set; }
-        public Piece NextPiece { get; set; }
+        public Tetromino? NextPiece { get; set; }
         public Move Move { get; set; }
         public int Lines { get; set; }
         public int Score { get; set; }
-        public int Level { get { return Tetris.TetrisLevel.GetLevel(0, Lines); } }
-
-        //public int? Player { get; set; }
-        //public GameType? GameType { get; set; }
-        //public int? MusicType { get; set; }
-        //public int? Level
-        //{
-        //    get { return State?.Board.CompletedLines; }
-        //}
-        //public int? High { get; set; }
-        //public int? Score { get; set; }
-        //public bool? IsPause { get; set; }
+        public int Level { get { return TetrisLevel.GetLevel(0, Lines); } }
 
         public TetrisGameState()
         {
             Board = new Board();
             Piece = new Piece();
-            NextPiece = new Piece();
+            NextPiece = Tetrominos.GetRandom(); // TODO: only generate if needed!
         }
 
         public TetrisGameState(TetrisGameState old)
         {
             Board = new Board(old.Board);
             if (old.Piece != null) Piece = new Piece(old.Piece);
-            if (old.NextPiece != null) NextPiece = new Piece(old.NextPiece);
+            NextPiece = old.NextPiece;
             Lines += old.Lines;
             Score += old.Score;
         }
@@ -48,26 +36,26 @@ namespace GameBot.Game.Tetris
         {
             Board = new Board(old.Board);
             Piece = piece;
-            if (old.NextPiece != null) NextPiece = new Piece(old.NextPiece);
+            NextPiece = old.NextPiece;
             Lines += old.Lines;
             Score += old.Score;
         }
 
-        public TetrisGameState(Piece piece, Piece nextPiece)
+        public TetrisGameState(Piece piece, Tetromino? nextPiece)
         {
             Board = new Board();
             Piece = piece;
             NextPiece = nextPiece;
         }
 
-        public TetrisGameState(Board board, Piece piece, Piece nextPiece)
+        public TetrisGameState(Board board, Piece piece, Tetromino? nextPiece)
         {
             Board = board;
             Piece = piece;
             NextPiece = nextPiece;
         }
 
-        public TetrisGameState(Tetromino tetromino, Tetromino nextTetromino) : this(new Piece(tetromino), new Piece(nextTetromino))
+        public TetrisGameState(Tetromino tetromino, Tetromino? nextTetromino) : this(new Piece(tetromino), nextTetromino)
         {
         }
 
@@ -75,18 +63,20 @@ namespace GameBot.Game.Tetris
         {
         }
 
-        public bool IsEnd
-        {
-            get { return Board.Intersects(NextPiece); }
-        }
-
         public bool IsPieceLanded
         {
             get { return Board.Intersects(new Piece(Piece).Fall()); }
         }
 
-        public bool Fall(Piece next = null)
+        public bool Fall()
         {
+            return Fall(Tetrominos.GetRandom());
+        }
+
+        public bool Fall(Tetromino next)
+        {
+            if (Board.DropDistance(Piece) < 0 && Board.Intersects(Piece)) throw new GameOverException();
+
             bool fallen = false;
 
             if (!IsPieceLanded)
@@ -100,20 +90,25 @@ namespace GameBot.Game.Tetris
                 Board.Place(Piece);
                 Piece = null;
 
-                if (NextPiece != null)
+                if (NextPiece.HasValue)
                 {
-                    Piece = new Piece(NextPiece);
-                    NextPiece = next ?? new Piece();
+                    Piece = new Piece(NextPiece.Value);
+                    NextPiece = next;
                 }
             }
 
             return fallen;
         }
 
-        public int Drop(Piece next = null)
+        public int Drop()
+        {
+            return Drop(Tetrominos.GetRandom());
+        }
+
+        public int Drop(Tetromino next)
         {
             int distance = Board.DropDistance(Piece);
-            if (distance < 0) throw new ArgumentException("Piece can't be dropped");
+            if (distance < 0 && Board.Intersects(Piece)) throw new GameOverException();
 
             // let piece fall
             Piece.Fall(distance);
@@ -125,17 +120,49 @@ namespace GameBot.Game.Tetris
             Lines += lines;
 
             // calculate score
-            Score += Tetris.TetrisScore.GetSoftdropScore(distance);
-            Score += Tetris.TetrisScore.GetLineScore(lines, Level);
+            Score += TetrisScore.GetSoftdropScore(distance);
+            Score += TetrisScore.GetLineScore(lines, Level);
 
-            if (NextPiece != null)
+            if (NextPiece.HasValue)
             {
-                // TODO: only generate new pice if this is explicitly wanted!
-                Piece = new Piece(NextPiece);
-                NextPiece = next ?? new Piece();
+                // TODO: only generate new piece if this is explicitly wanted!
+                Piece = new Piece(NextPiece.Value);
+                NextPiece = next;
             }
 
             return distance;
+        }
+
+        public void Left()
+        {
+            if (!Board.Intersects(new Piece(Piece).Left()))
+            {
+                Piece.Left();
+            }
+        }
+
+        public void Right()
+        {
+            if (!Board.Intersects(new Piece(Piece).Right()))
+            {
+                Piece.Right();
+            }
+        }
+
+        public void Rotate()
+        {
+            if (!Board.Intersects(new Piece(Piece).Rotate()))
+            {
+                Piece.Rotate();
+            }
+        }
+
+        public void RotateCounterclockwise()
+        {
+            if (!Board.Intersects(new Piece(Piece).RotateCounterclockwise()))
+            {
+                Piece.RotateCounterclockwise();
+            }
         }
 
         public override int GetHashCode()

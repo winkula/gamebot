@@ -5,7 +5,7 @@ namespace GameBot.Core
     /// <summary>
     /// Represents a robotic arm that can press buttons on a Game Boy device.
     /// </summary>
-    public interface IActor
+    public interface IActuator
     {
         /// <summary>
         /// Hits a button for a minimal amount of time.

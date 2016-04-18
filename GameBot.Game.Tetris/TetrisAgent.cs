@@ -5,7 +5,7 @@ namespace GameBot.Game.Tetris
 {
     public class TetrisAgent : AbstractAgent<TetrisGameState>
     {
-        public TetrisAgent(IExtractor<TetrisGameState> extractor, ISolver<TetrisGameState> solver) : base(extractor, solver)
+        public TetrisAgent(IExtractor<TetrisGameState> extractor, IPlayer<TetrisGameState> player) : base(extractor, player)
         {
         }
     }

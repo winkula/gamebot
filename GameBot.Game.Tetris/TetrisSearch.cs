@@ -31,7 +31,7 @@ namespace GameBot.Game.Tetris
             foreach (var successor in parent.GetSuccessors())
             {
                 var best = SearchNextPiece(successor);
-                if (best.Score > bestScore)
+                if (best?.Score > bestScore)
                 {
                     goal = best;
                     bestScore = best.Score;
@@ -112,7 +112,6 @@ namespace GameBot.Game.Tetris
 
         protected double GetBestScore(IEnumerable<TetrisNode> successors)
         {
-            // TODO: dont take NegativeInfinity for a totally lost game?
             var bestScore = double.NegativeInfinity;
 
             foreach (var successor in successors)

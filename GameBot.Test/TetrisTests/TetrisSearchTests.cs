@@ -28,7 +28,7 @@ namespace GameBot.Test.TetrisTests
         [TestCase(Tetromino.T, Tetromino.J)]
         public void Search(Tetromino current, Tetromino next)
         {
-            var gameState = new TetrisGameState(new Piece(current), new Piece(next));
+            var gameState = new TetrisGameState(current, next);
             var node = new TetrisNode(gameState);
             
             var result = search.Search(node);

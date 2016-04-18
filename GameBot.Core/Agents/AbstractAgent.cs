@@ -7,12 +7,12 @@ namespace GameBot.Core.Agents
     public abstract class AbstractAgent<T> : IAgent where T : class, IGameState
     {
         protected readonly IExtractor<T> Extractor;
-        protected readonly ISolver<T> Solver;
+        protected readonly IPlayer<T> Player;
 
-        public AbstractAgent(IExtractor<T> extractor, ISolver<T> solver)
+        public AbstractAgent(IExtractor<T> extractor, IPlayer<T> player)
         {
             Extractor = extractor;
-            Solver = solver;
+            Player = player;
         }
 
         public IEnumerable<ICommand> Act(IScreenshot screenshot)
@@ -20,9 +20,9 @@ namespace GameBot.Core.Agents
             if (MustExtract(screenshot))
             {
                 var gameState = Extractor.Extract(screenshot);
-                if (MustSolve(gameState))
+                if (MustPlay(gameState))
                 {
-                    return Solver.Solve(gameState);
+                    return Player.Play(gameState);
                 }
             }
             return new CommandCollection();
@@ -33,7 +33,7 @@ namespace GameBot.Core.Agents
             return true;
         }
 
-        protected virtual bool MustSolve(T gameState)
+        protected virtual bool MustPlay(T gameState)
         {
             return true;
         }

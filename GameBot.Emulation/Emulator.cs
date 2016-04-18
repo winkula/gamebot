@@ -18,7 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
- 
+
+using GameBot.Core;
 using GameBot.Core.Data;
 using System;
 using System.Drawing;
@@ -28,7 +29,7 @@ using System.Runtime.InteropServices;
 
 namespace GameBot.Emulation
 {
-    public class Emulator
+    public class Emulator : IActuator
     {
         private const int FramesPerSecond = 60;
         private const int MaxFramesSkipped = 10;
@@ -444,7 +445,7 @@ namespace GameBot.Emulation
             cpu.KeyChanged(button, false);
         }
 
-        public void HitButton(Button button)
+        public void Hit(Button button)
         {
             if (Running)
             {
@@ -455,7 +456,7 @@ namespace GameBot.Emulation
             }
         }
 
-        public void PressButton(Button button)
+        public void Press(Button button)
         {
             if (Running)
             {
@@ -464,7 +465,7 @@ namespace GameBot.Emulation
             }
         }
 
-        public void ReleaseButton(Button button)
+        public void Release(Button button)
         {
             if (Running)
             {
@@ -472,54 +473,5 @@ namespace GameBot.Emulation
                 Execute(FramesAfterButton);
             }
         }
-        /*
-        public void HitButton(Button button, int frames)
-        {
-            if (Running)
-            {
-                PressButtonInternal(button);
-                Execute(frames);
-                ReleaseButtonInternal(button);
-                Execute(2);
-            }
-        }*/
-        /*
-        public void HitButtons(IEnumerable<Button> buttons)
-        {
-            if (Running)
-            {
-                foreach (var button in buttons)
-                {
-                    PressButtonInternal(button);
-                    ExecuteWithoutRendering(2);
-                    ReleaseButtonInternal(button);
-                    ExecuteWithoutRendering(2);
-                }
-            }
-        }
-
-        public void PressButtons(IEnumerable<Button> buttons)
-        {
-            if (Running)
-            {
-                foreach (var button in buttons)
-                {
-                    PressButtonInternal(button);
-                    ExecuteWithoutRendering(FramesAfterButton);
-                }
-            }
-        }
-
-        public void ReleaseButtons(IEnumerable<Button> buttons)
-        {
-            if (Running)
-            {
-                foreach (var button in buttons)
-                {
-                    ReleaseButtonInternal(button);
-                    ExecuteWithoutRendering(FramesAfterButton);
-                }
-            }
-        }*/
     }
 }

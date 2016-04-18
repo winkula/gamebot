@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using GameBot.Core.Data;
 
-namespace GameBot.Robot.Actors
+namespace GameBot.Robot.Actuators
 {
-    public class Actor : IActor
+    public class Actuator : IActuator
     {
         public void Hit(Button button)
         {

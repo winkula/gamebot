@@ -10,15 +10,15 @@ namespace GameBot.Robot.Executors
     public class EmulatorExecutor : IExecutor
     {
         private readonly Emulator emulator;
-        private readonly IActor actor;
+        private readonly IActuator actuator;
         private readonly ITimeProvider timeProvider;
         private readonly List<ICommand> queue;
 
-        public EmulatorExecutor(Emulator emulator, IActor actor, ITimeProvider timeProvider)
+        public EmulatorExecutor(Emulator emulator, IActuator actuator, ITimeProvider timeProvider)
         {
             this.emulator = emulator;
             this.timeProvider = timeProvider;
-            this.actor = actor;
+            this.actuator = actuator;
             this.queue = new List<ICommand>();
         }
 
@@ -38,30 +38,20 @@ namespace GameBot.Robot.Executors
         {
             var time = timeProvider.Time;
 
-            var pending = queue.Where(x =>
-                IsHitCommand(x, time) ||
-                IsPressCommand(x, time) ||
-                IsReleaseCommand(x, time)).ToList();
+            var pendingCommands = queue.Where(x => IsPending(x, time)).ToList();
 
-            foreach (var command in pending)
+            foreach (var pendingCommand in pendingCommands)
             {
-                if (IsHitCommand(command, time)) { emulator.HitButton(command.Button); }
-                else if (IsPressCommand(command, time)) { emulator.PressButton(command.Button); }
-                else if (IsReleaseCommand(command, time)) { emulator.ReleaseButton(command.Button); }
+                pendingCommand.Execute(emulator);
             }
 
-            queue.RemoveAll(x =>
-                IsHitCommand(x, time) ||
-                IsPressCommand(x, time) ||
-                IsReleaseCommand(x, time));
+            queue.RemoveAll(x => IsPending(x, time));
 
             // emulate one frame
             //emulator.ExecuteFrame();
             emulator.ExecuteFrames(3);
         }
 
-        private bool IsHitCommand(ICommand command, TimeSpan time) { return command.Press <= time && command.Release != null; }
-        private bool IsPressCommand(ICommand command, TimeSpan time) { return command.Press <= time && command.Release == null; }
-        private bool IsReleaseCommand(ICommand command, TimeSpan time) { return command.Press == null && command.Release <= time; }
+        private bool IsPending(ICommand command, TimeSpan time) { return command.Timestamp <= time; }
     }
 }

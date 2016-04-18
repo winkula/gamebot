@@ -5,27 +5,26 @@ namespace GameBot.Core.Data.Commands
     public class HitCommand : ICommand
     {
         public Button Button { get; private set; }
-        public TimeSpan? Press { get; private set; }
-        public TimeSpan? Release { get; private set; }
+        public TimeSpan Timestamp { get; private set; }
 
-        public HitCommand(Button button, TimeSpan timestamp, TimeSpan duration)
+        public HitCommand(Button button, TimeSpan timestamp)
         {
             Button = button;
-            Press = timestamp;
-            Release = timestamp + duration;
+            Timestamp = timestamp;
         }
 
-        public HitCommand(Button button, TimeSpan timestamp) : this(button, timestamp, TimeSpan.Zero)
+        public HitCommand(Button button) : this(button, TimeSpan.Zero)
         {
         }
 
-        public HitCommand(Button button) : this(button, TimeSpan.Zero, TimeSpan.Zero)
+        public void Execute(IActuator actuator)
         {
+            actuator.Hit(Button);
         }
 
         public override string ToString()
         {
-            return $"HitCommand {{ Button: {Button}, Press: {Press}, Release: {Release} }}";
+            return $"HitCommand {{ Button: {Button}, Timestamp: {Timestamp} }}";
         }
     }
 }

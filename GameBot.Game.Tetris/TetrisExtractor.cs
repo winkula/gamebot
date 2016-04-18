@@ -80,7 +80,7 @@ namespace GameBot.Game.Tetris
         }
 
         // Tiles: x : 14 - 17, y : 13 - 16 
-        private Piece ExtractNextPiece()
+        private Tetromino? ExtractNextPiece()
         {
             ushort mask = 0;
             for (int x = 0; x < 4; x++)
@@ -95,7 +95,7 @@ namespace GameBot.Game.Tetris
                     }
                 }
             }
-            return Piece.FromMask(mask);
+            return Piece.FromMask(mask)?.Tetromino;
         }
     }
 }

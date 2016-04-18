@@ -87,7 +87,7 @@ namespace GameBot.Test.TetrisTests
         })]
         public void Drop(Tetromino piece, Tetromino next, int translation, int expectedFall, int[] before, int[] after)
         {
-            var gameState = new TetrisGameState(new Piece(piece, 0, translation), new Piece(next));
+            var gameState = new TetrisGameState(new Piece(piece, 0, translation), next);
             for (int x = 0; x < 10; x++)
             {
                 for (int y = 0; y < 18; y++)
