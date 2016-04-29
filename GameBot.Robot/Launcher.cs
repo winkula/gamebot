@@ -7,17 +7,18 @@ namespace GameBot.Robot
     {
         static void Main(string[] args)
         {
-            RunSimulations();
-            //RunMain();
+            //RunSimulations();
+            RunMain();
         }
-                 
+
         static void RunMain()
         {
             // Create dependency injection container
             //var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisSurviveHeuristic));
             //var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisHolesHeuristic));
             //var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast, typeof(TetrisStackingHeuristic));
-            var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Emulator, typeof(TetrisStackingHeuristic));
+            var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Emulator, typeof(TetrisSurviveHeuristic));
+            //var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.EmulatorInteractive, typeof(TetrisSurviveHeuristic));
 
             // Run the engine
             var engine = container.GetInstance<IEngine>();

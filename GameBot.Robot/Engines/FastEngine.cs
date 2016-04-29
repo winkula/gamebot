@@ -78,8 +78,8 @@ namespace GameBot.Robot.Engines
 
         protected void Render()
         {
-            Debug.WriteLine(simulator.GameState);
-            Thread.Sleep(200);
+            //Debug.WriteLine(simulator.GameState);
+            //Thread.Sleep(200);
         }
 
         protected void Log(int rounds, long time)

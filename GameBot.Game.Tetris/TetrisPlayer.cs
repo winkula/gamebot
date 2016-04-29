@@ -15,6 +15,7 @@ namespace GameBot.Game.Tetris
         private readonly ISearch<TetrisNode> search;// = new TetrisSearch(new TetrisHolesHeuristic());
 
         private bool started = false;
+        private int startLevel = 9;
 
         private TetrisGameState lastGameState;
 
@@ -28,10 +29,8 @@ namespace GameBot.Game.Tetris
             var commands = new CommandCollection();
             if (!started)
             {
-                // Initialization mode
-
-                //Start(commands);
-                QuickStart(commands);
+                // Initialization mode                
+                Start(commands);
 
                 started = true;
             }
@@ -94,42 +93,34 @@ namespace GameBot.Game.Tetris
         private void Start(CommandCollection commands)
         {
             // skip credits
-            double waitingTime = 6.0;
-
-            // start 1 player mode
-            commands.Hit(Button.Start, waitingTime);
-
-            // choose a-type
-            commands.Hit(Button.A, waitingTime + 1);
-
-            // switch music off
-            commands.Hit(Button.Right, waitingTime + 2);
-            commands.Hit(Button.Down, waitingTime + 2.5);
-            commands.Hit(Button.A, waitingTime + 3);
-
-            // choose level
-            commands.Hit(Button.Right, waitingTime + 4);
-            commands.Hit(Button.Right, waitingTime + 4.5);
-            commands.Hit(Button.A, waitingTime + 5);
-        }
-
-        private void QuickStart(CommandCollection commands)
-        {
-            // skip credits
             double waitingTime = 2.2 + new Random().NextDouble();
-            double delta = 0.25;
 
             // start 1 player mode
             commands.Hit(Button.Start, waitingTime);
 
             // choose a-type
-            commands.Hit(Button.A, waitingTime + 1 * delta);
+            commands.HitDelta(Button.A);
 
             // choose music
-            commands.Hit(Button.A, waitingTime + 2 * delta);
+            commands.HitDelta(Button.Right);
+            commands.HitDelta(Button.Down);
+            commands.HitDelta(Button.A);
 
-            // choose level
-            commands.Hit(Button.A, waitingTime + 3 * delta);
+            // select level
+            SelectLevel(commands, startLevel);
+        }
+
+        private void SelectLevel(CommandCollection commands, int startLevel)
+        {
+            if (startLevel >= 4)
+            {
+                commands.HitDelta(Button.Down);
+            }
+            for (int i = 0; i < (startLevel - 5); i++)
+            {
+                commands.HitDelta(Button.Right);
+            }
+            commands.HitDelta(Button.A);
         }
     }
 }
