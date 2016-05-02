@@ -1,6 +1,6 @@
 ﻿namespace GameBot.Game.Tetris.Heuristics
 {
-    public class TetrisSurviveHeuristic : BasicTetrisHeuristic
+    public class YiyuanLeeHeuristic : BasicTetrisHeuristic
     {
         // Heuristic from here: https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
         public override double Score(TetrisGameState gameState)

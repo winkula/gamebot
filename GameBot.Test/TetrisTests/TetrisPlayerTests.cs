@@ -1,6 +1,7 @@
 ﻿using GameBot.Game.Tetris;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Heuristics;
+using GameBot.Robot.Configuration;
 using NUnit.Framework;
 
 namespace GameBot.Test.TetrisTests
@@ -11,13 +12,13 @@ namespace GameBot.Test.TetrisTests
         [Test]
         public void Constructor()
         {
-            var player = new TetrisPlayer(new TetrisSearch(new TetrisSurviveHeuristic()));
+            var player = new TetrisPlayer(new Config());
         }
 
         [Test]
         public void Play()
         {
-            var player = new TetrisPlayer(new TetrisSearch(new TetrisSurviveHeuristic()));
+            var player = new TetrisPlayer(new Config());
             var gameState = new TetrisGameState(Tetromino.L, Tetromino.Z);
 
             var commandsBegin = player.Play(gameState);

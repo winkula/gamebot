@@ -142,6 +142,7 @@
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="IActuator.cs" />
     <Compile Include="ICamera.cs" />
+    <Compile Include="IConfig.cs" />
     <Compile Include="IEngine.cs" />
     <Compile Include="IExecutor.cs" />
     <Compile Include="ISimulator.cs" />

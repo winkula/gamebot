@@ -1,6 +1,6 @@
 ﻿namespace GameBot.Game.Tetris.Heuristics
 {
-    public class TetrisStackingHeuristic : BasicTetrisHeuristic
+    public class ExperimentalHeuristic : BasicTetrisHeuristic
     {
         // Heuristic from here: http://www.diva-portal.se/smash/get/diva2:815662/FULLTEXT01.pdf
         // Slightly modified

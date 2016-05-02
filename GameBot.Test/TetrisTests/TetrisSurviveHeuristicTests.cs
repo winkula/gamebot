@@ -10,7 +10,7 @@ namespace GameBot.Test.TetrisTests
         [Test]
         public void Constructor()
         {
-            var heuristic = new TetrisSurviveHeuristic();
+            var heuristic = new YiyuanLeeHeuristic();
         }
         
         [TestCase(6, new int[] {
@@ -33,7 +33,7 @@ namespace GameBot.Test.TetrisTests
         })]
         public void AggregateHeight(int expected, int[] squares)
         {
-            var heuristic = new TetrisSurviveHeuristic();
+            var heuristic = new YiyuanLeeHeuristic();
             var board = Build(4, 4, squares);
 
             var aggregateHeight = heuristic.AggregateHeight(board);
@@ -61,7 +61,7 @@ namespace GameBot.Test.TetrisTests
         })]
         public void CompleteLines(int expected, int[] squares)
         {
-            var heuristic = new TetrisSurviveHeuristic();
+            var heuristic = new YiyuanLeeHeuristic();
             var board = Build(4, 4, squares);
 
             var completeLines = heuristic.CompleteLines(board);
@@ -89,7 +89,7 @@ namespace GameBot.Test.TetrisTests
         })]
         public void Holes(int expected, int[] squares)
         {
-            var heuristic = new TetrisSurviveHeuristic();
+            var heuristic = new YiyuanLeeHeuristic();
             var board = Build(4, 4, squares);
 
             var holes = heuristic.Holes(board);
@@ -117,7 +117,7 @@ namespace GameBot.Test.TetrisTests
         })]
         public void Bumpiness(int expected, int[] squares)
         {
-            var heuristic = new TetrisSurviveHeuristic();
+            var heuristic = new YiyuanLeeHeuristic();
             var board = Build(4, 4, squares);
 
             var bumpiness = heuristic.Bumpiness(board);

@@ -5,11 +5,10 @@ using GameBot.Emulation;
 using GameBot.Robot.Renderers;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace GameBot.Robot.Engines
 {
-    public class Engine : IEngine
+    public class EmulatorEngine : IEngine
     {
         private readonly IConfig config;
 
@@ -17,11 +16,14 @@ namespace GameBot.Robot.Engines
         private readonly IQuantizer quantizer;
         private readonly IAgent agent;
         private readonly IExecutor executor;
+
         private readonly ITimeProvider timeProvider;
 
         private readonly IRenderer renderer;
 
-        public Engine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IExecutor executor, ITimeProvider timeProvider, IRenderer renderer)
+        private readonly Emulator emulator;
+
+        public EmulatorEngine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IExecutor executor, ITimeProvider timeProvider, IRenderer renderer, Emulator emulator)
         {
             this.config = config;
 
@@ -32,6 +34,12 @@ namespace GameBot.Robot.Engines
             this.timeProvider = timeProvider;
 
             this.renderer = renderer;
+
+            this.emulator = emulator;
+
+            var loader = new RomLoader();
+            var game = loader.Load(config.Read("Emulator.Rom.Path", "Roms/tetris.gb"));
+            this.emulator.Load(game);
         }
 
         public void Run()

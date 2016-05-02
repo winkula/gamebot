@@ -6,13 +6,15 @@ namespace GameBot.Robot.Cameras
 {
     public class Camera : ICamera
     {
+        private readonly IConfig config;
         private readonly Capture capture;
 
-        public Camera()
+        public Camera(IConfig config)
         {
-            capture = new Capture();
-            //capture.SetCaptureProperty(CapProp.PosFrames, 0);
-            capture.Start();
+            this.config = config;
+
+            this.capture = new Capture(config.Read("Robot.Camera.Index", 0));
+            this.capture.Start();
         }
 
         public IImage Capture()

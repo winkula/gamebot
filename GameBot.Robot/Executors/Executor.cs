@@ -11,9 +11,12 @@ namespace GameBot.Robot.Executors
 {
     public class Executor : IExecutor
     {
+        private readonly IConfig config;
+
         private readonly IActuator actuator;
         private readonly ITimeProvider timeProvider;
         private readonly ConcurrentQueue<ICommand> queue = new ConcurrentQueue<ICommand>();
+        
         private Queue<ICommand> queueInternal = new Queue<ICommand>();
         private Queue<ICommand> queueInternalSwap = new Queue<ICommand>();
         private Task worker;
@@ -46,7 +49,7 @@ namespace GameBot.Robot.Executors
                 CopyCommands();
                 ExecuteCommands();
 
-                Thread.Sleep(20);
+                Thread.Sleep(10);
             }
         }
 

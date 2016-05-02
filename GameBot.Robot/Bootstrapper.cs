@@ -1,11 +1,8 @@
 ﻿using GameBot.Core;
-using GameBot.Core.Data;
-using GameBot.Core.Searching;
 using GameBot.Emulation;
-using GameBot.Game.Tetris;
-using GameBot.Game.Tetris.Heuristics;
 using GameBot.Robot.Actuators;
 using GameBot.Robot.Cameras;
+using GameBot.Robot.Configuration;
 using GameBot.Robot.Engines;
 using GameBot.Robot.Executors;
 using GameBot.Robot.Quantizers;
@@ -22,57 +19,52 @@ namespace GameBot.Robot
         public enum EngineType
         {
             Emulator,
-            EmulatorInteractive,
             Fast,
             Real
         }
 
-        public static Container GetInitializedContainer(EngineType type)
+        public static Container GetInitializedContainer()
         {
-            return GetInitializedContainer(type, typeof(TetrisSurviveHeuristic));
-        }
+            var config = new Config();
+            var engineType = config.Read("Robot.Engine.Mode", EngineType.Real);
 
-        public static Container GetInitializedContainer(EngineType type, Type heuristicType)
+            return GetInitializedContainer(engineType);
+        }
+       
+        public static Container GetInitializedContainer(EngineType engineType)
         {
             var container = new Container();
 
-            switch (type)
+            switch (engineType)
             {
-                case EngineType.EmulatorInteractive:
-                    container.Register<IEngine, InteractiveEngine>();
-                    break;
                 case EngineType.Fast:
                     container.Register<IEngine, FastEngine>();
                     break;
+
                 case EngineType.Emulator:
+                    container.Register<IEngine, EmulatorEngine>();
+                    container.RegisterSingleton<Emulator>();
+                    container.Register<ICamera, EmulatorCamera>();
+                    container.Register<IQuantizer, PassthroughQuantizer>();
+                    container.Register<IExecutor, EmulatorExecutor>();
+                    container.Register<IActuator, Actuator>();
+                    container.RegisterSingleton<ITimeProvider, EmulatorTimeProvider>();
+                    break;
+
                 case EngineType.Real:
                     container.Register<IEngine, Engine>();
+                    container.Register<ICamera, Camera>();
+                    container.Register<IQuantizer, Quantizer>();
+                    container.Register<IExecutor, Executor>();
+                    container.Register<IActuator, Actuator>();
+                    container.RegisterSingleton<ITimeProvider, TimeProvider>();
                     break;
+
                 default:
                     break;
             }
 
-            if (type == EngineType.EmulatorInteractive || type == EngineType.Emulator)
-            {                
-                container.RegisterSingleton(new Emulator());
-
-                container.Register<ICamera, EmulatorCamera>();
-                container.Register<IQuantizer, PassthroughQuantizer>();
-                container.Register<IExecutor, EmulatorExecutor>();
-                container.Register<IActuator, Actuator>();
-
-                container.RegisterSingleton<ITimeProvider, EmulatorTimeProvider>();
-            }
-            else
-            {
-                container.Register<ICamera, Camera>();
-                container.Register<IQuantizer, Quantizer>();
-                container.Register<IExecutor, Executor>();
-                container.Register<IActuator, Actuator>();
-
-                container.RegisterSingleton<ITimeProvider, TimeProvider>();
-            }
-
+            container.RegisterSingleton<IConfig, Config>(); 
             container.Register<IRenderer, EmguRenderer>();
 
             // TODO: remove build-dependency to the "GameBot.Game.Tetris" and load
@@ -86,11 +78,7 @@ namespace GameBot.Robot
             container.Register(typeof(IExtractor<>), new[] { assembly });
             container.Register(typeof(IPlayer<>), new[] { assembly });
             container.Register(typeof(ISimulator<>), new[] { assembly });
-
-            container.Register(typeof(ISearch<>), new[] { assembly });
-            //container.Register(typeof(IHeuristic<>), new[] { assembly });
-            container.Register(typeof(IHeuristic<>), heuristicType);
-
+            
             container.Verify();
 
             return container;

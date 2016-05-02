@@ -6,22 +6,35 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using GameBot.Core.Data.Commands;
 using System.Linq;
+using System.Configuration;
+using GameBot.Game.Tetris.Heuristics;
 
 namespace GameBot.Game.Tetris
 {
     public class TetrisPlayer : IPlayer<TetrisGameState>
     {
-        //private readonly DepthFirstSearch search = new DepthFirstSearch();
-        private readonly ISearch<TetrisNode> search;// = new TetrisSearch(new TetrisHolesHeuristic());
+        private readonly IConfig config;
 
-        private bool started = false;
-        private int startLevel = 9;
+        private readonly ISearch<TetrisNode> search;
+        private bool started;
+        private int startLevel;
 
         private TetrisGameState lastGameState;
 
-        public TetrisPlayer(ISearch<TetrisNode> search)
+        public TetrisPlayer(IConfig config)
         {
-            this.search = search;
+            this.config = config;
+
+            this.search = new TetrisSearch(BuildHeuristic());
+            this.started = false;
+            this.startLevel = config.Read("Game.Tetris.StartLevel", 0);
+        }
+
+        private IHeuristic<TetrisGameState> BuildHeuristic()
+        {
+            var typeName = config.Read("Game.Tetris.Heuristic", "GameBot.Game.Tetris.Heuristics.YiyuanLeeHeuristic");
+            var type = Type.GetType(typeName);
+            return (IHeuristic<TetrisGameState>)Activator.CreateInstance(type);
         }
 
         public IEnumerable<ICommand> Play(TetrisGameState gameState)
@@ -58,7 +71,7 @@ namespace GameBot.Game.Tetris
                             commands.Hit(Button.B);
                         }
                         else
-                        { 
+                        {
                             // clockwise rotation
                             Enumerable.Range(0, move.Rotation % 4)
                                 .ToList()
@@ -112,11 +125,11 @@ namespace GameBot.Game.Tetris
 
         private void SelectLevel(CommandCollection commands, int startLevel)
         {
-            if (startLevel >= 4)
+            if (startLevel >= 5)
             {
                 commands.HitDelta(Button.Down);
             }
-            for (int i = 0; i < (startLevel - 5); i++)
+            for (int i = 0; i < (startLevel % 5); i++)
             {
                 commands.HitDelta(Button.Right);
             }

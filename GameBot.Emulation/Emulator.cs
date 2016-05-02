@@ -52,7 +52,7 @@ namespace GameBot.Emulation
         public Bitmap Display { get { return bitmap; } }
         public Game Game { get; private set; }
         private Size DisplaySize { get { return new Size(DisplayWidth, DisplayHeight); } }
-
+        
         public Emulator()
         {
             cpu = new X80();
