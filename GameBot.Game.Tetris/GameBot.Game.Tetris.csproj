@@ -86,6 +86,7 @@
     <Compile Include="Heuristics\YiyuanLeeHeuristic.cs" />
     <Compile Include="TetrisLevel.cs" />
     <Compile Include="TetrisScore.cs" />
+    <Compile Include="TetrisProbabilisticSearch.cs" />
     <Compile Include="TetrisSimulator.cs" />
     <Compile Include="TetrisGameState.cs" />
     <Compile Include="TetrisNode.cs" />

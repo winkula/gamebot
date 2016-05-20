@@ -1,10 +1,12 @@
 ﻿using Emgu.CV;
-using GameBot.Core.Data;
 using System;
 using System.Runtime.InteropServices;
 
-namespace GameBot.Robot.Data
+namespace GameBot.Core.Data
 {
+    /// <summary>
+    /// Represents a fast implementation for further processing with EmguCV.
+    /// </summary>
     public class EmguScreenshot : IScreenshot
     {
         public const int TileSize = 8;
@@ -37,11 +39,6 @@ namespace GameBot.Robot.Data
         private int QuantizePixelValue(int byteValue)
         {
             return (255 - byteValue) / 64;
-        }
-
-        private int QuantizePixelValue(float brightness)
-        {
-            return (byte)((1 - brightness) * 3.99);
         }
 
         public int[] GetTile(int x, int y)

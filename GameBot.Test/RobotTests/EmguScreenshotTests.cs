@@ -1,6 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
-using GameBot.Robot.Data;
+using GameBot.Core.Data;
 using NUnit.Framework;
 using System;
 

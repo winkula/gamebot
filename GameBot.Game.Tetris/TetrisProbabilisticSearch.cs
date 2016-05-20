@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisSearch : ISearch<TetrisNode>
+    public class TetrisProbabilisticSearch : ISearch<TetrisNode>
     {
         private readonly IHeuristic<TetrisGameState> heuristic;
 
-        public TetrisSearch(IHeuristic<TetrisGameState> heuristic)
+        public TetrisProbabilisticSearch(IHeuristic<TetrisGameState> heuristic)
         {
             this.heuristic = heuristic;
         }

@@ -25,10 +25,14 @@ namespace GameBot.Robot.Engines
 
         public void Run()
         {
-            // TODO: remove initialization
-            IEnumerable<ICommand> commands = player.Play(simulator.GameState);
-
+            Init();
             Loop();
+        }
+
+        protected void Init()
+        {
+            // first call to play only handles the menu actions
+            player.Play(simulator.GameState);
         }
 
         protected void Loop()

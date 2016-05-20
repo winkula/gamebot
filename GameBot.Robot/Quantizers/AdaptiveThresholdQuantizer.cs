@@ -1,9 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
 using GameBot.Core;
 using GameBot.Core.Data;
-using GameBot.Robot.Data;
 using System;
 using System.Diagnostics;
 using System.Drawing;

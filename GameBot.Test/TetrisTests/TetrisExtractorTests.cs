@@ -1,13 +1,10 @@
-﻿using Emgu.CV;
-using GameBot.Core;
-using GameBot.Core.Data;
+﻿using GameBot.Core.Data;
 using GameBot.Game.Tetris;
-using GameBot.Game.Tetris.Data;
+using GameBot.Robot.Configuration;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 
 namespace GameBot.Test.TetrisTests
 {
@@ -17,13 +14,17 @@ namespace GameBot.Test.TetrisTests
         [Test]
         public void Constructor()
         {
-            var extractor = new TetrisExtractor();
+            var config = new Config();
+
+            var extractor = new TetrisExtractor(config);
         }
 
         [Test]
         public void Extract()
         {
-            var extractor = new TetrisExtractor();
+            var config = new Config();
+
+            var extractor = new TetrisExtractor(config);
             var image = Image.FromFile("Screenshots/tetris_play_1.png");
             var screenshot = new Screenshot(image, TimeSpan.Zero);
             

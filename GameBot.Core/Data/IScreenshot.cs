@@ -5,6 +5,7 @@ namespace GameBot.Core.Data
     /// <summary>
     /// Represents the display state of the Game Boy device. In other words a screenshot.
     /// The origin of the coordinate system is top left.
+    /// Pixel values go from 0 (black) to 3 (white).
     /// </summary>
     public interface IScreenshot
     {

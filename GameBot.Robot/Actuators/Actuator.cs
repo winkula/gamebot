@@ -12,20 +12,20 @@ namespace GameBot.Robot.Actuators
     {
         public void Hit(Button button)
         {
-            // TODO:
-            //throw new NotImplementedException();
+            // TODO Pädu
+            throw new NotImplementedException();
         }
 
         public void Press(Button button)
         {
-            // TODO:
-            //throw new NotImplementedException();
+            // TODO Pädu
+            throw new NotImplementedException();
         }
 
         public void Release(Button button)
         {
-            // TODO:
-            //throw new NotImplementedException();
+            // TODO Pädu
+            throw new NotImplementedException();
         }
     }
 }

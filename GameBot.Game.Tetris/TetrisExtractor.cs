@@ -14,7 +14,16 @@ namespace GameBot.Game.Tetris
         private static Point CurrentTileOrigin = new Point(5, 0);
         private static Point PreviewTileOrigin = new Point(15, 13);
 
+        private readonly IConfig config;
+        private readonly int blockThreshold;
+
         private IScreenshot screenshot;
+
+        public TetrisExtractor(IConfig config)
+        {
+            this.config = config;
+            this.blockThreshold = config.Read<int>("Game.Tetris.Extractor.BlockThreshold");
+        }
 
         public TetrisGameState Extract(IScreenshot screenshot)
         {
@@ -38,7 +47,7 @@ namespace GameBot.Game.Tetris
         // TODO: better threshold
         private bool TileThresholdReached(int value)
         {
-            return value > 64;
+            return value > blockThreshold;
         }
 
         // Tiles: x : 5 - 8, y : 0 - 2

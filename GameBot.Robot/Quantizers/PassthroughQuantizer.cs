@@ -1,7 +1,6 @@
 ﻿using Emgu.CV;
 using GameBot.Core;
 using GameBot.Core.Data;
-using GameBot.Robot.Data;
 using System;
 
 namespace GameBot.Robot.Quantizers
