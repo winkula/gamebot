@@ -23,6 +23,9 @@ namespace GameBot.Robot.Quantizers
 
         private readonly Mat transform;
 
+        // for debug purposes only
+        public IImage ImageOutput;
+
         public Quantizer(IConfig config)
         {
             this.config = config;
@@ -61,7 +64,11 @@ namespace GameBot.Robot.Quantizers
             // threshold
             CvInvoke.AdaptiveThreshold(destImage, destImageBin, thresholdMaxValue, AdaptiveThresholdType.MeanC, ThresholdType.Binary, thresholdBlockSize, thresholdConstant);
 
-            CvInvoke.Imshow("Image_Binarized", destImageBin);
+            if (config.Read<bool>("Robot.Quantizer.Imshow", true))
+            {
+                CvInvoke.Imshow("Image_Binarized", destImageBin);
+            }
+            ImageOutput = destImageBin;
 
             return new EmguScreenshot(destImageBin, timestamp);
         }
