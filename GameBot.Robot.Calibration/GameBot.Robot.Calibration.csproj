@@ -105,6 +105,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -155,6 +156,10 @@
     <ProjectReference Include="..\GameBot.Core\GameBot.Core.csproj">
       <Project>{290c4c98-1bd9-46f1-af52-5ddea956f146}</Project>
       <Name>GameBot.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameBot.Game.Tetris\GameBot.Game.Tetris.csproj">
+      <Project>{f2a4ec65-2edc-4edc-810d-0f755243e289}</Project>
+      <Name>GameBot.Game.Tetris</Name>
     </ProjectReference>
     <ProjectReference Include="..\GameBot.Robot\GameBot.Robot.csproj">
       <Project>{a889b0a7-c49b-4688-a8be-81a23c0d7421}</Project>

@@ -149,6 +149,7 @@
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Engines\EmulatorEngine.cs" />
+    <Compile Include="Engines\FancyEngine.cs" />
     <Compile Include="Engines\FastEngine.cs" />
     <Compile Include="Executors\EmulatorExecutor.cs" />
     <Compile Include="Executors\Executor.cs" />

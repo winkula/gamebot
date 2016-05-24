@@ -3,6 +3,7 @@ using Emgu.CV.CvEnum;
 using GameBot.Core;
 using GameBot.Core.Data;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
@@ -21,10 +22,10 @@ namespace GameBot.Robot.Quantizers
         private AdaptiveThresholdType thresholdAdaptiveThresholdType;
         private ThresholdType thresholdType;
 
-        private readonly Mat transform;
+        public Mat transform { get; private set; }
 
         // for debug purposes only
-        public IImage ImageOutput;
+        public IImage ImageOutput { get; private set; }
 
         public Quantizer(IConfig config)
         {
@@ -47,7 +48,13 @@ namespace GameBot.Robot.Quantizers
             thresholdType = config.Read("Robot.Quantizer.Threshold.ThresholdType", ThresholdType.Binary);
 
             // precalculate transformation matrix
-            var srcKeypoints = new Matrix<float>(new float[,] { { keypoints[0], keypoints[1] }, { keypoints[2], keypoints[3] }, { keypoints[4], keypoints[5] }, { keypoints[6], keypoints[7] } });
+            CalculatePerspectiveTransform(keypoints);
+        }
+
+        public void CalculatePerspectiveTransform(IEnumerable<float> keypoints)
+        {
+            var keypointsArray = keypoints.ToArray();
+            var srcKeypoints = new Matrix<float>(new float[,] { { keypointsArray[0], keypointsArray[1] }, { keypointsArray[2], keypointsArray[3] }, { keypointsArray[4], keypointsArray[5] }, { keypointsArray[6], keypointsArray[7] } });
             var destKeypoints = new Matrix<float>(new float[,] { { 0, 0 }, { GameBoyScreenWidth, 0 }, { 0, GameBoyScreenHeight }, { GameBoyScreenWidth, GameBoyScreenHeight } });
             transform = CvInvoke.GetPerspectiveTransform(srcKeypoints, destKeypoints);
         }

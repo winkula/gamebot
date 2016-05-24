@@ -2,82 +2,157 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
+using GameBot.Core;
+using GameBot.Game.Tetris;
 using GameBot.Robot.Configuration;
 using GameBot.Robot.Quantizers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using System.Configuration;
 
 namespace GameBot.Robot.Calibration
 {
     public partial class Preview : Form
     {
+        private int leftWidth;
+        private int leftHeight;
+        private int rightWidth;
+        private int rightHeight;
+
+        private static IConfig config = new Config();
+
         private Capture capture = default(Capture);
+        private Quantizer quantizer = new Quantizer(config);
+        private List<int> keypoints = new List<int>();
+        private List<int> keypointsApplied = new List<int>();
+        private TetrisExtractor extractor = new TetrisExtractor(config);
 
         public Preview()
         {
             InitializeComponent();
-            imageBox1.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
-            imageBox2.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
-            splitContainer1.SplitterWidth = 1;
-            splitContainer1.Panel1MinSize = 640;
-            splitContainer1.Panel2MinSize = 166;
-            splitContainer1.Width = 1000;
-            splitContainer1.Height = 480;
 
-           // MinimumSize = new System.Drawing.Size(1000, 480);
-           // MaximumSize = new System.Drawing.Size(1000, 580);
-            ClientSize = new System.Drawing.Size(1000, 480);
+            capture = new Capture(1);
+            CheckForIllegalCrossThreadCalls = false;
+            //capture.Start();
 
-            // Width = 1000;
-            //Height = 480;
-            AutoSize = true;     
+            InitDimensions();
+
+            ImageBoxLeft.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
+            ImageBoxLeft.Width = leftWidth;
+            ImageBoxLeft.Height = leftHeight;
+            ImageBoxRight.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
+            ImageBoxRight.Width = rightWidth;
+            ImageBoxRight.Height = rightHeight;
+
+            var size = new Size(leftWidth + rightWidth, leftHeight);
+            MinimumSize = size;
+            ClientSize = size;
+            
+            AutoSize = true;
 
             Load += Loaded;
-            imageBox1.MouseClick += MouseClickEvent;
+            ImageBoxLeft.MouseClick += MouseClickEvent;
+
+            KeyPreview = true;
+            KeyPress += Preview_KeyPress;
+        }
+
+        private void InitDimensions()
+        {
+            leftWidth = capture.Width;
+            leftHeight = capture.Height;
+            rightWidth = (leftHeight * 160) / 144;
+            rightHeight = leftHeight;
+        }
+
+        private float Clamp(float value, float min, float max)
+        {
+            if (value < min) return min;
+            if (value > max) return max;
+            return value;
+        }
+
+        private void Preview_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '+')
+            {
+                extractor.BlockThreshold = Clamp(extractor.BlockThreshold + 0.05f, 0.0f, 1.0f);
+                Debug.WriteLine($"BlockThreshold: {extractor.BlockThreshold:0.00} %");
+            }
+            if (e.KeyChar == '-')
+            {
+                extractor.BlockThreshold = Clamp(extractor.BlockThreshold - 0.05f, 0.0f, 1.0f);
+                Debug.WriteLine($"BlockThreshold: {extractor.BlockThreshold:0.00} %");
+            }
+
+            if (e.KeyChar == 'c')
+            {
+                // clear
+                keypoints.Clear();
+                Debug.WriteLine("cleared already recorded keypoints");
+            }
+            if (e.KeyChar == 's')
+            {
+                // save
+                if (keypointsApplied.Count == 8)
+                {
+                    var config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                    config.AppSettings.Settings["Robot.Quantizer.Transformation.KeyPoints"].Value =  string.Join(",", keypointsApplied);
+                    config.AppSettings.Settings["Game.Tetris.Extractor.BlockThreshold"].Value = extractor.BlockThreshold.ToString();
+                    config.Save(ConfigurationSaveMode.Modified);
+                    Debug.WriteLine("saved configuration");
+                }
+            }
         }
 
         private void MouseClickEvent(object sender, MouseEventArgs e)
         {
-            Debug.WriteLine(e.X + " -- " + e.Y);
+            keypoints.Add(e.X);
+            keypoints.Add(e.Y);
+            Debug.WriteLine("added keypoint");
+
+            if (keypoints.Count >= 8)
+            {
+                keypointsApplied = keypoints.Take(8).ToList();
+                quantizer.CalculatePerspectiveTransform(keypointsApplied.Select(x => (float)x));
+                keypoints.Clear();
+                Debug.WriteLine("applied keypoints");
+            }
         }
 
         private void Loaded(object sender, EventArgs e)
         {
-            Init();
-            
             var t = new Thread(Loop);
             t.IsBackground = true;
             t.Start();
         }
         
-        public void Init()
-        {
-            capture = new Capture(1);
-            CheckForIllegalCrossThreadCalls = false;
-            //capture.Start();
-        }
-
         public void Loop()
         {
             while (true)
             {
-                /*
-                var src = new Image<Bgr, byte>(480, 320);
-                capture.Grab();
-                capture.Retrieve(src, 0);
-                CvInvoke.CvtColor(src, dst, ColorConversion.Rgb2Gray);
-                */
-                //var test = new Image<Gray, byte>(@"C:\Users\Winkler\Pictures\Saved Pictures\IMG_20160115_164732 (2).jpg");
                 var src = capture.QueryFrame();
                 var dst = new Image<Gray, byte>(src.Width, src.Height);
                 CvInvoke.CvtColor(src, dst, ColorConversion.Rgb2Gray);
 
-                var quantizer = new Quantizer(new Config());
                 var screenshot = quantizer.Quantize(dst, new TimeSpan());
+                extractor.Extract(screenshot);
 
-                SetImage(src, quantizer.ImageOutput);
+                var imageLeft = src.ToImage<Bgr, byte>();
+
+                var imageRight = new Image<Bgr, byte>(quantizer.ImageOutput.Bitmap);
+                foreach (var rectangle in extractor.Rectangles)
+                {
+                    imageRight.Draw(new Rectangle(8 * rectangle.X, 8 * rectangle.Y, 8, 8), new Bgr(0, 0, 255), 1);
+                }
+                imageRight = imageRight.Resize(rightWidth, rightHeight, Inter.Linear);
+
+                SetImage(imageLeft, imageRight);
             }
         }
 
@@ -85,8 +160,8 @@ namespace GameBot.Robot.Calibration
         {
             try
             {
-                imageBox1.Image = image1;
-                imageBox2.Image = image2;
+                ImageBoxLeft.Image = image1;
+                ImageBoxRight.Image = image2;
             }
             catch (ObjectDisposedException)
             {
