@@ -36,9 +36,8 @@ namespace GameBot.Robot.Calibration
         {
             InitializeComponent();
 
-            capture = new Capture(1);
+            capture = new Capture(config.Read<int>("Robot.Camera.Index"));
             CheckForIllegalCrossThreadCalls = false;
-            //capture.Start();
 
             InitDimensions();
 
