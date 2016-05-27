@@ -105,6 +105,7 @@ namespace GameBot.Robot.Calibration
                     config.AppSettings.Settings["Game.Tetris.Extractor.BlockThreshold"].Value = extractor.BlockThreshold.ToString();
                     config.Save(ConfigurationSaveMode.Modified);
                     Debug.WriteLine("saved configuration");
+                    Debug.WriteLine("keypoints: " + string.Join(",", keypointsApplied));
                 }
             }
         }

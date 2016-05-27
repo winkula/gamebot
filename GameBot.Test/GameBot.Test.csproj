@@ -144,6 +144,7 @@
     <Compile Include="CoreTests\PressCommandTests.cs" />
     <Compile Include="CoreTests\HitCommandTests.cs" />
     <Compile Include="RobotTests\EmguScreenshotTests.cs" />
+    <Compile Include="RobotTests\ActuatorTests.cs" />
     <Compile Include="RobotTests\ExecutorTests.cs" />
     <Compile Include="TetrisTests\TetrisLevelTests.cs" />
     <Compile Include="TetrisTests\ShapeTests.cs" />

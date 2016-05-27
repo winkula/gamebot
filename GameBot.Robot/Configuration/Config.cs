@@ -43,8 +43,12 @@ namespace GameBot.Robot.Configuration
         {
             string values = ConfigurationManager.AppSettings[key];
             if (values == null) throw new ArgumentException($"config value with key {key} not found.");
-
-            return defaultValue;
+            
+            foreach (var value in values.Split(Delimiter))
+            {
+                yield return Get<T>(value);
+            }
+            //return defaultValue;
         }
 
         private T Get<T>(string value)

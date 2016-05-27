@@ -1,4 +1,7 @@
 ﻿using GameBot.Core;
+using GameBot.Core.Data;
+using GameBot.Robot.Actuators;
+using System.Threading;
 
 namespace GameBot.Robot
 {
@@ -8,6 +11,18 @@ namespace GameBot.Robot
         {
             //RunSimulations();
             RunMain();
+            //TestTinkerfoge();
+        }
+
+        static void TestTinkerfoge()
+        {
+            using (var actuator = new Actuator())
+            {
+                actuator.Hit(Button.Up);
+                //actuator.Press(Button.B);
+                //Thread.Sleep(1000);
+                //actuator.Release(Button.Up);
+            }
         }
 
         static void RunMain()

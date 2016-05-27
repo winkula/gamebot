@@ -47,7 +47,7 @@ namespace GameBot.Robot
                     container.Register<ICamera, EmulatorCamera>();
                     container.Register<IQuantizer, PassthroughQuantizer>();
                     container.Register<IExecutor, EmulatorExecutor>();
-                    container.Register<IActuator, Actuator>();
+                    container.RegisterSingleton<IActuator, Actuator>();
                     container.RegisterSingleton<ITimeProvider, EmulatorTimeProvider>();
                     break;
 
@@ -56,7 +56,7 @@ namespace GameBot.Robot
                     container.Register<ICamera, Camera>();
                     container.Register<IQuantizer, Quantizer>();
                     container.Register<IExecutor, Executor>();
-                    container.Register<IActuator, Actuator>();
+                    container.RegisterSingleton<IActuator, Actuator>();
                     container.RegisterSingleton<ITimeProvider, TimeProvider>();
                     break;
 
