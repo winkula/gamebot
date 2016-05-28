@@ -4,10 +4,16 @@ namespace GameBot.Core.Ui
 {
     public interface IDebugger
     {
-        void Write(object message);
+        void WriteStatic(object message);
 
-        IEnumerable<string> Read();
+        void WriteDynamic(object message);
 
-        void Clear();
+        IEnumerable<string> ReadStatic();
+
+        IEnumerable<string> ReadDynamic();
+        
+        void ClearStatic();
+
+        void ClearDynamic();
     }
 }

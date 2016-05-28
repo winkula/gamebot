@@ -35,11 +35,13 @@ namespace GameBot.Game.Tetris
             return (IHeuristic<TetrisGameState>)Activator.CreateInstance(type);
         }
 
-
         public IEnumerable<ICommand> Initialize()
         {
             var commands = new CommandCollection();
-            Start(commands);
+            if (config.Read<bool>("Game.Tetris.Initialize"))
+            {
+                Start(commands);
+            }
             return commands;
         }
 

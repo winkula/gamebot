@@ -32,7 +32,8 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.ImageBoxLeft = new Emgu.CV.UI.ImageBox();
             this.ImageBoxRight = new Emgu.CV.UI.ImageBox();
-            this.Textbox = new System.Windows.Forms.TextBox();
+            this.TextboxStatic = new System.Windows.Forms.TextBox();
+            this.TextboxDynamic = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxLeft)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxRight)).BeginInit();
@@ -42,7 +43,8 @@
             // 
             this.flowLayoutPanel1.Controls.Add(this.ImageBoxLeft);
             this.flowLayoutPanel1.Controls.Add(this.ImageBoxRight);
-            this.flowLayoutPanel1.Controls.Add(this.Textbox);
+            this.flowLayoutPanel1.Controls.Add(this.TextboxStatic);
+            this.flowLayoutPanel1.Controls.Add(this.TextboxDynamic);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
@@ -70,13 +72,23 @@
             // 
             // Textbox
             // 
-            this.Textbox.Location = new System.Drawing.Point(0, 127);
-            this.Textbox.Margin = new System.Windows.Forms.Padding(0);
-            this.Textbox.Multiline = true;
-            this.Textbox.Name = "Textbox";
-            this.Textbox.ReadOnly = true;
-            this.Textbox.Size = new System.Drawing.Size(139, 110);
-            this.Textbox.TabIndex = 3;
+            this.TextboxStatic.Location = new System.Drawing.Point(0, 127);
+            this.TextboxStatic.Margin = new System.Windows.Forms.Padding(0);
+            this.TextboxStatic.Multiline = true;
+            this.TextboxStatic.Name = "Textbox";
+            this.TextboxStatic.ReadOnly = true;
+            this.TextboxStatic.Size = new System.Drawing.Size(139, 110);
+            this.TextboxStatic.TabIndex = 3;
+            // 
+            // textBox1
+            // 
+            this.TextboxDynamic.Location = new System.Drawing.Point(139, 127);
+            this.TextboxDynamic.Margin = new System.Windows.Forms.Padding(0);
+            this.TextboxDynamic.Multiline = true;
+            this.TextboxDynamic.Name = "textBox1";
+            this.TextboxDynamic.ReadOnly = true;
+            this.TextboxDynamic.Size = new System.Drawing.Size(139, 110);
+            this.TextboxDynamic.TabIndex = 4;
             // 
             // Window
             // 
@@ -100,7 +112,8 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private Emgu.CV.UI.ImageBox ImageBoxLeft;
         private Emgu.CV.UI.ImageBox ImageBoxRight;
-        private System.Windows.Forms.TextBox Textbox;
+        private System.Windows.Forms.TextBox TextboxStatic;
+        private System.Windows.Forms.TextBox TextboxDynamic;
     }
 }
 

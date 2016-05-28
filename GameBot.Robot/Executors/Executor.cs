@@ -6,25 +6,27 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using GameBot.Core.Ui;
 
 namespace GameBot.Robot.Executors
 {
     public class Executor : IExecutor
     {
-        private readonly IConfig config;
-
         private readonly IActuator actuator;
         private readonly ITimeProvider timeProvider;
+        private readonly IDebugger debugger;
+
         private readonly ConcurrentQueue<ICommand> queue = new ConcurrentQueue<ICommand>();
         
         private Queue<ICommand> queueInternal = new Queue<ICommand>();
         private Queue<ICommand> queueInternalSwap = new Queue<ICommand>();
         private Task worker;
 
-        public Executor(IActuator actuator, ITimeProvider timeProvider)
+        public Executor(IActuator actuator, ITimeProvider timeProvider, IDebugger debugger)
         {
             this.actuator = actuator;
             this.timeProvider = timeProvider;
+            this.debugger = debugger;
         }
 
         public void Execute(IEnumerable<ICommand> commands)
@@ -85,6 +87,7 @@ namespace GameBot.Robot.Executors
         {
             if (command.Timestamp <= time)
             {
+                debugger.WriteDynamic(command);
                 command.Execute(actuator);
             }
             else

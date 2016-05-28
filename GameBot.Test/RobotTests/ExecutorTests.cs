@@ -18,7 +18,7 @@ namespace GameBot.Test.RobotTests
         {
             var actuatorRepo = new Mock<IActuator>();
 
-            var executor = new Executor(actuatorRepo.Object, new TimeProvider());
+            var executor = new Executor(actuatorRepo.Object, new TimeProvider(), null);
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace GameBot.Test.RobotTests
             actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => b++);
 
             var timeProvider = new TimeProvider();
-            var executor = new Executor(actuatorRepo.Object, timeProvider);
+            var executor = new Executor(actuatorRepo.Object, timeProvider, null);
 
             var command = new HitCommand(Button.B);
 
@@ -53,7 +53,7 @@ namespace GameBot.Test.RobotTests
             actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => b++);
 
             var timeProvider = new TimeProvider();
-            var executor = new Executor(actuatorRepo.Object, timeProvider);
+            var executor = new Executor(actuatorRepo.Object, timeProvider, null);
 
             var command = new HitCommand(Button.B);
             timeProvider.Start();
@@ -74,7 +74,7 @@ namespace GameBot.Test.RobotTests
             actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => Assert.Fail());
 
             var timeProvider = new TimeProvider();
-            var executor = new Executor(actuatorRepo.Object, timeProvider);
+            var executor = new Executor(actuatorRepo.Object, timeProvider, null);
 
             var commands = new CommandCollection();
             commands.Add(new HitCommand(Button.A));
@@ -100,7 +100,7 @@ namespace GameBot.Test.RobotTests
             actuatorRepo.Setup(x => x.Hit(It.Is<Button>(p => p == Button.B))).Callback(() => b++);
 
             var timeProvider = new TimeProvider();
-            var executor = new Executor(actuatorRepo.Object, timeProvider);
+            var executor = new Executor(actuatorRepo.Object, timeProvider, null);
 
             var commands = new CommandCollection();
             commands.Add(new HitCommand(Button.A, TimeSpan.FromSeconds(0.5)));

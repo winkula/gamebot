@@ -55,6 +55,7 @@ namespace GameBot.Robot
             container.RegisterSingleton<IQuantizer, Quantizer>();
             container.RegisterSingleton<IExecutor, Executor>();
             container.RegisterSingleton<IActuator, Actuator>();
+            //container.RegisterSingleton<IActuator, LazyActuator>();
             container.RegisterSingleton<ITimeProvider, TimeProvider>();
         }
     }

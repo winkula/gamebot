@@ -24,7 +24,7 @@ namespace GameBot.Core.Data.Commands
 
         public override string ToString()
         {
-            return $"PressCommand {{ Button: {Button}, Timestamp: {Timestamp} }}";
+            return $"PressCommand {{ Button: {Button} }}";
         }
     }
 }

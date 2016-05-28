@@ -53,10 +53,12 @@ namespace GameBot.Robot.Ui
             ImageBoxRight.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
             ImageBoxRight.Width = rightWidth;
             ImageBoxRight.Height = rightHeight;
-            Textbox.Width = textWidth;
-            Textbox.Height = rightHeight;
+            TextboxStatic.Width = textWidth;
+            TextboxStatic.Height = rightHeight;
+            TextboxDynamic.Width = textWidth;
+            TextboxDynamic.Height = rightHeight;
 
-            var size = new Size(leftWidth + rightWidth + textWidth, leftHeight);
+            var size = new Size(leftWidth + rightWidth + 2* textWidth, leftHeight);
             MinimumSize = size;
             ClientSize = size;
             AutoSize = true;
@@ -92,7 +94,8 @@ namespace GameBot.Robot.Ui
             {
                 // clear
                 keypoints.Clear();
-                Debug.WriteLine("cleared already recorded keypoints");
+                debugger.ClearDynamic();
+                Debug.WriteLine("cleared temp stuff");
             }
             if (e.KeyChar == 's')
             {
@@ -147,13 +150,14 @@ namespace GameBot.Robot.Ui
                 stopwatch.Restart();
                 if (ms != 0)
                 {
-                    debugger.Write($"FPS: {1000 / ms}");
+                    debugger.WriteStatic($"FPS: {1000 / ms}");
                 }
 
                 Show(result.Original, result.Processed);
 
-                Textbox.Text = string.Join(Environment.NewLine, debugger.Read());
-                debugger.Clear();
+                TextboxDynamic.Text = string.Join(Environment.NewLine, debugger.ReadDynamic());
+                TextboxStatic.Text = string.Join(Environment.NewLine, debugger.ReadStatic());
+                debugger.ClearStatic();
             }
         }
 

@@ -77,7 +77,7 @@ namespace GameBot.Robot.Engines
             // give commands to command controller (output)
             executor.Execute(commands);
 
-            debugger.Write(DateTime.Now);
+            debugger.WriteStatic(DateTime.Now);
 
             return result;
         }
