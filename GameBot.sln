@@ -42,7 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{CA1497
 		Images\tetris_2.jpg = Images\tetris_2.jpg
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Robot.Ui", "GameBot.Robot.Calibration\GameBot.Robot.Ui.csproj", "{3AD8EE7E-AF10-4219-B5D8-EC4DC167F6EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Robot.Ui", "GameBot.Robot.Ui\GameBot.Robot.Ui.csproj", "{3AD8EE7E-AF10-4219-B5D8-EC4DC167F6EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Robot.Tinkerforge", "GameBot.Robot.Tinkerforge\GameBot.Robot.Tinkerforge.csproj", "{839B9FC0-12EE-43CE-96BA-FB7383EE2D42}"
 EndProject

@@ -36,22 +36,15 @@ namespace GameBot.Robot.Engines
             throw new NotSupportedException("Can only be called step by step.");
         }
 
-        public EngineResult Initialize()
+        public void Initialize()
         {
             timeProvider.Start();
-
-            return RunInternal(true);
         }
 
-        public EngineResult Step()
-        {
-            return RunInternal(false);
-        }
-
-        private EngineResult RunInternal(bool initialize)
+        public EngineResult Step(bool play)
         {
             var result = new EngineResult();
-            
+
             // get image as photo of the gameboy screen (input)
             IImage image = camera.Capture();
             result.Original = image;
@@ -64,20 +57,16 @@ namespace GameBot.Robot.Engines
             processed = agent.Visualize(processed);
             result.Processed = new Image<Bgr, byte>(processed.Bitmap);
 
-            // handle input to the agent which
-            //  - extracts the game state
-            //  - decides which commands to press
-            IEnumerable<ICommand> commands;
-            
-            if (initialize)
-                commands = agent.Initialize();
-            else
-                commands = agent.Act(screenshot);
+            if (play)
+            {
+                // handle input to the agent which
+                //  - extracts the game state
+                //  - decides which commands to press
+                IEnumerable<ICommand> commands = agent.Act(screenshot);
 
-            // give commands to command controller (output)
-            executor.Execute(commands);
-
-            debugger.WriteStatic(DateTime.Now);
+                // give commands to command controller (output)
+                executor.Execute(commands);
+            }
 
             return result;
         }

@@ -70,22 +70,24 @@
             this.ImageBoxRight.TabIndex = 2;
             this.ImageBoxRight.TabStop = false;
             // 
-            // Textbox
+            // TextboxStatic
             // 
+            this.TextboxStatic.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TextboxStatic.Location = new System.Drawing.Point(0, 127);
             this.TextboxStatic.Margin = new System.Windows.Forms.Padding(0);
             this.TextboxStatic.Multiline = true;
-            this.TextboxStatic.Name = "Textbox";
+            this.TextboxStatic.Name = "TextboxStatic";
             this.TextboxStatic.ReadOnly = true;
             this.TextboxStatic.Size = new System.Drawing.Size(139, 110);
             this.TextboxStatic.TabIndex = 3;
             // 
-            // textBox1
+            // TextboxDynamic
             // 
+            this.TextboxDynamic.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TextboxDynamic.Location = new System.Drawing.Point(139, 127);
             this.TextboxDynamic.Margin = new System.Windows.Forms.Padding(0);
             this.TextboxDynamic.Multiline = true;
-            this.TextboxDynamic.Name = "textBox1";
+            this.TextboxDynamic.Name = "TextboxDynamic";
             this.TextboxDynamic.ReadOnly = true;
             this.TextboxDynamic.Size = new System.Drawing.Size(139, 110);
             this.TextboxDynamic.TabIndex = 4;

@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.Configuration;
 using GameBot.Core.Ui;
 using GameBot.Robot.Quantizers;
+using GameBot.Core.Exceptions;
 
 namespace GameBot.Robot.Ui
 {
@@ -29,6 +30,8 @@ namespace GameBot.Robot.Ui
         private readonly ICamera camera;
         private readonly Quantizer quantizer;
         private readonly IDebugger debugger;
+
+        private bool play = false;
 
         private List<int> keypoints = new List<int>();
         private List<int> keypointsApplied = new List<int>();
@@ -58,7 +61,7 @@ namespace GameBot.Robot.Ui
             TextboxDynamic.Width = textWidth;
             TextboxDynamic.Height = rightHeight;
 
-            var size = new Size(leftWidth + rightWidth + 2* textWidth, leftHeight);
+            var size = new Size(leftWidth + rightWidth + 2 * textWidth, leftHeight);
             MinimumSize = size;
             ClientSize = size;
             AutoSize = true;
@@ -86,6 +89,11 @@ namespace GameBot.Robot.Ui
 
         private void KeyPressed(object sender, KeyPressEventArgs e)
         {
+            if (e.KeyChar == 'p')
+            {
+                play = !play;
+                debugger.WriteDynamic(play ? "> play" : "> don't play");
+            }
             if (e.KeyChar == 'q')
             {
                 Application.Exit();
@@ -142,22 +150,30 @@ namespace GameBot.Robot.Ui
 
             while (true)
             {
-                var result = engine.Step();
-                result.Processed = result.Processed.Resize(rightWidth, rightHeight, Inter.Linear);
-
-                stopwatch.Stop();
-                long ms = stopwatch.ElapsedMilliseconds;
-                stopwatch.Restart();
-                if (ms != 0)
+                try
                 {
-                    debugger.WriteStatic($"FPS: {1000 / ms}");
+                    var result = engine.Step(play);
+                    result.Processed = result.Processed.Resize(rightWidth, rightHeight, Inter.Linear);
+
+                    stopwatch.Stop();
+                    long ms = stopwatch.ElapsedMilliseconds;
+                    stopwatch.Restart();
+                    if (ms != 0)
+                    {
+                        debugger.WriteStatic($"FPS: {1000 / ms}");
+                    }
+
+                    Show(result.Original, result.Processed);
+
+                    TextboxDynamic.Text = string.Join(Environment.NewLine, debugger.ReadDynamic());
+                    TextboxStatic.Text = string.Join(Environment.NewLine, debugger.ReadStatic());
+                    debugger.ClearStatic();
                 }
-
-                Show(result.Original, result.Processed);
-
-                TextboxDynamic.Text = string.Join(Environment.NewLine, debugger.ReadDynamic());
-                TextboxStatic.Text = string.Join(Environment.NewLine, debugger.ReadStatic());
-                debugger.ClearStatic();
+                catch (GameOverException)
+                {
+                    debugger.WriteDynamic("> Game over!");
+                    play = false;
+                }
             }
         }
 

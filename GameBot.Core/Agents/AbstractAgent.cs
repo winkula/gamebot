@@ -9,6 +9,7 @@ namespace GameBot.Core.Agents
     {
         protected readonly IExtractor<T> Extractor;
         protected readonly IPlayer<T> Player;
+        protected bool initialized = false;
 
         public AbstractAgent(IExtractor<T> extractor, IPlayer<T> player)
         {
@@ -16,37 +17,42 @@ namespace GameBot.Core.Agents
             Player = player;
         }
 
-        public IEnumerable<ICommand> Initialize()
-        {
-            return Player.Initialize();
-        }
-
         public IEnumerable<ICommand> Act(IScreenshot screenshot)
         {
-            if (MustExtract(screenshot))
+            var gameState = Extractor.Extract(screenshot);
+
+            if (!initialized)
             {
-                var gameState = Extractor.Extract(screenshot);
-                if (MustPlay(gameState))
-                {
-                    return Player.Play(gameState);
-                }
+                initialized = true;
+                return Player.Initialize();
             }
+            if (MustPlay(gameState))
+            {
+                var commands = Play(gameState);
+                AfterPlay();
+                return commands;
+            }
+
             return new CommandCollection();
         }
-        
+
+        public virtual bool MustPlay(T gameState)
+        {
+            return true;
+        }
+
+        public virtual void AfterPlay()
+        {
+        }
+
+        public virtual IEnumerable<ICommand> Play(T gameState)
+        {
+            return Player.Play(gameState);
+        }
+
         public virtual IImage Visualize(IImage image)
         {
             return image;
-        }
-
-        protected virtual bool MustExtract(IScreenshot screenshot)
-        {
-            return true;
-        }
-
-        protected virtual bool MustPlay(T gameState)
-        {
-            return true;
         }
     }
 }

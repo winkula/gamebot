@@ -34,7 +34,8 @@ namespace GameBot.Game.Tetris
 
             this.screenshot = screenshot;
 
-            var board = ExtractBoard();
+            //var board = ExtractBoard();
+            var board = new Board();
             var currentPiece = ExtractCurrentPiece();
             var nextPiece = ExtractNextPiece();
 

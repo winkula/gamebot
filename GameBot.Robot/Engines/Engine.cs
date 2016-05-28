@@ -35,19 +35,12 @@ namespace GameBot.Robot.Engines
             throw new NotSupportedException("Can only be called step by step.");
         }
 
-        public EngineResult Initialize()
+        public void Initialize()
         {
             timeProvider.Start();
-
-            return RunInternal(true);
         }
 
-        public EngineResult Step()
-        {
-            return RunInternal(false);
-        }
-
-        private EngineResult RunInternal(bool initialize)
+        public EngineResult Step(bool play)
         {
             var result = new EngineResult();
 
@@ -59,18 +52,16 @@ namespace GameBot.Robot.Engines
             IImage processed = quantizer.Quantize(image);
             IScreenshot screenshot = new EmguScreenshot(processed, time);
 
-            // handle input to the agent which
-            //  - extracts the game state
-            //  - decides which commands to press
-            IEnumerable<ICommand> commands;
+            if (play)
+            {
+                // handle input to the agent which
+                //  - extracts the game state
+                //  - decides which commands to press
+                IEnumerable<ICommand> commands = agent.Act(screenshot);
 
-            if (initialize)
-                commands = agent.Initialize();
-            else
-                commands = agent.Act(screenshot);
-
-            // give commands to command controller (output)
-            executor.Execute(commands);
+                // give commands to command controller (output)
+                executor.Execute(commands);
+            }
 
             return result;
         }

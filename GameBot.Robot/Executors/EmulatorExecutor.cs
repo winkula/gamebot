@@ -4,6 +4,7 @@ using System.Linq;
 using GameBot.Core.Data;
 using GameBot.Emulation;
 using System;
+using GameBot.Core.Ui;
 
 namespace GameBot.Robot.Executors
 {
@@ -12,13 +13,15 @@ namespace GameBot.Robot.Executors
         private readonly Emulator emulator;
         private readonly IActuator actuator;
         private readonly ITimeProvider timeProvider;
+        private readonly IDebugger debugger;
         private readonly List<ICommand> queue;
 
-        public EmulatorExecutor(Emulator emulator, IActuator actuator, ITimeProvider timeProvider)
+        public EmulatorExecutor(Emulator emulator, IActuator actuator, ITimeProvider timeProvider, IDebugger debugger)
         {
             this.emulator = emulator;
             this.timeProvider = timeProvider;
             this.actuator = actuator;
+            this.debugger = debugger;
             this.queue = new List<ICommand>();
         }
 
@@ -42,6 +45,7 @@ namespace GameBot.Robot.Executors
 
             foreach (var pendingCommand in pendingCommands)
             {
+                debugger.WriteDynamic(pendingCommand);
                 pendingCommand.Execute(emulator);
             }
 

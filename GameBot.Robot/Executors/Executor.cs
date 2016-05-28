@@ -87,7 +87,10 @@ namespace GameBot.Robot.Executors
         {
             if (command.Timestamp <= time)
             {
-                debugger.WriteDynamic(command);
+                if (debugger != null)
+                {
+                    debugger.WriteDynamic(command);
+                }
                 command.Execute(actuator);
             }
             else

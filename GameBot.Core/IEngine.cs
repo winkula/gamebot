@@ -17,14 +17,14 @@ namespace GameBot.Core
         /// Initializes the engine. Must be called before any calls to 'Run'.
         /// This method is intended to call before a loop.
         /// </summary>
-        /// <returns>The engines result.</returns>
-        EngineResult Initialize();
-
+        void Initialize();
+        
         /// <summary>
         /// Runs one step of the engine and returns the result.
         /// This method is intended to call in a loop.
         /// </summary>
+        /// <param name="play">If the agent should play.</param>
         /// <returns>The engines result.</returns>
-        EngineResult Step();
+        EngineResult Step(bool play);
     }
 }

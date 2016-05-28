@@ -10,12 +10,6 @@ namespace GameBot.Core
     public interface IAgent
     {
         /// <summary>
-        /// Initializes the game.
-        /// </summary>
-        /// <returns>A collection of commands for the device.</returns>
-        IEnumerable<ICommand> Initialize();
-        
-        /// <summary>
         /// Acts based on the current screenshot.
         /// </summary>
         /// <param name="screenshot">The current screenshot of the device's display.</param>

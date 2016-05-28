@@ -12,18 +12,24 @@ namespace GameBot.Robot.Ui.Debugging
         
         public void WriteStatic(object message)
         {
-            messagesStatic.Add(message.ToString());
+            messagesStatic.Add(Convert(message));
         }
 
         public void WriteDynamic(object message)
         {
-            messagesDynamic.Enqueue(message.ToString());
+            messagesDynamic.Enqueue(Convert(message));
             while (messagesDynamic.Count > dynamicMax)
             {
                 messagesDynamic.Dequeue();
             }
         }
         
+        private string Convert(object obj)
+        {
+            if (obj == null) return string.Empty;
+            return obj.ToString();
+        }
+
         public IEnumerable<string> ReadStatic()
         {
             return messagesStatic.ToList();

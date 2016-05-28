@@ -52,6 +52,7 @@ namespace GameBot.Game.Tetris
                         bestScore = best.Score;
                     }
                 }
+                bestNode = bestNode ?? parent;
             }
             else
             {

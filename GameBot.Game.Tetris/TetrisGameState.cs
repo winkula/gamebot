@@ -14,7 +14,8 @@ namespace GameBot.Game.Tetris
         public Move Move { get; set; }
         public int Lines { get; set; }
         public int Score { get; set; }
-        public int Level { get { return TetrisLevel.GetLevel(0, Lines); } }
+        public int StartLevel { get; set; }
+        public int Level { get { return TetrisLevel.GetLevel(StartLevel, Lines); } }
 
         public TetrisGameState()
         {
@@ -135,34 +136,34 @@ namespace GameBot.Game.Tetris
 
         public void Left()
         {
-            if (!Board.Intersects(new Piece(Piece).Left()))
-            {
-                Piece.Left();
-            }
+            if (Board.Intersects(new Piece(Piece).Left()))
+                throw new GameOverException("Left not possible");
+
+            Piece.Left();
         }
 
         public void Right()
         {
-            if (!Board.Intersects(new Piece(Piece).Right()))
-            {
-                Piece.Right();
-            }
+            if (Board.Intersects(new Piece(Piece).Right()))
+                throw new GameOverException("Right not possible");
+
+            Piece.Right();            
         }
 
         public void Rotate()
         {
-            if (!Board.Intersects(new Piece(Piece).Rotate()))
-            {
-                Piece.Rotate();
-            }
+            if (Board.Intersects(new Piece(Piece).Rotate()))
+                throw new GameOverException("Rotate not possible");
+
+            Piece.Rotate();            
         }
 
         public void RotateCounterclockwise()
         {
-            if (!Board.Intersects(new Piece(Piece).RotateCounterclockwise()))
-            {
-                Piece.RotateCounterclockwise();
-            }
+            if (Board.Intersects(new Piece(Piece).RotateCounterclockwise()))
+                throw new GameOverException("RotateCounterclockwise not possible");
+
+            Piece.RotateCounterclockwise();
         }
 
         public override int GetHashCode()
@@ -196,7 +197,7 @@ namespace GameBot.Game.Tetris
                 builder.Append("|");
                 for (int x = 0; x < Board.Width; x++)
                 {
-                    if (Piece.IsSquareOccupiedRegardTranslation(x - Board.Origin.X, y - Board.Origin.Y))
+                    if (Piece != null && Piece.IsSquareOccupiedRegardTranslation(x - Board.Origin.X, y - Board.Origin.Y))
                     {
                         builder.Append('*');
                     }

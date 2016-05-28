@@ -35,5 +35,12 @@ namespace GameBot.Game.Tetris
             if (level > 20) level = 20;
             return TimeSpan.FromSeconds(rows * LevelSpeeds[level] / Framerate);
         }
+
+        public static TimeSpan GetFreeFallDuration(int rows)
+        {
+            // this is just an estimate
+            // the speed of the freefall is not documented anywhere
+            return GetDuration(20, rows);
+        }
     }
 }

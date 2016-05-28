@@ -100,12 +100,12 @@ namespace GameBot.Robot.Engines
             File.AppendAllText(path, message);
         }
         
-        public EngineResult Initialize()
+        public void Initialize()
         {
             throw new NotSupportedException("Only the 'run' mode is supported.");
         }
 
-        public EngineResult Step()
+        public EngineResult Step(bool play)
         {
             throw new NotSupportedException("Only the 'run' mode is supported.");
         }

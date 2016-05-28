@@ -3,20 +3,54 @@ using Emgu.CV.Structure;
 using GameBot.Core;
 using GameBot.Core.Agents;
 using System.Drawing;
-using GameBot.Core.Data;
-using System.Collections.Generic;
 using System;
+using GameBot.Core.Ui;
 
 namespace GameBot.Game.Tetris
 {
     public class TetrisAgent : AbstractAgent<TetrisGameState>
     {
-        private readonly Random random = new Random();
+        private readonly ITimeProvider timeProvider;
+        private readonly IDebugger debugger;
 
-        public TetrisAgent(IExtractor<TetrisGameState> extractor, IPlayer<TetrisGameState> player) : base(extractor, player)
-        { 
+        private bool awaitNextTetromino = true;
+        private TimeSpan timeNextAction = TimeSpan.Zero;
+
+        public TetrisAgent(IExtractor<TetrisGameState> extractor, IPlayer<TetrisGameState> player, ITimeProvider timeProvider, IDebugger debugger) : base(extractor, player)
+        {
+            this.timeProvider = timeProvider;
+            this.debugger = debugger;
         }
-        
+
+        public override bool MustPlay(TetrisGameState gameState)
+        {
+            if (gameState == null) throw new ArgumentNullException(nameof(gameState));
+
+            if (gameState.Piece == null && timeNextAction <= timeProvider.Time)
+            {
+                // await next tetromino when the piece was null some time in the past
+                // and the timer to look for the next piece is exceeded
+                awaitNextTetromino = true;
+            }
+
+            var tetrisPlayer = (TetrisPlayer)Player;
+            debugger.WriteStatic(tetrisPlayer.CurrentGameState);
+
+            return awaitNextTetromino &&
+                gameState.Piece != null &&
+                gameState.NextPiece != null;
+        }
+
+        public override void AfterPlay()
+        {
+            // start next timer
+            var tetrisPlayer = (TetrisPlayer)Player;
+            var duration = TetrisLevel.GetFreeFallDuration(tetrisPlayer.LastMove.Fall);
+
+            timeNextAction = timeProvider.Time.Add(duration);
+            awaitNextTetromino = false;
+        }
+
         public override IImage Visualize(IImage image)
         {
             var visualization = new Image<Bgr, byte>(image.Bitmap);

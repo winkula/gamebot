@@ -154,7 +154,6 @@
     <Compile Include="CoreTests\ScreenshotTests.cs" />
     <Compile Include="CoreTests\ButtonTests.cs" />
     <Compile Include="EmulatorTests\EmulatorTests.cs" />
-    <Compile Include="ContainerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RobotTests\QuantizerTests.cs" />
     <Compile Include="TetrisTests\TetrisEmulatorTests.cs" />
@@ -166,7 +165,9 @@
     <Compile Include="TetrisTests\TetrominoTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
