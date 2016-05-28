@@ -90,5 +90,9 @@ namespace GameBot.Robot.Engines
         {
             renderer.Render(image, "Image_Captured");
         }
+
+        public void Configure(string key, object value)
+        {
+        }
     }
 }

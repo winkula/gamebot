@@ -1,6 +1,7 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Robot.Actuators;
+using GameBot.Robot.Configuration;
 using System.Threading;
 
 namespace GameBot.Robot
@@ -16,7 +17,7 @@ namespace GameBot.Robot
 
         static void TestTinkerfoge()
         {
-            using (var actuator = new Actuator())
+            using (var actuator = new Actuator(new Config()))
             {
                 actuator.Hit(Button.Up);
                 //actuator.Press(Button.B);

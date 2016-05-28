@@ -1,4 +1,7 @@
-﻿namespace GameBot.Core
+﻿using System;
+using System.Linq.Expressions;
+
+namespace GameBot.Core
 {
     /// <summary>
     /// Represents an engine that can run the GameBot.
@@ -9,5 +12,7 @@
         /// Runs the engine.
         /// </summary>
         void Run();
+
+        void Configure(string key, object value);
     }
 }

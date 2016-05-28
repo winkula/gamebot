@@ -6,6 +6,7 @@ using GameBot.Robot.Renderers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace GameBot.Robot.Engines
 {
@@ -81,6 +82,10 @@ namespace GameBot.Robot.Engines
         protected void Render(IImage image)
         {
             renderer.Render(image, "Image_Captured");
+        }
+
+        public void Configure(string key, object value)
+        {
         }
     }
 }

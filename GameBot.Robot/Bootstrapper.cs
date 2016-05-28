@@ -52,10 +52,11 @@ namespace GameBot.Robot
                     break;
 
                 case EngineType.Real:
-                    container.Register<IEngine, Engine>();
+                    container.Register<IEngine, FancyEngine>();
                     container.Register<ICamera, Camera>();
                     container.Register<IQuantizer, Quantizer>();
                     container.Register<IExecutor, Executor>();
+                    //container.RegisterSingleton<IActuator, LazyActuator>();
                     container.RegisterSingleton<IActuator, Actuator>();
                     container.RegisterSingleton<ITimeProvider, TimeProvider>();
                     break;

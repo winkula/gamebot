@@ -3,6 +3,7 @@ using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
 using GameBot.Robot;
 using GameBot.Robot.Actuators;
+using GameBot.Robot.Configuration;
 using GameBot.Robot.Executors;
 using Moq;
 using NUnit.Framework;
@@ -17,7 +18,7 @@ namespace GameBot.Test.RobotTests
         [Test]
         public void ConstructDispose()
         {
-            using (var actuator = new Actuator())
+            using (var actuator = new Actuator(new Config()))
             {
             }
         }
@@ -25,7 +26,7 @@ namespace GameBot.Test.RobotTests
         [Test]
         public void TestAll()
         {
-            using (var actuator = new Actuator())
+            using (var actuator = new Actuator(new Config()))
             {
                 actuator.Hit(Button.Up);
                 Thread.Sleep(1000);

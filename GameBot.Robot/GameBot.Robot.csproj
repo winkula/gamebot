@@ -144,6 +144,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actuators\LazyActuator.cs" />
     <Compile Include="Actuators\Actuator.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Cameras\Camera.cs" />
@@ -163,7 +164,6 @@
     <Compile Include="Cameras\EmulatorCamera.cs" />
     <Compile Include="Launcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Actuators\ExamplesTinkerforge.cs" />
     <Compile Include="Quantizers\ThresholdQuantizer.cs" />
     <Compile Include="TimeProviders\EmulatorTimeProvider.cs" />
     <Compile Include="TimeProviders\TimeProvider.cs" />

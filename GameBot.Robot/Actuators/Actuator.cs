@@ -1,9 +1,5 @@
 ﻿using GameBot.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GameBot.Core.Data;
 using Tinkerforge;
 using System.Diagnostics;
@@ -13,37 +9,43 @@ namespace GameBot.Robot.Actuators
 {
     public class Actuator : IActuator, IDisposable
     {
-        private static string HOST = "localhost";
-        private static int PORT = 4223;
-        private static string UID_MASTER = "6JKbWn";
+        private readonly IConfig config;
 
-        public void Hit(object up)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static string UID_RELAY1 = "r5F";
-        private static string UID_RELAY2 = "mTC";
-        private static string UID_TEMP = "qBx";
+        private string host;
+        private int port;
+        private string uidMaster;
+        private string uidRelay1;
+        private string uidRelay2;
+        private string uidTemp;
 
         private int State1;
         private int State2;
 
-        IPConnection ipcon;
-        BrickMaster master;
-        BrickletIndustrialQuadRelay or1;
-        BrickletIndustrialQuadRelay or2;
-        BrickletTemperatureIR tir;
+        private IPConnection ipcon;
+        private BrickMaster master;
+        private BrickletIndustrialQuadRelay or1;
+        private BrickletIndustrialQuadRelay or2;
+        private BrickletTemperatureIR tir;
 
-        public Actuator()
+        public Actuator(IConfig config)
         {
-            ipcon = new IPConnection(); // Create IP connection
-            ipcon.Connect(HOST, PORT); // Connect to brickd. Don't use device before ipcon is connected
+            this.config = config;
 
-            master = new BrickMaster(UID_MASTER, ipcon); // Create device object
-            or1 = new BrickletIndustrialQuadRelay(UID_RELAY1, ipcon);
-            or2 = new BrickletIndustrialQuadRelay(UID_RELAY2, ipcon);
-            tir = new BrickletTemperatureIR(UID_TEMP, ipcon);
+            this.host = config.Read<string>("Robot.Actuator.Host");
+            this.port = config.Read<int>("Robot.Actuator.Port");
+            this.uidMaster = config.Read<string>("Robot.Actuator.UidMaster");
+            this.uidRelay1 = config.Read<string>("Robot.Actuator.UidRelay1");
+            this.uidRelay2 = config.Read<string>("Robot.Actuator.UidRelay2");
+            this.uidTemp = config.Read<string>("Robot.Actuator.UidTemp");
+            
+            ipcon = new IPConnection(); // Create IP connection
+            ipcon.Connect(host, port); // Connect to brickd. Don't use device before ipcon is connected
+            
+            master = new BrickMaster(uidMaster, ipcon); // Create device object
+            or1 = new BrickletIndustrialQuadRelay(uidRelay1, ipcon);
+            or2 = new BrickletIndustrialQuadRelay(uidRelay2, ipcon);
+            tir = new BrickletTemperatureIR(uidTemp, ipcon);
+            
             // Get current stack voltage (unit is mV)
             int stackVoltage = master.GetStackVoltage();
             Debug.WriteLine("Stack Voltage: " + stackVoltage / 1000.0 + " V");
