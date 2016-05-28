@@ -188,6 +188,14 @@
     <Error Condition="!Exists('..\packages\EmguCV.3.0.0\build\EmguCV.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EmguCV.3.0.0\build\EmguCV.targets'))" />
   </Target>
   <Import Project="..\packages\EmguCV.3.0.0\build\EmguCV.targets" Condition="Exists('..\packages\EmguCV.3.0.0\build\EmguCV.targets')" />
+  <PropertyGroup>
+    <PreBuildEvent>mkdir "$(TargetDir)Roms"
+xcopy /y "$(SolutionDir)Roms" "$(TargetDir)Roms"
+mkdir "$(TargetDir)Screenshots"
+xcopy /y "$(SolutionDir)Screenshots" "$(TargetDir)Screenshots"
+mkdir "$(TargetDir)Images"
+xcopy /y "$(SolutionDir)Images" "$(TargetDir)Images"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

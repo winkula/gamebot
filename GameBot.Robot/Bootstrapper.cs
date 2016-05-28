@@ -6,7 +6,6 @@ using GameBot.Robot.Configuration;
 using GameBot.Robot.Engines;
 using GameBot.Robot.Executors;
 using GameBot.Robot.Quantizers;
-using GameBot.Robot.Renderers;
 using SimpleInjector;
 using System;
 using System.Linq;
@@ -16,32 +15,25 @@ namespace GameBot.Robot
 {
     public class Bootstrapper
     {
-        public enum EngineType
-        {
-            Emulator,
-            Fast,
-            Real
-        }
-
         public static Container GetInitializedContainer()
         {
             var config = new Config();
-            var engineType = config.Read("Robot.Engine.Mode", EngineType.Real);
+            var engineType = config.Read("Robot.Engine.Mode", EngineMode.Real);
 
             return GetInitializedContainer(engineType);
         }
        
-        public static Container GetInitializedContainer(EngineType engineType)
+        public static Container GetInitializedContainer(EngineMode engineType)
         {
             var container = new Container();
 
             switch (engineType)
             {
-                case EngineType.Fast:
+                case EngineMode.Fast:
                     container.Register<IEngine, FastEngine>();
                     break;
 
-                case EngineType.Emulator:
+                case EngineMode.Emulator:
                     container.Register<IEngine, EmulatorEngine>();
                     container.RegisterSingleton<Emulator>();
                     container.Register<ICamera, EmulatorCamera>();
@@ -51,7 +43,7 @@ namespace GameBot.Robot
                     container.RegisterSingleton<ITimeProvider, EmulatorTimeProvider>();
                     break;
 
-                case EngineType.Real:
+                case EngineMode.Real:
                     container.Register<IEngine, UiEngine>();
                     container.Register<ICamera, Camera>();
                     container.Register<IQuantizer, Quantizer>();

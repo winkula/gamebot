@@ -1,8 +1,4 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-using GameBot.Core;
-using GameBot.Core.Ui;
+﻿using GameBot.Core.Ui;
 using SimpleInjector;
 using System;
 using System.Collections.Generic;
@@ -26,10 +22,10 @@ namespace GameBot.Robot.Ui
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 container.RegisterPackages(GetAssemblies(
+                    "GameBot.Game.Tetris",
                     "GameBot.Emulation",
                     "GameBot.Robot",
-                    "GameBot.Robot.Ui",
-                    "GameBot.Game.Tetris"));
+                    "GameBot.Robot.Ui"));
                 container.Verify();
 
                 Application.Run((Form)container.GetInstance<IUi>());

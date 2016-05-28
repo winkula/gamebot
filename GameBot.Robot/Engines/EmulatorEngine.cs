@@ -1,8 +1,8 @@
 ﻿using Emgu.CV;
+using Emgu.CV.Structure;
 using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Emulation;
-using GameBot.Robot.Renderers;
 using System;
 using System.Collections.Generic;
 
@@ -30,60 +30,59 @@ namespace GameBot.Robot.Engines
             this.agent = agent;
             this.executor = executor;
             this.timeProvider = timeProvider;
-
-            //this.renderer = renderer;
-
+            
             this.emulator = emulator;
 
             var loader = new RomLoader();
             var game = loader.Load(config.Read("Emulator.Rom.Path", "Roms/tetris.gb"));
             this.emulator.Load(game);
         }
-
+        
         public void Run()
+        {
+            throw new NotSupportedException("Can only be called step by step.");
+        }
+
+        public EngineResult Initialize()
         {
             timeProvider.Start();
 
-            Loop();
-
-            //renderer.End();
+            return RunInternal(true);
         }
-
-        protected void Loop()
-        {
-            while (true)
-            {
-                // get image as photo of the gameboy screen (input)
-                IImage image = camera.Capture();
-                Render(image);
-
-                // process image and get display data
-                TimeSpan time = timeProvider.Time;
-                IImage processed = quantizer.Quantize(image);
-                IScreenshot screenshot = new EmguScreenshot(processed, time);
-
-                // handle input to the agent which
-                //  - extracts the game state
-                //  - decides which commands to press
-                IEnumerable<ICommand> commands = agent.Act(screenshot);
-
-                // give commands to command controller (output)
-                executor.Execute(commands);
-            }
-        }
-        
-        protected void Render(IImage image)
-        {
-            //CvInvoke.Imshow("Image_Captured", image);
-        }
-
-        public void Configure(string key, object value)
-        {
-        }
-
+                
         public EngineResult Step()
         {
-            throw new NotImplementedException();
+            return RunInternal(false);
+        }
+
+        private EngineResult RunInternal(bool initialize)
+        {
+            var result = new EngineResult();
+
+            // get image as photo of the gameboy screen (input)
+            IImage image = camera.Capture();
+            result.Original = image;
+
+            // process image and get display data
+            TimeSpan time = timeProvider.Time;
+            IImage processed = quantizer.Quantize(image);
+            result.Processed = new Image<Bgr, byte>(processed.Bitmap);
+            IScreenshot screenshot = new EmguScreenshot(processed, time);
+
+            // handle input to the agent which
+            //  - extracts the game state
+            //  - decides which commands to press
+            IEnumerable<ICommand> commands;
+
+            if (initialize)
+                commands = agent.Initialize();
+            else
+                commands = agent.Act(screenshot);
+
+            // give commands to command controller (output)
+            executor.Execute(commands);
+
+            return result;
         }
     }
 }

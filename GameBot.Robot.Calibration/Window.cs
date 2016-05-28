@@ -12,6 +12,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Configuration;
 using GameBot.Core.Ui;
+using GameBot.Robot.Quantizers;
 
 namespace GameBot.Robot.Ui
 {
@@ -26,20 +27,22 @@ namespace GameBot.Robot.Ui
         private readonly IConfig config;
         private readonly IEngine engine;
         private readonly ICamera camera;
+        private readonly Quantizer quantizer;
         private readonly IDebugger debugger;
-        
+
         private List<int> keypoints = new List<int>();
         private List<int> keypointsApplied = new List<int>();
 
-        public Window(IConfig config, IEngine engine, ICamera camera, IDebugger debugger)
+        public Window(IConfig config, IEngine engine, ICamera camera, IDebugger debugger, IQuantizer quantizer)
         {
             this.config = config;
             this.engine = engine;
             this.camera = camera;
             this.debugger = debugger;
+            this.quantizer = quantizer as Quantizer;
 
             InitializeComponent();
-            
+
             CheckForIllegalCrossThreadCalls = false;
 
             InitDimensions();
@@ -85,17 +88,6 @@ namespace GameBot.Robot.Ui
             {
                 Application.Exit();
             }
-            if (e.KeyChar == '+')
-            {
-                // extractor.BlockThreshold = Clamp(extractor.BlockThreshold + 0.05f, 0.0f, 1.0f);
-                // Debug.WriteLine($"BlockThreshold: {extractor.BlockThreshold:0.00} %");
-            }
-            if (e.KeyChar == '-')
-            {
-                //  extractor.BlockThreshold = Clamp(extractor.BlockThreshold - 0.05f, 0.0f, 1.0f);
-                //  Debug.WriteLine($"BlockThreshold: {extractor.BlockThreshold:0.00} %");
-            }
-
             if (e.KeyChar == 'c')
             {
                 // clear
@@ -107,12 +99,12 @@ namespace GameBot.Robot.Ui
                 // save
                 if (keypointsApplied.Count == 8)
                 {
-                    var config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                    config.AppSettings.Settings["Robot.Quantizer.Transformation.KeyPoints"].Value = string.Join(",", keypointsApplied);
-                    //  config.AppSettings.Settings["Game.Tetris.Extractor.BlockThreshold"].Value = extractor.BlockThreshold.ToString();
-                    config.Save(ConfigurationSaveMode.Modified);
-                    Debug.WriteLine("saved configuration");
                     Debug.WriteLine("keypoints: " + string.Join(",", keypointsApplied));
+
+                    config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsApplied));
+                    config.Save();
+
+                    Debug.WriteLine("saved configuration");
                 }
             }
         }
@@ -123,10 +115,10 @@ namespace GameBot.Robot.Ui
             keypoints.Add(e.Y);
             Debug.WriteLine("added keypoint");
 
-            if (keypoints.Count >= 8)
+            if (keypoints.Count >= 8 && quantizer != null)
             {
                 keypointsApplied = keypoints.Take(8).ToList();
-                //quantizer.CalculatePerspectiveTransform(keypointsApplied.Select(x => (float)x));
+                quantizer.CalculatePerspectiveTransform(keypointsApplied.Select(x => (float)x));
                 keypoints.Clear();
                 Debug.WriteLine("applied keypoints");
             }
@@ -142,6 +134,9 @@ namespace GameBot.Robot.Ui
         public void Run()
         {
             var stopwatch = new Stopwatch();
+
+            engine.Initialize();
+
             while (true)
             {
                 var result = engine.Step();
@@ -156,7 +151,6 @@ namespace GameBot.Robot.Ui
                 }
 
                 Show(result.Original, result.Processed);
-
 
                 Textbox.Text = string.Join(Environment.NewLine, debugger.Read());
                 debugger.Clear();
@@ -174,11 +168,6 @@ namespace GameBot.Robot.Ui
             {
                 // ignore
             }
-        }
-
-        public void Write(object message)
-        {
-            Textbox.Text = $"{message}\n{Textbox.Text}";
         }
     }
 }

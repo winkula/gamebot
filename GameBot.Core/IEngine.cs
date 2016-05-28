@@ -1,6 +1,4 @@
 ﻿using GameBot.Core.Data;
-using System;
-using System.Linq.Expressions;
 
 namespace GameBot.Core
 {
@@ -10,21 +8,23 @@ namespace GameBot.Core
     public interface IEngine
     {
         /// <summary>
-        /// Runs the engine.
+        /// Runs the engine in a loop.
+        /// This method is intended to call only once in the beginning of the application.
         /// </summary>
         void Run();
         
         /// <summary>
-        /// Runs only one step on the engine and returns the result.
+        /// Initializes the engine. Must be called before any calls to 'Run'.
+        /// This method is intended to call before a loop.
         /// </summary>
-        /// <returns>The result of the step</returns>
-        EngineResult Step();
+        /// <returns>The engines result.</returns>
+        EngineResult Initialize();
 
         /// <summary>
-        /// Configures a value on the engine.
+        /// Runs one step of the engine and returns the result.
+        /// This method is intended to call in a loop.
         /// </summary>
-        /// <param name="key">Config key name</param>
-        /// <param name="value">Config key value</param>
-        void Configure(string key, object value);
+        /// <returns>The engines result.</returns>
+        EngineResult Step();
     }
 }

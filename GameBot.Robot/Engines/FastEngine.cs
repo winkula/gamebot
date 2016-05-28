@@ -99,14 +99,15 @@ namespace GameBot.Robot.Engines
             string message = $"{rounds},{simulator.GameState.Lines},{simulator.GameState.Score},{simulator.GameState.Level},{time}\n";
             File.AppendAllText(path, message);
         }
-
-        public void Configure(string key, object value)
+        
+        public EngineResult Initialize()
         {
+            throw new NotSupportedException("Only the 'run' mode is supported.");
         }
 
         public EngineResult Step()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Only the 'run' mode is supported.");
         }
     }
 }

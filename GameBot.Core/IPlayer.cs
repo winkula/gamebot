@@ -17,6 +17,12 @@ namespace GameBot.Core
     public interface IPlayer<T> : IPlayer where T : class, IGameState
     {
         /// <summary>
+        /// Initializes the Game Boy game.
+        /// </summary>
+        /// <returns>A collection of commands to execute on the device.</returns>
+        IEnumerable<ICommand> Initialize();
+        
+        /// <summary>
         /// Plays a Game Boy game, i. e. decides, which commands to press on the device for a given game state.
         /// </summary>
         /// <param name="gameState">The game state.</param>

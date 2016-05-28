@@ -37,8 +37,8 @@ namespace GameBot.Robot
         {
             for (int i = 0; i < 20; i++)
             {
-                var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Fast);
-                container.GetInstance<IEngine>().Run();
+                var container = Bootstrapper.GetInitializedContainer(Engines.EngineMode.Fast);
+                container.GetInstance<IEngine>().Step();
             }
         }
     }

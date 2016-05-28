@@ -3,12 +3,8 @@ using Emgu.CV.Structure;
 using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Core.Ui;
-using GameBot.Emulation;
-using GameBot.Robot.Quantizers;
-using GameBot.Robot.Renderers;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace GameBot.Robot.Engines
 {
@@ -37,31 +33,22 @@ namespace GameBot.Robot.Engines
 
         public void Run()
         {
+            throw new NotSupportedException("Can only be called step by step.");
+        }
+
+        public EngineResult Initialize()
+        {
             timeProvider.Start();
 
-            Loop();
-
-            //renderer.End();
-        }
-
-        protected void Loop()
-        {
-            while (true)
-            {
-                Step();
-            }
-        }
-        
-        protected void Render(IImage image)
-        {
-            //renderer.Render(image, "Image_Captured");
-        }
-
-        public void Configure(string key, object value)
-        {
+            return RunInternal(true);
         }
 
         public EngineResult Step()
+        {
+            return RunInternal(false);
+        }
+
+        private EngineResult RunInternal(bool initialize)
         {
             var result = new EngineResult();
             
@@ -76,11 +63,16 @@ namespace GameBot.Robot.Engines
 
             processed = agent.Visualize(processed);
             result.Processed = new Image<Bgr, byte>(processed.Bitmap);
-            
+
             // handle input to the agent which
             //  - extracts the game state
             //  - decides which commands to press
-            IEnumerable<ICommand> commands = agent.Act(screenshot);
+            IEnumerable<ICommand> commands;
+            
+            if (initialize)
+                commands = agent.Initialize();
+            else
+                commands = agent.Act(screenshot);
 
             // give commands to command controller (output)
             executor.Execute(commands);

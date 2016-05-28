@@ -3,15 +3,20 @@ using Emgu.CV.Structure;
 using GameBot.Core;
 using GameBot.Core.Agents;
 using System.Drawing;
+using GameBot.Core.Data;
+using System.Collections.Generic;
+using System;
 
 namespace GameBot.Game.Tetris
 {
     public class TetrisAgent : AbstractAgent<TetrisGameState>
     {
+        private readonly Random random = new Random();
+
         public TetrisAgent(IExtractor<TetrisGameState> extractor, IPlayer<TetrisGameState> player) : base(extractor, player)
         { 
         }
-
+        
         public override IImage Visualize(IImage image)
         {
             var visualization = new Image<Bgr, byte>(image.Bitmap);

@@ -2,6 +2,7 @@
 using GameBot.Core;
 using GameBot.Game.Tetris;
 using GameBot.Robot;
+using GameBot.Robot.Engines;
 
 namespace GameBot.Test
 {
@@ -11,7 +12,7 @@ namespace GameBot.Test
         [Test]
         public void DependencyInjection()
         {
-            var container = Bootstrapper.GetInitializedContainer(Bootstrapper.EngineType.Emulator);
+            var container = Bootstrapper.GetInitializedContainer(EngineMode.Emulator);
             
             container.Verify();
 

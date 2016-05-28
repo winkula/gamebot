@@ -2,7 +2,6 @@
 using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Emulation;
-using GameBot.Robot.Renderers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,51 +29,50 @@ namespace GameBot.Robot.Engines
             this.executor = executor;
             this.timeProvider = timeProvider;
         }
-
+        
         public void Run()
+        {
+            throw new NotSupportedException("Can only be called step by step.");
+        }
+
+        public EngineResult Initialize()
         {
             timeProvider.Start();
 
-            Loop();
-
-            //renderer.End();
-        }
-
-        protected void Loop()
-        {
-            while (true)
-            {
-                // get image as photo of the gameboy screen (input)
-                IImage image = camera.Capture();
-                Render(image);
-
-                // process image and get display data
-                TimeSpan time = timeProvider.Time;
-                IImage processed = quantizer.Quantize(image);
-                IScreenshot screenshot = new EmguScreenshot(processed, time);
-
-                // handle input to the agent which
-                //  - extracts the game state
-                //  - decides which commands to press
-                IEnumerable<ICommand> commands = agent.Act(screenshot);
-
-                // give commands to command controller (output)
-                executor.Execute(commands);
-            }
-        }
-        
-        protected void Render(IImage image)
-        {
-            //renderer.Render(image, "Image_Captured");
-        }
-
-        public void Configure(string key, object value)
-        {
+            return RunInternal(true);
         }
 
         public EngineResult Step()
         {
-            throw new NotImplementedException();
+            return RunInternal(false);
+        }
+
+        private EngineResult RunInternal(bool initialize)
+        {
+            var result = new EngineResult();
+
+            // get image as photo of the gameboy screen (input)
+            IImage image = camera.Capture();
+
+            // process image and get display data
+            TimeSpan time = timeProvider.Time;
+            IImage processed = quantizer.Quantize(image);
+            IScreenshot screenshot = new EmguScreenshot(processed, time);
+
+            // handle input to the agent which
+            //  - extracts the game state
+            //  - decides which commands to press
+            IEnumerable<ICommand> commands;
+
+            if (initialize)
+                commands = agent.Initialize();
+            else
+                commands = agent.Act(screenshot);
+
+            // give commands to command controller (output)
+            executor.Execute(commands);
+
+            return result;
         }
     }
 }

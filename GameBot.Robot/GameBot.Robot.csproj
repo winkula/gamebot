@@ -153,6 +153,7 @@
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Engines\EmulatorEngine.cs" />
+    <Compile Include="Engines\EngineMode.cs" />
     <Compile Include="Engines\UiEngine.cs" />
     <Compile Include="Engines\FastEngine.cs" />
     <Compile Include="Executors\EmulatorExecutor.cs" />
@@ -162,7 +163,6 @@
     <Compile Include="Quantizers\PassthroughQuantizer.cs" />
     <Compile Include="Quantizers\Quantizer.cs" />
     <Compile Include="Quantizers\AdaptiveThresholdQuantizer.cs" />
-    <Compile Include="Renderers\EmguRenderer.cs" />
     <Compile Include="Cameras\EmulatorCamera.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -14,7 +14,7 @@ namespace GameBot.Robot.Configuration
             string value = ConfigurationManager.AppSettings[key];
             if (value == null) throw new ArgumentException($"config value with key {key} not found.");
 
-            return (T)Convert.ChangeType(value, typeof(T));
+            return Get<T>(value);
         }
 
         public T Read<T>(string key, T defaultValue)
@@ -26,6 +26,11 @@ namespace GameBot.Robot.Configuration
             }
 
             return Get<T>(value);
+        }
+
+        public void Write<T>(string key, T value)
+        {
+            throw new NotImplementedException();
         }
 
         public IEnumerable<T> ReadCollection<T>(string key)
@@ -55,6 +60,16 @@ namespace GameBot.Robot.Configuration
             {
                 yield return Get<T>(value);
             }
+        }
+        
+        public void WriteCollection<T>(string key, IEnumerable<T> values)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Save()
+        {
+            throw new NotImplementedException();
         }
 
         private T Get<T>(string value)

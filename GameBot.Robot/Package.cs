@@ -14,30 +14,47 @@ namespace GameBot.Robot
     {
         public void RegisterServices(Container container)
         {
-            //container.RegisterSingleton<IConfig, Config>();
+            var config = new Config();
+            var mode = config.Read<EngineMode>("Robot.Engine.Mode");
 
-            /*
-            // fast
-            container.Register<IEngine, FastEngine>();
-            */
+            switch (mode)
+            {
+                case EngineMode.Emulator:
+                    RegisterEmulatorEngine(container);
+                    break;
+                case EngineMode.Fast:
+                    RegisterFastEngine(container);
+                    break;
+                case EngineMode.Real:
+                    RegisterRealEngine(container);
+                    break;
+                default:
+                    break;
+            }           
+        }
 
-            /*
-            // emulator
-            container.Register<IEngine, EmulatorEngine>();
-            container.Register<ICamera, EmulatorCamera>();
-            container.Register<IQuantizer, PassthroughQuantizer>();
-            container.Register<IExecutor, EmulatorExecutor>();
-            //container.RegisterSingleton<IActuator, Actuator>();
+        private void RegisterFastEngine(Container container)
+        {
+            container.RegisterSingleton<IEngine, FastEngine>();
+        }
+
+        private void RegisterEmulatorEngine(Container container)
+        {
+            container.RegisterSingleton<IEngine, EmulatorEngine>();
+            container.RegisterSingleton<ICamera, EmulatorCamera>();
+            container.RegisterSingleton<IQuantizer, PassthroughQuantizer>();
+            container.RegisterSingleton<IExecutor, EmulatorExecutor>();
+            container.RegisterSingleton<IActuator, LazyActuator>();
             container.RegisterSingleton<ITimeProvider, EmulatorTimeProvider>();
-            */
-            
-            // real
+        }
+
+        private void RegisterRealEngine(Container container)
+        {
             container.RegisterSingleton<IEngine, UiEngine>();
             container.RegisterSingleton<ICamera, Camera>();
             container.RegisterSingleton<IQuantizer, Quantizer>();
             container.RegisterSingleton<IExecutor, Executor>();
-            container.RegisterSingleton<IActuator, LazyActuator>();
-            //container.RegisterSingleton<IActuator, Actuator>();
+            container.RegisterSingleton<IActuator, Actuator>();
             container.RegisterSingleton<ITimeProvider, TimeProvider>();
         }
     }
