@@ -27,7 +27,7 @@ namespace GameBot.Robot.Quantizers
             this.block = block;
         }
 
-        public IScreenshot Quantize(IImage image, TimeSpan timestamp)
+        public IImage Quantize(IImage image)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -75,9 +75,8 @@ namespace GameBot.Robot.Quantizers
                 Debug.WriteLine("Constant: " + c);
                 Debug.WriteLine("Block size: " + block);
             }
-
-            var screenshot = new EmguScreenshot(destImageBin, TimeSpan.Zero);
-            return screenshot;
+            
+            return destImageBin;
         }
     }
 }

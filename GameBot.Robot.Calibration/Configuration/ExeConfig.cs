@@ -2,12 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Windows.Forms;
 
-namespace GameBot.Robot.Configuration
+namespace GameBot.Robot.Ui.Configuration
 {
-    public class Config : IConfig
+    public class ExeConfig : IConfig
     {
         private const char Delimiter = ',';
+        private readonly System.Configuration.Configuration configuration;
+
+        public ExeConfig()
+        {
+            this.configuration = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+        }
 
         public T Read<T>(string key)
         {
@@ -42,19 +49,13 @@ namespace GameBot.Robot.Configuration
         public IEnumerable<T> ReadCollection<T>(string key, IEnumerable<T> defaultValue)
         {
             string values = ConfigurationManager.AppSettings[key];
-            if (values == null)
-            {
-                foreach (var defaultValueItem in defaultValue)
-                {
-                    yield return defaultValueItem;
-                }
-                yield break;
-            }
-
+            if (values == null) throw new ArgumentException($"config value with key {key} not found.");
+            
             foreach (var value in values.Split(Delimiter))
             {
                 yield return Get<T>(value);
             }
+            //return defaultValue;
         }
 
         private T Get<T>(string value)

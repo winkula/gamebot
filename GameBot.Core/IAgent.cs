@@ -1,4 +1,5 @@
-﻿using GameBot.Core.Data;
+﻿using Emgu.CV;
+using GameBot.Core.Data;
 using System.Collections.Generic;
 
 namespace GameBot.Core
@@ -13,6 +14,14 @@ namespace GameBot.Core
         /// </summary>
         /// <param name="screenshot">The current screenshot of the device's display.</param>
         /// <returns>A collection of commands for the device.</returns>
-        IEnumerable<ICommand> Act(IScreenshot screenshot); 
+        IEnumerable<ICommand> Act(IScreenshot screenshot);
+
+        /// <summary>
+        /// Visualizes the current game state or the extracted information on the quantized image.
+        /// This method is for th UI.
+        /// </summary>
+        /// <param name="image">The quantized image.</param>
+        /// <returns>A visualization on the quantized image.</returns>
+        IImage Visualize(IImage image);
     }
 }

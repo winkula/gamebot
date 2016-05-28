@@ -9,6 +9,9 @@ namespace GameBot.Robot.Cameras
         private readonly IConfig config;
         private readonly Capture capture;
 
+        public int Width { get { return capture.Width; } }
+        public int Height { get { return capture.Height; } }
+
         public Camera(IConfig config)
         {
             this.config = config;
@@ -23,8 +26,12 @@ namespace GameBot.Robot.Cameras
             var dst = new Mat();
             capture.Grab();
             capture.Retrieve(src, 0);
-            CvInvoke.CvtColor(src, dst, ColorConversion.Rgb2Gray);
-            return dst;
+            //CvInvoke.CvtColor(src, dst, ColorConversion.Rgb2Gray);
+
+            // var dst = new Mat();
+            // var captured =  capture.QueryFrame();
+
+            return src;
         }
     }
 }

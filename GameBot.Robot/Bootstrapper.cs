@@ -52,7 +52,7 @@ namespace GameBot.Robot
                     break;
 
                 case EngineType.Real:
-                    container.Register<IEngine, FancyEngine>();
+                    container.Register<IEngine, UiEngine>();
                     container.Register<ICamera, Camera>();
                     container.Register<IQuantizer, Quantizer>();
                     container.Register<IExecutor, Executor>();
@@ -66,7 +66,7 @@ namespace GameBot.Robot
             }
 
             container.RegisterSingleton<IConfig, Config>(); 
-            container.Register<IRenderer, EmguRenderer>();
+            //container.Register<IRenderer, EmguRenderer>();
 
             // TODO: remove build-dependency to the "GameBot.Game.Tetris" and load
             // the assembly with "LoadFrom"

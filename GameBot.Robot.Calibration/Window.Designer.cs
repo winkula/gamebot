@@ -1,6 +1,6 @@
-﻿namespace GameBot.Robot.Calibration
+﻿namespace GameBot.Robot.Ui
 {
-    partial class Preview
+    partial class Window
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -32,6 +32,7 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.ImageBoxLeft = new Emgu.CV.UI.ImageBox();
             this.ImageBoxRight = new Emgu.CV.UI.ImageBox();
+            this.Textbox = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxLeft)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxRight)).BeginInit();
@@ -41,6 +42,7 @@
             // 
             this.flowLayoutPanel1.Controls.Add(this.ImageBoxLeft);
             this.flowLayoutPanel1.Controls.Add(this.ImageBoxRight);
+            this.flowLayoutPanel1.Controls.Add(this.Textbox);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
@@ -48,34 +50,45 @@
             this.flowLayoutPanel1.Size = new System.Drawing.Size(389, 277);
             this.flowLayoutPanel1.TabIndex = 0;
             // 
-            // imageBox1
+            // ImageBoxLeft
             // 
             this.ImageBoxLeft.Location = new System.Drawing.Point(0, 0);
             this.ImageBoxLeft.Margin = new System.Windows.Forms.Padding(0);
-            this.ImageBoxLeft.Name = "imageBox1";
+            this.ImageBoxLeft.Name = "ImageBoxLeft";
             this.ImageBoxLeft.Size = new System.Drawing.Size(156, 127);
             this.ImageBoxLeft.TabIndex = 2;
             this.ImageBoxLeft.TabStop = false;
             // 
-            // imageBox2
+            // ImageBoxRight
             // 
             this.ImageBoxRight.Location = new System.Drawing.Point(156, 0);
             this.ImageBoxRight.Margin = new System.Windows.Forms.Padding(0);
-            this.ImageBoxRight.Name = "imageBox2";
+            this.ImageBoxRight.Name = "ImageBoxRight";
             this.ImageBoxRight.Size = new System.Drawing.Size(212, 127);
             this.ImageBoxRight.TabIndex = 2;
             this.ImageBoxRight.TabStop = false;
             // 
-            // Preview
+            // Textbox
+            // 
+            this.Textbox.Location = new System.Drawing.Point(0, 127);
+            this.Textbox.Margin = new System.Windows.Forms.Padding(0);
+            this.Textbox.Multiline = true;
+            this.Textbox.Name = "Textbox";
+            this.Textbox.ReadOnly = true;
+            this.Textbox.Size = new System.Drawing.Size(139, 110);
+            this.Textbox.TabIndex = 3;
+            // 
+            // Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(389, 277);
             this.Controls.Add(this.flowLayoutPanel1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.Name = "Preview";
-            this.Text = "GameBot.Robot.Calibration";
+            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Name = "Window";
+            this.Text = "GameBot.Robot.Ui";
             this.flowLayoutPanel1.ResumeLayout(false);
+            this.flowLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxLeft)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxRight)).EndInit();
             this.ResumeLayout(false);
@@ -87,6 +100,7 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private Emgu.CV.UI.ImageBox ImageBoxLeft;
         private Emgu.CV.UI.ImageBox ImageBoxRight;
+        private System.Windows.Forms.TextBox Textbox;
     }
 }
 

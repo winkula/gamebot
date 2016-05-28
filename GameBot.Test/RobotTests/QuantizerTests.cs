@@ -57,12 +57,12 @@ namespace GameBot.Test.RobotTests
 
             var w = new Stopwatch();
             w.Start();
-            var screenshot = quantizer.Quantize(image, TimeSpan.Zero);
+            var quantized = quantizer.Quantize(image);
             w.Stop();
 
             Debug.Write(w.ElapsedMilliseconds);
 
-            Assert.NotNull(screenshot);
+            Assert.NotNull(quantized);
         }
     }
 }

@@ -124,9 +124,12 @@
       <HintPath>..\packages\EmguCV.3.0.0\lib\net451\Emgu.Util.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SimpleInjector, Version=3.1.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\SimpleInjector.3.1.2\lib\net45\SimpleInjector.dll</HintPath>
+    <Reference Include="SimpleInjector">
+      <HintPath>..\packages\SimpleInjector.3.1.5\lib\net45\SimpleInjector.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector.Packaging, Version=3.1.5.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.Packaging.3.1.5\lib\net40-client\SimpleInjector.Packaging.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -150,19 +153,18 @@
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Engines\EmulatorEngine.cs" />
-    <Compile Include="Engines\FancyEngine.cs" />
+    <Compile Include="Engines\UiEngine.cs" />
     <Compile Include="Engines\FastEngine.cs" />
     <Compile Include="Executors\EmulatorExecutor.cs" />
     <Compile Include="Executors\Executor.cs" />
     <Compile Include="Engines\Engine.cs" />
-    <Compile Include="Quantizers\TestQuantizer.cs" />
+    <Compile Include="Package.cs" />
     <Compile Include="Quantizers\PassthroughQuantizer.cs" />
     <Compile Include="Quantizers\Quantizer.cs" />
     <Compile Include="Quantizers\AdaptiveThresholdQuantizer.cs" />
     <Compile Include="Renderers\EmguRenderer.cs" />
-    <Compile Include="Renderers\IRenderer.cs" />
     <Compile Include="Cameras\EmulatorCamera.cs" />
-    <Compile Include="Launcher.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Quantizers\ThresholdQuantizer.cs" />
     <Compile Include="TimeProviders\EmulatorTimeProvider.cs" />

@@ -1,6 +1,6 @@
 ﻿using Emgu.CV;
 
-namespace GameBot.Core
+namespace GameBot.Core.Ui
 {
     public interface IUi
     {

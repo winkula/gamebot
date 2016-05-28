@@ -8,8 +8,8 @@
     <ProjectGuid>{3AD8EE7E-AF10-4219-B5D8-EC4DC167F6EB}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GameBot.Robot.Calibration</RootNamespace>
-    <AssemblyName>GameBot.Robot.Calibration</AssemblyName>
+    <RootNamespace>GameBot.Robot.Ui</RootNamespace>
+    <AssemblyName>GameBot.Robot.Ui</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -104,6 +104,14 @@
       <HintPath>..\packages\EmguCV.3.0.0\lib\net451\Emgu.Util.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SimpleInjector, Version=3.1.5.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.3.1.5\lib\net45\SimpleInjector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SimpleInjector.Packaging, Version=3.1.5.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.Packaging.3.1.5\lib\net40-client\SimpleInjector.Packaging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -118,16 +126,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Preview.cs">
+    <Compile Include="Configuration\ExeConfig.cs" />
+    <Compile Include="Debugging\Debugger.cs" />
+    <Compile Include="Package.cs" />
+    <Compile Include="Window.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Preview.Designer.cs">
-      <DependentUpon>Preview.cs</DependentUpon>
+    <Compile Include="Window.Designer.cs">
+      <DependentUpon>Window.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Preview.resx">
-      <DependentUpon>Preview.cs</DependentUpon>
+    <EmbeddedResource Include="Window.resx">
+      <DependentUpon>Window.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -137,6 +149,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

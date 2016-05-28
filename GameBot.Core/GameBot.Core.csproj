@@ -136,6 +136,7 @@
     <Compile Include="Data\Commands\PressCommand.cs" />
     <Compile Include="Data\Commands\ReleaseCommand.cs" />
     <Compile Include="Data\EmguScreenshot.cs" />
+    <Compile Include="Data\EngineResult.cs" />
     <Compile Include="Data\ICommand.cs" />
     <Compile Include="Data\IGameState.cs" />
     <Compile Include="Data\Screenshot.cs" />
@@ -153,7 +154,8 @@
     <Compile Include="IQuantizer.cs" />
     <Compile Include="Data\IScreenshot.cs" />
     <Compile Include="ITimeProvider.cs" />
-    <Compile Include="IUi.cs" />
+    <Compile Include="Ui\IDebugger.cs" />
+    <Compile Include="Ui\IUi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Searching\DepthFirstSearch.cs" />
     <Compile Include="Searching\IHeuristic.cs" />

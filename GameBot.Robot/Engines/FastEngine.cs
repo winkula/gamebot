@@ -103,5 +103,10 @@ namespace GameBot.Robot.Engines
         public void Configure(string key, object value)
         {
         }
+
+        public EngineResult Step()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

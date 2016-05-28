@@ -3,9 +3,6 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using GameBot.Core;
-using GameBot.Game.Tetris;
-using GameBot.Robot.Configuration;
-using GameBot.Robot.Quantizers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,29 +11,35 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using System.Configuration;
+using GameBot.Core.Ui;
 
-namespace GameBot.Robot.Calibration
+namespace GameBot.Robot.Ui
 {
-    public partial class Preview : Form
+    public partial class Window : Form, IUi
     {
         private int leftWidth;
         private int leftHeight;
         private int rightWidth;
         private int rightHeight;
+        private int textWidth = 200;
 
-        private static IConfig config = new Config();
-
-        private Capture capture = default(Capture);
-        private Quantizer quantizer = new Quantizer(config);
+        private readonly IConfig config;
+        private readonly IEngine engine;
+        private readonly ICamera camera;
+        private readonly IDebugger debugger;
+        
         private List<int> keypoints = new List<int>();
         private List<int> keypointsApplied = new List<int>();
-        private TetrisExtractor extractor = new TetrisExtractor(config);
 
-        public Preview()
+        public Window(IConfig config, IEngine engine, ICamera camera, IDebugger debugger)
         {
-            InitializeComponent();
+            this.config = config;
+            this.engine = engine;
+            this.camera = camera;
+            this.debugger = debugger;
 
-            capture = new Capture(config.Read<int>("Robot.Camera.Index"));
+            InitializeComponent();
+            
             CheckForIllegalCrossThreadCalls = false;
 
             InitDimensions();
@@ -47,24 +50,24 @@ namespace GameBot.Robot.Calibration
             ImageBoxRight.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
             ImageBoxRight.Width = rightWidth;
             ImageBoxRight.Height = rightHeight;
+            Textbox.Width = textWidth;
+            Textbox.Height = rightHeight;
 
-            var size = new Size(leftWidth + rightWidth, leftHeight);
+            var size = new Size(leftWidth + rightWidth + textWidth, leftHeight);
             MinimumSize = size;
             ClientSize = size;
-            
             AutoSize = true;
 
             Load += Loaded;
-            ImageBoxLeft.MouseClick += MouseClickEvent;
-
+            ImageBoxLeft.MouseClick += MouseClicked;
             KeyPreview = true;
-            KeyPress += Preview_KeyPress;
+            KeyPress += KeyPressed;
         }
 
         private void InitDimensions()
         {
-            leftWidth = capture.Width;
-            leftHeight = capture.Height;
+            leftWidth = camera.Width;
+            leftHeight = camera.Height;
             rightWidth = (leftHeight * 160) / 144;
             rightHeight = leftHeight;
         }
@@ -76,17 +79,21 @@ namespace GameBot.Robot.Calibration
             return value;
         }
 
-        private void Preview_KeyPress(object sender, KeyPressEventArgs e)
+        private void KeyPressed(object sender, KeyPressEventArgs e)
         {
+            if (e.KeyChar == 'q')
+            {
+                Application.Exit();
+            }
             if (e.KeyChar == '+')
             {
-                extractor.BlockThreshold = Clamp(extractor.BlockThreshold + 0.05f, 0.0f, 1.0f);
-                Debug.WriteLine($"BlockThreshold: {extractor.BlockThreshold:0.00} %");
+                // extractor.BlockThreshold = Clamp(extractor.BlockThreshold + 0.05f, 0.0f, 1.0f);
+                // Debug.WriteLine($"BlockThreshold: {extractor.BlockThreshold:0.00} %");
             }
             if (e.KeyChar == '-')
             {
-                extractor.BlockThreshold = Clamp(extractor.BlockThreshold - 0.05f, 0.0f, 1.0f);
-                Debug.WriteLine($"BlockThreshold: {extractor.BlockThreshold:0.00} %");
+                //  extractor.BlockThreshold = Clamp(extractor.BlockThreshold - 0.05f, 0.0f, 1.0f);
+                //  Debug.WriteLine($"BlockThreshold: {extractor.BlockThreshold:0.00} %");
             }
 
             if (e.KeyChar == 'c')
@@ -101,8 +108,8 @@ namespace GameBot.Robot.Calibration
                 if (keypointsApplied.Count == 8)
                 {
                     var config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                    config.AppSettings.Settings["Robot.Quantizer.Transformation.KeyPoints"].Value =  string.Join(",", keypointsApplied);
-                    config.AppSettings.Settings["Game.Tetris.Extractor.BlockThreshold"].Value = extractor.BlockThreshold.ToString();
+                    config.AppSettings.Settings["Robot.Quantizer.Transformation.KeyPoints"].Value = string.Join(",", keypointsApplied);
+                    //  config.AppSettings.Settings["Game.Tetris.Extractor.BlockThreshold"].Value = extractor.BlockThreshold.ToString();
                     config.Save(ConfigurationSaveMode.Modified);
                     Debug.WriteLine("saved configuration");
                     Debug.WriteLine("keypoints: " + string.Join(",", keypointsApplied));
@@ -110,7 +117,7 @@ namespace GameBot.Robot.Calibration
             }
         }
 
-        private void MouseClickEvent(object sender, MouseEventArgs e)
+        private void MouseClicked(object sender, MouseEventArgs e)
         {
             keypoints.Add(e.X);
             keypoints.Add(e.Y);
@@ -119,7 +126,7 @@ namespace GameBot.Robot.Calibration
             if (keypoints.Count >= 8)
             {
                 keypointsApplied = keypoints.Take(8).ToList();
-                quantizer.CalculatePerspectiveTransform(keypointsApplied.Select(x => (float)x));
+                //quantizer.CalculatePerspectiveTransform(keypointsApplied.Select(x => (float)x));
                 keypoints.Clear();
                 Debug.WriteLine("applied keypoints");
             }
@@ -127,46 +134,51 @@ namespace GameBot.Robot.Calibration
 
         private void Loaded(object sender, EventArgs e)
         {
-            var t = new Thread(Loop);
+            var t = new Thread(Run);
             t.IsBackground = true;
             t.Start();
         }
-        
-        public void Loop()
+
+        public void Run()
         {
+            var stopwatch = new Stopwatch();
             while (true)
             {
-                var src = capture.QueryFrame();
-                var dst = new Image<Gray, byte>(src.Width, src.Height);
-                CvInvoke.CvtColor(src, dst, ColorConversion.Rgb2Gray);
+                var result = engine.Step();
+                result.Processed = result.Processed.Resize(rightWidth, rightHeight, Inter.Linear);
 
-                var screenshot = quantizer.Quantize(dst, new TimeSpan());
-                extractor.Extract(screenshot);
-
-                var imageLeft = src.ToImage<Bgr, byte>();
-
-                var imageRight = new Image<Bgr, byte>(quantizer.ImageOutput.Bitmap);
-                foreach (var rectangle in extractor.Rectangles)
+                stopwatch.Stop();
+                long ms = stopwatch.ElapsedMilliseconds;
+                stopwatch.Restart();
+                if (ms != 0)
                 {
-                    imageRight.Draw(new Rectangle(8 * rectangle.X, 8 * rectangle.Y, 8, 8), new Bgr(0, 0, 255), 1);
+                    debugger.Write($"FPS: {1000 / ms}");
                 }
-                imageRight = imageRight.Resize(rightWidth, rightHeight, Inter.Linear);
 
-                SetImage(imageLeft, imageRight);
+                Show(result.Original, result.Processed);
+
+
+                Textbox.Text = string.Join(Environment.NewLine, debugger.Read());
+                debugger.Clear();
             }
         }
 
-        public void SetImage(IImage image1, IImage image2)
+        public void Show(IImage original, IImage processed)
         {
             try
             {
-                ImageBoxLeft.Image = image1;
-                ImageBoxRight.Image = image2;
+                ImageBoxLeft.Image = original;
+                ImageBoxRight.Image = processed;
             }
             catch (ObjectDisposedException)
             {
                 // ignore
             }
+        }
+
+        public void Write(object message)
+        {
+            Textbox.Text = $"{message}\n{Textbox.Text}";
         }
     }
 }

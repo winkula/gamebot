@@ -6,6 +6,7 @@ using System.Drawing;
 
 namespace GameBot.Robot.Renderers
 {
+    /*
     public class EmguRenderer : IRenderer
     {
         private string title;
@@ -47,5 +48,5 @@ namespace GameBot.Robot.Renderers
             // Destroy the window if key is pressed
             CvInvoke.DestroyWindow(title);
         }
-    }
+    }*/
 }

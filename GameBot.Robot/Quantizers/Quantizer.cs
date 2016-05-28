@@ -22,10 +22,7 @@ namespace GameBot.Robot.Quantizers
         private AdaptiveThresholdType thresholdAdaptiveThresholdType;
         private ThresholdType thresholdType;
 
-        public Mat transform { get; private set; }
-
-        // for debug purposes only
-        public IImage ImageOutput { get; private set; }
+        public Mat transform { get; private set; }        
 
         public Quantizer(IConfig config)
         {
@@ -59,25 +56,21 @@ namespace GameBot.Robot.Quantizers
             transform = CvInvoke.GetPerspectiveTransform(srcKeypoints, destKeypoints);
         }
 
-        public IScreenshot Quantize(IImage image, TimeSpan timestamp)
+        public IImage Quantize(IImage image)
         {
-            var sourceImage = image;
-            var destImage = new Mat(new Size(GameBoyScreenWidth, GameBoyScreenHeight), DepthType.Default, 1);
-            var destImageBin = new Mat(new Size(GameBoyScreenWidth, GameBoyScreenHeight), DepthType.Default, 1);
+            // convert to gray values
+            var imageGray = new Mat();
+            CvInvoke.CvtColor(image, imageGray, ColorConversion.Rgb2Gray);
 
             // transform
-            CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(GameBoyScreenWidth, GameBoyScreenHeight), Inter.Linear, Warp.Default);
+            var imageWarped = new Mat(new Size(GameBoyScreenWidth, GameBoyScreenHeight), DepthType.Default, 1);
+            CvInvoke.WarpPerspective(imageGray, imageWarped, transform, new Size(GameBoyScreenWidth, GameBoyScreenHeight), Inter.Linear, Warp.Default);
 
             // threshold
-            CvInvoke.AdaptiveThreshold(destImage, destImageBin, thresholdMaxValue, AdaptiveThresholdType.MeanC, ThresholdType.Binary, thresholdBlockSize, thresholdConstant);
-
-            if (config.Read<bool>("Robot.Quantizer.Imshow", true))
-            {
-                CvInvoke.Imshow("Image_Binarized", destImageBin);
-            }
-            ImageOutput = destImageBin;
-
-            return new EmguScreenshot(destImageBin, timestamp);
+            var imageBinarized = new Mat(new Size(GameBoyScreenWidth, GameBoyScreenHeight), DepthType.Default, 1);
+            CvInvoke.AdaptiveThreshold(imageWarped, imageBinarized, thresholdMaxValue, AdaptiveThresholdType.MeanC, ThresholdType.Binary, thresholdBlockSize, thresholdConstant);
+            
+            return imageBinarized;
         }
     }
 }

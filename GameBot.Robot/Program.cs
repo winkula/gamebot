@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace GameBot.Robot
 {
-    public class Launcher
+    public class Program
     {
         static void Main(string[] args)
         {
@@ -30,7 +30,6 @@ namespace GameBot.Robot
         {
             using (var container = Bootstrapper.GetInitializedContainer())
             {
-                container.GetInstance<IEngine>().Run();
             }
         }
 

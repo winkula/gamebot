@@ -74,7 +74,7 @@ namespace GameBot.Robot.Quantizers
             return screenshot;
         }
         */
-        public IScreenshot Quantize(IImage image, TimeSpan timestamp)
+        public IImage Quantize(IImage image)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -118,8 +118,7 @@ namespace GameBot.Robot.Quantizers
                 Debug.WriteLine("Threshold: " + threshold);
             }
 
-            var screenshot = new EmguScreenshot(destImageBin, TimeSpan.Zero);
-            return screenshot;
+            return destImageBin;
         }
     }
 }

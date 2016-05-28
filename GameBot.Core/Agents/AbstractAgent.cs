@@ -1,6 +1,8 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
 using System.Collections.Generic;
+using Emgu.CV;
+using System;
 
 namespace GameBot.Core.Agents
 {
@@ -26,6 +28,11 @@ namespace GameBot.Core.Agents
                 }
             }
             return new CommandCollection();
+        }
+
+        public virtual IImage Visualize(IImage image)
+        {
+            return image;
         }
 
         protected virtual bool MustExtract(IScreenshot screenshot)

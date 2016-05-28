@@ -12,5 +12,15 @@ namespace GameBot.Core
         /// </summary>
         /// <returns>The captured image from the camera as an EmguCV Mat object.</returns>
         IImage Capture();
+        
+        /// <summary>
+        /// Gets the width of the camera image.
+        /// </summary>
+        int Width { get; }
+
+        /// <summary>
+        /// Gets the height of the camera image.
+        /// </summary>
+        int Height { get; }
     }
 }

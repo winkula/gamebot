@@ -1,15 +1,13 @@
 ﻿using Emgu.CV;
 using GameBot.Core;
-using GameBot.Core.Data;
-using System;
 
 namespace GameBot.Robot.Quantizers
 {
     public class PassthroughQuantizer : IQuantizer
     {
-        public IScreenshot Quantize(IImage image, TimeSpan timestamp)
+        public IImage Quantize(IImage image)
         {
-            return new EmguScreenshot(image, timestamp);
+            return image;
         }
     }
 }

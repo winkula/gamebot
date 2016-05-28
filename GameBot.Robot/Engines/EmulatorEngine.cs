@@ -18,12 +18,10 @@ namespace GameBot.Robot.Engines
         private readonly IExecutor executor;
 
         private readonly ITimeProvider timeProvider;
-
-        private readonly IRenderer renderer;
-
+        
         private readonly Emulator emulator;
 
-        public EmulatorEngine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IExecutor executor, ITimeProvider timeProvider, IRenderer renderer, Emulator emulator)
+        public EmulatorEngine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IExecutor executor, ITimeProvider timeProvider, Emulator emulator)
         {
             this.config = config;
 
@@ -33,7 +31,7 @@ namespace GameBot.Robot.Engines
             this.executor = executor;
             this.timeProvider = timeProvider;
 
-            this.renderer = renderer;
+            //this.renderer = renderer;
 
             this.emulator = emulator;
 
@@ -48,12 +46,12 @@ namespace GameBot.Robot.Engines
 
             Loop();
 
-            renderer.End();
+            //renderer.End();
         }
 
         protected void Loop()
         {
-            while (!IsEscape)
+            while (true)
             {
                 // get image as photo of the gameboy screen (input)
                 IImage image = camera.Capture();
@@ -61,7 +59,8 @@ namespace GameBot.Robot.Engines
 
                 // process image and get display data
                 TimeSpan time = timeProvider.Time;
-                IScreenshot screenshot = quantizer.Quantize(image, time);
+                IImage processed = quantizer.Quantize(image);
+                IScreenshot screenshot = new EmguScreenshot(processed, time);
 
                 // handle input to the agent which
                 //  - extracts the game state
@@ -72,27 +71,19 @@ namespace GameBot.Robot.Engines
                 executor.Execute(commands);
             }
         }
-
-        private bool IsEscape
-        {
-            get
-            {
-                var key = renderer.Key(1);
-                if (key.HasValue)
-                {
-                    if (key == 27) return true; // Escape
-                }
-                return false;
-            }
-        }
-
+        
         protected void Render(IImage image)
         {
-            renderer.Render(image, "Image_Captured");
+            //CvInvoke.Imshow("Image_Captured", image);
         }
 
         public void Configure(string key, object value)
         {
+        }
+
+        public EngineResult Step()
+        {
+            throw new NotImplementedException();
         }
     }
 }
