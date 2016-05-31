@@ -28,6 +28,7 @@ namespace GameBot.Robot.Ui
         private readonly IConfig config;
         private readonly IEngine engine;
         private readonly ICamera camera;
+        private readonly IActuator actuator;
         private readonly Quantizer quantizer;
         private readonly IDebugger debugger;
 
@@ -36,11 +37,12 @@ namespace GameBot.Robot.Ui
         private List<int> keypoints = new List<int>();
         private List<int> keypointsApplied = new List<int>();
 
-        public Window(IConfig config, IEngine engine, ICamera camera, IDebugger debugger, IQuantizer quantizer)
+        public Window(IConfig config, IEngine engine, ICamera camera, IActuator actuator, IDebugger debugger, IQuantizer quantizer)
         {
             this.config = config;
             this.engine = engine;
             this.camera = camera;
+            this.actuator = actuator;
             this.debugger = debugger;
             this.quantizer = quantizer as Quantizer;
 
@@ -89,6 +91,37 @@ namespace GameBot.Robot.Ui
 
         private void KeyPressed(object sender, KeyPressEventArgs e)
         {
+            if (e.KeyChar == 'y')
+            {
+                actuator.Hit(Core.Data.Button.A);
+                debugger.WriteDynamic("> press A");
+            }
+            if (e.KeyChar == 'x')
+            {
+                actuator.Hit(Core.Data.Button.B);
+                debugger.WriteDynamic("> press B");
+            }
+            if (e.KeyChar == 'a')
+            {
+                actuator.Hit(Core.Data.Button.Left);
+                debugger.WriteDynamic("> press Left");
+            }
+            if (e.KeyChar == 'd')
+            {
+                actuator.Hit(Core.Data.Button.Right);
+                debugger.WriteDynamic("> press Right");
+            }
+            if (e.KeyChar == 'c')
+            {
+                actuator.Hit(Core.Data.Button.Start);
+                debugger.WriteDynamic("> press Start");
+            }
+            if (e.KeyChar == 'v')
+            {
+                actuator.Hit(Core.Data.Button.Select);
+                debugger.WriteDynamic("> press Select");
+            }
+
             if (e.KeyChar == 'p')
             {
                 play = !play;
@@ -98,12 +131,12 @@ namespace GameBot.Robot.Ui
             {
                 Application.Exit();
             }
-            if (e.KeyChar == 'c')
+            if (e.KeyChar == 'r')
             {
                 // clear
                 keypoints.Clear();
                 debugger.ClearDynamic();
-                Debug.WriteLine("cleared temp stuff");
+                Debug.WriteLine("reset temp stuff");
             }
             if (e.KeyChar == 's')
             {

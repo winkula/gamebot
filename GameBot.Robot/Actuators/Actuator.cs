@@ -9,6 +9,9 @@ namespace GameBot.Robot.Actuators
 {
     public class Actuator : IActuator, IDisposable
     {
+        private const int DelayHit = 40;
+        private const int DelayCommand = 50;
+
         private readonly IConfig config;
 
         private string host;
@@ -61,21 +64,21 @@ namespace GameBot.Robot.Actuators
         public void Hit(Button button)
         {
             HandleState(button, true);
-            Thread.Sleep(50);
+            Thread.Sleep(DelayHit);
             HandleState(button, false);
-            Thread.Sleep(50);
+            Thread.Sleep(DelayCommand);
         }
 
         public void Press(Button button)
         {
             HandleState(button, true);
-            Thread.Sleep(50);
+            Thread.Sleep(DelayCommand);
         }
 
         public void Release(Button button)
         {
             HandleState(button, false);
-            Thread.Sleep(50);
+            Thread.Sleep(DelayCommand);
         }
 
         private void HandleState(Button button, bool pressOrRelease)
@@ -109,7 +112,7 @@ namespace GameBot.Robot.Actuators
                     break;
 
                 default:
-                    throw new Exception("Undefind button!");
+                    throw new ArgumentException($"Undefined button {button}!");
             }
         }
 
