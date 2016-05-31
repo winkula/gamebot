@@ -8,7 +8,7 @@ using Tinkerforge;
 
 namespace GameBot.Robot.Tinkerforge
 {
-    class Program
+    class Programm
     {
         private static string HOST = "localhost";
         private static int PORT = 4223;
@@ -16,7 +16,7 @@ namespace GameBot.Robot.Tinkerforge
         private static string UID_RELAY1 = "r5F";
         private static string UID_RELAY2 = "mTC";
         private static string UID_TEMP = "qBx";
-        
+
         static void Main()
         {
             IPConnection ipcon = new IPConnection(); // Create IP connection
@@ -39,27 +39,84 @@ namespace GameBot.Robot.Tinkerforge
             short ChipTemp = tir.GetAmbientTemperature();
             Console.WriteLine("Chibi master address: " + ChipTemp / 10 + "°/C");
 
-            for (int i = 0; i < 10; i++)
+            int delay = 50;
+
+            while (true)
             {
-                Thread.Sleep(100);
-                or1.SetValue(1 << 0);
-                or2.SetValue(1 << 0);
-                Thread.Sleep(100);
-                or1.SetValue(1 << 1);
-                or2.SetValue(1 << 1);
-                Thread.Sleep(100);
-                or1.SetValue(1 << 2);
-                or2.SetValue(1 << 2);
-                Thread.Sleep(100);
-                or1.SetValue(1 << 3);
-                or2.SetValue(1 << 3);
+                ConsoleKeyInfo insertKey = Console.ReadKey();
+                int result = insertKey.KeyChar;
+                // UP
+                if (result.Equals(32)){
+                    or1.SetValue(1 << 0);
+                    Thread.Sleep(delay);
+                    or1.SetValue(1 << 0);
+                    Thread.Sleep(delay);
+                } 
+                // DOWN
+                if (result.Equals(32))
+                {
+                    or1.SetValue(1 << 0);
+                    Thread.Sleep(delay);
+                    or1.SetValue(1 << 0);
+                    Thread.Sleep(delay);
+                }
+                // LEFT
+                if (result.Equals(97))
+                {
+                    or1.SetValue(1 << 0);
+                    Thread.Sleep(delay);
+                    or1.SetValue(1 << 0);
+                    Thread.Sleep(delay);
+                }
+                // RIGHT
+                if (result.Equals(32))
+                {
+                    or1.SetValue(1 << 0);
+                    Thread.Sleep(delay);
+                    or1.SetValue(1 << 0);
+                    Thread.Sleep(delay);
+                }
+                // START
+                if (result.Equals(115))
+                {
+                    or2.SetValue(1);
+                    Thread.Sleep(delay);
+                    or2.SetValue(0);
+                    Thread.Sleep(delay);
+                }
+                // SELECT
+                if (result.Equals(83))
+                {
+                    or2.SetValue(4);
+                    Thread.Sleep(delay);
+                    or2.SetValue(0);
+                    Thread.Sleep(delay);
+                }
+                // A
+                if (result.Equals(97))
+                {
+                    or2.SetValue(2);
+                    Thread.Sleep(delay);
+                    or2.SetValue(0);
+                    Thread.Sleep(delay);
+                }
+                // B
+                if (result.Equals(98))
+                {
+                    or2.SetValue(8);
+                    Thread.Sleep(delay);
+                    or2.SetValue(0);
+                    Thread.Sleep(delay);
+                }
+                Console.WriteLine(result);
+                // ESC for EXIT
+                if (result.Equals(27))
+                {
+                    break;
+                }
+
+
             }
-
-            or1.SetValue(0);
-            or2.SetValue(0);
-
-            Console.WriteLine("Press enter to exit");
-            Console.ReadLine();
             ipcon.Disconnect();
         }
     }
