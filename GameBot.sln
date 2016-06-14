@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{CA1497
 	ProjectSection(SolutionItems) = preProject
 		Images\tetris_1.jpg = Images\tetris_1.jpg
 		Images\tetris_2.jpg = Images\tetris_2.jpg
+		Images\tetris_3.jpg = Images\tetris_3.jpg
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Robot.Ui", "GameBot.Robot.Ui\GameBot.Robot.Ui.csproj", "{3AD8EE7E-AF10-4219-B5D8-EC4DC167F6EB}"
