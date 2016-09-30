@@ -26,9 +26,15 @@ namespace GameBot.Test.TetrisTests
 
             var extractor = new TetrisExtractor(config);
             var image = Image.FromFile("Screenshots/tetris_play_1.png");
-            var screenshot = new Screenshot(image, TimeSpan.Zero);
-            
+            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             var gameState = extractor.Extract(screenshot);
+
+            stopwatch.Stop();
+            Debug.Write($"Extraction in {stopwatch.ElapsedMilliseconds} ms");
 
             Assert.NotNull(gameState);
             Assert.NotNull(gameState.Board);
@@ -38,6 +44,7 @@ namespace GameBot.Test.TetrisTests
             Debug.WriteLine(gameState.Piece);
             Debug.WriteLine(gameState.NextPiece);
 
+            Debug.WriteLine(gameState);
             Debug.WriteLine(gameState.Board);
         }
     }

@@ -1,5 +1,8 @@
 ﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
 using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace GameBot.Core.Data
@@ -10,14 +13,21 @@ namespace GameBot.Core.Data
     public class EmguScreenshot : IScreenshot
     {
         public const int TileSize = 8;
-
+        public static Mat Black;
+                
         private readonly IImage image;
-        private readonly byte[] bytes;
-        public int[] Pixels { get { throw new NotImplementedException(); } }
+
+        public byte[] Pixels { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
         public TimeSpan Timestamp { get; private set; }
 
+        static EmguScreenshot()
+        {
+            Black = new Mat(new Size(160, 144), DepthType.Cv8U, 1);
+            Black.SetTo(new MCvScalar(0, 0, 0));
+        }
+        
         public EmguScreenshot(IImage image, TimeSpan timestamp)
         {
             this.image = image;
@@ -25,25 +35,27 @@ namespace GameBot.Core.Data
             var mat = image.GetInputArray().GetMat();
             Width = mat.Width;
             Height = mat.Height;
-            bytes = new byte[Width * Height];
-            Marshal.Copy(mat.DataPointer, bytes, 0, Width * Height);
+            Pixels = new byte[Width * Height];
+            Marshal.Copy(mat.DataPointer, Pixels, 0, Width * Height);
             Timestamp = timestamp;
         }
 
-        public int GetPixel(int x, int y)
+        public EmguScreenshot(Image image, TimeSpan timestamp) : this(new Image<Gray, byte>(new Bitmap(image)), timestamp)
         {
-            var byteValue = bytes[y * Width + x];
-            return QuantizePixelValue(byteValue);
         }
 
-        private int QuantizePixelValue(int byteValue)
+        public EmguScreenshot(Bitmap bitmap, TimeSpan timestamp) : this(new Image<Gray, byte>(bitmap), timestamp)
         {
-            return (255 - byteValue) / 64;
         }
 
-        public int[] GetTile(int x, int y)
+        public byte GetPixel(int x, int y)
         {
-            var tile = new int[TileSize * TileSize];
+            return Pixels[y * Width + x];
+        }
+
+        public byte[] GetTile(int x, int y)
+        {
+            var tile = new byte[TileSize * TileSize];
             for (int yIn = 0; yIn < TileSize; yIn++)
             {
                 for (int xIn = 0; xIn < TileSize; xIn++)
@@ -52,6 +64,16 @@ namespace GameBot.Core.Data
                 }
             }
             return tile;
+        }
+
+        public byte GetTileMean(int x, int y)
+        {
+            var mask = Black.Clone();
+            var roi = new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize);
+            CvInvoke.Rectangle(mask, roi, new MCvScalar(255, 255, 255), -1);
+            
+            var mean = CvInvoke.Mean(image, mask);
+            return (byte) mean.V0;
         }
     }
 }

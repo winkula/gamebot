@@ -20,11 +20,9 @@ namespace GameBot.Test.TetrisTests
         {
             var player = new TetrisPlayer(new Config());
             var gameState = new TetrisGameState(Tetromino.L, Tetromino.Z);
-
-            var commandsBegin = player.Play(gameState);
+            
             var commands = player.Play(gameState);
-
-            Assert.NotNull(commandsBegin);
+            
             Assert.NotNull(commands);
         }
     }

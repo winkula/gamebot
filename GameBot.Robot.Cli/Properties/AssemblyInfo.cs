@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Allgemeine Informationen über eine Assembly werden über die folgenden 
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
-[assembly: AssemblyTitle("GameBot.Robot.Tinkerforge")]
+[assembly: AssemblyTitle("GameBot.Robot.Cli")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("GameBot.Robot.Tinkerforge")]
+[assembly: AssemblyProduct("GameBot.Robot.Cli")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Die folgende GUID bestimmt die ID der Typbibliothek, wenn dieses Projekt für COM verfügbar gemacht wird
-[assembly: Guid("839b9fc0-12ee-43ce-96ba-fb7383ee2d42")]
+[assembly: Guid("c6b14a01-1d95-4bab-901b-3358a4a50719")]
 
 // Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:
 //

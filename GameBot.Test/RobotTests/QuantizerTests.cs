@@ -11,8 +11,8 @@ namespace GameBot.Test.RobotTests
     [TestFixture]
     public class QuantizerTests
     {
-        private const bool adjust = false;
-
+        private const bool adjust = true;
+        
         [Test]
         public void UnwarpAndAdaptiveThreshold1()
         {

@@ -43,28 +43,11 @@ namespace GameBot.Game.Tetris
 
             return gameState;
         }
-
-        // TODO: better threshold
-        private bool IsBlockThresholdReached(int value)
+        
+        private bool IsBlock(byte mean)
         {
-            return value > (3 * 8 * 8 * BlockThreshold);
-        }
-
-        private bool IsBlockOuterLines(int[] values)
-        {
-            int sum = 0;
-            int[] indizes = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 23, 24, 31, 32, 39, 40, 47, 48, 55, 56, 57, 58, 59, 60, 61, 62, 63 };
-            for (int i = 0; i < indizes.Length; i++)
-            {
-                sum += values[i];
-            }
-            return sum > (4 * indizes.Length / 3);
-        }
-
-        private bool IsBlock(int[] values)
-        {
-            int sum = values.Sum();
-            return IsBlockThresholdReached(sum);
+            const int TileMeanThreshold = 195; // optimum is between 185 and 195
+            return mean < TileMeanThreshold;     
         }
 
         // Tiles: x : 5 - 8, y : 0 - 2
@@ -76,10 +59,8 @@ namespace GameBot.Game.Tetris
                 // TODO: extract whole board but subtract current piece
                 for (int y = 3; y < 18; y++)
                 {
-                    int[] values = screenshot.GetTile(BoardTileOrigin.X + x, BoardTileOrigin.Y + y);
-                    //int sum = values.Sum();
-                    //if (TileThresholdReached(sum))
-                    if (IsBlock(values))
+                    byte mean = screenshot.GetTileMean(BoardTileOrigin.X + x, BoardTileOrigin.Y + y);
+                    if (IsBlock(mean))
                     {
                         board.Occupy(x, 17 - y);
                         Rectangles.Add(new Point(BoardTileOrigin.X + x, BoardTileOrigin.Y + y));
@@ -97,10 +78,8 @@ namespace GameBot.Game.Tetris
             {
                 for (int y = 0; y < 3; y++)
                 {
-                    int[] values = screenshot.GetTile(CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y);
-                    //int sum = values.Sum();
-                    //if (TileThresholdReached(sum))
-                    if (IsBlock(values))
+                    byte mean = screenshot.GetTileMean(CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y);
+                    if (IsBlock(mean))
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);
@@ -119,10 +98,8 @@ namespace GameBot.Game.Tetris
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    int[] values = screenshot.GetTile(PreviewTileOrigin.X + x, PreviewTileOrigin.Y + y);
-                    //int sum = values.Sum();
-                    //if (TileThresholdReached(sum))
-                    if (IsBlock(values))
+                    byte mean = screenshot.GetTileMean(PreviewTileOrigin.X + x, PreviewTileOrigin.Y + y);
+                    if (IsBlock(mean))
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);

@@ -17,8 +17,15 @@ namespace GameBot.Core
         IEnumerable<ICommand> Act(IScreenshot screenshot);
 
         /// <summary>
+        /// Checks, if the last command was executed correctly.
+        /// </summary>
+        /// <param name="command">The command to check.</param>
+        /// <returns><code>True</code> if the command was executed correctly.</returns>
+        bool Check(ICommand command);
+
+        /// <summary>
         /// Visualizes the current game state or the extracted information on the quantized image.
-        /// This method is for th UI.
+        /// This method is for the UI.
         /// </summary>
         /// <param name="image">The quantized image.</param>
         /// <returns>A visualization on the quantized image.</returns>

@@ -139,7 +139,6 @@
     <Compile Include="Data\EngineResult.cs" />
     <Compile Include="Data\ICommand.cs" />
     <Compile Include="Data\IGameState.cs" />
-    <Compile Include="Data\Screenshot.cs" />
     <Compile Include="Exceptions\GameOverException.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="IActuator.cs" />

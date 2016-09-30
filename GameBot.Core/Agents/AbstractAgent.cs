@@ -2,6 +2,7 @@
 using GameBot.Core.Data.Commands;
 using System.Collections.Generic;
 using Emgu.CV;
+using System;
 
 namespace GameBot.Core.Agents
 {
@@ -34,6 +35,11 @@ namespace GameBot.Core.Agents
             }
 
             return new CommandCollection();
+        }
+
+        public bool Check(ICommand command)
+        {
+            throw new NotImplementedException();
         }
 
         public virtual bool MustPlay(T gameState)

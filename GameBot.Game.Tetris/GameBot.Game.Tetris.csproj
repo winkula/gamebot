@@ -140,6 +140,8 @@
     <Compile Include="Data\Move.cs" />
     <Compile Include="Data\Piece.cs" />
     <Compile Include="Data\Shape.cs" />
+    <Compile Include="Extraction\PieceExtractionResult.cs" />
+    <Compile Include="Extraction\PieceExtractor.cs" />
     <Compile Include="Heuristics\BasicTetrisHeuristic.cs" />
     <Compile Include="Heuristics\ExperimentalHeuristic.cs" />
     <Compile Include="Heuristics\YiyuanLeeHeuristic.cs" />
