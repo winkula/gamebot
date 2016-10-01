@@ -62,10 +62,12 @@ namespace GameBot.Robot.Engines
                 // handle input to the agent which
                 //  - extracts the game state
                 //  - decides which commands to press
-                IEnumerable<ICommand> commands = agent.Act(screenshot);
-
-                // give commands to command controller (output)
-                executor.Execute(commands);
+                ICommand command = agent.Act(screenshot);
+                if (command != null)
+                {
+                    // give command to command controller (output)
+                    executor.Execute(command);
+                }
             }
 
             return result;

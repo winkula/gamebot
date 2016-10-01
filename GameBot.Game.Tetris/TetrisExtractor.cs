@@ -28,7 +28,7 @@ namespace GameBot.Game.Tetris
             this.BlockThreshold = config.Read<float>("Game.Tetris.Extractor.BlockThreshold");
         }
 
-        public TetrisGameState Extract(IScreenshot screenshot)
+        public TetrisGameState Extract(IScreenshot screenshot, TetrisGameState currentGameState)
         {
             Rectangles.Clear();
 

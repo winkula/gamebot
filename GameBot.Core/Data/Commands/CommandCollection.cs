@@ -30,6 +30,25 @@ namespace GameBot.Core.Data.Commands
             commands.Add(command);
         }
 
+        public void AddRange(IEnumerable<ICommand> commands)
+        {
+            foreach (var command in commands)
+            {
+                Add(command);
+            }
+        }
+        
+        public ICommand Pop()
+        {
+            if (commands.Any())
+            {
+                var first = commands.First();
+                commands.RemoveAt(0);
+                return first;
+            }
+            return null;
+        }
+
         public void Hit(Button button)
         {
             commands.Add(new HitCommand(button));

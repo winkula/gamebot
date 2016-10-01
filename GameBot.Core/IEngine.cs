@@ -7,6 +7,7 @@ namespace GameBot.Core
     /// </summary>
     public interface IEngine
     {
+        // TODO: remove
         /// <summary>
         /// Runs the engine in a loop.
         /// This method is intended to call only once in the beginning of the application.

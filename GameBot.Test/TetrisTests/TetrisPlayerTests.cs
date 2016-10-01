@@ -12,13 +12,13 @@ namespace GameBot.Test.TetrisTests
         [Test]
         public void Constructor()
         {
-            var player = new TetrisPlayer(new Config());
+            var player = new TetrisAi(new Config());
         }
 
         [Test]
         public void Play()
         {
-            var player = new TetrisPlayer(new Config());
+            var player = new TetrisAi(new Config());
             var gameState = new TetrisGameState(Tetromino.L, Tetromino.Z);
             
             var commands = player.Play(gameState);

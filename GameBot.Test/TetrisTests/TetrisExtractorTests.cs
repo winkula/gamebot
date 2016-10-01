@@ -31,7 +31,7 @@ namespace GameBot.Test.TetrisTests
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            var gameState = extractor.Extract(screenshot);
+            var gameState = extractor.Extract(screenshot, null);
 
             stopwatch.Stop();
             Debug.Write($"Extraction in {stopwatch.ElapsedMilliseconds} ms");

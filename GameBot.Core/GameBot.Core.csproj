@@ -128,7 +128,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Agents\AbstractAgent.cs" />
     <Compile Include="Data\AbstractGameState.cs" />
     <Compile Include="Data\Button.cs" />
     <Compile Include="Data\Commands\CommandCollection.cs" />

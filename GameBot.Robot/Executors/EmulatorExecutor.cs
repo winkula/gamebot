@@ -33,7 +33,10 @@ namespace GameBot.Robot.Executors
 
         public void Execute(ICommand command)
         {
-            queue.Add(command);
+            if (command != null)
+            {
+                queue.Add(command);
+            }
             Execute();
         }
 

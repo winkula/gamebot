@@ -12,7 +12,7 @@ using GameBot.Game.Tetris.Data;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisPlayer : IPlayer<TetrisGameState>
+    public class TetrisAi
     {
         private readonly IConfig config;
         private readonly ISearch<TetrisNode> search;
@@ -20,7 +20,7 @@ namespace GameBot.Game.Tetris
         public TetrisGameState CurrentGameState { get; private set; }
         public Move LastMove { get; private set; }
 
-        public TetrisPlayer(IConfig config)
+        public TetrisAi(IConfig config)
         {
             this.config = config;
 

@@ -18,7 +18,7 @@ namespace GameBot.Robot.Engines
         private readonly IExecutor executor;
 
         private readonly ITimeProvider timeProvider;
-        
+
         private readonly Emulator emulator;
 
         public EmulatorEngine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IExecutor executor, ITimeProvider timeProvider, Emulator emulator)
@@ -30,14 +30,14 @@ namespace GameBot.Robot.Engines
             this.agent = agent;
             this.executor = executor;
             this.timeProvider = timeProvider;
-            
+
             this.emulator = emulator;
 
             var loader = new RomLoader();
             var game = loader.Load(config.Read("Emulator.Rom.Path", "Roms/tetris.gb"));
             this.emulator.Load(game);
         }
-        
+
         public void Run()
         {
             throw new NotSupportedException("Can only be called step by step.");
@@ -47,7 +47,7 @@ namespace GameBot.Robot.Engines
         {
             timeProvider.Start();
         }
-                
+
         public EngineResult Step(bool play)
         {
             var result = new EngineResult();
@@ -67,10 +67,10 @@ namespace GameBot.Robot.Engines
                 // handle input to the agent which
                 //  - extracts the game state
                 //  - decides which commands to press
-                IEnumerable<ICommand> commands = agent.Act(screenshot);
+                ICommand command = agent.Act(screenshot);
                 
-                // give commands to command controller (output)
-                executor.Execute(commands);
+                // give commands to command controller(output)
+                executor.Execute(command);
             }
 
             return result;
