@@ -155,8 +155,6 @@
     <Compile Include="Engines\EngineMode.cs" />
     <Compile Include="Engines\UiEngine.cs" />
     <Compile Include="Engines\FastEngine.cs" />
-    <Compile Include="Executors\EmulatorExecutor.cs" />
-    <Compile Include="Executors\Executor.cs" />
     <Compile Include="Engines\Engine.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="Quantizers\BlockQuantizer.cs" />

@@ -19,7 +19,7 @@ namespace GameBot.Test.Performance
         [Test]
         public void PerformanceVideoCapture()
         {
-            int num = 100;
+            int num = 10;
             bool show = false;
 
             capture.Start();
@@ -48,7 +48,7 @@ namespace GameBot.Test.Performance
         [Test]
         public void PerformanceQueryFrame()
         {
-            int num = 100;
+            int num = 10;
             bool show = false;
             
             stopwatch.Restart();

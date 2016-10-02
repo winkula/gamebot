@@ -146,7 +146,6 @@
     <Compile Include="Performance\PerformanceTests.cs" />
     <Compile Include="RobotTests\EmguScreenshotTests.cs" />
     <Compile Include="RobotTests\ActuatorTests.cs" />
-    <Compile Include="RobotTests\ExecutorTests.cs" />
     <Compile Include="RobotTests\BlockQuantizerTests.cs" />
     <Compile Include="TetrisTests\PieceExtractorTests.cs" />
     <Compile Include="TetrisTests\TetrisLevelTests.cs" />

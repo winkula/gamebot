@@ -15,23 +15,23 @@ namespace GameBot.Robot.Engines
         private readonly ICamera camera;
         private readonly IQuantizer quantizer;
         private readonly IAgent agent;
-        private readonly IExecutor executor;
+        private readonly IActuator actuator;
 
         private readonly ITimeProvider timeProvider;
 
         private readonly Emulator emulator;
 
-        public EmulatorEngine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IExecutor executor, ITimeProvider timeProvider, Emulator emulator)
+        public EmulatorEngine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, ITimeProvider timeProvider, Emulator emulator)
         {
             this.config = config;
 
             this.camera = camera;
             this.quantizer = quantizer;
             this.agent = agent;
-            this.executor = executor;
             this.timeProvider = timeProvider;
 
             this.emulator = emulator;
+            this.actuator = emulator;
 
             var loader = new RomLoader();
             var game = loader.Load(config.Read("Emulator.Rom.Path", "Roms/tetris.gb"));
@@ -67,11 +67,11 @@ namespace GameBot.Robot.Engines
                 // handle input to the agent which
                 //  - extracts the game state
                 //  - decides which commands to press
-                ICommand command = agent.Act(screenshot);
-                
-                // give commands to command controller(output)
-                executor.Execute(command);
+                //  - presses the commands
+                agent.Act(screenshot, actuator);
             }
+
+            emulator.Execute();
 
             return result;
         }

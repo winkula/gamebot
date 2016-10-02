@@ -3,7 +3,6 @@ using GameBot.Robot.Actuators;
 using GameBot.Robot.Cameras;
 using GameBot.Robot.Configuration;
 using GameBot.Robot.Engines;
-using GameBot.Robot.Executors;
 using GameBot.Robot.Quantizers;
 using SimpleInjector;
 using SimpleInjector.Packaging;
@@ -43,9 +42,8 @@ namespace GameBot.Robot
             container.RegisterSingleton<IEngine, EmulatorEngine>();
             container.RegisterSingleton<ICamera, EmulatorCamera>();
             container.RegisterSingleton<IQuantizer, PassthroughQuantizer>();
-            container.RegisterSingleton<IExecutor, EmulatorExecutor>();
-            container.RegisterSingleton<IActuator, LazyActuator>();
             container.RegisterSingleton<ITimeProvider, EmulatorTimeProvider>();
+            container.RegisterSingleton<IActuator, LazyActuator>();
         }
 
         private void RegisterRealEngine(Container container)
@@ -53,7 +51,6 @@ namespace GameBot.Robot
             container.RegisterSingleton<IEngine, UiEngine>();
             container.RegisterSingleton<ICamera, Camera>();
             container.RegisterSingleton<IQuantizer, Quantizer>();
-            container.RegisterSingleton<IExecutor, Executor>();
             container.RegisterSingleton<IActuator, Actuator>();
             //container.RegisterSingleton<IActuator, LazyActuator>();
             container.RegisterSingleton<ITimeProvider, TimeProvider>();

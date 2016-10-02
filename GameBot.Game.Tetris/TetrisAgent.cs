@@ -30,7 +30,7 @@ namespace GameBot.Game.Tetris
             this.commandQueue = new CommandCollection();
         }
 
-        public ICommand Act(IScreenshot screenshot)
+        public void Act(IScreenshot screenshot, IActuator actuator)
         {
             var gameState = extractor.Extract(screenshot, ai.CurrentGameState);
 
@@ -47,7 +47,11 @@ namespace GameBot.Game.Tetris
                 commandQueue.AddRange(commands);
             }
 
-            return commandQueue.Pop();
+            var command = commandQueue.Pop();
+            if (command != null)
+            {
+                command.Execute(actuator);
+            }
         }
 
         private bool MustPlay(TetrisGameState gameState)

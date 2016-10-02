@@ -16,17 +16,17 @@ namespace GameBot.Robot.Engines
         private readonly ICamera camera;
         private readonly IQuantizer quantizer;
         private readonly IAgent agent;
-        private readonly IExecutor executor;
+        private readonly IActuator actuator;
         private readonly ITimeProvider timeProvider;
 
-        public Engine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IExecutor executor, ITimeProvider timeProvider)
+        public Engine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IActuator actuator, ITimeProvider timeProvider)
         {
             this.config = config;
 
             this.camera = camera;
             this.quantizer = quantizer;
             this.agent = agent;
-            this.executor = executor;
+            this.actuator = actuator;
             this.timeProvider = timeProvider;
         }
         
@@ -57,12 +57,8 @@ namespace GameBot.Robot.Engines
                 // handle input to the agent which
                 //  - extracts the game state
                 //  - decides which commands to press
-                ICommand command = agent.Act(screenshot);
-                if (command != null)
-                {
-                    // give commands to command controller (output)
-                    executor.Execute(command);
-                }
+                //  - presses the buttons
+                agent.Act(screenshot, actuator);
             }
 
             return result;

@@ -53,6 +53,8 @@ namespace GameBot.Emulation
         public Game Game { get; private set; }
         private Size DisplaySize { get { return new Size(DisplayWidth, DisplayHeight); } }
         
+        private bool anyButtonsPressed = false;
+
         public Emulator()
         {
             cpu = new X80();
@@ -405,6 +407,15 @@ namespace GameBot.Emulation
             Execute(n);
         }
 
+        public void Execute()
+        {
+            if (!anyButtonsPressed)
+            {
+                ExecuteFrames(2);
+            }
+            anyButtonsPressed = false;
+        }
+
         public void Execute(TimeSpan time)
         {
             int frames = (int)(time.TotalSeconds * FramesPerSecond);
@@ -449,6 +460,8 @@ namespace GameBot.Emulation
         {
             if (Running)
             {
+                anyButtonsPressed = true;
+
                 PressButtonInternal(button);
                 Execute(FramesAfterButton);
                 ReleaseButtonInternal(button);
@@ -460,6 +473,8 @@ namespace GameBot.Emulation
         {
             if (Running)
             {
+                anyButtonsPressed = true;
+
                 PressButtonInternal(button);
                 Execute(FramesAfterButton);
             }
@@ -469,6 +484,8 @@ namespace GameBot.Emulation
         {
             if (Running)
             {
+                anyButtonsPressed = true;
+
                 ReleaseButtonInternal(button);
                 Execute(FramesAfterButton);
             }

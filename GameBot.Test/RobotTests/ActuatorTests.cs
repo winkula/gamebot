@@ -4,7 +4,6 @@ using GameBot.Core.Data.Commands;
 using GameBot.Robot;
 using GameBot.Robot.Actuators;
 using GameBot.Robot.Configuration;
-using GameBot.Robot.Executors;
 using Moq;
 using NUnit.Framework;
 using System;
