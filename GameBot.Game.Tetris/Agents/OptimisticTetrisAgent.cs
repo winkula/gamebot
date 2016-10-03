@@ -6,10 +6,11 @@ using System;
 using GameBot.Core.Ui;
 using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
+using System.Collections.Generic;
 
-namespace GameBot.Game.Tetris
+namespace GameBot.Game.Tetris.Agents
 {
-    public class TetrisAgent : IAgent
+    public class OptimisticTetrisAgent : IAgent
     {
         private readonly ITimeProvider timeProvider;
         private readonly IDebugger debugger;
@@ -19,38 +20,41 @@ namespace GameBot.Game.Tetris
         private bool initialized = false;
         private bool awaitNextTetromino = true;
         private TimeSpan timeNextAction = TimeSpan.Zero;
-        private CommandCollection commandQueue;
         
-        public TetrisAgent(IExtractor<TetrisGameState> extractor, TetrisAi ai, ITimeProvider timeProvider, IDebugger debugger)
+        public OptimisticTetrisAgent(IExtractor<TetrisGameState> extractor, TetrisAi ai, ITimeProvider timeProvider, IDebugger debugger)
         {
             this.timeProvider = timeProvider;
             this.debugger = debugger;
             this.extractor = extractor;
             this.ai = ai;
-            this.commandQueue = new CommandCollection();
         }
 
         public void Act(IScreenshot screenshot, IActuator actuator)
         {
             var gameState = extractor.Extract(screenshot, ai.CurrentGameState);
-
+            
             if (!initialized)
             {
                 initialized = true;
                 var commands = ai.Initialize();
-                commandQueue.AddRange(commands);
+                Execute(commands, actuator);
             }
             else if (MustPlay(gameState))
             {
                 var commands = ai.Play(gameState);
+                Execute(commands, actuator);
                 AfterPlay();
-                commandQueue.AddRange(commands);
             }
+        }
 
-            var command = commandQueue.Pop();
-            if (command != null)
+        private void Execute(IEnumerable<ICommand> commands, IActuator actuator)
+        {
+            if (commands != null)
             {
-                command.Execute(actuator);
+                foreach (var nextCommand in commands)
+                {
+                    nextCommand.Execute(actuator);
+                }
             }
         }
 
