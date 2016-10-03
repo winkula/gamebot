@@ -16,7 +16,7 @@ namespace GameBot.Game.Tetris
             container.Register(typeof(IPlayer<>), Assembly.GetExecutingAssembly);
             container.Register(typeof(ISimulator<>), Assembly.GetExecutingAssembly);*/
            
-            container.RegisterSingleton<IAgent, OptimisticTetrisAgent>();
+            container.RegisterSingleton<IAgent, PessimisticTetrisAgent>();
             container.RegisterSingleton<IExtractor<TetrisGameState>, TetrisExtractor>();
             container.RegisterSingleton<TetrisAi>();
             container.RegisterSingleton<ISimulator<TetrisGameState>, TetrisSimulator>();

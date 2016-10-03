@@ -11,7 +11,12 @@ namespace GameBot.Game.Tetris.Data
 
         public Tetromino Tetromino { get; private set; }
         public Shape Shape { get; private set; }
+
+        /// <summary>
+        /// Orientation is counted in clockwise direction from the start position of a Tetromino.
+        /// </summary>
         public int Orientation { get; private set; }
+
         public int X { get; private set; }
         public int Y { get; private set; }
 
@@ -89,6 +94,11 @@ namespace GameBot.Game.Tetris.Data
         public bool IsSquareOccupiedRegardTranslation(int x, int y)
         {
             return Shape.IsSquareOccupied(x - X, y - Y);
+        }
+
+        public PieceDelta Delta(Piece target)
+        {
+            return new PieceDelta(this, target);
         }
 
         public override int GetHashCode()

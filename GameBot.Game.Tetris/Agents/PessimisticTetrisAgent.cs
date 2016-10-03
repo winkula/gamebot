@@ -6,6 +6,8 @@ using System;
 using GameBot.Core.Ui;
 using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GameBot.Game.Tetris.Agents
 {
@@ -19,7 +21,10 @@ namespace GameBot.Game.Tetris.Agents
         private bool initialized = false;
         private bool awaitNextTetromino = true;
         private TimeSpan timeNextAction = TimeSpan.Zero;
-        private CommandCollection commandQueue;
+
+        private Queue<ICommand> commandQueue;
+        private ICommand lastCommand;
+        private TetrisGameState goalState;
         
         public PessimisticTetrisAgent(IExtractor<TetrisGameState> extractor, TetrisAi ai, ITimeProvider timeProvider, IDebugger debugger)
         {
@@ -27,31 +32,53 @@ namespace GameBot.Game.Tetris.Agents
             this.debugger = debugger;
             this.extractor = extractor;
             this.ai = ai;
-            this.commandQueue = new CommandCollection();
+            this.commandQueue = new Queue<ICommand>();
         }
-
+              
         public void Act(IScreenshot screenshot, IActuator actuator)
         {
             var gameState = extractor.Extract(screenshot, ai.CurrentGameState);
 
-            if (!initialized)
+            if (commandQueue.Any())
             {
-                initialized = true;
-                var commands = ai.Initialize();
-                commandQueue.AddRange(commands);
-            }
-            else if (MustPlay(gameState))
-            {
-                var commands = ai.Play(gameState);
-                AfterPlay();
-                commandQueue.AddRange(commands);
-            }
+                // there are commands to execute
+                
+                if (lastCommand != null)
+                {
+                    // check if last command was executed
+                    // if not, repeat                                
+                }
 
-            var command = commandQueue.Pop();
-            if (command != null)
-            {
-                command.Execute(actuator);
+                var command = commandQueue.Dequeue();
+                if (command != null)
+                {
+                    command.Execute(actuator);
+                    lastCommand = command;
+                }
             }
+            else
+            {
+                // all commands are executed
+
+                if (!initialized)
+                {
+                    initialized = true;
+                    var commands = ai.Initialize();
+                    foreach (var command in commands)
+                    {
+                        commandQueue.Enqueue(command);
+                    }
+                }
+                else if (MustPlay(gameState))
+                {
+                    var commands = ai.Play(gameState);
+                    foreach (var command in commands)
+                    {
+                        commandQueue.Enqueue(command);
+                    }
+                    AfterPlay();
+                }
+            }   
         }
 
         private bool MustPlay(TetrisGameState gameState)
