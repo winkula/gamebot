@@ -7,6 +7,7 @@ using GameBot.Core.Ui;
 using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
 using System.Collections.Generic;
+using GameBot.Game.Tetris.Extraction;
 
 namespace GameBot.Game.Tetris.Agents
 {
@@ -79,7 +80,7 @@ namespace GameBot.Game.Tetris.Agents
         public void AfterPlay()
         {
             // start next timer
-            var duration = TetrisLevel.GetFreeFallDuration(ai.LastMove.Fall);
+            var duration = TetrisLevel.GetFreeFallDuration(ai.LastWay.Fall);
 
             timeNextAction = timeProvider.Time.Add(duration);
             awaitNextTetromino = false;

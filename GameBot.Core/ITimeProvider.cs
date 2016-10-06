@@ -13,6 +13,12 @@ namespace GameBot.Core
         void Start();
 
         /// <summary>
+        /// Sleeps for e specified amount of time.
+        /// </summary>
+        /// <param name="miliseconds">Time in miliseconds to sleep</param>
+        void Sleep(int miliseconds);
+
+        /// <summary>
         /// Gets the relative time since the GameBot engine has been started.
         /// </summary>
         TimeSpan Time { get; }

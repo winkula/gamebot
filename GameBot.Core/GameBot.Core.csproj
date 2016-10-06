@@ -154,11 +154,6 @@
     <Compile Include="Ui\IDebugger.cs" />
     <Compile Include="Ui\IUi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Searching\DepthFirstSearch.cs" />
-    <Compile Include="Searching\IHeuristic.cs" />
-    <Compile Include="Searching\INode.cs" />
-    <Compile Include="Searching\ISearch.cs" />
-    <Compile Include="Searching\Node.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

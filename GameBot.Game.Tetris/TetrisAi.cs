@@ -1,30 +1,28 @@
 ﻿using GameBot.Core;
 using System;
 using GameBot.Core.Data;
-using GameBot.Core.Searching;
 using System.Diagnostics;
 using System.Collections.Generic;
 using GameBot.Core.Data.Commands;
-using System.Linq;
-using System.Configuration;
-using GameBot.Game.Tetris.Heuristics;
 using GameBot.Game.Tetris.Data;
+using GameBot.Game.Tetris.Searching;
+using GameBot.Game.Tetris.Searching.Heuristics;
 
 namespace GameBot.Game.Tetris
 {
     public class TetrisAi
     {
         private readonly IConfig config;
-        private readonly ISearch<TetrisNode> search;
-        
+        private readonly ISearch search;
+
         public TetrisGameState CurrentGameState { get; private set; }
-        public Move LastMove { get; private set; }
+        public Way LastWay { get; private set; }
 
         public TetrisAi(IConfig config)
         {
             this.config = config;
 
-            this.search = new TetrisSearch(BuildHeuristic());
+            this.search = new SimpleSearch(BuildHeuristic());
 
             CurrentGameState = new TetrisGameState();
             CurrentGameState.StartLevel = config.Read("Game.Tetris.StartLevel", 0);
@@ -32,11 +30,11 @@ namespace GameBot.Game.Tetris
             CurrentGameState.NextPiece = null;
         }
 
-        private IHeuristic<TetrisGameState> BuildHeuristic()
+        private IHeuristic BuildHeuristic()
         {
-            var typeName = config.Read("Game.Tetris.Heuristic", "GameBot.Game.Tetris.Heuristics.YiyuanLeeHeuristic");
+            var typeName = config.Read("Game.Tetris.Heuristic", "GameBot.Game.Tetris.Searching.Heuristics.YiyuanLeeHeuristic");
             var type = Type.GetType(typeName);
-            return (IHeuristic<TetrisGameState>)Activator.CreateInstance(type);
+            return (IHeuristic)Activator.CreateInstance(type);
         }
 
         public IEnumerable<ICommand> Initialize()
@@ -64,60 +62,50 @@ namespace GameBot.Game.Tetris
             CurrentGameState.Piece = gameState.Piece;
             CurrentGameState.NextPiece = gameState.NextPiece;
 
-            var start = new TetrisNode(new TetrisGameState(CurrentGameState));
+            var start = new Node(new TetrisGameState(CurrentGameState));
             var result = search.Search(start);
-            var move = result?.Parent.Move;
-            if (move != null)
+
+            foreach (var move in result.Moves)
             {
-                if (move.Rotation % 4 == 3)
+                switch (move)
                 {
-                    // counterclockwise rotation
-                    commands.Hit(Button.B);
-                    CurrentGameState.RotateCounterclockwise();
-                }
-                else
-                {
-                    // clockwise rotation
-                    Enumerable.Range(0, move.Rotation % 4)
-                        .ToList()
-                        .ForEach(x =>
-                        {
-                            commands.Hit(Button.A);
-                            CurrentGameState.Rotate();
-                        });
-                }
+                    case Move.Left:
+                        // move left
+                        commands.Hit(Button.Left);
+                        CurrentGameState.Left();
+                        break;
 
-                if (move.Translation < 0)
-                {
-                    // move left
-                    Enumerable.Range(0, -move.Translation)
-                        .ToList()
-                        .ForEach(x =>
-                        {
-                            commands.Hit(Button.Left);
-                            CurrentGameState.Left();
-                        });
-                }
-                else if (move.Translation > 0)
-                {
-                    // move right
-                    Enumerable.Range(0, move.Translation)
-                        .ToList()
-                        .ForEach(x =>
-                        {
-                            commands.Hit(Button.Right);
-                            CurrentGameState.Right();
-                        });
-                }
+                    case Move.Right:
+                        // move right
+                        commands.Hit(Button.Right);
+                        CurrentGameState.Right();
+                        break;
 
-                // drop
-                commands.Add(new PressCommand(Button.Down));
-                CurrentGameState.Drop(gameState.NextPiece.Value);
-                LastMove = move;
+                    case Move.Rotate:
+                        // clockwise rotation
+                        commands.Hit(Button.A);
+                        CurrentGameState.Rotate();
+                        break;
 
-                Debug.WriteLine(CurrentGameState);
+                    case Move.RotateCounterclockwise:
+                        // counterclockwise rotation
+                        commands.Hit(Button.B);
+                        CurrentGameState.RotateCounterclockwise();
+                        break;
+
+                    case Move.Drop:
+                        // drop
+                        commands.Add(new PressCommand(Button.Down));
+                        CurrentGameState.Drop(gameState.NextPiece.Value);
+                        LastWay = result.Way;
+                        break;
+
+                    default:
+                        break;
+                }
             }
 
+            Debug.WriteLine(CurrentGameState);
             return commands;
         }
 

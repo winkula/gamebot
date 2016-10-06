@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GameBot.Game.Tetris.Data
 {
@@ -43,6 +44,26 @@ namespace GameBot.Game.Tetris.Data
         public static double GetChance(this Tetromino tetromino)
         {
             return Tetrominos.GetChance(tetromino);
+        }
+
+        public static IEnumerable<int> GetPossibleOrientations(this Tetromino tetromino)
+        {
+            // TODO: lookup table
+            switch (tetromino)
+            {
+                case Tetromino.O:
+                    return new int[] { 0 };
+                case Tetromino.I:
+                case Tetromino.S:
+                case Tetromino.Z:
+                    return new[] { 0, 1 };
+                case Tetromino.L:
+                case Tetromino.J:
+                case Tetromino.T:
+                    return new int[] { 0, 1, 2, 3 };
+                default:
+                    throw new ArgumentException("illegal tetromino");
+            };
         }
     }
 }

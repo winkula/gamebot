@@ -1,5 +1,6 @@
 ﻿using GameBot.Core;
 using GameBot.Game.Tetris.Agents;
+using GameBot.Game.Tetris.Extraction;
 using SimpleInjector;
 using SimpleInjector.Packaging;
 using System.Reflection;
@@ -16,8 +17,9 @@ namespace GameBot.Game.Tetris
             container.Register(typeof(IPlayer<>), Assembly.GetExecutingAssembly);
             container.Register(typeof(ISimulator<>), Assembly.GetExecutingAssembly);*/
            
-            container.RegisterSingleton<IAgent, PessimisticTetrisAgent>();
-            container.RegisterSingleton<IExtractor<TetrisGameState>, TetrisExtractor>();
+            container.RegisterSingleton<IAgent, TetrisAgent>();
+            //container.RegisterSingleton<IExtractor<TetrisGameState>, TetrisExtractor>();
+            container.RegisterSingleton<TetrisExtractor>();
             container.RegisterSingleton<TetrisAi>();
             container.RegisterSingleton<ISimulator<TetrisGameState>, TetrisSimulator>();
         }

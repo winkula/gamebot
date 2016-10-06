@@ -11,7 +11,7 @@ namespace GameBot.Game.Tetris
         public Board Board { get; private set; }
         public Piece Piece { get; set; }
         public Tetromino? NextPiece { get; set; }
-        public Move Move { get; set; }
+        public Way Move { get; set; }
         public int Lines { get; set; }
         public int Score { get; set; }
         public int StartLevel { get; set; }

@@ -18,5 +18,10 @@ namespace GameBot.Robot
         {
             // ignore
         }
+
+        public void Sleep(int miliseconds)
+        {
+            emulator.Execute(TimeSpan.FromMilliseconds(miliseconds));
+        }
     }
 }

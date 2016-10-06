@@ -17,7 +17,14 @@ namespace GameBot.Game.Tetris.Data
         /// </summary>
         public int Orientation { get; private set; }
 
+        /// <summary>
+        /// X axis is from left to right. The origin is the spawning point of the Tetromino.
+        /// </summary>
         public int X { get; private set; }
+
+        /// <summary>
+        /// Y axis is from bottom to top. The origin is the spawning point of the Tetromino.
+        /// </summary>
         public int Y { get; private set; }
 
         public Piece(Tetromino tetromino, int orientation = 0, int x = 0, int y = 0)

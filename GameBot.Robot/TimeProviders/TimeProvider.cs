@@ -1,5 +1,6 @@
 ﻿using GameBot.Core;
 using System;
+using System.Threading;
 
 namespace GameBot.Robot
 {
@@ -11,6 +12,11 @@ namespace GameBot.Robot
         public void Start()
         {
             StartTime = DateTime.Now;
+        }
+
+        public void Sleep(int miliseconds)
+        {
+            Thread.Sleep(miliseconds);
         }
     }
 }

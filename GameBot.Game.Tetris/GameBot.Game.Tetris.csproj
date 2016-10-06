@@ -136,31 +136,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Agents\PessimisticTetrisAgent.cs" />
-    <Compile Include="Data\Board.cs" />
+    <Compile Include="Agents\TetrisAgent.cs" />
+    <Compile Include="Searching\BaseSearch.cs" />
+    <Compile Include="Searching\Heuristics\IHeuristic.cs" />
+    <Compile Include="Searching\ISearch.cs" />
+    <Compile Include="Searching\SearchResult.cs" />
+    <Compile Include="Searching\SimpleSearch.cs" />
     <Compile Include="Data\Move.cs" />
+    <Compile Include="Data\Board.cs" />
+    <Compile Include="Data\Way.cs" />
     <Compile Include="Data\Piece.cs" />
     <Compile Include="Data\PieceDelta.cs" />
+    <Compile Include="Data\Pose.cs" />
     <Compile Include="Data\Shape.cs" />
     <Compile Include="Extraction\PieceExtractionResult.cs" />
     <Compile Include="Extraction\PieceExtractor.cs" />
-    <Compile Include="Heuristics\BasicTetrisHeuristic.cs" />
-    <Compile Include="Heuristics\ExperimentalHeuristic.cs" />
-    <Compile Include="Heuristics\YiyuanLeeHeuristic.cs" />
+    <Compile Include="Searching\Heuristics\BasicTetrisHeuristic.cs" />
+    <Compile Include="Searching\Heuristics\ExperimentalHeuristic.cs" />
+    <Compile Include="Searching\Heuristics\YiyuanLeeHeuristic.cs" />
     <Compile Include="Package.cs" />
+    <Compile Include="States\ITetrisState.cs" />
+    <Compile Include="States\TetrisExecuteState.cs" />
+    <Compile Include="States\TetrisAnalyzeState.cs" />
+    <Compile Include="States\TetrisStartState.cs" />
     <Compile Include="TetrisLevel.cs" />
     <Compile Include="TetrisScore.cs" />
-    <Compile Include="TetrisProbabilisticSearch.cs" />
+    <Compile Include="Searching\RecursiveSearch.cs" />
     <Compile Include="TetrisSimulator.cs" />
     <Compile Include="TetrisGameState.cs" />
-    <Compile Include="TetrisNode.cs" />
+    <Compile Include="Searching\Node.cs" />
     <Compile Include="Data\Tetromino.cs" />
     <Compile Include="Agents\OptimisticTetrisAgent.cs" />
     <Compile Include="TetrisAi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TetrisExtractor.cs" />
-    <Compile Include="Heuristics\MaxBergmarkHeuristic.cs" />
-    <Compile Include="TetrisSearch.cs" />
+    <Compile Include="Extraction\TetrisExtractor.cs" />
+    <Compile Include="Searching\Heuristics\MaxBergmarkHeuristic.cs" />
+    <Compile Include="Searching\ProbabilisticSearch.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameBot.Core\GameBot.Core.csproj">

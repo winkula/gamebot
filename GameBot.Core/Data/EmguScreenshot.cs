@@ -68,6 +68,9 @@ namespace GameBot.Core.Data
 
         public byte GetTileMean(int x, int y)
         {
+            // TODO: implement faster? (with ROI maybe)
+            // TODO: cache mean values for fast multiple lookup
+
             var mask = Black.Clone();
             var roi = new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize);
             CvInvoke.Rectangle(mask, roi, new MCvScalar(255, 255, 255), -1);
