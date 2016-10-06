@@ -12,7 +12,6 @@ namespace GameBot.Game.Tetris.Data
     /// </summary>
     public class Board
     {
-        public static Point Origin = new Point(4, 16);
         private static int[] columnHeights;
         private static int[] columnHoles;
         private static int[] linePosition;
@@ -221,8 +220,8 @@ namespace GameBot.Game.Tetris.Data
         {
             foreach (var block in piece.Shape.Body)
             {
-                int positionX = Origin.X + piece.X + block.X;
-                int positionY = Origin.Y + piece.Y + block.Y;
+                int positionX = Coordinates.PieceOrigin.X + piece.X + block.X;
+                int positionY = Coordinates.PieceOrigin.Y + piece.Y + block.Y;
                 if (IsOccupied(positionX, positionY)) throw new ArgumentException("Square is already occupied");
 
                 Occupy(positionX, positionY);
@@ -271,8 +270,8 @@ namespace GameBot.Game.Tetris.Data
         {
             foreach (var block in piece.Shape.Body)
             {
-                int positionX = Origin.X + piece.X + block.X;
-                int positionY = Origin.Y + piece.Y + block.Y;
+                int positionX = Coordinates.PieceOrigin.X + piece.X + block.X;
+                int positionY = Coordinates.PieceOrigin.Y + piece.Y + block.Y;
                 if (SquareExists(positionX, positionY))
                 {
                     if (IsOccupied(positionX, positionY))
@@ -296,7 +295,7 @@ namespace GameBot.Game.Tetris.Data
             
             foreach (var block in piece.Shape.Head)
             {
-                var distanceTest = (Origin.Y + block.Y + piece.Y) - ColumnHeight(Origin.X + block.X + piece.X);
+                var distanceTest = (Coordinates.PieceOrigin.Y + block.Y + piece.Y) - ColumnHeight(Coordinates.PieceOrigin.X + block.X + piece.X);
                 distance = Math.Min(distance, distanceTest);
             }
 

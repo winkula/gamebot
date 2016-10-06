@@ -197,7 +197,7 @@ namespace GameBot.Game.Tetris
                 builder.Append("|");
                 for (int x = 0; x < Board.Width; x++)
                 {
-                    if (Piece != null && Piece.IsSquareOccupiedRegardTranslation(x - Board.Origin.X, y - Board.Origin.Y))
+                    if (Piece != null && Piece.IsSquareOccupiedRegardTranslation(x - Coordinates.PieceOrigin.X, y - Coordinates.PieceOrigin.Y))
                     {
                         builder.Append('*');
                     }

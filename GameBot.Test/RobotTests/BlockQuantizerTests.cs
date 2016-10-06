@@ -11,7 +11,7 @@ namespace GameBot.Test.RobotTests
     [TestFixture]
     public class BlockQuantizerTests
     {
-        private const bool adjust = true;
+        private const bool adjust = false;
         
         [Test]
         public void BlockQuantizer()
