@@ -68,6 +68,10 @@ namespace GameBot.Core.Data
 
         public byte GetTileMean(int x, int y)
         {
+            // this makes tiles white which are above the board (for easier piece matching)
+            // TODO: solve better
+            if (y < 0) return 255;
+
             // TODO: implement faster? (with ROI maybe)
             // TODO: cache mean values for fast multiple lookup
 

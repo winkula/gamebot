@@ -137,6 +137,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agents\TetrisAgent.cs" />
+    <Compile Include="Data\Coordinates.cs" />
+    <Compile Include="Extraction\PieceMatcher.cs" />
     <Compile Include="Searching\BaseSearch.cs" />
     <Compile Include="Searching\Heuristics\IHeuristic.cs" />
     <Compile Include="Searching\ISearch.cs" />

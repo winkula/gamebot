@@ -26,6 +26,13 @@ namespace GameBot.Game.Tetris.Data
         private static int LocalCoordinateMin = -1;
         private static int LocalCoordinateMax = 2;
         private static int LocalCoordinateSize = LocalCoordinateMax - LocalCoordinateMin + 1;
+
+        // this masks are built from the screen tiles like this (the number represents the bits from lowest to heighest):
+        //
+        // 9 10 11 12
+        // 5  6  7  8
+        // 1  2  3  4
+        //
         private static ushort[] bodies = new ushort[] {
             0x0066, 0x0066, 0x0066, 0x0066, // O
             0x00F0, 0x2222, 0x00F0, 0x2222, // I

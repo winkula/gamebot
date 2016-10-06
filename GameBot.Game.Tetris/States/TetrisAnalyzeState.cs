@@ -26,7 +26,7 @@ namespace GameBot.Game.Tetris.States
         {
             this.agent = agent;
 
-            Queue<ICommand> commands = null;
+            Queue<ICommand> commands = new Queue<ICommand>();
             TetrisGameState currentGameState = Extract(3); // TODO: define search height
 
             if (currentTetromino.HasValue)

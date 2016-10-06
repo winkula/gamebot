@@ -8,7 +8,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 
-namespace GameBot.Test.Tetris
+namespace GameBot.Test.Tetris.Extraction
 {
     [TestFixture]
     public class TetrisExtractorTests
@@ -65,7 +65,7 @@ namespace GameBot.Test.Tetris
             Assert.AreEqual(Tetromino.S, piece.Tetromino);
             Assert.AreEqual(0, piece.Orientation);
             Assert.AreEqual(0, piece.X);
-            Assert.AreEqual(0, piece.Y);            
+            Assert.AreEqual(0, piece.Y);
         }
 
         [Test]
@@ -88,6 +88,22 @@ namespace GameBot.Test.Tetris
             Assert.AreEqual(0, piece.Orientation);
             Assert.AreEqual(0, piece.X);
             Assert.AreEqual(-6, piece.Y);
+        }
+
+        // TODO: fix this
+        [TestCase(0, 0, 0x0000)]
+        [TestCase(0, -5, 0x0003)]
+        [TestCase(0, -6, 0x0036)]
+        public void GetPieceMask(int x, int y, int expected)
+        {
+            var config = new Config();
+
+            var extractor = new TetrisExtractor(config);
+            var image = Image.FromFile("Screenshots/tetris_play_2.png");
+            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+
+            var mask = extractor.GetPieceMask(screenshot, x, y);
+            Assert.AreEqual(expected, (ushort)mask);
         }
     }
 }

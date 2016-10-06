@@ -2,6 +2,7 @@
 {
     public enum Move
     {
+        // TODO: do we need this?
         None = 0,
         
         Left = 1,

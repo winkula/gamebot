@@ -11,11 +11,16 @@ namespace GameBot.Game.Tetris.Extraction
 {
     public class TetrisExtractor : IExtractor<TetrisGameState>
     {
+        // this coordinates are in the coordinate system of the tile system of the game boy screen (origin is top left)
         private static Point BoardTileOrigin = new Point(2, 0);
         private static Point CurrentTileOrigin = new Point(5, 0);
         private static Point PreviewTileOrigin = new Point(15, 13);
 
+        private static PieceMatcher PieceMatcher = PieceMatcher.Instance;
+
         private readonly IConfig config;
+
+        // TODO: change this to a mean threshold of the mean value
         public float BlockThreshold { get; set; }
 
         // debugging/visualization only
@@ -41,8 +46,35 @@ namespace GameBot.Game.Tetris.Extraction
             return gameState;
         }
 
+        // this masks are built from the screen tiles like this (the number represents the bits from lowest to heighest):
+        //
+        // 13 14 15 16
+        //  9 10 11 12
+        //  5  6  7  8
+        //  1  2  3  4
+        //
+        public ushort GetPieceMask(IScreenshot screenshot, int xGame, int yGame)
+        {
+            var tileCoordinates = Coordinates.GameToSearchWindow(xGame, yGame);
+            ushort mask = 0;
+            for (int x = 0; x < 4; x++)
+            {
+                for (int y = 0; y < 4; y++)
+                {
+                    byte mean = screenshot.GetTileMean(tileCoordinates.X + x, tileCoordinates.Y + y);
+                    if (IsBlock(mean))
+                    {
+                        int index = 4 * (3 - y) + (x);
+                        mask |= (ushort)(1 << index);
+                    }
+                }
+            }
+            return mask;
+        }
+
         private bool IsBlock(byte mean)
         {
+            // TODO: put this value in the config
             const int TileMeanThreshold = 195; // optimum is between 185 and 195
             return mean < TileMeanThreshold;
         }
@@ -133,9 +165,21 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         // Confirms that the piece has moved or roteted according to the command
-        public Piece ConfirmPieceMovement(IScreenshot screenshot, Piece lastPosition, ICommand lastCommand)
+        public Piece ConfirmPieceMove(IScreenshot screenshot, Piece lastPosition, Move move, int searchHeight)
         {
-            throw new NotImplementedException();
+            if (searchHeight < 0)
+                throw new ArgumentException("searchHeight must be positive.");
+
+            if (move == Move.None) return lastPosition;
+            
+            var expectedPosition = new Piece(lastPosition);
+
+            for (int i = 0; i < searchHeight; i++)
+            {
+                //PieceMatcher.GetMask(screenshot, )
+            }
+
+            return null;
         }
 
         // Tiles: x : 14 - 17, y : 13 - 16 

@@ -98,6 +98,22 @@ namespace GameBot.Game.Tetris.Data
             return this;
         }
 
+        public void Apply(Move move)
+        {
+            // TODO: lookup table
+            switch (move)
+            {
+                case Move.None: break;
+                case Move.Left: Left(); break;
+                case Move.Right: Right(); break;
+                case Move.Rotate: Rotate(); break;
+                case Move.RotateCounterclockwise: RotateCounterclockwise(); break;
+                case Move.Fall: Fall(); break;
+                default:
+                    throw new ArgumentException("only None, Left, Right, Rotate and RotateCounterclockwise are allowed.");
+            }
+        }
+
         public bool IsSquareOccupiedRegardTranslation(int x, int y)
         {
             return Shape.IsSquareOccupied(x - X, y - Y);

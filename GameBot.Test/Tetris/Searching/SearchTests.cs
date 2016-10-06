@@ -16,8 +16,8 @@ namespace GameBot.Test.Tetris.Searching
         private ProbabilisticSearch probabilisticSearch;
         private RecursiveSearch recursiveSearch;
 
-        [SetUp]
-        public void Setup()
+        [TestFixtureSetUp]
+        public void Init()
         {
             heuristic = new YiyuanLeeHeuristic();
 
