@@ -1,11 +1,6 @@
 ﻿using Emgu.CV;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameBot.Test.Performance
 {
@@ -13,13 +8,19 @@ namespace GameBot.Test.Performance
     public class PerformanceTests
     {
         private readonly Stopwatch stopwatch = new Stopwatch();
-        private Capture capture = new Capture(0);
+        private Capture capture;
         private IImage image;
+
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            capture = new Capture(0);
+        }
 
         [Test]
         public void PerformanceVideoCapture()
         {
-            int num = 10;
+            int num = 30;
             bool show = false;
 
             capture.Start();
@@ -48,7 +49,7 @@ namespace GameBot.Test.Performance
         [Test]
         public void PerformanceQueryFrame()
         {
-            int num = 10;
+            int num = 30;
             bool show = false;
             
             stopwatch.Restart();
