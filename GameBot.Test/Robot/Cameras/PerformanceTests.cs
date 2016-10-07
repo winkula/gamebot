@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using System.Diagnostics;
 
-namespace GameBot.Test.Performance
+namespace GameBot.Test.Robot.Cameras
 {
     [TestFixture]
     public class PerformanceTests

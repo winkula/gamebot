@@ -3,7 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 
-namespace GameBot.Test
+namespace GameBot.Test.Core.Data
 {
     [TestFixture]
     public class ButtonTests

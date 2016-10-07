@@ -5,17 +5,17 @@ using Moq;
 using NUnit.Framework;
 using System;
 
-namespace GameBot.Test
+namespace GameBot.Test.Core.Data.Commands
 {
     [TestFixture]
-    public class PressCommandTests
+    public class ReleaseCommandTests
     {
         [Test]
         public void ConstructorOne()
         {
             var button = Button.Down;
 
-            var command = new PressCommand(button);
+            var command = new ReleaseCommand(button);
             
             Assert.AreEqual(button, command.Button);
             Assert.AreEqual(TimeSpan.Zero, command.Timestamp);
@@ -27,7 +27,7 @@ namespace GameBot.Test
             var button = Button.Down;
             var timestamp = TimeSpan.FromSeconds(3);
 
-            var command = new PressCommand(button, timestamp);
+            var command = new ReleaseCommand(button, timestamp);
 
             Assert.AreEqual(button, command.Button);
             Assert.AreEqual(timestamp, command.Timestamp);
@@ -36,20 +36,20 @@ namespace GameBot.Test
         [Test]
         public void Execute()
         {
-            int presses = 0;
+            int releases = 0;
 
             var actuatorRepo = new Mock<IActuator>();
             actuatorRepo.Setup(x => x.Hit(It.IsAny<Button>())).Callback(() => Assert.Fail());
-            actuatorRepo.Setup(x => x.Press(It.IsAny<Button>())).Callback(() => presses++);
-            actuatorRepo.Setup(x => x.Release(It.IsAny<Button>())).Callback(() => Assert.Fail());
+            actuatorRepo.Setup(x => x.Press(It.IsAny<Button>())).Callback(() => Assert.Fail());
+            actuatorRepo.Setup(x => x.Release(It.IsAny<Button>())).Callback(() => releases++);
 
             var button = Button.Down;
             var timestamp = TimeSpan.FromSeconds(3);
-            var command = new PressCommand(button, timestamp);
+            var command = new ReleaseCommand(button, timestamp);
 
             command.Execute(actuatorRepo.Object);
 
-            Assert.AreEqual(1, presses);
+            Assert.AreEqual(1, releases);
         }
     }
 }

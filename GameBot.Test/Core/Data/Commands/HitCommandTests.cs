@@ -5,7 +5,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 
-namespace GameBot.Test
+namespace GameBot.Test.Core.Data.Commands
 {
     [TestFixture]
     public class HitCommandTests

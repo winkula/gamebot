@@ -1,15 +1,10 @@
-﻿using GameBot.Core;
-using GameBot.Core.Data;
-using GameBot.Core.Data.Commands;
-using GameBot.Robot;
+﻿using GameBot.Core.Data;
 using GameBot.Robot.Actuators;
 using GameBot.Robot.Configuration;
-using Moq;
 using NUnit.Framework;
-using System;
 using System.Threading;
 
-namespace GameBot.Test.RobotTests
+namespace GameBot.Test.Robot.Actuators
 {
     [TestFixture]
     public class ActuatorTests

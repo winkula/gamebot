@@ -5,7 +5,7 @@ using NUnit.Framework;
 using System;
 using System.Drawing;
 
-namespace GameBot.Test
+namespace GameBot.Test.Core.Data
 {
     [TestFixture]
     public class ScreenshotTests

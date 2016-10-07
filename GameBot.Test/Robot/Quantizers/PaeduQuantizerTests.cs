@@ -1,13 +1,10 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
-using GameBot.Core;
-using GameBot.Robot.Quantizers;
 using NUnit.Framework;
-using System;
 using System.Diagnostics;
 using System.Drawing;
 
-namespace GameBot.Test.RobotTests.Quantizers
+namespace GameBot.Test.Robot.Quantizers
 {
     [TestFixture]
     public class PaeduQuantizerTests

@@ -3,10 +3,9 @@ using Emgu.CV.CvEnum;
 using GameBot.Core;
 using GameBot.Robot.Quantizers;
 using NUnit.Framework;
-using System;
 using System.Diagnostics;
 
-namespace GameBot.Test.RobotTests
+namespace GameBot.Test.Robot.Quantizers
 {
     [TestFixture]
     public class BlockQuantizerTests

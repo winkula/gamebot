@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace GameBot.Test.Tetris
 {
     [TestFixture]
-    public class TetrisPlayerTests
+    public class TetrisAiTests
     {
         [Test]
         public void Constructor()

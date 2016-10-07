@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
-namespace GameBot.Test
+namespace GameBot.Test.Emulation
 {
     [TestFixture]
     public class EmulatorTests
