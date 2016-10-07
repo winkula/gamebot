@@ -1,8 +1,10 @@
-﻿using GameBot.Game.Tetris.Agents;
+﻿using GameBot.Core.Data;
+using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Searching;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GameBot.Game.Tetris.States
 {
@@ -26,8 +28,38 @@ namespace GameBot.Game.Tetris.States
             this.agent = agent;
 
             // TODO: define search height
-            Extract(3);
+            //int searchHeight = TetrisLevel.GetMaxFallDistance();
+            int searchHeight = 3;
 
+            // TODO: always carry along the game state! only clear when a new game starts
+            currentGameState = Extract(searchHeight);
+            if (currentGameState != null && currentGameState.Piece != null)
+            {
+                // we found a new piece. release the down key (end the drop)
+                agent.Actuator.Release(Button.Down);
+                Debug.WriteLine("> End the drop.");
+
+                // do the search
+                // this is the essence of the a.i.
+                var results = agent.Search.Search(currentGameState);
+
+                if (results != null)
+                {
+                    Debug.WriteLine("> AI found a solution.");
+                    Debug.WriteLine(results.GoalGameState);
+                    foreach (var move in results.Moves)
+                    {
+                        Debug.WriteLine(move);
+                    }
+
+                    // somthing found.. we can execute now
+                    Execute(results);
+                }
+            }
+        }
+
+        private GameState Extract(int searchHeight)
+        {
             if (currentTetromino.HasValue)
             {
                 // we know which Tetromino to look for
@@ -37,31 +69,15 @@ namespace GameBot.Game.Tetris.States
                 // maybe the game just started, we must search in the board to find the current Tetromino 
             }
 
-            if (currentGameState != null)
-            {
-                // do the search
-                // this is the essence of the a.i.
-                var results = agent.Search.Search(currentGameState);
-
-                if (results != null)
-                {
-                    // somthing found.. we can execute now
-                    Execute(results);
-                }
-            }
-        }
-
-        private void Extract(int searchHeight)
-        {
             var screenshot = agent.Screenshot;
 
             var board = agent.Extractor.ExtractBoard(screenshot);
-            var currentPiece = agent.Extractor.ExtractSpawnedPieceOrigin(screenshot);
+            var currentPiece = agent.Extractor.ExtractSpawnedPiece(screenshot, searchHeight);
             var nextPiece = agent.Extractor.ExtractNextPiece(screenshot);
 
             var gameState = new GameState(board, currentPiece, nextPiece);
 
-            currentGameState = gameState;
+            return gameState;
         }
 
         private void Execute(SearchResult results)

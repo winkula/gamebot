@@ -48,12 +48,12 @@ namespace GameBot.Game.Tetris.Searching
                 }
             }
             
-            if (goal != null)
+            if (goal?.Parent != null)
             {
                 var result = new SearchResult();
                 result.CurrentGameState = root?.GameState;
-                result.GoalGameState = goal.GameState;
-                result.Way = goal.Moves;
+                result.GoalGameState = goal?.Parent.GameState;
+                result.Way = goal?.Parent.Moves;
                 result.Moves = GetMoves(result.Way);
                 return result;
             }

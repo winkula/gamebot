@@ -54,10 +54,8 @@ namespace GameBot.Test.Tetris.Extraction
         public void ExtractSpawnedPieceOrigin()
         {
             var config = new Config();
-
             var extractor = new TetrisExtractor(config);
-            var image = Image.FromFile("Screenshots/tetris_play_1.png");
-            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
 
             var piece = extractor.ExtractSpawnedPieceOrigin(screenshot);
 
@@ -72,10 +70,8 @@ namespace GameBot.Test.Tetris.Extraction
         public void ExtractPieceSpawnedFalled()
         {
             var config = new Config();
-
             var extractor = new TetrisExtractor(config);
-            var image = Image.FromFile("Screenshots/tetris_play_2.png");
-            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
 
             var piece = extractor.ExtractSpawnedPiece(screenshot, 5);
 
@@ -88,6 +84,22 @@ namespace GameBot.Test.Tetris.Extraction
             Assert.AreEqual(0, piece.Orientation);
             Assert.AreEqual(0, piece.X);
             Assert.AreEqual(-6, piece.Y);
+        }
+
+        [Test]
+        public void ExtractPieceSpawnedFalledPieceIsInOrigin()
+        {
+            var config = new Config();
+            var extractor = new TetrisExtractor(config);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+
+            var piece = extractor.ExtractSpawnedPiece(screenshot, 10);
+
+            Assert.NotNull(piece);
+            Assert.AreEqual(Tetromino.S, piece.Tetromino);
+            Assert.AreEqual(0, piece.Orientation);
+            Assert.AreEqual(0, piece.X);
+            Assert.AreEqual(0, piece.Y);
         }
 
         [TestCase(0, 0, 0x0000)]

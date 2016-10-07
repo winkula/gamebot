@@ -45,11 +45,15 @@ namespace GameBot.Game.Tetris
             return GetDuration(20, rows);
         }
 
-        // how many rows will a tile fall in a specific time span?
-        public static int GetFallDistance(int level, TimeSpan duration)
+        // how many rows will a tile maximal fall in a specific time span?
+        public static int GetMaxFallDistance(int level, TimeSpan duration)
         {
             int frames = (int)(duration.TotalSeconds * Framerate);
-            return frames / GetFramesPerRow(level);
+            int framePerRow = GetFramesPerRow(level);
+
+            // we can always miss the next frame, no matter how fast we are
+            // so we always add 1
+            return frames / framePerRow + 1;
         }
     }
 }

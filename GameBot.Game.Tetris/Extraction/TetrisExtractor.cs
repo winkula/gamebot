@@ -128,6 +128,7 @@ namespace GameBot.Game.Tetris.Extraction
             return Piece.FromMask(mask);
         }
 
+        // TODO: fix this!
         // Searches the piece only in the spawning area on top of the board and a specifiec number of tiles below
         // Searches only pieces with the orientation 0
         // returns null, if the piece was not found in the spawning area or the specifiec number of tiles below
@@ -136,28 +137,27 @@ namespace GameBot.Game.Tetris.Extraction
             if (searchHeight < 0)
                 throw new ArgumentException("searchHeight must be positive.");
 
-            for (int i = 0; i < searchHeight; i++)
+            for (int yDelta = 0; yDelta < searchHeight; yDelta++)
             {
                 ushort mask = 0;
                 for (int x = 0; x < 4; x++)
                 {
                     for (int y = 0; y < 3; y++)
                     {
-                        byte mean = screenshot.GetTileMean(CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y + searchHeight);
+                        byte mean = screenshot.GetTileMean(CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y + yDelta);
                         if (IsBlock(mean))
                         {
                             int index = 4 * (2 - y) + (x);
                             mask |= (ushort)(1 << index);
-                            Rectangles.Add(new Point(CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y + searchHeight));
                         }
                     }
                 }
                 var piece = Piece.FromMask(mask);
                 if (piece != null)
                 {
-                    piece.Fall(searchHeight);
+                    piece.Fall(yDelta);
                     return piece;
-                }
+                }                
             }
 
             // not found
@@ -182,17 +182,19 @@ namespace GameBot.Game.Tetris.Extraction
             var expectedPosition = new Piece(lastPosition);
             expectedPosition.Apply(move);
 
+            // TODO: tweak the error tolerance / make better solution
+            int errorTolerance = 1;
             for (int i = 0; i <= maxFallDistance; i++)
             {
                 var errorsLast = PieceMatcher.GetErrors(screenshot, lastPositionTemp);
                 var errorsExpected = PieceMatcher.GetErrors(screenshot, expectedPosition);
                 
-                if (errorsLast == 0 && errorsExpected > 0)
+                if (errorsLast < errorsExpected && errorsLast <= errorTolerance)
                 {
                     // piece stayed in the lat position (did not move)
                     return lastPositionTemp;
                 }
-                if (errorsExpected == 0 && errorsLast > 0)
+                if (errorsExpected < errorsLast && errorsExpected <= errorTolerance)
                 {
                     // piece was moved
                     return expectedPosition;

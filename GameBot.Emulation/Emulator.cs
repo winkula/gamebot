@@ -39,6 +39,7 @@ namespace GameBot.Emulation
 
         private const int FramesAfterButton = 2;
 
+        private readonly Random random = new Random();
         private readonly X80 cpu;
         private double scanLineTicks;
         private uint[] pixels = new uint[DisplayWidth * DisplayHeight];
@@ -54,10 +55,12 @@ namespace GameBot.Emulation
         private Size DisplaySize { get { return new Size(DisplayWidth, DisplayHeight); } }
         
         private bool anyButtonsPressed = false;
+        private double errorProbability;
 
-        public Emulator()
+        public Emulator(double errorProbability = 0)
         {
             cpu = new X80();
+            this.errorProbability = errorProbability;
 
             graphics = Graphics.FromImage(new Bitmap(DisplayWidth, DisplayHeight));
             graphics.CompositingQuality = CompositingQuality.HighSpeed;
@@ -456,9 +459,15 @@ namespace GameBot.Emulation
             cpu.KeyChanged(button, false);
         }
 
+        private bool IsError()
+        {
+            var value = random.NextDouble();
+            return value < errorProbability;
+        }
+
         public void Hit(Button button)
         {
-            if (Running)
+            if (Running && !IsError())
             {
                 anyButtonsPressed = true;
 
@@ -471,7 +480,7 @@ namespace GameBot.Emulation
 
         public void Press(Button button)
         {
-            if (Running)
+            if (Running && !IsError())
             {
                 anyButtonsPressed = true;
 
@@ -482,7 +491,7 @@ namespace GameBot.Emulation
 
         public void Release(Button button)
         {
-            if (Running)
+            if (Running && !IsError())
             {
                 anyButtonsPressed = true;
 

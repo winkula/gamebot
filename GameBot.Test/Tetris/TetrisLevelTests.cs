@@ -58,7 +58,7 @@ namespace GameBot.Test.Tetris
         public void GetFallDistance(int level, double seconds, int expectedDistance)
         {
             var duration = TimeSpan.FromSeconds(seconds);
-            int distance = TetrisLevel.GetFallDistance(level, duration);
+            int distance = TetrisLevel.GetMaxFallDistance(level, duration);
 
             Assert.AreEqual(expectedDistance, distance);
         }

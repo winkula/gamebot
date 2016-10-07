@@ -4,6 +4,7 @@ using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Searching.Heuristics;
 using NUnit.Framework;
 using System.Diagnostics;
+using System.Linq;
 
 namespace GameBot.Test.Tetris.Searching
 {
@@ -23,7 +24,7 @@ namespace GameBot.Test.Tetris.Searching
 
             simpleSearch = new SimpleSearch(heuristic);
             probabilisticSearch = new ProbabilisticSearch(heuristic);
-            recursiveSearch = new RecursiveSearch(heuristic, 3);
+            recursiveSearch = new RecursiveSearch(heuristic, 2);
         }
 
         [TestCase(Tetromino.O, Tetromino.S)]
@@ -39,6 +40,23 @@ namespace GameBot.Test.Tetris.Searching
             
             var result = simpleSearch.Search(gameState);
             Debug.WriteLine(result.GoalGameState);
+        }
+
+        [TestCase(Tetromino.T, Tetromino.J)]
+        public void SimpleSearchFull(Tetromino current, Tetromino next)
+        {
+            var simpleSearchLocal = new SimpleSearch(new YiyuanLeeHeuristic());
+
+            var gameState = new GameState(current, next);
+            Debug.WriteLine(gameState);
+
+            var result = simpleSearchLocal.Search(gameState);
+            Debug.WriteLine(result.GoalGameState);
+
+            Assert.AreEqual(3, result.Moves.Count());
+            Assert.AreEqual(Move.Rotate, result.Moves.ToList()[0]);
+            Assert.AreEqual(Move.Rotate, result.Moves.ToList()[1]);
+            Assert.AreEqual(Move.Drop, result.Moves.ToList()[2]);
         }
 
         [TestCase(Tetromino.O, Tetromino.S)]

@@ -3,6 +3,7 @@ using GameBot.Core.Data.Commands;
 using GameBot.Game.Tetris.Agents;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GameBot.Game.Tetris.States
 {
@@ -27,7 +28,8 @@ namespace GameBot.Game.Tetris.States
             {
                 command.Execute(agent.Actuator);
             }
-            
+
+            Debug.WriteLine("> Game started. Initialization sequence executed.");
             agent.SetState(new TetrisAnalyzeState(null));
         }
 

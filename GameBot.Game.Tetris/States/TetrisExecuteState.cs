@@ -4,34 +4,32 @@ using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Searching;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace GameBot.Game.Tetris.States
 {
     public class TetrisExecuteState : ITetrisState
     {
-        private const double timePadding = 0.4;
+        private const double timePaddingSeconds = 0.4;
 
         private TetrisAgent agent;
 
         private Queue<Move> moves;
+
         private Move? lastMove;
         private Piece lastPosition;
-        private Piece expectedPosition;
-        private TimeSpan screenshotTimestamp;
+        private TimeSpan lastPositionTimeStamp;
 
         private GameState currentGameState;
-        private Tetromino? nextTetromino;
 
         public TetrisExecuteState(Queue<Move> moves, GameState currentGameState, TimeSpan analyzeTimetampt)
         {
             this.moves = moves;
             this.currentGameState = currentGameState;
-            this.nextTetromino = currentGameState.NextPiece;
-            this.screenshotTimestamp = analyzeTimetampt;
             if (currentGameState.Piece != null)
             {
-                this.lastPosition = new Piece(currentGameState.Piece);
+                UpdateLastPosition(currentGameState.Piece, analyzeTimetampt);
             }
         }
 
@@ -43,21 +41,19 @@ namespace GameBot.Game.Tetris.States
             if (lastMove.HasValue)
             {
                 var now = agent.TimeProvider.Time;
-                var duration = (now - screenshotTimestamp) + TimeSpan.FromSeconds(timePadding);
-                var expectedFallDistance = TetrisLevel.GetFallDistance(currentGameState.Level, duration);
-
-                // TODO: calculate fall disatnce correct
-                expectedFallDistance = 10;
-
+                var duration = (now - lastPositionTimeStamp) + TimeSpan.FromSeconds(timePaddingSeconds);
+                var expectedFallDistance = TetrisLevel.GetMaxFallDistance(currentGameState.Level, duration);
+                Debug.WriteLine("> Check command. Maximal expected fall distance is " + expectedFallDistance);
+                
                 var piece = agent.Extractor.ConfirmPieceMove(agent.Screenshot, lastPosition, lastMove.Value, expectedFallDistance);
                 if (piece == null)
                     throw new ApplicationException("we have not found the piece! we can't say if the command was executed or not!");
-
-                lastPosition = piece;
+                                
+                // check if last command was executed
+                // if not, repeat      
                 var delta = piece.Delta(new Piece(lastPosition).Apply(lastMove.Value));
 
-                // check if last command was executed
-                // if not, repeat                
+                UpdateLastPosition(piece, now);
                 if (delta.IsTargetPosition)
                 {
                     // move was successfully executed
@@ -66,8 +62,10 @@ namespace GameBot.Game.Tetris.States
                 }
                 else
                 {
+                    // the command was not executed and the tile is in the old position
+                    Debug.WriteLine("> Failed to execute the command.");
                     RepeatCommand();
-                    return;
+                    return; // we return here because we need a new screenshot
                 }
             }
 
@@ -85,6 +83,12 @@ namespace GameBot.Game.Tetris.States
                 // back to the analyze state
                 Analyze();
             }
+        }
+
+        private void UpdateLastPosition(Piece newLastPosition, TimeSpan newLastPositionTimestamp)
+        {
+            lastPosition = newLastPosition;
+            lastPositionTimeStamp = newLastPositionTimestamp;
         }
 
         private void NextCommand()
@@ -109,8 +113,10 @@ namespace GameBot.Game.Tetris.States
             else
             {
                 lastMove = null;
+                NextCommand(); // we can already remove this, beacause we don't check it later
             }
 
+            Debug.WriteLine("> Execute " + move);
             switch (move)
             {
                 case Move.Left: agent.Actuator.Hit(Button.Left); break;
@@ -124,7 +130,7 @@ namespace GameBot.Game.Tetris.States
 
         private void Analyze()
         {
-            agent.SetState(new TetrisAnalyzeState(nextTetromino));
+            agent.SetState(new TetrisAnalyzeState(currentGameState.NextPiece));
         }
     }
 }
