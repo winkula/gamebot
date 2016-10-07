@@ -18,7 +18,7 @@ namespace GameBot.Test.Tetris
         public void Play()
         {
             var player = new TetrisAi(new Config());
-            var gameState = new TetrisGameState(Tetromino.L, Tetromino.Z);
+            var gameState = new GameState(Tetromino.L, Tetromino.Z);
             
             var commands = player.Play(gameState);
             

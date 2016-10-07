@@ -10,8 +10,10 @@ namespace GameBot.Game.Tetris
     public class TetrisLevel
     {
         private static double Framerate = 59.73;
+
+        // frames per row
         private static int[] LevelSpeeds = new[] { 53, 49, 45, 41, 37, 33, 28, 22, 17, 11, 10, 9, 8, 7, 6, 6, 5, 5, 4, 4, 3 };
-        
+
         // For A Type
         public static int GetLevel(int startLevel, int clearedLines)
         {
@@ -20,7 +22,7 @@ namespace GameBot.Game.Tetris
         }
 
         // Frames per row
-        public static int GetSpeed(int level)
+        public static int GetFramesPerRow(int level)
         {
             if (level < 0) throw new ArgumentException("Level must not be negative");
 
@@ -41,6 +43,13 @@ namespace GameBot.Game.Tetris
             // this is just an estimate
             // the speed of the freefall is not documented anywhere
             return GetDuration(20, rows);
+        }
+
+        // how many rows will a tile fall in a specific time span?
+        public static int GetFallDistance(int level, TimeSpan duration)
+        {
+            int frames = (int)(duration.TotalSeconds * Framerate);
+            return frames / GetFramesPerRow(level);
         }
     }
 }

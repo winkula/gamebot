@@ -1,6 +1,6 @@
-﻿using GameBot.Core.Data;
-using GameBot.Game.Tetris.Agents;
+﻿using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Data;
+using GameBot.Game.Tetris.Searching;
 using System;
 using System.Collections.Generic;
 
@@ -10,12 +10,11 @@ namespace GameBot.Game.Tetris.States
     {
         private TetrisAgent agent;
 
-        private Tetromino? currentTetromino;
+        private GameState currentGameState;
 
+        private Tetromino? currentTetromino;
         private bool awaitNextTetromino = true;
         private TimeSpan timeNextAction = TimeSpan.Zero;
-
-        private Queue<ICommand> commands = new Queue<ICommand>();
 
         public TetrisAnalyzeState(Tetromino? currentTetromino)
         {
@@ -26,8 +25,8 @@ namespace GameBot.Game.Tetris.States
         {
             this.agent = agent;
 
-            Queue<ICommand> commands = new Queue<ICommand>();
-            TetrisGameState currentGameState = Extract(3); // TODO: define search height
+            // TODO: define search height
+            Extract(3);
 
             if (currentTetromino.HasValue)
             {
@@ -37,21 +36,22 @@ namespace GameBot.Game.Tetris.States
             {
                 // maybe the game just started, we must search in the board to find the current Tetromino 
             }
-            
-            if (MustPlay(currentGameState))
-            {
-                commands = new Queue<ICommand>(agent.Ai.Play(currentGameState));
-                foreach (var command in commands)
-                {
-                    this.commands.Enqueue(command);
-                }
-                AfterPlay();
-            }
 
-            agent.SetState(new TetrisExecuteState(commands, currentGameState));
+            if (currentGameState != null)
+            {
+                // do the search
+                // this is the essence of the a.i.
+                var results = agent.Search.Search(currentGameState);
+
+                if (results != null)
+                {
+                    // somthing found.. we can execute now
+                    Execute(results);
+                }
+            }
         }
 
-        private TetrisGameState Extract(int searchHeight)
+        private void Extract(int searchHeight)
         {
             var screenshot = agent.Screenshot;
 
@@ -59,12 +59,18 @@ namespace GameBot.Game.Tetris.States
             var currentPiece = agent.Extractor.ExtractSpawnedPieceOrigin(screenshot);
             var nextPiece = agent.Extractor.ExtractNextPiece(screenshot);
 
-            var gameState = new TetrisGameState(board, currentPiece, nextPiece);
-            
-            return gameState;
+            var gameState = new GameState(board, currentPiece, nextPiece);
+
+            currentGameState = gameState;
         }
 
-        private bool MustPlay(TetrisGameState gameState)
+        private void Execute(SearchResult results)
+        {
+            var moves = new Queue<Move>(results.Moves);
+            agent.SetState(new TetrisExecuteState(moves, currentGameState, agent.Screenshot.Timestamp));
+        }
+
+        private bool MustPlay(GameState gameState)
         {
             if (gameState == null) throw new ArgumentNullException(nameof(gameState));
 

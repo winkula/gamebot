@@ -3,6 +3,7 @@ using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
 using GameBot.Core.Exceptions;
 using GameBot.Game.Tetris;
+using GameBot.Game.Tetris.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,10 +15,10 @@ namespace GameBot.Robot.Engines
 {
     public class FastEngine : IEngine
     {
-        private readonly IPlayer<TetrisGameState> player;
+        private readonly IPlayer<GameState> player;
         private readonly TetrisSimulator simulator;
 
-        public FastEngine(IPlayer<TetrisGameState> player, TetrisSimulator emulator)
+        public FastEngine(IPlayer<GameState> player, TetrisSimulator emulator)
         {
             this.player = player;
             this.simulator = emulator;

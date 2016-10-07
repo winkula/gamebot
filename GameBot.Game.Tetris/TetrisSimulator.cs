@@ -1,19 +1,20 @@
 ﻿using GameBot.Core;
 using System;
 using GameBot.Core.Data;
+using GameBot.Game.Tetris.Data;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisSimulator : ISimulator<TetrisGameState>, IActuator
+    public class TetrisSimulator : ISimulator<GameState>, IActuator
     {
         private readonly Random random = new Random();
 
         public TetrisSimulator()
         {
-            GameState = new TetrisGameState();
+            GameState = new GameState();
         }
 
-        public TetrisGameState GameState { get; }
+        public GameState GameState { get; }
 
         public void Simulate(ICommand command)
         {

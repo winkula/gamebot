@@ -152,7 +152,7 @@
     <Compile Include="Tetris\Extraction\PieceMatcherTests.cs" />
     <Compile Include="Tetris\TetrisLevelTests.cs" />
     <Compile Include="Tetris\Data\ShapeTests.cs" />
-    <Compile Include="Tetris\TetrisGameStateTests.cs" />
+    <Compile Include="Tetris\Data\GameStateTests.cs" />
     <Compile Include="Tetris\Searching\SearchTests.cs" />
     <Compile Include="CoreTests\EmguScreenshotTests.cs" />
     <Compile Include="CoreTests\ButtonTests.cs" />

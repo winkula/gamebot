@@ -1,6 +1,9 @@
 ﻿using GameBot.Core;
 using GameBot.Game.Tetris.Agents;
+using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction;
+using GameBot.Game.Tetris.Searching;
+using GameBot.Game.Tetris.Searching.Heuristics;
 using SimpleInjector;
 using SimpleInjector.Packaging;
 using System.Reflection;
@@ -21,7 +24,9 @@ namespace GameBot.Game.Tetris
             //container.RegisterSingleton<IExtractor<TetrisGameState>, TetrisExtractor>();
             container.RegisterSingleton<TetrisExtractor>();
             container.RegisterSingleton<TetrisAi>();
-            container.RegisterSingleton<ISimulator<TetrisGameState>, TetrisSimulator>();
+            container.RegisterSingleton<ISearch, SimpleSearch>();
+            container.RegisterSingleton<IHeuristic, YiyuanLeeHeuristic>();
+            container.RegisterSingleton<ISimulator<GameState>, TetrisSimulator>();
         }
     }
 }

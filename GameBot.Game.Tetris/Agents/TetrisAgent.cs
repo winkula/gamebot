@@ -7,6 +7,8 @@ using GameBot.Core.Data;
 using GameBot.Game.Tetris.States;
 using System;
 using GameBot.Game.Tetris.Extraction;
+using GameBot.Game.Tetris.Searching;
+using GameBot.Game.Tetris.Data;
 
 namespace GameBot.Game.Tetris.Agents
 {
@@ -21,19 +23,21 @@ namespace GameBot.Game.Tetris.Agents
         public ITimeProvider TimeProvider { get; private set; }
         public TetrisExtractor Extractor { get; private set; }
         public TetrisAi Ai { get; private set; }
+        public ISearch Search { get; private set; }
         public IScreenshot Screenshot { get; private set; }
         public IActuator Actuator { get; private set; }
 
         // global data
-        public TetrisGameState GameState { get; private set; }
+        public GameState GameState { get; private set; }
 
-        public TetrisAgent(IConfig config, TetrisExtractor extractor, TetrisAi ai, ITimeProvider timeProvider, IDebugger debugger)
+        public TetrisAgent(IConfig config, TetrisExtractor extractor, TetrisAi ai, ISearch search, ITimeProvider timeProvider, IDebugger debugger)
         {
             Config = config;
             Debugger = debugger;
             TimeProvider = timeProvider;
             Extractor = extractor;
             Ai = ai;
+            Search = search;
 
             int startLevel = config.Read("Game.Tetris.StartLevel", 0);
             SetState(new TetrisStartState(startLevel));

@@ -15,7 +15,7 @@ namespace GameBot.Game.Tetris
         private readonly IConfig config;
         private readonly ISearch search;
 
-        public TetrisGameState CurrentGameState { get; private set; }
+        public GameState CurrentGameState { get; private set; }
         public Way LastWay { get; private set; }
 
         public TetrisAi(IConfig config)
@@ -24,7 +24,7 @@ namespace GameBot.Game.Tetris
 
             this.search = new SimpleSearch(BuildHeuristic());
 
-            CurrentGameState = new TetrisGameState();
+            CurrentGameState = new GameState();
             CurrentGameState.StartLevel = config.Read("Game.Tetris.StartLevel", 0);
             CurrentGameState.Piece = null;
             CurrentGameState.NextPiece = null;
@@ -47,7 +47,7 @@ namespace GameBot.Game.Tetris
             return commands;
         }
 
-        public IEnumerable<ICommand> Play(TetrisGameState gameState)
+        public IEnumerable<ICommand> Play(GameState gameState)
         {
             if (gameState == null) throw new ArgumentNullException(nameof(gameState));
             if (gameState.Piece == null) throw new ArgumentNullException(nameof(gameState.Piece));
@@ -61,9 +61,8 @@ namespace GameBot.Game.Tetris
             // update current game state
             CurrentGameState.Piece = gameState.Piece;
             CurrentGameState.NextPiece = gameState.NextPiece;
-
-            var start = new Node(new TetrisGameState(CurrentGameState));
-            var result = search.Search(start);
+            
+            var result = search.Search(new GameState(CurrentGameState));
 
             foreach (var move in result.Moves)
             {

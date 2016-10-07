@@ -47,6 +47,18 @@ namespace GameBot.Test
         }
 
         [Test]
+        public void ConstructorFile()
+        {
+            var file = "Screenshots/tetris_start.png";
+            var timestamp = TimeSpan.FromSeconds(6);
+
+            IScreenshot screenshot = new EmguScreenshot(file, timestamp);
+
+            Assert.NotNull(screenshot);
+            Assert.AreEqual(timestamp, screenshot.Timestamp);
+        }
+
+        [Test]
         public void GetPixel()
         {
             var image = Image.FromFile("Screenshots/tetris_start.png");

@@ -90,10 +90,10 @@ namespace GameBot.Test.Tetris.Extraction
             Assert.AreEqual(-6, piece.Y);
         }
 
-        // TODO: fix this
         [TestCase(0, 0, 0x0000)]
         [TestCase(0, -5, 0x0003)]
         [TestCase(0, -6, 0x0036)]
+        [TestCase(-2, -8, 0xC800)]
         public void GetPieceMask(int x, int y, int expected)
         {
             var config = new Config();
@@ -103,7 +103,52 @@ namespace GameBot.Test.Tetris.Extraction
             var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
 
             var mask = extractor.GetPieceMask(screenshot, x, y);
-            Assert.AreEqual(expected, (ushort)mask);
+
+            Assert.AreEqual(expected, mask);
+        }
+
+        [Test]
+        public void ConfirmPieceMovement()
+        {
+            var config = new Config();
+
+            var extractor = new TetrisExtractor(config);
+            var image = Image.FromFile("Screenshots/tetris_play_2.png");
+            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+
+            var lastPosition = new Piece(Tetromino.Z, 0, 1, -6);
+            
+            var newPosition = extractor.ConfirmPieceMove(screenshot, lastPosition, Move.Left, 0);
+
+            Assert.NotNull(newPosition);
+
+            Assert.AreEqual(Tetromino.Z, newPosition.Tetromino);
+            Assert.AreEqual(0, newPosition.Orientation);
+            Assert.AreEqual(0, newPosition.X);
+            Assert.AreEqual(-6, newPosition.Y);
+        }
+
+        [Test]
+        public void ConfirmPieceMovementWithFallDistance()
+        {
+            var config = new Config();
+
+            var extractor = new TetrisExtractor(config);
+            var image = Image.FromFile("Screenshots/tetris_play_2.png");
+            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+
+            var lastPosition = new Piece(Tetromino.Z, 0, 1, 0);
+
+            var newPosition = extractor.ConfirmPieceMove(screenshot, lastPosition, Move.Left, 5);
+            Assert.Null(newPosition);
+
+            newPosition = extractor.ConfirmPieceMove(screenshot, lastPosition, Move.Left, 6);
+            Assert.NotNull(newPosition);
+
+            Assert.AreEqual(Tetromino.Z, newPosition.Tetromino);
+            Assert.AreEqual(0, newPosition.Orientation);
+            Assert.AreEqual(0, newPosition.X);
+            Assert.AreEqual(-6, newPosition.Y);
         }
     }
 }

@@ -17,10 +17,12 @@ namespace GameBot.Game.Tetris.Searching
             this.tetrominos = Enum.GetValues(typeof(Tetromino)).Cast<Tetromino>().ToList();
         }
 
-        public override SearchResult Search(Node root)
+        public override SearchResult Search(GameState gameState)
         {
-            if (root == null) throw new ArgumentNullException(nameof(root));
+            if (gameState == null)
+                throw new ArgumentNullException(nameof(gameState));
 
+            var root = new Node(gameState);
             var goal = SearchRecursive(root, 0);
             
             var result = new SearchResult();
@@ -78,7 +80,7 @@ namespace GameBot.Game.Tetris.Searching
                     //TetrisNode probabBestNode = null;
                     double probabBestScore = double.NegativeInfinity;
 
-                    var newState = new TetrisGameState(parent.GameState, new Piece(tetromino));
+                    var newState = new GameState(parent.GameState, new Piece(tetromino));
                     var newNode = new Node(newState, parent);
 
                     foreach (var successor in newNode.GetSuccessors())

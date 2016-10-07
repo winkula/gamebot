@@ -1,7 +1,9 @@
-﻿namespace GameBot.Game.Tetris.Searching
+﻿using GameBot.Game.Tetris.Data;
+
+namespace GameBot.Game.Tetris.Searching
 {
     public interface ISearch
     {
-        SearchResult Search(Node node);
+        SearchResult Search(GameState gameState);
     }
 }

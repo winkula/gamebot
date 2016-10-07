@@ -1,12 +1,10 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Core.Exceptions;
-using GameBot.Game.Tetris.Data;
-using System;
 using System.Text;
 
-namespace GameBot.Game.Tetris
+namespace GameBot.Game.Tetris.Data
 {
-    public class TetrisGameState : AbstractGameState
+    public class GameState : AbstractGameState
     {
         public Board Board { get; private set; }
         public Piece Piece { get; set; }
@@ -17,14 +15,14 @@ namespace GameBot.Game.Tetris
         public int StartLevel { get; set; }
         public int Level { get { return TetrisLevel.GetLevel(StartLevel, Lines); } }
 
-        public TetrisGameState()
+        public GameState()
         {
             Board = new Board();
             Piece = new Piece();
             NextPiece = Tetrominos.GetRandom(); // TODO: only generate if needed!
         }
 
-        public TetrisGameState(TetrisGameState old)
+        public GameState(GameState old)
         {
             Board = new Board(old.Board);
             if (old.Piece != null) Piece = new Piece(old.Piece);
@@ -33,7 +31,7 @@ namespace GameBot.Game.Tetris
             Score += old.Score;
         }
 
-        public TetrisGameState(TetrisGameState old, Piece piece)
+        public GameState(GameState old, Piece piece)
         {
             Board = new Board(old.Board);
             Piece = piece;
@@ -42,25 +40,25 @@ namespace GameBot.Game.Tetris
             Score += old.Score;
         }
 
-        public TetrisGameState(Piece piece, Tetromino? nextPiece)
+        public GameState(Piece piece, Tetromino? nextPiece)
         {
             Board = new Board();
             Piece = piece;
             NextPiece = nextPiece;
         }
 
-        public TetrisGameState(Board board, Piece piece, Tetromino? nextPiece)
+        public GameState(Board board, Piece piece, Tetromino? nextPiece)
         {
             Board = board;
             Piece = piece;
             NextPiece = nextPiece;
         }
 
-        public TetrisGameState(Tetromino tetromino, Tetromino? nextTetromino) : this(new Piece(tetromino), nextTetromino)
+        public GameState(Tetromino tetromino, Tetromino? nextTetromino) : this(new Piece(tetromino), nextTetromino)
         {
         }
 
-        public TetrisGameState(Tetromino tetromino) : this(new Piece(tetromino), null)
+        public GameState(Tetromino tetromino) : this(new Piece(tetromino), null)
         {
         }
 
@@ -176,7 +174,7 @@ namespace GameBot.Game.Tetris
         {
             if (obj == null) return false;
             if (obj == this) return true;
-            TetrisGameState other = obj as TetrisGameState;
+            GameState other = obj as GameState;
             if (other != null)
             {
                 return

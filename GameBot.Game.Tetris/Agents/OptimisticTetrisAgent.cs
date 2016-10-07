@@ -8,6 +8,7 @@ using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
 using System.Collections.Generic;
 using GameBot.Game.Tetris.Extraction;
+using GameBot.Game.Tetris.Data;
 
 namespace GameBot.Game.Tetris.Agents
 {
@@ -15,14 +16,14 @@ namespace GameBot.Game.Tetris.Agents
     {
         private readonly ITimeProvider timeProvider;
         private readonly IDebugger debugger;
-        private readonly IExtractor<TetrisGameState> extractor;
+        private readonly IExtractor<GameState> extractor;
         private readonly TetrisAi ai;
 
         private bool initialized = false;
         private bool awaitNextTetromino = true;
         private TimeSpan timeNextAction = TimeSpan.Zero;
         
-        public OptimisticTetrisAgent(IExtractor<TetrisGameState> extractor, TetrisAi ai, ITimeProvider timeProvider, IDebugger debugger)
+        public OptimisticTetrisAgent(IExtractor<GameState> extractor, TetrisAi ai, ITimeProvider timeProvider, IDebugger debugger)
         {
             this.timeProvider = timeProvider;
             this.debugger = debugger;
@@ -59,7 +60,7 @@ namespace GameBot.Game.Tetris.Agents
             }
         }
 
-        private bool MustPlay(TetrisGameState gameState)
+        private bool MustPlay(GameState gameState)
         {
             if (gameState == null) throw new ArgumentNullException(nameof(gameState));
 

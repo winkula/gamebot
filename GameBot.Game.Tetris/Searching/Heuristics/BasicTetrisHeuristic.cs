@@ -6,7 +6,7 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
     public abstract class BasicTetrisHeuristic : IHeuristic
     {
         // Heuristic from here: https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
-        public abstract double Score(TetrisGameState gameState);
+        public abstract double Score(GameState gameState);
 
         protected int Threshold(int value, int min)
         {

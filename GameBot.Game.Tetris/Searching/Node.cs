@@ -6,17 +6,17 @@ namespace GameBot.Game.Tetris.Searching
     public class Node
     {
         public Node Parent { get; set; }
-        public TetrisGameState GameState { get; set; }
+        public GameState GameState { get; set; }
         public Way Moves { get; set; }
         public double Score { get; set; }
 
-        public Node(TetrisGameState gameState, Node parent)
+        public Node(GameState gameState, Node parent)
         {
             GameState = gameState;
             Parent = parent;
         }
 
-        public Node(TetrisGameState gameState) : this(gameState, null)
+        public Node(GameState gameState) : this(gameState, null)
         {
         }
 
@@ -32,7 +32,7 @@ namespace GameBot.Game.Tetris.Searching
                     var newPiece = new Piece(GameState.Piece.Tetromino, orientation, translation);
                     if (GameState.Board.CanDrop(newPiece))
                     {
-                        var successor = new TetrisGameState(GameState, newPiece);
+                        var successor = new GameState(GameState, newPiece);
                         var fall = successor.Drop();
 
                         var node = new Node(successor, this);

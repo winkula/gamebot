@@ -35,10 +35,9 @@ namespace GameBot.Test.Tetris.Searching
         [TestCase(Tetromino.T, Tetromino.J)]
         public void SimpleSearch(Tetromino current, Tetromino next)
         {
-            var gameState = new TetrisGameState(current, next);
-            var node = new Node(gameState);
+            var gameState = new GameState(current, next);
             
-            var result = simpleSearch.Search(node);
+            var result = simpleSearch.Search(gameState);
             Debug.WriteLine(result.GoalGameState);
         }
 
@@ -51,10 +50,9 @@ namespace GameBot.Test.Tetris.Searching
         [TestCase(Tetromino.T, Tetromino.J)]
         public void ProbabilisticSearch(Tetromino current, Tetromino next)
         {
-            var gameState = new TetrisGameState(current, next);
-            var node = new Node(gameState);
+            var gameState = new GameState(current, next);
 
-            var result = probabilisticSearch.Search(node);
+            var result = probabilisticSearch.Search(gameState);
             Debug.WriteLine(result.GoalGameState);
         }
 
@@ -67,10 +65,9 @@ namespace GameBot.Test.Tetris.Searching
         [TestCase(Tetromino.T, Tetromino.J)]
         public void RecursiveSearch(Tetromino current, Tetromino next)
         {
-            var gameState = new TetrisGameState(current, next);
-            var node = new Node(gameState);
+            var gameState = new GameState(current, next);
 
-            var result = recursiveSearch.Search(node);
+            var result = recursiveSearch.Search(gameState);
             Debug.WriteLine(result.GoalGameState);
         }
     }

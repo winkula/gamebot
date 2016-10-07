@@ -1,11 +1,10 @@
-﻿using GameBot.Game.Tetris;
-using GameBot.Game.Tetris.Data;
+﻿using GameBot.Game.Tetris.Data;
 using NUnit.Framework;
 
 namespace GameBot.Test.Tetris
 {
     [TestFixture]
-    public class TetrisGameStateTests
+    public class GameStateTests
     {
         [TestCase(Tetromino.L, Tetromino.O, 0, 10, new[] {
             0,0,0,0,0,0,0,0,0,0,
@@ -87,7 +86,7 @@ namespace GameBot.Test.Tetris
         })]
         public void Drop(Tetromino piece, Tetromino next, int translation, int expectedFall, int[] before, int[] after)
         {
-            var gameState = new TetrisGameState(new Piece(piece, 0, translation), next);
+            var gameState = new GameState(new Piece(piece, 0, translation), next);
             for (int x = 0; x < 10; x++)
             {
                 for (int y = 0; y < 18; y++)

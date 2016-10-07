@@ -98,7 +98,7 @@ namespace GameBot.Game.Tetris.Data
             return this;
         }
 
-        public void Apply(Move move)
+        public Piece Apply(Move move)
         {
             // TODO: lookup table
             switch (move)
@@ -112,6 +112,7 @@ namespace GameBot.Game.Tetris.Data
                 default:
                     throw new ArgumentException("only None, Left, Right, Rotate and RotateCounterclockwise are allowed.");
             }
+            return this;
         }
 
         public bool IsSquareOccupiedRegardTranslation(int x, int y)

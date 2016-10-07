@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace GameBot.Game.Tetris.Extraction
 {
-    public class TetrisExtractor : IExtractor<TetrisGameState>
+    public class TetrisExtractor : IExtractor<GameState>
     {
         // this coordinates are in the coordinate system of the tile system of the game boy screen (origin is top left)
         private static Point BoardTileOrigin = new Point(2, 0);
@@ -20,8 +20,11 @@ namespace GameBot.Game.Tetris.Extraction
 
         private readonly IConfig config;
 
-        // TODO: change this to a mean threshold of the mean value
         public float BlockThreshold { get; set; }
+
+        // where is the threshold of the mean value of a tile, that it is interpreted as a block
+        // optimum is between 185 and 195
+        public static int MeanThreshold = 195;
 
         // debugging/visualization only
         public IList<Point> Rectangles { get; private set; } = new List<Point>();
@@ -32,7 +35,7 @@ namespace GameBot.Game.Tetris.Extraction
             this.BlockThreshold = config.Read<float>("Game.Tetris.Extractor.BlockThreshold");
         }
 
-        public TetrisGameState Extract(IScreenshot screenshot, TetrisGameState currentGameState)
+        public GameState Extract(IScreenshot screenshot, GameState currentGameState)
         {
             Rectangles.Clear();
 
@@ -41,7 +44,7 @@ namespace GameBot.Game.Tetris.Extraction
             var currentPiece = ExtractSpawnedPieceOrigin(screenshot);
             var nextPiece = ExtractNextPiece(screenshot);
 
-            var gameState = new TetrisGameState(board, currentPiece, nextPiece);
+            var gameState = new GameState(board, currentPiece, nextPiece);
 
             return gameState;
         }
@@ -53,9 +56,9 @@ namespace GameBot.Game.Tetris.Extraction
         //  5  6  7  8
         //  1  2  3  4
         //
-        public ushort GetPieceMask(IScreenshot screenshot, int xGame, int yGame)
+        public ushort GetPieceMask(IScreenshot screenshot, int pieceX, int pieceY)
         {
-            var tileCoordinates = Coordinates.GameToSearchWindow(xGame, yGame);
+            var tileCoordinates = Coordinates.PieceToSearchWindow(pieceX, pieceY);
             ushort mask = 0;
             for (int x = 0; x < 4; x++)
             {
@@ -72,11 +75,14 @@ namespace GameBot.Game.Tetris.Extraction
             return mask;
         }
 
-        private bool IsBlock(byte mean)
+        public ushort GetPieceMask(IScreenshot screenshot, Piece pieceExpected)
         {
-            // TODO: put this value in the config
-            const int TileMeanThreshold = 195; // optimum is between 185 and 195
-            return mean < TileMeanThreshold;
+            return GetPieceMask(screenshot, pieceExpected.X, pieceExpected.Y);
+        }
+
+        public static bool IsBlock(byte mean)
+        {
+            return mean < MeanThreshold;
         }
 
         // Tiles: x : 5 - 8, y : 0 - 2
@@ -165,23 +171,42 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         // Confirms that the piece has moved or roteted according to the command
-        public Piece ConfirmPieceMove(IScreenshot screenshot, Piece lastPosition, Move move, int searchHeight)
+        public Piece ConfirmPieceMove(IScreenshot screenshot, Piece lastPosition, Move move, int maxFallDistance)
         {
-            if (searchHeight < 0)
+            if (maxFallDistance < 0)
                 throw new ArgumentException("searchHeight must be positive.");
 
             if (move == Move.None) return lastPosition;
-            
-            var expectedPosition = new Piece(lastPosition);
 
-            for (int i = 0; i < searchHeight; i++)
+            var lastPositionTemp = new Piece(lastPosition);
+            var expectedPosition = new Piece(lastPosition);
+            expectedPosition.Apply(move);
+
+            for (int i = 0; i <= maxFallDistance; i++)
             {
-                //PieceMatcher.GetMask(screenshot, )
+                var errorsLast = PieceMatcher.GetErrors(screenshot, lastPositionTemp);
+                var errorsExpected = PieceMatcher.GetErrors(screenshot, expectedPosition);
+                
+                if (errorsLast == 0 && errorsExpected > 0)
+                {
+                    // piece stayed in the lat position (did not move)
+                    return lastPositionTemp;
+                }
+                if (errorsExpected == 0 && errorsLast > 0)
+                {
+                    // piece was moved
+                    return expectedPosition;
+                }
+
+                lastPositionTemp.Fall();
+                expectedPosition.Fall();
             }
 
+            // piece not found
+            // TODO: search with more sophisticated search algorithms
             return null;
         }
-
+        
         // Tiles: x : 14 - 17, y : 13 - 16 
         public Tetromino? ExtractNextPiece(IScreenshot screenshot)
         {

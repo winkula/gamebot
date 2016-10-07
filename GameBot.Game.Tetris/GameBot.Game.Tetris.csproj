@@ -165,7 +165,7 @@
     <Compile Include="TetrisScore.cs" />
     <Compile Include="Searching\RecursiveSearch.cs" />
     <Compile Include="TetrisSimulator.cs" />
-    <Compile Include="TetrisGameState.cs" />
+    <Compile Include="Data\GameState.cs" />
     <Compile Include="Searching\Node.cs" />
     <Compile Include="Data\Tetromino.cs" />
     <Compile Include="Agents\OptimisticTetrisAgent.cs" />

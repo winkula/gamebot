@@ -16,11 +16,12 @@ namespace GameBot.Game.Tetris.Searching
             this.heuristic = heuristic;
         }
 
-        public virtual SearchResult Search(Node root)
+        public virtual SearchResult Search(GameState gameState)
         {
-            if (root == null)
-                throw new ArgumentNullException(nameof(root));
-            
+            if (gameState == null)
+                throw new ArgumentNullException(nameof(gameState));
+
+            Node root = new Node(gameState);            
             Node goal = null;
             var bestScore = double.NegativeInfinity;
 
@@ -47,16 +48,19 @@ namespace GameBot.Game.Tetris.Searching
                 }
             }
             
-            var result = new SearchResult();
-            result.CurrentGameState = root?.GameState;
             if (goal != null)
             {
-                result.GoalGameState = goal?.GameState;
-                result.Way = goal?.Moves;
+                var result = new SearchResult();
+                result.CurrentGameState = root?.GameState;
+                result.GoalGameState = goal.GameState;
+                result.Way = goal.Moves;
                 result.Moves = GetMoves(result.Way);
+                return result;
             }
 
-            return result;
+            // game is in the wrong state
+            // no search is possible here
+            return null;
         }
 
         protected IEnumerable<Move> GetMoves(Way way)
@@ -126,7 +130,7 @@ namespace GameBot.Game.Tetris.Searching
 
             foreach (var tetromino in tetrominos)
             {
-                var newState = new TetrisGameState(parent.GameState, new Piece(tetromino));
+                var newState = new GameState(parent.GameState, new Piece(tetromino));
                 var child = new Node(newState);
                 var successors = child.GetSuccessors();
                 var score = GetBestScore(successors);
@@ -141,7 +145,7 @@ namespace GameBot.Game.Tetris.Searching
         {
             double chance = tetromino.GetChance();
 
-            var newState = new TetrisGameState(parent.GameState, new Piece(tetromino));
+            var newState = new GameState(parent.GameState, new Piece(tetromino));
             var child = new Node(newState);
             var successors = child.GetSuccessors();
             var score = GetBestScore(successors);

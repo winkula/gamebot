@@ -16,7 +16,7 @@ namespace GameBot.Test.Tetris
         [TestCase(30, 3)]
         public void GetSpeed(int level, int expected)
         {
-            var speed = TetrisLevel.GetSpeed(level);
+            var speed = TetrisLevel.GetFramesPerRow(level);
 
             Assert.AreEqual(expected, speed);
         }
@@ -51,6 +51,16 @@ namespace GameBot.Test.Tetris
             int level = TetrisLevel.GetLevel(startLevel, clearedLines);
 
             Assert.AreEqual(expectedLevel, level);
+        }
+
+        [TestCase(0, 1.0, 1)]
+        [TestCase(0, 20.0, 22)]
+        public void GetFallDistance(int level, double seconds, int expectedDistance)
+        {
+            var duration = TimeSpan.FromSeconds(seconds);
+            int distance = TetrisLevel.GetFallDistance(level, duration);
+
+            Assert.AreEqual(expectedDistance, distance);
         }
     }
 }

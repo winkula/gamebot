@@ -48,6 +48,10 @@ namespace GameBot.Core.Data
         {
         }
 
+        public EmguScreenshot(string file, TimeSpan timestamp) : this(new Mat(file, LoadImageType.Grayscale), timestamp)
+        {
+        }
+
         public byte GetPixel(int x, int y)
         {
             return Pixels[y * Width + x];
