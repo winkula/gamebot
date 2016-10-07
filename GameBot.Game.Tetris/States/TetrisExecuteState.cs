@@ -45,9 +45,13 @@ namespace GameBot.Game.Tetris.States
                 var expectedFallDistance = TetrisLevel.GetMaxFallDistance(currentGameState.Level, duration);
                 Debug.WriteLine("> Check command. Maximal expected fall distance is " + expectedFallDistance);
                 
+                // TODO: solve the problem, when a I-piece spawns (maybe when its rotated and not the whole piece is visible?)
                 var piece = agent.Extractor.ConfirmPieceMove(agent.Screenshot, lastPosition, lastMove.Value, expectedFallDistance);
                 if (piece == null)
-                    throw new ApplicationException("we have not found the piece! we can't say if the command was executed or not!");
+                {
+                    Debug.WriteLine("> PIECE NOT FOUND! Looking for " + lastPosition.Tetromino + ". Try again.");
+                    return;
+                }
                                 
                 // check if last command was executed
                 // if not, repeat      

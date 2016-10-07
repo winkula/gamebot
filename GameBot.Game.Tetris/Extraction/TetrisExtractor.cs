@@ -182,23 +182,25 @@ namespace GameBot.Game.Tetris.Extraction
             var expectedPosition = new Piece(lastPosition);
             expectedPosition.Apply(move);
 
-            // TODO: tweak the error tolerance / make better solution
-            int errorTolerance = 1;
+            // TODO: add error tolerance of the camera
             for (int i = 0; i <= maxFallDistance; i++)
             {
                 var errorsLast = PieceMatcher.GetErrors(screenshot, lastPositionTemp);
                 var errorsExpected = PieceMatcher.GetErrors(screenshot, expectedPosition);
                 
-                if (errorsLast < errorsExpected && errorsLast <= errorTolerance)
+                if (errorsLast != errorsExpected)
                 {
-                    // piece stayed in the lat position (did not move)
-                    return lastPositionTemp;
-                }
-                if (errorsExpected < errorsLast && errorsExpected <= errorTolerance)
-                {
-                    // piece was moved
-                    return expectedPosition;
-                }
+                    if (errorsLast == 0)
+                    {
+                        // piece stayed in the lat position (did not move)
+                        return lastPositionTemp;
+                    }
+                    if (errorsExpected == 0)
+                    {
+                        // piece was moved
+                        return expectedPosition;
+                    }
+                }               
 
                 lastPositionTemp.Fall();
                 expectedPosition.Fall();
