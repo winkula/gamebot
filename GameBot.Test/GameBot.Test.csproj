@@ -146,6 +146,7 @@
     <Compile Include="Performance\PerformanceTests.cs" />
     <Compile Include="RobotTests\ActuatorTests.cs" />
     <Compile Include="RobotTests\BlockQuantizerTests.cs" />
+    <Compile Include="RobotTests\Quantizers\PaeduQuantizerTests.cs" />
     <Compile Include="Tetris\Data\CoordinatesTest.cs" />
     <Compile Include="Tetris\Data\PieceDeltaTests.cs" />
     <Compile Include="Tetris\Data\PoseTests.cs" />
@@ -158,7 +159,7 @@
     <Compile Include="CoreTests\ButtonTests.cs" />
     <Compile Include="EmulatorTests\EmulatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RobotTests\QuantizerTests.cs" />
+    <Compile Include="RobotTests\Quantizers\QuantizerTests.cs" />
     <Compile Include="Tetris\TetrisEmulatorTests.cs" />
     <Compile Include="Tetris\TetrisPlayerTests.cs" />
     <Compile Include="Tetris\Extraction\TetrisExtractorTests.cs" />

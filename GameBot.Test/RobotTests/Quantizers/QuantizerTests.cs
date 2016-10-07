@@ -6,7 +6,7 @@ using NUnit.Framework;
 using System;
 using System.Diagnostics;
 
-namespace GameBot.Test.RobotTests
+namespace GameBot.Test.RobotTests.Quantizers
 {
     [TestFixture]
     public class QuantizerTests
