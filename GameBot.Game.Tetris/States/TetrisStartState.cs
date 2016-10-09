@@ -71,6 +71,9 @@ namespace GameBot.Game.Tetris.States
 
         private void SelectLevel(CommandCollection commands, int startLevel)
         {
+            if (startLevel < 0 || startLevel > 9)
+                throw new ArgumentException("startLevel must be between 0 and 9 (inclusive)");
+
             if (startLevel >= 5)
             {
                 commands.HitDelta(Button.Down);

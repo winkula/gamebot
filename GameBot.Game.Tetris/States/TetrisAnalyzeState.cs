@@ -16,8 +16,7 @@ namespace GameBot.Game.Tetris.States
 
         private Piece extractedPiece;
         private Tetromino? extractedNextPiece;
-
-        private bool awaitNextTetromino = true;
+        
         private TimeSpan timeNextAction = TimeSpan.Zero;
 
         public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)

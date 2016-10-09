@@ -130,7 +130,7 @@ namespace GameBot.Test.Tetris.Extraction
 
             var lastPosition = new Piece(Tetromino.Z, 0, 1, -6);
             
-            var newPosition = extractor.ConfirmPieceMove(screenshot, lastPosition, Move.Left, 0);
+            var newPosition = extractor.ExtractMovedPiece(screenshot, lastPosition, Move.Left, 0);
 
             Assert.NotNull(newPosition);
 
@@ -151,10 +151,10 @@ namespace GameBot.Test.Tetris.Extraction
 
             var lastPosition = new Piece(Tetromino.Z, 0, 1, 0);
 
-            var newPosition = extractor.ConfirmPieceMove(screenshot, lastPosition, Move.Left, 5);
+            var newPosition = extractor.ExtractMovedPiece(screenshot, lastPosition, Move.Left, 5);
             Assert.Null(newPosition);
 
-            newPosition = extractor.ConfirmPieceMove(screenshot, lastPosition, Move.Left, 6);
+            newPosition = extractor.ExtractMovedPiece(screenshot, lastPosition, Move.Left, 6);
             Assert.NotNull(newPosition);
 
             Assert.AreEqual(Tetromino.Z, newPosition.Tetromino);

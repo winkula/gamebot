@@ -1,7 +1,6 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Data;
-using GameBot.Game.Tetris.Searching;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +10,8 @@ namespace GameBot.Game.Tetris.States
 {
     public class TetrisExecuteState : ITetrisState
     {
-        private const double timePaddingSeconds = 0.4;
+        private const int timePaddingMiliseconds = 200;
+        private const int timeSubtractedFromDropDuration = 80;
 
         private TetrisAgent agent;
 
@@ -23,6 +23,10 @@ namespace GameBot.Game.Tetris.States
 
         public TetrisExecuteState(TetrisAgent agent, Queue<Move> moves, TimeSpan analyzeTimestamp)
         {
+            if (agent == null) throw new ArgumentNullException(nameof(agent));
+            if (moves == null) throw new ArgumentNullException(nameof(moves));
+            if (analyzeTimestamp == null) throw new ArgumentNullException(nameof(analyzeTimestamp));
+
             this.agent = agent;
 
             this.moves = moves;
@@ -41,16 +45,10 @@ namespace GameBot.Game.Tetris.States
             if (lastMove.HasValue)
             {
                 var now = agent.TimeProvider.Time;
-                var duration = (now - lastPositionTimeStamp) + TimeSpan.FromSeconds(timePaddingSeconds);
-                var expectedFallDistance = TetrisLevel.GetMaxFallDistance(agent.GameState.Level, duration);
-
-                // TODO: remove this fix value
-                expectedFallDistance = 10;
-
+                var expectedFallDistance = GetExpectedFallDistance(now);
                 Debug.WriteLine("> Check command. Maximal expected fall distance is " + expectedFallDistance);
-
-                // TODO: solve the problem, when a I-piece spawns (maybe when its rotated and not the whole piece is visible?)
-                var piece = agent.Extractor.ConfirmPieceMove(agent.Screenshot, lastPosition, lastMove.Value, expectedFallDistance);
+                                
+                var piece = agent.Extractor.ExtractMovedPiece(agent.Screenshot, lastPosition, lastMove.Value, expectedFallDistance);
                 if (piece == null)
                 {
                     Debug.WriteLine("> PIECE NOT FOUND! Looking for " + lastPosition.Tetromino + ". Try again.");
@@ -66,7 +64,7 @@ namespace GameBot.Game.Tetris.States
                 {
                     // move was successfully executed
                     // we remove it from the queue
-                    NextCommand();
+                    ProceedToNextCommand();
                 }
                 else
                 {
@@ -78,23 +76,44 @@ namespace GameBot.Game.Tetris.States
             }
 
             // are there commands to execute?
-            if (moves != null && moves.Any())
+            if (moves.Any())
             {
                 var move = moves.Peek();
 
-                bool check = move != Move.Drop;
-
                 // first execution
-                Execute(move, check);
-            }
-            else
-            {
-                // we executed all moves
-                // back to the analyze state
-                Analyze();
+                if (move != Move.Drop)
+                {
+                    ExecuteAndCheck(move);
+                }
+                else
+                {
+                    if (moves.Count != 1)
+                        throw new Exception("Drop must be the last move to execute.");
+
+                    ExecuteWithoutCheck(move);
+                }
+
+                if (!moves.Any() && !lastMove.HasValue)
+                {
+                    // we executed all moves and have no comannd to check
+                    // back to the analyze state
+                    Analyze();
+                }
             }
         }
-        
+
+        private int GetExpectedFallDistance(TimeSpan now)
+        {
+            // we add some time to the theoretical duration between now and the
+            // timestamp of the last analyzed screenshot
+            // so we are sure, that we don't miss the piece
+            var duration = 
+                (now - lastPositionTimeStamp) + 
+                TimeSpan.FromMilliseconds(timePaddingMiliseconds);
+
+            return TetrisLevel.GetMaxFallDistance(agent.GameState.Level, duration);
+        }
+
         private void UpdateLastPosition(Piece newLastPosition, TimeSpan newLastPositionTimestamp)
         {
             lastPosition = newLastPosition;
@@ -102,7 +121,7 @@ namespace GameBot.Game.Tetris.States
             lastPositionTimeStamp = newLastPositionTimestamp;
         }
 
-        private void NextCommand()
+        private void ProceedToNextCommand()
         {
             moves.Dequeue();
         }
@@ -113,21 +132,26 @@ namespace GameBot.Game.Tetris.States
                 throw new ArgumentNullException(nameof(lastMove));
 
             // repeated execution
-            Execute(lastMove.Value, true);
+            ExecuteAndCheck(lastMove.Value);
         }
 
-        private void Execute(Move move, bool check)
+        private void ExecuteAndCheck(Move move)
         {
-            if (check)
-            {
-                lastMove = move;
-            }
-            else
-            {
-                lastMove = null;
-                NextCommand(); // we can already remove this, beacause we don't check it later
-            }
+            lastMove = move;
 
+            Execute(move);
+        }
+
+        private void ExecuteWithoutCheck(Move move)
+        {
+            lastMove = null;
+            ProceedToNextCommand();
+
+            Execute(move);
+        }
+
+        private void Execute(Move move)
+        {
             Debug.WriteLine("> Execute " + move);
             switch (move)
             {
@@ -151,11 +175,31 @@ namespace GameBot.Game.Tetris.States
                     agent.Actuator.Press(Button.Down); // drop
 
                     // calculates the score and the level
-                    agent.GameState.Drop();
+                    var dropDistance = agent.GameState.Drop();
+
+                    // let time lapse away
+                    // (the tetromino falls and we must pause
+                    // TODO: here we could to some precalculations for the next search???
+                    AwaitDrop(dropDistance);
                     break;
 
                 default:
                     break;
+            }
+        }
+
+        private void AwaitDrop(int fallDistanceRows)
+        {
+            // we subtract a time padding, because we dont want to wait the
+            // theoretical drop duration, but the real drop duration
+            // (we lose some overhead time)  
+            var dropDuration = TetrisLevel
+                .GetFreeFallDuration(fallDistanceRows)
+                .Subtract(TimeSpan.FromMilliseconds(timeSubtractedFromDropDuration));
+
+            if (dropDuration > TimeSpan.Zero)
+            {
+                agent.TimeProvider.Sleep((int)dropDuration.TotalMilliseconds);
             }
         }
 

@@ -99,11 +99,13 @@ namespace GameBot.Game.Tetris.Data
             return fallen;
         }
 
+        // returns the fallen distance of the piece
         public int Drop()
         {
             return Drop(Tetrominos.GetRandom());
         }
 
+        // returns the fallen distance of the piece
         public int Drop(Tetromino next)
         {
             int distance = Board.DropDistance(Piece);

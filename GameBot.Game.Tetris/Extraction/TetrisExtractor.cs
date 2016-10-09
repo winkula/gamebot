@@ -178,7 +178,7 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         // Confirms that the piece has moved or roteted according to the command
-        public Piece ConfirmPieceMove(IScreenshot screenshot, Piece lastPosition, Move move, int maxFallDistance)
+        public Piece ExtractMovedPiece(IScreenshot screenshot, Piece lastPosition, Move move, int maxFallDistance)
         {
             if (maxFallDistance < 0)
                 throw new ArgumentException("searchHeight must be positive.");
@@ -186,8 +186,7 @@ namespace GameBot.Game.Tetris.Extraction
             if (move == Move.None) return lastPosition;
 
             var lastPositionTemp = new Piece(lastPosition);
-            var expectedPosition = new Piece(lastPosition);
-            expectedPosition.Apply(move);
+            var expectedPosition = new Piece(lastPosition).Apply(move);
 
             // TODO: add error tolerance of the camera
             for (int i = 0; i <= maxFallDistance; i++)
@@ -213,8 +212,6 @@ namespace GameBot.Game.Tetris.Extraction
                 expectedPosition.Fall();
             }
 
-            throw new ApplicationException("piece not found");
-
             // piece not found
             // TODO: search with more sophisticated search algorithms
             return null;
@@ -231,10 +228,11 @@ namespace GameBot.Game.Tetris.Extraction
                     errors++;
                 }
             }
+
             if (errors > 0 && expected.Tetromino == Tetromino.I && expected.Y == 0 && expected.Orientation == 1)
             {
                 // TODO: remove this ugly hack
-                // subtract one because the I piece is not completly visible in upight position
+                // subtract one because the I piece is not completly visible in upright position
                 errors--;
             }
 

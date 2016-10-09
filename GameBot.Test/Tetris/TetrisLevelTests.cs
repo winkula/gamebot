@@ -53,8 +53,10 @@ namespace GameBot.Test.Tetris
             Assert.AreEqual(expectedLevel, level);
         }
 
-        [TestCase(0, 1.0, 1)]
-        [TestCase(0, 20.0, 22)]
+        [TestCase(0, 0.8, 1)]
+        [TestCase(0, 1.0, 2)]
+        [TestCase(0, 20.0, 23)]
+        [TestCase(20, 1.0, 20)]
         public void GetFallDistance(int level, double seconds, int expectedDistance)
         {
             var duration = TimeSpan.FromSeconds(seconds);
