@@ -10,9 +10,6 @@ namespace GameBot.Game.Tetris.States
 {
     public class TetrisExecuteState : ITetrisState
     {
-        private const int timePaddingMiliseconds = 200;
-        private const int timeSubtractedFromDropDuration = 80;
-
         private TetrisAgent agent;
 
         private Queue<Move> moves;
@@ -109,7 +106,7 @@ namespace GameBot.Game.Tetris.States
             // so we are sure, that we don't miss the piece
             var duration = 
                 (now - lastPositionTimeStamp) + 
-                TimeSpan.FromMilliseconds(timePaddingMiliseconds);
+                TimeSpan.FromMilliseconds(Timing.ExpectedFallDurationPadding);
 
             return TetrisLevel.GetMaxFallDistance(agent.GameState.Level, duration);
         }
@@ -195,7 +192,7 @@ namespace GameBot.Game.Tetris.States
             // (we lose some overhead time)  
             var dropDuration = TetrisLevel
                 .GetFreeFallDuration(fallDistanceRows)
-                .Subtract(TimeSpan.FromMilliseconds(timeSubtractedFromDropDuration));
+                .Subtract(TimeSpan.FromMilliseconds(Timing.NegativeDropDurationPadding));
 
             if (dropDuration > TimeSpan.Zero)
             {

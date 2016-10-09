@@ -16,7 +16,7 @@ namespace GameBot.Game.Tetris.States
 
         private Piece extractedPiece;
         private Tetromino? extractedNextPiece;
-        
+
         private TimeSpan timeNextAction = TimeSpan.Zero;
 
         public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)
@@ -28,16 +28,16 @@ namespace GameBot.Game.Tetris.States
 
         public void Act()
         {
-            // TODO: define search height
-            //int searchHeight = TetrisLevel.GetMaxFallDistance();
-            int searchHeight = 3;
-            
+            // TODO: calculate duration as the time that passed since the initialization of this state
+            var duration = TimeSpan.FromMilliseconds(Timing.ExpectedFallDurationPadding);
+            int searchHeight = TetrisLevel.GetMaxFallDistance(agent.GameState.StartLevel, duration);
+
             if (Extract(searchHeight))
             {
                 // update global game state
                 agent.GameState.Piece = extractedPiece;
                 agent.GameState.NextPiece = extractedNextPiece;
-                
+
                 // we found a new piece. release the down key (end the drop)
                 agent.Actuator.Release(Button.Down);
                 Debug.WriteLine("> End the drop.");
