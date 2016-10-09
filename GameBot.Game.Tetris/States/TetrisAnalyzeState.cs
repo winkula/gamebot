@@ -12,36 +12,40 @@ namespace GameBot.Game.Tetris.States
     {
         private TetrisAgent agent;
 
-        private GameState currentGameState;
-
         private Tetromino? currentTetromino;
+
+        private Piece extractedPiece;
+        private Tetromino? extractedNextPiece;
+
         private bool awaitNextTetromino = true;
         private TimeSpan timeNextAction = TimeSpan.Zero;
 
-        public TetrisAnalyzeState(Tetromino? currentTetromino)
-        {
-            this.currentTetromino = currentTetromino;
-        }
-
-        public void Act(TetrisAgent agent)
+        public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)
         {
             this.agent = agent;
 
+            this.currentTetromino = currentTetromino;
+        }
+
+        public void Act()
+        {
             // TODO: define search height
             //int searchHeight = TetrisLevel.GetMaxFallDistance();
             int searchHeight = 3;
-
-            // TODO: always carry along the game state! only clear when a new game starts
-            currentGameState = Extract(searchHeight);
-            if (currentGameState != null && currentGameState.Piece != null)
+            
+            if (Extract(searchHeight))
             {
+                // update global game state
+                agent.GameState.Piece = extractedPiece;
+                agent.GameState.NextPiece = extractedNextPiece;
+                
                 // we found a new piece. release the down key (end the drop)
                 agent.Actuator.Release(Button.Down);
                 Debug.WriteLine("> End the drop.");
 
                 // do the search
                 // this is the essence of the a.i.
-                var results = agent.Search.Search(currentGameState);
+                var results = agent.Search.Search(agent.GameState);
 
                 if (results != null)
                 {
@@ -58,59 +62,38 @@ namespace GameBot.Game.Tetris.States
             }
         }
 
-        private GameState Extract(int searchHeight)
+        // this method return true, when the current and the next piece were extracted sucessfully
+        // only then can we start the search and proceed to the execute-state
+        private bool Extract(int searchHeight)
         {
-            if (currentTetromino.HasValue)
-            {
-                // we know which Tetromino to look for
-            }
-            else
-            {
-                // maybe the game just started, we must search in the board to find the current Tetromino 
-            }
-
             var screenshot = agent.Screenshot;
 
-            var board = agent.Extractor.ExtractBoard(screenshot);
-            var currentPiece = agent.Extractor.ExtractSpawnedPiece(screenshot, searchHeight);
-            var nextPiece = agent.Extractor.ExtractNextPiece(screenshot);
+            // we dont extract the board (too error prone)
+            // instead we carry along the game state
 
-            var gameState = new GameState(board, currentPiece, nextPiece);
+            // extract the pieces
+            // TODO: if currentTetromino.HasValue, then we know, which tetromino we look for, so we can optimize the piece matching
+            extractedPiece = agent.Extractor.ExtractSpawnedPiece(screenshot, searchHeight);
+            if (extractedPiece == null) return false;
+            if (extractedPiece.Orientation != 0) return false; // spawned piece must have orientation 0
+            if (extractedPiece.X != 0) return false; // spawned piece must have x coordinate 0
 
-            return gameState;
+            extractedNextPiece = agent.Extractor.ExtractNextPiece(screenshot);
+            if (extractedNextPiece == null) return false;
+
+            if (currentTetromino.HasValue && currentTetromino.Value != extractedPiece.Tetromino)
+            {
+                Debug.WriteLine("> Extracted inconsistent current piece!");
+                return false;
+            }
+
+            return true;
         }
 
         private void Execute(SearchResult results)
         {
             var moves = new Queue<Move>(results.Moves);
-            agent.SetState(new TetrisExecuteState(moves, currentGameState, agent.Screenshot.Timestamp));
-        }
-
-        private bool MustPlay(GameState gameState)
-        {
-            if (gameState == null) throw new ArgumentNullException(nameof(gameState));
-
-            if (gameState.Piece == null && timeNextAction <= agent.TimeProvider.Time)
-            {
-                // await next tetromino when the piece was null some time in the past
-                // and the timer to look for the next piece is exceeded
-                awaitNextTetromino = true;
-            }
-
-            agent.Debugger.WriteStatic(agent.Ai.CurrentGameState);
-
-            return awaitNextTetromino &&
-                gameState.Piece != null &&
-                gameState.NextPiece != null;
-        }
-
-        public void AfterPlay()
-        {
-            // start next timer
-            var duration = TetrisLevel.GetFreeFallDuration(agent.Ai.LastWay.Fall);
-
-            timeNextAction = agent.TimeProvider.Time.Add(duration);
-            awaitNextTetromino = false;
+            agent.SetState(new TetrisExecuteState(agent, moves, agent.Screenshot.Timestamp));
         }
     }
 }

@@ -14,8 +14,9 @@ namespace GameBot.Game.Tetris.Agents
 {
     public class TetrisAgent : IAgent
     {
-        // current state (state pattern)
+        // current state of the ai (state pattern)
         private ITetrisState State;
+
 
         // global services
         public IConfig Config { get; private set; }
@@ -28,7 +29,7 @@ namespace GameBot.Game.Tetris.Agents
         public IActuator Actuator { get; private set; }
 
         // global data
-        public GameState GameState { get; private set; }
+        public GameState GameState { get; set; }
 
         public TetrisAgent(IConfig config, TetrisExtractor extractor, TetrisAi ai, ISearch search, ITimeProvider timeProvider, IDebugger debugger)
         {
@@ -40,7 +41,7 @@ namespace GameBot.Game.Tetris.Agents
             Search = search;
 
             int startLevel = config.Read("Game.Tetris.StartLevel", 0);
-            SetState(new TetrisStartState(startLevel));
+            SetState(new TetrisStartState(this, startLevel));
         }
         
         public void SetState(ITetrisState newState)
@@ -56,7 +57,7 @@ namespace GameBot.Game.Tetris.Agents
             Screenshot = screenshot;
             Actuator = actuator;
             
-            State.Act(this);
+            State.Act();
         }
 
         public IImage Visualize(IImage image)

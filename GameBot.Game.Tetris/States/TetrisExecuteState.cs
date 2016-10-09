@@ -21,30 +21,34 @@ namespace GameBot.Game.Tetris.States
         private Piece lastPosition;
         private TimeSpan lastPositionTimeStamp;
 
-        private GameState currentGameState;
-
-        public TetrisExecuteState(Queue<Move> moves, GameState currentGameState, TimeSpan analyzeTimetampt)
-        {
-            this.moves = moves;
-            this.currentGameState = currentGameState;
-            if (currentGameState.Piece != null)
-            {
-                UpdateLastPosition(currentGameState.Piece, analyzeTimetampt);
-            }
-        }
-
-        public void Act(TetrisAgent agent)
+        public TetrisExecuteState(TetrisAgent agent, Queue<Move> moves, TimeSpan analyzeTimestamp)
         {
             this.agent = agent;
 
+            this.moves = moves;
+            this.lastPositionTimeStamp = analyzeTimestamp;
+
+            if (agent.GameState == null) throw new ArgumentNullException(nameof(agent.GameState));
+            if (agent.GameState.Piece == null) throw new ArgumentNullException(nameof(agent.GameState.Piece));
+            if (agent.GameState.NextPiece == null) throw new ArgumentNullException(nameof(agent.GameState.NextPiece));
+
+            this.lastPosition = new Piece(agent.GameState.Piece);
+        }
+
+        public void Act()
+        {
             // first we have to check if the last command was successful
             if (lastMove.HasValue)
             {
                 var now = agent.TimeProvider.Time;
                 var duration = (now - lastPositionTimeStamp) + TimeSpan.FromSeconds(timePaddingSeconds);
-                var expectedFallDistance = TetrisLevel.GetMaxFallDistance(currentGameState.Level, duration);
+                var expectedFallDistance = TetrisLevel.GetMaxFallDistance(agent.GameState.Level, duration);
+
+                // TODO: remove this fix value
+                expectedFallDistance = 10;
+
                 Debug.WriteLine("> Check command. Maximal expected fall distance is " + expectedFallDistance);
-                
+
                 // TODO: solve the problem, when a I-piece spawns (maybe when its rotated and not the whole piece is visible?)
                 var piece = agent.Extractor.ConfirmPieceMove(agent.Screenshot, lastPosition, lastMove.Value, expectedFallDistance);
                 if (piece == null)
@@ -52,7 +56,7 @@ namespace GameBot.Game.Tetris.States
                     Debug.WriteLine("> PIECE NOT FOUND! Looking for " + lastPosition.Tetromino + ". Try again.");
                     return;
                 }
-                                
+
                 // check if last command was executed
                 // if not, repeat      
                 var delta = piece.Delta(new Piece(lastPosition).Apply(lastMove.Value));
@@ -79,6 +83,8 @@ namespace GameBot.Game.Tetris.States
                 var move = moves.Peek();
 
                 bool check = move != Move.Drop;
+
+                // first execution
                 Execute(move, check);
             }
             else
@@ -88,10 +94,11 @@ namespace GameBot.Game.Tetris.States
                 Analyze();
             }
         }
-
+        
         private void UpdateLastPosition(Piece newLastPosition, TimeSpan newLastPositionTimestamp)
         {
             lastPosition = newLastPosition;
+            agent.GameState.Piece = new Piece(lastPosition);
             lastPositionTimeStamp = newLastPositionTimestamp;
         }
 
@@ -105,6 +112,7 @@ namespace GameBot.Game.Tetris.States
             if (!lastMove.HasValue)
                 throw new ArgumentNullException(nameof(lastMove));
 
+            // repeated execution
             Execute(lastMove.Value, true);
         }
 
@@ -123,18 +131,37 @@ namespace GameBot.Game.Tetris.States
             Debug.WriteLine("> Execute " + move);
             switch (move)
             {
-                case Move.Left: agent.Actuator.Hit(Button.Left); break;
-                case Move.Right: agent.Actuator.Hit(Button.Right); break;
-                case Move.Rotate: agent.Actuator.Hit(Button.A); break; // clockwise rotation
-                case Move.RotateCounterclockwise: agent.Actuator.Hit(Button.B); break; // counterclockwise rotation
-                case Move.Drop: agent.Actuator.Press(Button.Down); break; // drop
-                default: break;
+                case Move.Left:
+                    agent.Actuator.Hit(Button.Left);
+                    break;
+
+                case Move.Right:
+                    agent.Actuator.Hit(Button.Right);
+                    break;
+
+                case Move.Rotate:
+                    agent.Actuator.Hit(Button.A); // clockwise rotation
+                    break;
+
+                case Move.RotateCounterclockwise:
+                    agent.Actuator.Hit(Button.B); // counterclockwise rotation
+                    break;
+
+                case Move.Drop:
+                    agent.Actuator.Press(Button.Down); // drop
+
+                    // calculates the score and the level
+                    agent.GameState.Drop();
+                    break;
+
+                default:
+                    break;
             }
         }
 
         private void Analyze()
         {
-            agent.SetState(new TetrisAnalyzeState(currentGameState.NextPiece));
+            agent.SetState(new TetrisAnalyzeState(agent, agent.GameState.Piece.Tetromino));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using GameBot.Core;
+﻿using Emgu.CV;
+using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
 using GameBot.Core.Exceptions;
@@ -106,7 +107,7 @@ namespace GameBot.Robot.Engines
             throw new NotSupportedException("Only the 'run' mode is supported.");
         }
 
-        public EngineResult Step(bool play)
+        public void Step(bool play, Action<IImage, IImage> callback)
         {
             throw new NotSupportedException("Only the 'run' mode is supported.");
         }

@@ -15,9 +15,7 @@ namespace GameBot.Game.Tetris.Extraction
         private static Point BoardTileOrigin = new Point(2, 0);
         private static Point CurrentTileOrigin = new Point(5, 0);
         private static Point PreviewTileOrigin = new Point(15, 13);
-
-        private static PieceMatcher PieceMatcher = PieceMatcher.Instance;
-
+        
         private readonly IConfig config;
 
         public float BlockThreshold { get; set; }
@@ -64,8 +62,7 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    byte mean = screenshot.GetTileMean(tileCoordinates.X + x, tileCoordinates.Y + y);
-                    if (IsBlock(mean))
+                    if (IsTileBlock(screenshot, tileCoordinates.X + x, tileCoordinates.Y + y))
                     {
                         int index = 4 * (3 - y) + (x);
                         mask |= (ushort)(1 << index);
@@ -83,6 +80,18 @@ namespace GameBot.Game.Tetris.Extraction
         public static bool IsBlock(byte mean)
         {
             return mean < MeanThreshold;
+        }
+
+        // x and y are in board coordinates
+        private bool IsTileBlock(IScreenshot screenshot, int x, int y)
+        {
+            // TODO: make relative to board size?
+            // ignore walls
+            if (x < 2 || x > 11) return false;
+            if (y < 0 || y > 17) return false;
+
+            var mean = screenshot.GetTileMean(x, y);
+            return IsBlock(mean);
         }
 
         // Tiles: x : 5 - 8, y : 0 - 2
@@ -116,8 +125,7 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 for (int y = 0; y < 3; y++)
                 {
-                    byte mean = screenshot.GetTileMean(CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y);
-                    if (IsBlock(mean))
+                    if (IsTileBlock(screenshot, CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y))
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);
@@ -144,8 +152,7 @@ namespace GameBot.Game.Tetris.Extraction
                 {
                     for (int y = 0; y < 3; y++)
                     {
-                        byte mean = screenshot.GetTileMean(CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y + yDelta);
-                        if (IsBlock(mean))
+                        if (IsTileBlock(screenshot, CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y + yDelta))
                         {
                             int index = 4 * (2 - y) + (x);
                             mask |= (ushort)(1 << index);
@@ -157,7 +164,7 @@ namespace GameBot.Game.Tetris.Extraction
                 {
                     piece.Fall(yDelta);
                     return piece;
-                }                
+                }
             }
 
             // not found
@@ -185,9 +192,9 @@ namespace GameBot.Game.Tetris.Extraction
             // TODO: add error tolerance of the camera
             for (int i = 0; i <= maxFallDistance; i++)
             {
-                var errorsLast = PieceMatcher.GetErrors(screenshot, lastPositionTemp);
-                var errorsExpected = PieceMatcher.GetErrors(screenshot, expectedPosition);
-                
+                var errorsLast = GetErrors(screenshot, lastPositionTemp);
+                var errorsExpected = GetErrors(screenshot, expectedPosition);
+
                 if (errorsLast != errorsExpected)
                 {
                     if (errorsLast == 0)
@@ -200,17 +207,40 @@ namespace GameBot.Game.Tetris.Extraction
                         // piece was moved
                         return expectedPosition;
                     }
-                }               
+                }
 
                 lastPositionTemp.Fall();
                 expectedPosition.Fall();
             }
+
+            throw new ApplicationException("piece not found");
 
             // piece not found
             // TODO: search with more sophisticated search algorithms
             return null;
         }
         
+        public int GetErrors(IScreenshot screenshot, Piece expected)
+        {
+            int errors = 0;
+            foreach (var block in expected.Shape.Body)
+            {
+                var coordinates = Coordinates.PieceToTile(expected.X + block.X, expected.Y + block.Y);
+                if (!IsTileBlock(screenshot, coordinates.X, coordinates.Y))
+                {
+                    errors++;
+                }
+            }
+            if (errors > 0 && expected.Tetromino == Tetromino.I && expected.Y == 0 && expected.Orientation == 1)
+            {
+                // TODO: remove this ugly hack
+                // subtract one because the I piece is not completly visible in upight position
+                errors--;
+            }
+
+            return errors;
+        }
+
         // Tiles: x : 14 - 17, y : 13 - 16 
         public Tetromino? ExtractNextPiece(IScreenshot screenshot)
         {

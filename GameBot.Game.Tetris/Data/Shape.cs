@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -91,6 +92,10 @@ namespace GameBot.Game.Tetris.Data
         // TODO: make constructor, better performance without loops, direct lookup!
         public static Shape FromMask(ushort mask)
         {
+            // TODO: remove this ugly hack
+            // special case, because shape is not completly visible
+            if (mask == 0x0222) return Get(Tetromino.I, 1);
+
             for (int i = 0; i < 7 * 4; i++)
             {
                 if (mask == bodies[i])

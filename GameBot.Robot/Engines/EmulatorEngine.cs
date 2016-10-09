@@ -48,22 +48,21 @@ namespace GameBot.Robot.Engines
             timeProvider.Start();
         }
 
-        public EngineResult Step(bool play)
+        public void Step(bool play, Action<IImage,IImage> callback)
         {
-            var result = new EngineResult();
-
             // get image as photo of the gameboy screen (input)
             IImage image = camera.Capture();
-            result.Original = image;
 
             // process image and get display data
             TimeSpan time = timeProvider.Time;
             IImage processed = quantizer.Quantize(image);
-            result.Processed = new Image<Bgr, byte>(processed.Bitmap);
-            IScreenshot screenshot = new EmguScreenshot(processed, time);
+
+            callback(image, processed);
 
             if (play)
             {
+                IScreenshot screenshot = new EmguScreenshot(processed, time);
+
                 // handle input to the agent which
                 //  - extracts the game state
                 //  - decides which commands to press
@@ -72,8 +71,6 @@ namespace GameBot.Robot.Engines
             }
 
             emulator.Execute();
-
-            return result;
         }
     }
 }

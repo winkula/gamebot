@@ -1,6 +1,7 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
 using GameBot.Game.Tetris.Agents;
+using GameBot.Game.Tetris.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,26 +12,34 @@ namespace GameBot.Game.Tetris.States
     {
         private TetrisAgent agent;
 
-        private readonly int StartLevel;
+        private readonly int startLevel;
 
-        public TetrisStartState(int startLevel)
-        {
-            StartLevel = startLevel;
-        }
-
-        public void Act(TetrisAgent agent)
+        public TetrisStartState(TetrisAgent agent, int startLevel)
         {
             this.agent = agent;
 
-            var commands = Initialize();
+            this.startLevel = startLevel;
+        }
 
-            foreach (var command in commands)
+        public void Act()
+        {
+            // wait before start
+            if (agent.TimeProvider.Time >= TimeSpan.FromSeconds(2.2))
             {
-                command.Execute(agent.Actuator);
-            }
+                var commands = Initialize();
 
-            Debug.WriteLine("> Game started. Initialization sequence executed.");
-            agent.SetState(new TetrisAnalyzeState(null));
+                foreach (var command in commands)
+                {
+                    command.Execute(agent.Actuator);
+                }
+
+                // init game state
+                agent.GameState = new GameState();
+                agent.GameState.StartLevel = startLevel;
+
+                Debug.WriteLine("> Game started. Initialization sequence executed.");
+                agent.SetState(new TetrisAnalyzeState(agent, null));
+            }
         }
 
         private IEnumerable<ICommand> Initialize()
@@ -57,7 +66,7 @@ namespace GameBot.Game.Tetris.States
             commands.HitDelta(Button.A);
 
             // select level
-            SelectLevel(commands, StartLevel);
+            SelectLevel(commands, startLevel);
         }
 
         private void SelectLevel(CommandCollection commands, int startLevel)

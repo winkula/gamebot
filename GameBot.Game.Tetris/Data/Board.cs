@@ -12,6 +12,8 @@ namespace GameBot.Game.Tetris.Data
     /// </summary>
     public class Board
     {
+        #region Static part
+
         private static int[] columnHeights;
         private static int[] columnHoles;
         private static int[] linePosition;
@@ -82,6 +84,8 @@ namespace GameBot.Game.Tetris.Data
             }
             return linePosition[columns];
         }
+
+        #endregion
 
         public int Width { get; private set; }
         public int Height { get; private set; }

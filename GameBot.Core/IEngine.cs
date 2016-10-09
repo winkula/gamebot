@@ -1,4 +1,6 @@
-﻿using GameBot.Core.Data;
+﻿using Emgu.CV;
+using GameBot.Core.Data;
+using System;
 
 namespace GameBot.Core
 {
@@ -19,13 +21,14 @@ namespace GameBot.Core
         /// This method is intended to call before a loop.
         /// </summary>
         void Initialize();
-        
+
         /// <summary>
         /// Runs one step of the engine and returns the result.
         /// This method is intended to call in a loop.
         /// </summary>
         /// <param name="play">If the agent should play.</param>
+        /// <param name="callback">Callback with the extracted images.</param>
         /// <returns>The engines result.</returns>
-        EngineResult Step(bool play);
+        void Step(bool play, Action<IImage, IImage> callback);
     }
 }

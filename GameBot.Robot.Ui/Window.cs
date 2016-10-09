@@ -185,8 +185,7 @@ namespace GameBot.Robot.Ui
             {
                 try
                 {
-                    var result = engine.Step(play);
-                    result.Processed = result.Processed.Resize(rightWidth, rightHeight, Inter.Linear);
+                    engine.Step(play, Show);
 
                     stopwatch.Stop();
                     long ms = stopwatch.ElapsedMilliseconds;
@@ -195,8 +194,6 @@ namespace GameBot.Robot.Ui
                     {
                         debugger.WriteStatic($"FPS: {1000 / ms}");
                     }
-
-                    Show(result.Original, result.Processed);
 
                     TextboxDynamic.Text = string.Join(Environment.NewLine, debugger.ReadDynamic());
                     TextboxStatic.Text = string.Join(Environment.NewLine, debugger.ReadStatic());
@@ -214,6 +211,9 @@ namespace GameBot.Robot.Ui
         {
             try
             {
+                // TODO:
+                //processed = processed.Resize(rightWidth, rightHeight, Inter.Linear);
+
                 ImageBoxLeft.Image = original;
                 ImageBoxRight.Image = processed;
             }
