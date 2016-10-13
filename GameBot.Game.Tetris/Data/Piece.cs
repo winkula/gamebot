@@ -124,8 +124,7 @@ namespace GameBot.Game.Tetris.Data
 
         public override int GetHashCode()
         {
-            // TODO: better hash code
-            return (int)Tetromino ^ Orientation ^ X ^ Y;
+            return (int)Tetromino ^ (Orientation << 3) ^ (X << 5) ^ (Y << 10);
         }
 
         public override bool Equals(object obj)

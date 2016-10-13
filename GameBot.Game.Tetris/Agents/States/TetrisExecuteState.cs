@@ -42,7 +42,7 @@ namespace GameBot.Game.Tetris.Agents.States
             // first we have to check if the last command was successful
             if (lastMove.HasValue)
             {
-                var now = agent.TimeProvider.Time;
+                var now = agent.Clock.Time;
                 var expectedFallDistance = GetExpectedFallDistance(now);
                 logger.Info("> Check command. Maximal expected fall distance is " + expectedFallDistance);
                                 
@@ -197,7 +197,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
             if (dropDuration > TimeSpan.Zero)
             {
-                agent.TimeProvider.Sleep((int)dropDuration.TotalMilliseconds);
+                agent.Clock.Sleep((int)dropDuration.TotalMilliseconds);
             }
         }
 

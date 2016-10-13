@@ -15,7 +15,7 @@ namespace GameBot.Game.Tetris.Agents
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        private readonly ITimeProvider timeProvider;
+        private readonly IClock clock;
         private readonly IExtractor<GameState> extractor;
         private readonly TetrisAi ai;
 
@@ -23,9 +23,9 @@ namespace GameBot.Game.Tetris.Agents
         private bool awaitNextTetromino = true;
         private TimeSpan timeNextAction = TimeSpan.Zero;
         
-        public OptimisticTetrisAgent(IExtractor<GameState> extractor, TetrisAi ai, ITimeProvider timeProvider)
+        public OptimisticTetrisAgent(IExtractor<GameState> extractor, TetrisAi ai, IClock clock)
         {
-            this.timeProvider = timeProvider;
+            this.clock = clock;
             this.extractor = extractor;
             this.ai = ai;
         }
@@ -63,7 +63,7 @@ namespace GameBot.Game.Tetris.Agents
         {
             if (gameState == null) throw new ArgumentNullException(nameof(gameState));
 
-            if (gameState.Piece == null && timeNextAction <= timeProvider.Time)
+            if (gameState.Piece == null && timeNextAction <= clock.Time)
             {
                 // await next tetromino when the piece was null some time in the past
                 // and the timer to look for the next piece is exceeded
@@ -82,7 +82,7 @@ namespace GameBot.Game.Tetris.Agents
             // start next timer
             var duration = TetrisLevel.GetFreeFallDuration(ai.LastWay.Fall);
 
-            timeNextAction = timeProvider.Time.Add(duration);
+            timeNextAction = clock.Time.Add(duration);
             awaitNextTetromino = false;
         }
 

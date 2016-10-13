@@ -18,7 +18,7 @@ namespace GameBot.Game.Tetris.Agents
         
         // global services
         public IConfig Config { get; private set; }
-        public ITimeProvider TimeProvider { get; private set; }
+        public IClock Clock { get; private set; }
         public TetrisExtractor Extractor { get; private set; }
         public TetrisAi Ai { get; private set; }
         public ISearch Search { get; private set; }
@@ -28,10 +28,10 @@ namespace GameBot.Game.Tetris.Agents
         // global data
         public GameState GameState { get; set; }
 
-        public TetrisAgent(IConfig config, TetrisExtractor extractor, TetrisAi ai, ISearch search, ITimeProvider timeProvider)
+        public TetrisAgent(IConfig config, TetrisExtractor extractor, TetrisAi ai, ISearch search, IClock clock)
         {
             Config = config;
-            TimeProvider = timeProvider;
+            Clock = clock;
             Extractor = extractor;
             Ai = ai;
             Search = search;

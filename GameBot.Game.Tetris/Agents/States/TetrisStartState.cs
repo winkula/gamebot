@@ -1,6 +1,5 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
-using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Data;
 using NLog;
 using System;
@@ -26,7 +25,7 @@ namespace GameBot.Game.Tetris.Agents.States
         public void Act()
         {
             // wait before start
-            if (agent.TimeProvider.Time >= TimeSpan.FromSeconds(2.2))
+            if (agent.Clock.Time >= TimeSpan.FromSeconds(2.2))
             {
                 var commands = Initialize();
 

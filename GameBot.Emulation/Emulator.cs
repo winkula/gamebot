@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 
 namespace GameBot.Emulation
 {
-    public class Emulator : IActuator
+    public class Emulator
     {
         private const int FramesPerSecond = 60;
         private const int MaxFramesSkipped = 10;

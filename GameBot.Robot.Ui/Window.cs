@@ -8,7 +8,6 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-using GameBot.Robot.Quantizers;
 using GameBot.Core.Exceptions;
 using NLog;
 
@@ -27,12 +26,10 @@ namespace GameBot.Robot.Ui
         private readonly IEngine engine;
         private readonly ICamera camera;
         private readonly IActuator actuator;
-        private readonly Quantizer quantizer;
-
-        private bool play = false;
-
-        private List<int> keypoints = new List<int>();
-        private List<int> keypointsApplied = new List<int>();
+        private readonly ICalibrateableQuantizer quantizer;
+        
+        private List<Point> keypoints = new List<Point>();
+        private List<Point> keypointsApplied = new List<Point>();
 
         public Window(IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
         {
@@ -40,7 +37,7 @@ namespace GameBot.Robot.Ui
             this.engine = engine;
             this.camera = camera;
             this.actuator = actuator;
-            this.quantizer = quantizer as Quantizer;
+            this.quantizer = quantizer as ICalibrateableQuantizer;
 
             InitializeComponent();
 
@@ -123,8 +120,8 @@ namespace GameBot.Robot.Ui
 
             if (e.KeyChar == 'p')
             {
-                play = !play;
-                logger.Info(play ? "Play A.I." : "Pause A.I.");
+                engine.Play = !engine.Play;
+                logger.Info(engine.Play ? "Play A.I." : "Pause A.I.");
             }
             if (e.KeyChar == 'q')
             {
@@ -153,14 +150,13 @@ namespace GameBot.Robot.Ui
 
         private void MouseClicked(object sender, MouseEventArgs e)
         {
-            keypoints.Add(e.X);
-            keypoints.Add(e.Y);
+            keypoints.Add(new Point(e.X, e.Y));
             logger.Info($"Added keypoint ({e.X}, {e.Y})");
 
             if (keypoints.Count >= 8 && quantizer != null)
             {
                 keypointsApplied = keypoints.Take(8).ToList();
-                quantizer.CalculatePerspectiveTransform(keypointsApplied.Select(x => (float)x));
+                quantizer.Calibrate(keypointsApplied);
                 keypoints.Clear();
                 logger.Info($"Applied keypoints {keypointsApplied}");
             }
@@ -183,7 +179,7 @@ namespace GameBot.Robot.Ui
             {
                 try
                 {
-                    engine.Step(play, Show);
+                    engine.Step(Show);
 
                     stopwatch.Stop();
                     long ms = stopwatch.ElapsedMilliseconds;
@@ -196,7 +192,7 @@ namespace GameBot.Robot.Ui
                 catch (GameOverException)
                 {
                     logger.Info("Game over");
-                    play = false;
+                    engine.Play = false;
                 }
             }
         }

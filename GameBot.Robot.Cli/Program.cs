@@ -1,7 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core;
-using GameBot.Robot.Engines;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -18,31 +17,40 @@ namespace GameBot.Robot.Cli
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            // CLI = command line interface
-            // for tests and measurements
-
-            Simulate();
-        }
-        
-        static void Simulate()
+        static void Main()
         {
             using (var container = new Container())
             {
-                container.RegisterSingleton<IEngine, FastEngine>();
-
-                container.RegisterPackages(GetAssemblies(
-                    "GameBot.Game.Tetris",
-                    "GameBot.Emulation",
-                    "GameBot.Robot"));
+                container.RegisterPackages(GetEmulatedEngineAssembies());
+                //container.RegisterPackages(GetPhysicalEngineAssembies());
                 container.Verify();
 
                 ConfigureLogging();
 
                 var engine = container.GetInstance<IEngine>();
-                engine.Run();
+                engine.Play = true;
+                while (true)
+                {
+                    engine.Step(null);
+                }               
             }
+        }
+
+        static IEnumerable<Assembly> GetPhysicalEngineAssembies()
+        {
+            return GetAssemblies(
+                "GameBot.Game.Tetris",
+                "GameBot.Engine.Physical",
+                "GameBot.Robot.Cli");
+        }
+
+        static IEnumerable<Assembly> GetEmulatedEngineAssembies()
+        {
+            return GetAssemblies(
+                "GameBot.Game.Tetris",
+                "GameBot.Engine.Emulated",
+                "GameBot.Emulation",
+                "GameBot.Robot.Cli");
         }
 
         static IEnumerable<Assembly> GetAssemblies(params string[] assemblyNames)
@@ -59,7 +67,12 @@ namespace GameBot.Robot.Cli
             config.AddTarget("debugger", traceTarget);
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, traceTarget));
 
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Simulator.txt");
+            var consoleTarget = new ConsoleTarget();
+            consoleTarget.Layout = @"${message}";
+            config.AddTarget("console", traceTarget);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, consoleTarget));
+
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Log.txt");
             var fileTarget = new FileTarget();
             fileTarget.Layout = @"${longdate}|${level:uppercase=true}|${logger}|${message}";
             fileTarget.FileName = path;

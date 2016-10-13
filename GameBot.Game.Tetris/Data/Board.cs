@@ -310,8 +310,12 @@ namespace GameBot.Game.Tetris.Data
         
         public override int GetHashCode()
         {
-            // TODO: implement
-            return base.GetHashCode();
+            int hashCode = 0;
+            for (int x = 0; x < Width; x++)
+            {
+                hashCode ^= Columns[x];
+            }
+            return hashCode;
         }
 
         public override bool Equals(object obj)

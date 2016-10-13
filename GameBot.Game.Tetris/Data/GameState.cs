@@ -168,8 +168,7 @@ namespace GameBot.Game.Tetris.Data
 
         public override int GetHashCode()
         {
-            // TODO: implement
-            return base.GetHashCode();
+            return Lines ^ (Piece.GetHashCode() << 5) ^ ((int) NextPiece << 20);
         }
 
         public override bool Equals(object obj)

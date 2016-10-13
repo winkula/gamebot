@@ -108,12 +108,12 @@
       <HintPath>..\packages\NLog.4.3.10\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SimpleInjector, Version=3.1.5.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
-      <HintPath>..\packages\SimpleInjector.3.1.5\lib\net45\SimpleInjector.dll</HintPath>
+    <Reference Include="SimpleInjector, Version=3.2.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.3.2.2\lib\net45\SimpleInjector.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SimpleInjector.Packaging, Version=3.1.5.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
-      <HintPath>..\packages\SimpleInjector.Packaging.3.1.5\lib\net40-client\SimpleInjector.Packaging.dll</HintPath>
+    <Reference Include="SimpleInjector.Packaging, Version=3.2.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.Packaging.3.2.2\lib\net40-client\SimpleInjector.Packaging.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -173,13 +173,21 @@
       <Project>{290c4c98-1bd9-46f1-af52-5ddea956f146}</Project>
       <Name>GameBot.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GameBot.Emulation\GameBot.Emulation.csproj">
+      <Project>{99dd5df9-be92-4704-83e6-36554b296a90}</Project>
+      <Name>GameBot.Emulation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameBot.Engine.Emulated\GameBot.Engine.Emulated.csproj">
+      <Project>{dfe3f4ee-2d6f-4b48-87c0-589cb5443133}</Project>
+      <Name>GameBot.Engine.Emulated</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameBot.Engine.Physical\GameBot.Engine.Physical.csproj">
+      <Project>{e787f6b0-3372-4df8-8942-7e8789b83d85}</Project>
+      <Name>GameBot.Engine.Physical</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GameBot.Game.Tetris\GameBot.Game.Tetris.csproj">
       <Project>{f2a4ec65-2edc-4edc-810d-0f755243e289}</Project>
       <Name>GameBot.Game.Tetris</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GameBot.Robot\GameBot.Robot.csproj">
-      <Project>{a889b0a7-c49b-4688-a8be-81a23c0d7421}</Project>
-      <Name>GameBot.Robot</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

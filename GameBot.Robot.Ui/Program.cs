@@ -21,17 +21,31 @@ namespace GameBot.Robot.Ui
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
-                container.RegisterPackages(GetAssemblies(
-                    "GameBot.Game.Tetris",
-                    "GameBot.Emulation",
-                    "GameBot.Robot",
-                    "GameBot.Robot.Ui"));
+                container.RegisterPackages(GetEmulatedEngineAssembies());
+                //container.RegisterPackages(GetPhysicalEngineAssembies());
                 container.Verify();
 
                 ConfigureLogging();
 
                 Application.Run(container.GetInstance<Window>());
             }
+        }
+
+        static IEnumerable<Assembly> GetPhysicalEngineAssembies()
+        {
+            return GetAssemblies(
+                "GameBot.Game.Tetris",
+                "GameBot.Engine.Physical",
+                "GameBot.Robot.Ui");
+        }
+
+        static IEnumerable<Assembly> GetEmulatedEngineAssembies()
+        {
+            return GetAssemblies(
+                "GameBot.Game.Tetris",
+                "GameBot.Engine.Emulated",
+                "GameBot.Emulation",
+                "GameBot.Robot.Ui");
         }
 
         static IEnumerable<Assembly> GetAssemblies(params string[] assemblyNames)

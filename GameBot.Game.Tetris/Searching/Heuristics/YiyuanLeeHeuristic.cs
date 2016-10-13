@@ -14,8 +14,8 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
             var h = Holes(board);
             var b = Bumpiness(board);
 
-            return -0.510066 * a + 0.760666 * c - 100 * h - 0.184483 * b;
-            //return -0.510066 * a + 0.760666 * c - 0.35663 * h - 0.184483 * b;
+            //return -0.510066 * a + 0.760666 * c - 100 * h - 0.184483 * b;
+            return -0.510066 * a + 0.760666 * c - 0.35663 * h - 0.184483 * b;
         }
     }
 }

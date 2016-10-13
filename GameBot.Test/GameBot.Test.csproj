@@ -129,8 +129,9 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SimpleInjector">
-      <HintPath>..\packages\SimpleInjector.3.1.5\lib\net45\SimpleInjector.dll</HintPath>
+    <Reference Include="SimpleInjector, Version=3.2.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.3.2.2\lib\net45\SimpleInjector.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -141,38 +142,46 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Tinkerforge, Version=2.1.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Tinkerforge.2.1.11\lib\Net40\Tinkerforge.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Data\Commands\CommandCollectionTests.cs" />
     <Compile Include="Core\Data\Commands\ReleaseCommandTests.cs" />
     <Compile Include="Core\Data\Commands\PressCommandTests.cs" />
     <Compile Include="Core\Data\Commands\HitCommandTests.cs" />
-    <Compile Include="Robot\Cameras\PerformanceTests.cs" />
-    <Compile Include="Robot\Actuators\ActuatorTests.cs" />
-    <Compile Include="Robot\Quantizers\BlockQuantizerTests.cs" />
-    <Compile Include="Robot\Quantizers\MaethuQuantizerTests.cs" />
-    <Compile Include="Robot\Quantizers\PaeduQuantizerTests.cs" />
+    <Compile Include="Misc\PerformanceTests.cs" />
+    <Compile Include="Engine\Physical\Actuators\PhysicalActuatorTests.cs" />
+    <Compile Include="Misc\MaethuQuantizerTests.cs" />
+    <Compile Include="Misc\PaeduQuantizerTests.cs" />
+    <Compile Include="Misc\TinkerforgeTests.cs" />
     <Compile Include="Setup.cs" />
-    <Compile Include="Tetris\Data\CoordinatesTest.cs" />
-    <Compile Include="Tetris\Data\PieceDeltaTests.cs" />
-    <Compile Include="Tetris\Data\PoseTests.cs" />
-    <Compile Include="Tetris\Extraction\PieceMatcherTests.cs" />
-    <Compile Include="Tetris\TetrisLevelTests.cs" />
-    <Compile Include="Tetris\Data\ShapeTests.cs" />
-    <Compile Include="Tetris\Data\GameStateTests.cs" />
-    <Compile Include="Tetris\Searching\SearchTests.cs" />
+    <Compile Include="Game\Tetris\Data\CoordinatesTest.cs" />
+    <Compile Include="Game\Tetris\Data\PieceDeltaTests.cs" />
+    <Compile Include="Game\Tetris\Data\PoseTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\PieceMatcherTests.cs" />
+    <Compile Include="Game\Tetris\TetrisLevelTests.cs" />
+    <Compile Include="Game\Tetris\Data\ShapeTests.cs" />
+    <Compile Include="Game\Tetris\Data\GameStateTests.cs" />
+    <Compile Include="Game\Tetris\Searching\SearchTests.cs" />
     <Compile Include="Core\Data\EmguScreenshotTests.cs" />
     <Compile Include="Core\Data\ButtonTests.cs" />
     <Compile Include="Emulation\EmulatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Robot\Quantizers\QuantizerTests.cs" />
-    <Compile Include="Tetris\TetrisEmulatorTests.cs" />
-    <Compile Include="Tetris\TetrisAiTests.cs" />
-    <Compile Include="Tetris\Extraction\TetrisExtractorTests.cs" />
-    <Compile Include="Tetris\Searching\Heuristics\YiyuanLeeHeuristicTests.cs" />
-    <Compile Include="Tetris\Data\PieceTests.cs" />
-    <Compile Include="Tetris\Data\BoardTests.cs" />
-    <Compile Include="Tetris\Data\TetrominoTests.cs" />
+    <Compile Include="Engine\Physical\Quantizers\QuantizerTests.cs" />
+    <Compile Include="Game\Tetris\TetrisAiTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\TetrisExtractorTests.cs" />
+    <Compile Include="Game\Tetris\Searching\Heuristics\YiyuanLeeHeuristicTests.cs" />
+    <Compile Include="Game\Tetris\Data\PieceTests.cs" />
+    <Compile Include="Game\Tetris\Data\BoardTests.cs" />
+    <Compile Include="Game\Tetris\Data\TetrominoTests.cs" />
+    <Compile Include="TestImages.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestImages.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -189,18 +198,43 @@
       <Project>{99dd5df9-be92-4704-83e6-36554b296a90}</Project>
       <Name>GameBot.Emulation</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GameBot.Engine.Emulated\GameBot.Engine.Emulated.csproj">
+      <Project>{dfe3f4ee-2d6f-4b48-87c0-589cb5443133}</Project>
+      <Name>GameBot.Engine.Emulated</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameBot.Engine.Physical\GameBot.Engine.Physical.csproj">
+      <Project>{e787f6b0-3372-4df8-8942-7e8789b83d85}</Project>
+      <Name>GameBot.Engine.Physical</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GameBot.Game.Tetris\GameBot.Game.Tetris.csproj">
       <Project>{f2a4ec65-2edc-4edc-810d-0f755243e289}</Project>
       <Name>GameBot.Game.Tetris</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GameBot.Robot\GameBot.Robot.csproj">
-      <Project>{a889b0a7-c49b-4688-a8be-81a23c0d7421}</Project>
-      <Name>GameBot.Robot</Name>
+    <ProjectReference Include="..\GameBot.Robot.Ui\GameBot.Robot.Ui.csproj">
+      <Project>{3ad8ee7e-af10-4219-b5d8-ec4dc167f6eb}</Project>
+      <Name>GameBot.Robot.Ui</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Engine\Emulated\" />
+  </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestImages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>TestImages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BlockTemplate.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\block.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dilate.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
