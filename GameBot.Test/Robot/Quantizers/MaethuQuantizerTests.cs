@@ -35,9 +35,10 @@ namespace GameBot.Test.Robot.Quantizers
             // playground....
             stopwatch.Start();
             {
-                GaussAndAdaptive(img);
+                //GaussAndAdaptive(img);
                 //GaussContrastAndAdaptive(img);
                 //Canny(img);
+                CannyDilate(img);
                 //TemplateMatching(img);
             }
             stopwatch.Stop();
@@ -66,6 +67,19 @@ namespace GameBot.Test.Robot.Quantizers
         {
             //CvInvoke.GaussianBlur(img, img, new Size(3, 3), 0.6, 0.6, BorderType.Default);
             CvInvoke.Canny(img, img, 200, 900, 5);
+        }
+
+        private void CannyDilate(IImage img)
+        {
+            var dilate = new Mat(@"C:\users\winkler\desktop\dilate.png", LoadImageType.Grayscale);
+
+            //CvInvoke.GaussianBlur(img, img, new Size(3, 3), 0.6, 0.6, BorderType.Default);
+            CvInvoke.Canny(img, img, 70, 70, 3);
+            CvInvoke.Dilate(img, img, dilate, new Point(1, 1), 1, BorderType.Default, new Emgu.CV.Structure.MCvScalar(1));
+            //CvInvoke.Erode(img, img, dilate, new Point(1, 1), 1, BorderType.Default, new Emgu.CV.Structure.MCvScalar(1));
+            
+            //var template = new Mat(@"C:\users\winkler\desktop\block.png", LoadImageType.Grayscale);
+            //CvInvoke.MatchTemplate(img, template, img, TemplateMatchingType.CcoeffNormed);
         }
 
         private void TemplateMatching(IImage img)
