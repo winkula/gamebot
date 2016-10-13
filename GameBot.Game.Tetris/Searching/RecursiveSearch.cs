@@ -8,12 +8,12 @@ namespace GameBot.Game.Tetris.Searching
 {
     public class RecursiveSearch : BaseSearch
     {
-        private readonly int depth;
+        public int Depth;
         private readonly ICollection<Tetromino> tetrominos;
 
-        public RecursiveSearch(IHeuristic heuristic, int depth) : base(heuristic)
+        public RecursiveSearch(IHeuristic heuristic) : base(heuristic)
         {
-            this.depth = depth;
+            Depth = 3;
             this.tetrominos = Enum.GetValues(typeof(Tetromino)).Cast<Tetromino>().ToList();
         }
 
@@ -53,7 +53,7 @@ namespace GameBot.Game.Tetris.Searching
 
         protected Node SearchRecursive(Node parent, int depth)
         {
-            if (depth >= this.depth)
+            if (depth >= Depth)
             {
                 // depth limit is reached -> score the game state
                 parent.Score = heuristic.Score(parent.GameState);
@@ -82,13 +82,14 @@ namespace GameBot.Game.Tetris.Searching
             {
                 // search probabilistic
 
-                double expected = 0;
+                //double expected = 0;
+                double minimal = double.MaxValue;
                 bestNode = parent;
 
                 // test each tetromino with its chance to appear
                 foreach (var tetromino in tetrominos)
                 {
-                    double chance = tetromino.GetChance();
+                    //double chance = tetromino.GetChance();
 
                     //Node bestNodeForThisTetromino = null;
                     double bestScoreForThisTetromino = double.NegativeInfinity;
@@ -106,10 +107,12 @@ namespace GameBot.Game.Tetris.Searching
                         }
                     }
 
-                    expected += chance * bestScoreForThisTetromino;
+                    //expected += chance * bestScoreForThisTetromino;
+                    minimal = Math.Min(minimal, bestScoreForThisTetromino);
                 }
 
-                bestNode.Score = expected;
+                //bestNode.Score = expected;
+                bestNode.Score = minimal;
             }
 
             return bestNode;

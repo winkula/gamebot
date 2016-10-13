@@ -20,8 +20,9 @@ namespace GameBot.Game.Tetris.Simulator
             ConfigureLogging();
 
             var heuristic = new YiyuanLeeHeuristic();
-            //var tetrisSearch = new SimpleSearch(heuristic);
-            var tetrisSearch = new RecursiveSearch(heuristic, 3);
+            var tetrisSearch = new SimpleSearch(heuristic);
+            //var tetrisSearch = new RecursiveSearch(heuristic);
+            //tetrisSearch.Depth = 3;
 
             var tetrisSimulator = new TetrisSimulator();
             var engine = new SimulatorEngine(tetrisSearch, tetrisSimulator);

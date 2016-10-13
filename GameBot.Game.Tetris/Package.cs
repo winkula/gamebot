@@ -14,7 +14,8 @@ namespace GameBot.Game.Tetris
         {
             container.RegisterSingleton<IAgent, TetrisAgent>();
 
-            container.RegisterSingleton<ISearch, SimpleSearch>();
+            //container.RegisterSingleton<ISearch, SimpleSearch>();
+            container.RegisterSingleton<ISearch, RecursiveSearch>();
             container.RegisterSingleton<IHeuristic, YiyuanLeeHeuristic>();
 
             container.RegisterSingleton<TetrisExtractor>();

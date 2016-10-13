@@ -25,7 +25,8 @@ namespace GameBot.Test.Game.Tetris.Searching
 
             simpleSearch = new SimpleSearch(heuristic);
             probabilisticSearch = new ProbabilisticSearch(heuristic);
-            recursiveSearch = new RecursiveSearch(heuristic, 2);
+            recursiveSearch = new RecursiveSearch(heuristic);
+            recursiveSearch.Depth = 2;
         }
 
         [TestCase(Tetromino.O, Tetromino.S)]
