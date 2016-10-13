@@ -1,14 +1,16 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Core.Data.Commands;
 using GameBot.Game.Tetris;
+using NLog;
 using NUnit.Framework;
-using System.Diagnostics;
 
 namespace GameBot.Test.Tetris
 {
     [TestFixture]
     public class TetrisEmulatorTests
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         [Test]
         public void Constructor()
         {
@@ -20,7 +22,7 @@ namespace GameBot.Test.Tetris
         {
             var emulator = new TetrisSimulator();
             
-            Debug.WriteLine(emulator.GameState);
+            logger.Info(emulator.GameState);
 
             emulator.Simulate(new HitCommand(Button.Down));
             emulator.Simulate(new HitCommand(Button.Down));
@@ -28,7 +30,7 @@ namespace GameBot.Test.Tetris
             emulator.Simulate(new HitCommand(Button.Down));
             emulator.Simulate(new HitCommand(Button.Down));
 
-            Debug.WriteLine(emulator.GameState);
+            logger.Info(emulator.GameState);
         }
     }
 }

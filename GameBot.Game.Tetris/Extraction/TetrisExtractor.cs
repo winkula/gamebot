@@ -1,10 +1,8 @@
 ﻿using System;
 using GameBot.Core;
 using GameBot.Core.Data;
-using System.Linq;
 using System.Drawing;
 using GameBot.Game.Tetris.Data;
-using System.IO;
 using System.Collections.Generic;
 
 namespace GameBot.Game.Tetris.Extraction

@@ -2,14 +2,16 @@
 using GameBot.Core.Data.Commands;
 using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Data;
+using NLog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace GameBot.Game.Tetris.States
 {
     public class TetrisStartState : ITetrisState
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private TetrisAgent agent;
 
         private readonly int startLevel;
@@ -37,7 +39,7 @@ namespace GameBot.Game.Tetris.States
                 agent.GameState = new GameState();
                 agent.GameState.StartLevel = startLevel;
 
-                Debug.WriteLine("> Game started. Initialization sequence executed.");
+                logger.Info("> Game started. Initialization sequence executed.");
                 agent.SetState(new TetrisAnalyzeState(agent, null));
             }
         }

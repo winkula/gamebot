@@ -1,5 +1,4 @@
 ﻿using Emgu.CV;
-using GameBot.Core.Data;
 using System;
 
 namespace GameBot.Core

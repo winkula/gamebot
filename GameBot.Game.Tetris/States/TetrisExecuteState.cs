@@ -1,15 +1,17 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Data;
+using NLog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace GameBot.Game.Tetris.States
 {
     public class TetrisExecuteState : ITetrisState
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private TetrisAgent agent;
 
         private Queue<Move> moves;
@@ -43,12 +45,12 @@ namespace GameBot.Game.Tetris.States
             {
                 var now = agent.TimeProvider.Time;
                 var expectedFallDistance = GetExpectedFallDistance(now);
-                Debug.WriteLine("> Check command. Maximal expected fall distance is " + expectedFallDistance);
+                logger.Info("> Check command. Maximal expected fall distance is " + expectedFallDistance);
                                 
                 var piece = agent.Extractor.ExtractMovedPieceWithErrorTolerance(agent.Screenshot, lastPosition, lastMove.Value, expectedFallDistance);
                 if (piece == null)
                 {
-                    Debug.WriteLine("> PIECE NOT FOUND! Looking for " + lastPosition.Tetromino + ". Try again.");
+                    logger.Info("> PIECE NOT FOUND! Looking for " + lastPosition.Tetromino + ". Try again.");
                     return;
                 }
 
@@ -66,7 +68,7 @@ namespace GameBot.Game.Tetris.States
                 else
                 {
                     // the command was not executed and the tile is in the old position
-                    Debug.WriteLine("> Failed to execute the command.");
+                    logger.Info("> Failed to execute the command.");
                     RepeatCommand();
                     return; // we return here because we need a new screenshot
                 }
@@ -149,7 +151,7 @@ namespace GameBot.Game.Tetris.States
 
         private void Execute(Move move)
         {
-            Debug.WriteLine("> Execute " + move);
+            logger.Info("> Execute " + move);
             switch (move)
             {
                 case Move.Left:

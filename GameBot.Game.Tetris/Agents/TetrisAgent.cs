@@ -2,7 +2,6 @@
 using Emgu.CV.Structure;
 using GameBot.Core;
 using System.Drawing;
-using GameBot.Core.Ui;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.States;
 using System;
@@ -20,7 +19,6 @@ namespace GameBot.Game.Tetris.Agents
 
         // global services
         public IConfig Config { get; private set; }
-        public IDebugger Debugger { get; private set; }
         public ITimeProvider TimeProvider { get; private set; }
         public TetrisExtractor Extractor { get; private set; }
         public TetrisAi Ai { get; private set; }
@@ -31,10 +29,9 @@ namespace GameBot.Game.Tetris.Agents
         // global data
         public GameState GameState { get; set; }
 
-        public TetrisAgent(IConfig config, TetrisExtractor extractor, TetrisAi ai, ISearch search, ITimeProvider timeProvider, IDebugger debugger)
+        public TetrisAgent(IConfig config, TetrisExtractor extractor, TetrisAi ai, ISearch search, ITimeProvider timeProvider)
         {
             Config = config;
-            Debugger = debugger;
             TimeProvider = timeProvider;
             Extractor = extractor;
             Ai = ai;

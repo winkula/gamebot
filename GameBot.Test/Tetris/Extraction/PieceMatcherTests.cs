@@ -1,7 +1,5 @@
-﻿using GameBot.Game.Tetris.Data;
-using GameBot.Game.Tetris.Extraction;
+﻿using GameBot.Game.Tetris.Extraction;
 using NUnit.Framework;
-using System.Diagnostics;
 
 namespace GameBot.Test.Tetris.Extraction
 {

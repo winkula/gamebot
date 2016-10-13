@@ -19,7 +19,6 @@
  * 
  */
 
-using GameBot.Core;
 using GameBot.Core.Data;
 using System;
 using System.Diagnostics;

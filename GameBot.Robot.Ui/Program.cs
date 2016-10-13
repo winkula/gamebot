@@ -1,4 +1,6 @@
-﻿using GameBot.Core.Ui;
+﻿using NLog;
+using NLog.Config;
+using NLog.Targets;
 using SimpleInjector;
 using System;
 using System.Collections.Generic;
@@ -10,9 +12,6 @@ namespace GameBot.Robot.Ui
 {
     static class Program
     {
-        /// <summary>
-        /// Der Haupteinstiegspunkt für die Anwendung.
-        /// </summary>
         [STAThread]
         static void Main()
         {
@@ -28,13 +27,27 @@ namespace GameBot.Robot.Ui
                     "GameBot.Robot.Ui"));
                 container.Verify();
 
-                Application.Run((Form)container.GetInstance<IUi>());
+                ConfigureLogging();
+
+                Application.Run(container.GetInstance<Window>());
             }
         }
 
         static IEnumerable<Assembly> GetAssemblies(params string[] assemblyNames)
         {
             return assemblyNames.Select(x => Assembly.Load(x)).ToList();
+        }
+
+        static void ConfigureLogging()
+        {
+            var config = new LoggingConfiguration();
+
+            var target = new TraceTarget();
+            target.Layout = @"${message}";
+            config.AddTarget("debugger", target);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, target));
+
+            LogManager.Configuration = config;
         }
     }
 }

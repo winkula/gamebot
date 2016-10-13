@@ -1,8 +1,8 @@
 ﻿using GameBot.Core.Data;
-using GameBot.Game.Tetris;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Robot.Configuration;
+using NLog;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
@@ -12,6 +12,8 @@ namespace GameBot.Test.Tetris.Extraction
     [TestFixture]
     public class TetrisExtractorTests
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         [Test]
         public void Constructor()
         {
@@ -41,11 +43,11 @@ namespace GameBot.Test.Tetris.Extraction
             Assert.NotNull(gameState.Piece);
             Assert.NotNull(gameState.NextPiece);
 
-            Debug.WriteLine(gameState.Piece);
-            Debug.WriteLine(gameState.NextPiece);
+            logger.Info(gameState.Piece);
+            logger.Info(gameState.NextPiece);
 
-            Debug.WriteLine(gameState);
-            Debug.WriteLine(gameState.Board);
+            logger.Info(gameState);
+            logger.Info(gameState.Board);
         }
 
         [Test]

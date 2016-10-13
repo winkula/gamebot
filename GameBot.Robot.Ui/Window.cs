@@ -8,14 +8,16 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-using GameBot.Core.Ui;
 using GameBot.Robot.Quantizers;
 using GameBot.Core.Exceptions;
+using NLog;
 
 namespace GameBot.Robot.Ui
 {
-    public partial class Window : Form, IUi
+    public partial class Window : Form
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private int originalWidth;
         private int originalHeight;
         private int processedWidth;
@@ -97,38 +99,32 @@ namespace GameBot.Robot.Ui
             if (e.KeyChar == 'y')
             {
                 actuator.Hit(Core.Data.Button.A);
-                Debug.WriteLine("> press A");
             }
             if (e.KeyChar == 'x')
             {
                 actuator.Hit(Core.Data.Button.B);
-                Debug.WriteLine("> press B");
             }
             if (e.KeyChar == 'a')
             {
                 actuator.Hit(Core.Data.Button.Left);
-                Debug.WriteLine("> press Left");
             }
             if (e.KeyChar == 'd')
             {
                 actuator.Hit(Core.Data.Button.Right);
-                Debug.WriteLine("> press Right");
             }
             if (e.KeyChar == 'c')
             {
                 actuator.Hit(Core.Data.Button.Start);
-                Debug.WriteLine("> press Start");
             }
             if (e.KeyChar == 'v')
             {
                 actuator.Hit(Core.Data.Button.Select);
-                Debug.WriteLine("> press Select");
             }
 
             if (e.KeyChar == 'p')
             {
                 play = !play;
-                Debug.WriteLine(play ? "> play" : "> don't play");
+                logger.Info(play ? "Play A.I." : "Pause A.I.");
             }
             if (e.KeyChar == 'q')
             {
@@ -138,19 +134,19 @@ namespace GameBot.Robot.Ui
             {
                 // clear
                 keypoints.Clear();
-                Debug.WriteLine("reset temp stuff");
+                logger.Info("Reset temporary keypoints");
             }
             if (e.KeyChar == 's')
             {
                 // save
                 if (keypointsApplied.Count == 8)
                 {
-                    Debug.WriteLine("keypoints: " + string.Join(",", keypointsApplied));
+                    logger.Info("Keypoints: " + string.Join(",", keypointsApplied));
 
                     config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsApplied));
                     config.Save();
 
-                    Debug.WriteLine("saved configuration");
+                    logger.Info("Saved configuration");
                 }
             }
         }
@@ -159,14 +155,14 @@ namespace GameBot.Robot.Ui
         {
             keypoints.Add(e.X);
             keypoints.Add(e.Y);
-            Debug.WriteLine("added keypoint");
+            logger.Info($"Added keypoint ({e.X}, {e.Y})");
 
             if (keypoints.Count >= 8 && quantizer != null)
             {
                 keypointsApplied = keypoints.Take(8).ToList();
                 quantizer.CalculatePerspectiveTransform(keypointsApplied.Select(x => (float)x));
                 keypoints.Clear();
-                Debug.WriteLine("applied keypoints");
+                logger.Info($"Applied keypoints {keypointsApplied}");
             }
         }
 
@@ -199,7 +195,7 @@ namespace GameBot.Robot.Ui
                 }
                 catch (GameOverException)
                 {
-                    Debug.WriteLine("> Game over!");
+                    logger.Info("Game over");
                     play = false;
                 }
             }

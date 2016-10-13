@@ -6,7 +6,6 @@ using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Searching.Heuristics;
 using SimpleInjector;
 using SimpleInjector.Packaging;
-using System.Reflection;
 
 namespace GameBot.Game.Tetris
 {

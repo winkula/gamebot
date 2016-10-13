@@ -1,10 +1,7 @@
 ﻿using Emgu.CV;
-using Emgu.CV.Structure;
 using GameBot.Core;
 using GameBot.Core.Data;
-using GameBot.Core.Ui;
 using System;
-using System.Collections.Generic;
 
 namespace GameBot.Robot.Engines
 {
@@ -17,9 +14,8 @@ namespace GameBot.Robot.Engines
         private readonly IAgent agent;
         private readonly IActuator actuator;
         private readonly ITimeProvider timeProvider;
-        private readonly IDebugger debugger;
 
-        public UiEngine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IActuator actuator, ITimeProvider timeProvider, IDebugger debugger)
+        public UiEngine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IActuator actuator, ITimeProvider timeProvider)
         {
             this.config = config;
 
@@ -28,7 +24,6 @@ namespace GameBot.Robot.Engines
             this.agent = agent;
             this.actuator = actuator;
             this.timeProvider = timeProvider;
-            this.debugger = debugger;
         }
 
         public void Run()

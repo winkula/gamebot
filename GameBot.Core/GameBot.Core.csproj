@@ -151,8 +151,6 @@
     <Compile Include="IQuantizer.cs" />
     <Compile Include="Data\IScreenshot.cs" />
     <Compile Include="ITimeProvider.cs" />
-    <Compile Include="Ui\IDebugger.cs" />
-    <Compile Include="Ui\IUi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,8 +2,7 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using GameBot.Core;
-using GameBot.Core.Data;
-using System;
+using NLog;
 using System.Diagnostics;
 using System.Drawing;
 using System.Text;
@@ -12,6 +11,8 @@ namespace GameBot.Robot.Quantizers
 {
     public class BlockQuantizer : IQuantizer
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private bool adjust;
         private int c = 5;
         private int block = 13;
@@ -44,19 +45,19 @@ namespace GameBot.Robot.Quantizers
             // calculate transformation matrix
             var transform = CvInvoke.GetPerspectiveTransform(srcKeypoints, destKeypoints);
 
-            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, GetPerspectiveTransform");
+            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, GetPerspectiveTransform");
             stopwatch.Restart();
 
             // transform
             CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(160, 144), Inter.Linear, Warp.Default);
 
-            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, WarpPerspective");
+            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, WarpPerspective");
             stopwatch.Restart();
 
             // threshold
             CvInvoke.AdaptiveThreshold(destImage, destImageBin, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, block, c);
 
-            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, AdaptiveThreshold");
+            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, AdaptiveThreshold");
             stopwatch.Restart();
 
             // get blocks
@@ -82,7 +83,7 @@ namespace GameBot.Robot.Quantizers
             }
             Debug.Write(sb.ToString());
 
-            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, GetBlocks");
+            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, GetBlocks");
             stopwatch.Restart();
 
             CvInvoke.Imshow("Test", destImageBin);
@@ -103,8 +104,8 @@ namespace GameBot.Robot.Quantizers
 
                 if (block < 3) block = 3;
 
-                Debug.WriteLine("Constant: " + c);
-                Debug.WriteLine("Block size: " + block);
+                logger.Info("Constant: " + c);
+                logger.Info("Block size: " + block);
             }
 
             return destImageBin;

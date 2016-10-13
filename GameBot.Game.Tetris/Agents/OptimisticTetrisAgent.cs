@@ -3,19 +3,19 @@ using Emgu.CV.Structure;
 using GameBot.Core;
 using System.Drawing;
 using System;
-using GameBot.Core.Ui;
 using GameBot.Core.Data;
-using GameBot.Core.Data.Commands;
 using System.Collections.Generic;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Data;
+using NLog;
 
 namespace GameBot.Game.Tetris.Agents
 {
     public class OptimisticTetrisAgent : IAgent
     {
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         private readonly ITimeProvider timeProvider;
-        private readonly IDebugger debugger;
         private readonly IExtractor<GameState> extractor;
         private readonly TetrisAi ai;
 
@@ -23,10 +23,9 @@ namespace GameBot.Game.Tetris.Agents
         private bool awaitNextTetromino = true;
         private TimeSpan timeNextAction = TimeSpan.Zero;
         
-        public OptimisticTetrisAgent(IExtractor<GameState> extractor, TetrisAi ai, ITimeProvider timeProvider, IDebugger debugger)
+        public OptimisticTetrisAgent(IExtractor<GameState> extractor, TetrisAi ai, ITimeProvider timeProvider)
         {
             this.timeProvider = timeProvider;
-            this.debugger = debugger;
             this.extractor = extractor;
             this.ai = ai;
         }
@@ -71,7 +70,7 @@ namespace GameBot.Game.Tetris.Agents
                 awaitNextTetromino = true;
             }
             
-            debugger.WriteStatic(ai.CurrentGameState);
+            logger.Info("Current game state: " + ai.CurrentGameState);
 
             return awaitNextTetromino &&
                 gameState.Piece != null &&

@@ -1,9 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
 using GameBot.Core;
-using GameBot.Core.Data;
-using System;
+using NLog;
 using System.Diagnostics;
 using System.Drawing;
 
@@ -11,6 +9,8 @@ namespace GameBot.Robot.Quantizers
 {
     public class ThresholdQuantizer : IQuantizer
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private bool adjust;
         private int threshold = 50;
         private float[,] keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
@@ -40,19 +40,19 @@ namespace GameBot.Robot.Quantizers
 
             var transform = CvInvoke.GetPerspectiveTransform(image, destMat);
 
-            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, GetPerspectiveTransform");
+            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, GetPerspectiveTransform");
             stopwatch.Restart();
 
             // transform
             CvInvoke.WarpPerspective(sourceImage, destImageMat, transform, new Size(160, 144), Inter.Linear, Warp.Default);
 
 
-            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, Threshold");
+            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, Threshold");
             stopwatch.Restart();
 
             CvInvoke.Threshold(destImage, destImageBin, threshold, 255, ThresholdType.Binary);
 
-            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, Threshold");
+            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, Threshold");
             stopwatch.Restart();
 
             while (adjust)
@@ -67,7 +67,7 @@ namespace GameBot.Robot.Quantizers
                 if (key == 2555904) threshold--;
                 if (key == 27) break;
 
-                Debug.WriteLine("Threshold: " + threshold);
+                logger.Info("Threshold: " + threshold);
             }
 
             var screenshot = new Screenshot(destImageBin.ToBitmap(), new TimeSpan());
@@ -88,19 +88,19 @@ namespace GameBot.Robot.Quantizers
             // calculate transformation matrix
             var transform = CvInvoke.GetPerspectiveTransform(srcKeypoints, destKeypoints);
 
-            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, GetPerspectiveTransform");
+            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, GetPerspectiveTransform");
             stopwatch.Restart();
 
             // transform
             CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(160, 144), Inter.Linear, Warp.Default);
 
-            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, WarpPerspective");
+            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, WarpPerspective");
             stopwatch.Restart();
 
             // threshold
             CvInvoke.Threshold(destImage, destImageBin, threshold, 255, ThresholdType.Binary);
 
-            Debug.WriteLine($"{stopwatch.ElapsedMilliseconds} ms, Threshold");
+            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, Threshold");
             stopwatch.Restart();
 
             while (adjust)
@@ -115,7 +115,7 @@ namespace GameBot.Robot.Quantizers
                 if (key == 2555904) threshold--;
                 if (key == 27) break;
 
-                Debug.WriteLine("Threshold: " + threshold);
+                logger.Info("Threshold: " + threshold);
             }
 
             return destImageBin;

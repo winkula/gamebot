@@ -2,13 +2,15 @@
 using System;
 using GameBot.Core.Data;
 using Tinkerforge;
-using System.Diagnostics;
 using System.Threading;
+using NLog;
 
 namespace GameBot.Robot.Actuators
 {
     public class Actuator : IActuator, IDisposable
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private const int DelayHit = 40;
         private const int DelayCommand = 50;
 
@@ -51,18 +53,20 @@ namespace GameBot.Robot.Actuators
             
             // Get current stack voltage (unit is mV)
             int stackVoltage = master.GetStackVoltage();
-            Debug.WriteLine("Stack Voltage: " + stackVoltage / 1000.0 + " V");
+            logger.Info("Stack Voltage: " + stackVoltage / 1000.0 + " V");
 
             // Get current stack current (unit is mA)
             int stackCurrent = master.GetStackCurrent();
-            Debug.WriteLine("Stack Current: " + stackCurrent / 1000.0 + " A");
+            logger.Info("Stack Current: " + stackCurrent / 1000.0 + " A");
 
             short ChipTemp = tir.GetAmbientTemperature();
-            Debug.WriteLine("Chibi master address: " + ChipTemp / 10 + "°/C");
+            logger.Info("Chibi master address: " + ChipTemp / 10 + "°/C");
         }
 
         public void Hit(Button button)
         {
+            logger.Info($"Hit button {button}");
+
             HandleState(button, true);
             Thread.Sleep(DelayHit);
             HandleState(button, false);
@@ -71,12 +75,16 @@ namespace GameBot.Robot.Actuators
 
         public void Press(Button button)
         {
+            logger.Info($"Press button {button}");
+
             HandleState(button, true);
             Thread.Sleep(DelayCommand);
         }
 
         public void Release(Button button)
         {
+            logger.Info($"Release button {button}");
+
             HandleState(button, false);
             Thread.Sleep(DelayCommand);
         }

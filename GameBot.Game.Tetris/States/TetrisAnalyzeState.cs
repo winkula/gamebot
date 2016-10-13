@@ -2,14 +2,16 @@
 using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Searching;
+using NLog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace GameBot.Game.Tetris.States
 {
     public class TetrisAnalyzeState : ITetrisState
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private TetrisAgent agent;
 
         private Tetromino? currentTetromino;
@@ -18,7 +20,7 @@ namespace GameBot.Game.Tetris.States
         private Tetromino? extractedNextPiece;
 
         private TimeSpan timeNextAction = TimeSpan.Zero;
-
+        
         public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)
         {
             this.agent = agent;
@@ -40,7 +42,7 @@ namespace GameBot.Game.Tetris.States
 
                 // we found a new piece. release the down key (end the drop)
                 agent.Actuator.Release(Button.Down);
-                Debug.WriteLine("> End the drop.");
+                logger.Info("> End the drop.");
 
                 // do the search
                 // this is the essence of the a.i.
@@ -48,11 +50,11 @@ namespace GameBot.Game.Tetris.States
 
                 if (results != null)
                 {
-                    Debug.WriteLine("> AI found a solution.");
-                    Debug.WriteLine(results.GoalGameState);
+                    logger.Info("> AI found a solution.");
+                    logger.Info(results.GoalGameState);
                     foreach (var move in results.Moves)
                     {
-                        Debug.WriteLine(move);
+                        logger.Info(move);
                     }
 
                     // somthing found.. we can execute now
@@ -82,7 +84,7 @@ namespace GameBot.Game.Tetris.States
 
             if (currentTetromino.HasValue && currentTetromino.Value != extractedPiece.Tetromino)
             {
-                Debug.WriteLine("> Extracted inconsistent current piece!");
+                logger.Info("> Extracted inconsistent current piece!");
                 return false;
             }
 

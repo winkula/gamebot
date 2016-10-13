@@ -1,5 +1,4 @@
-﻿using GameBot.Core.Data;
-using GameBot.Game.Tetris.Data;
+﻿using GameBot.Game.Tetris.Data;
 using System;
 
 namespace GameBot.Game.Tetris.Extraction

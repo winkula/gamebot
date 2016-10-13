@@ -1,17 +1,19 @@
 ﻿using GameBot.Core;
 using System;
 using GameBot.Core.Data;
-using System.Diagnostics;
 using System.Collections.Generic;
 using GameBot.Core.Data.Commands;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Searching.Heuristics;
+using NLog;
 
 namespace GameBot.Game.Tetris
 {
     public class TetrisAi
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private readonly IConfig config;
         private readonly ISearch search;
 
@@ -104,7 +106,7 @@ namespace GameBot.Game.Tetris
                 }
             }
 
-            Debug.WriteLine(CurrentGameState);
+            logger.Info(CurrentGameState);
             return commands;
         }
 

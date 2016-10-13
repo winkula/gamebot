@@ -5,17 +5,19 @@ using GameBot.Core.Data.Commands;
 using GameBot.Core.Exceptions;
 using GameBot.Game.Tetris;
 using GameBot.Game.Tetris.Data;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 
 namespace GameBot.Robot.Engines
 {
     public class FastEngine : IEngine
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private readonly IPlayer<GameState> player;
         private readonly TetrisSimulator simulator;
 
@@ -47,7 +49,7 @@ namespace GameBot.Robot.Engines
                 try
                 {
                     // status log
-                    if (round % 100 == 0) Debug.WriteLine("Play round " + round + "...");
+                    if (round % 100 == 0) logger.Info("Play round " + round + "...");
 
                     Update();
                     //Render();
@@ -84,7 +86,7 @@ namespace GameBot.Robot.Engines
 
         protected void Render()
         {
-            //Debug.WriteLine(simulator.GameState);
+            //logger.Info(simulator.GameState);
             //Thread.Sleep(200);
         }
 

@@ -1,11 +1,4 @@
-﻿using GameBot.Game.Tetris.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GameBot.Game.Tetris.Extraction
+﻿namespace GameBot.Game.Tetris.Extraction
 {
     public class PieceExtractor
     {

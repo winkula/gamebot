@@ -1,9 +1,5 @@
 ﻿using GameBot.Game.Tetris.Data;
 using NUnit.Framework;
-using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
 
 namespace GameBot.Test.Tetris.Data
 {

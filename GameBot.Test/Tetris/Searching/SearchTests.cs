@@ -1,9 +1,8 @@
-﻿using GameBot.Game.Tetris;
-using GameBot.Game.Tetris.Data;
+﻿using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Searching.Heuristics;
+using NLog;
 using NUnit.Framework;
-using System.Diagnostics;
 using System.Linq;
 
 namespace GameBot.Test.Tetris.Searching
@@ -11,6 +10,8 @@ namespace GameBot.Test.Tetris.Searching
     [TestFixture]
     public class TetrisSearchTests
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private IHeuristic heuristic;
 
         private SimpleSearch simpleSearch;
@@ -39,7 +40,7 @@ namespace GameBot.Test.Tetris.Searching
             var gameState = new GameState(current, next);
             
             var result = simpleSearch.Search(gameState);
-            Debug.WriteLine(result.GoalGameState);
+            logger.Info(result.GoalGameState);
         }
 
         [TestCase(Tetromino.T, Tetromino.J)]
@@ -48,10 +49,10 @@ namespace GameBot.Test.Tetris.Searching
             var simpleSearchLocal = new SimpleSearch(new YiyuanLeeHeuristic());
 
             var gameState = new GameState(current, next);
-            Debug.WriteLine(gameState);
+            logger.Info(gameState);
 
             var result = simpleSearchLocal.Search(gameState);
-            Debug.WriteLine(result.GoalGameState);
+            logger.Info(result.GoalGameState);
 
             Assert.AreEqual(3, result.Moves.Count());
             Assert.AreEqual(Move.Rotate, result.Moves.ToList()[0]);
@@ -71,7 +72,7 @@ namespace GameBot.Test.Tetris.Searching
             var gameState = new GameState(current, next);
 
             var result = probabilisticSearch.Search(gameState);
-            Debug.WriteLine(result.GoalGameState);
+            logger.Info(result.GoalGameState);
         }
 
         [TestCase(Tetromino.O, Tetromino.S)]
@@ -86,7 +87,7 @@ namespace GameBot.Test.Tetris.Searching
             var gameState = new GameState(current, next);
 
             var result = recursiveSearch.Search(gameState);
-            Debug.WriteLine(result.GoalGameState);
+            logger.Info(result.GoalGameState);
         }
     }
 }

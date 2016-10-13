@@ -1,5 +1,4 @@
 ﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
 using GameBot.Core;
 
 namespace GameBot.Robot.Cameras

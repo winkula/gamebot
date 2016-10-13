@@ -1,10 +1,8 @@
 ﻿using Emgu.CV;
-using Emgu.CV.Structure;
 using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Emulation;
 using System;
-using System.Collections.Generic;
 
 namespace GameBot.Robot.Engines
 {

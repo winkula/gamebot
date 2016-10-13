@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
+using NLog;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
@@ -11,6 +12,8 @@ namespace GameBot.Test.Robot.Quantizers
     [TestFixture]
     public class MaethuQuantizerTests
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         [Test]
         public void TestMe()
         {
@@ -44,7 +47,7 @@ namespace GameBot.Test.Robot.Quantizers
                 //TemplateMatching(img);
             }
             stopwatch.Stop();
-            Debug.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
+            logger.Info($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
 
             // show/save 
             string outputFilename = "output.png";

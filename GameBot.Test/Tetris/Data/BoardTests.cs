@@ -1,12 +1,14 @@
 ﻿using GameBot.Game.Tetris.Data;
+using NLog;
 using NUnit.Framework;
-using System.Diagnostics;
 
 namespace GameBot.Test.Tetris.Data
 {
     [TestFixture]
     public class BoardTests
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         [Test]
         public void Constructor()
         {
@@ -38,7 +40,7 @@ namespace GameBot.Test.Tetris.Data
             Assert.AreEqual(19, board.Height);
             Assert.AreEqual(0, board.Pieces);
 
-            Debug.WriteLine(board.ToString());
+            logger.Info(board.ToString());
 
             for (int x = 0; x < board.Width; x++)
             {
@@ -134,7 +136,7 @@ namespace GameBot.Test.Tetris.Data
             {
                 for (int _y = 0; _y < board.Height; _y++)
                 {
-                    Debug.WriteLine(_x + "," + _y);
+                    logger.Info(_x + "," + _y);
                     if (_x != x || _y != y)
                     {
                         Assert.True(board.IsOccupied(_x, _y));
@@ -383,8 +385,8 @@ namespace GameBot.Test.Tetris.Data
             board.Place(piece);
             board.RemoveLines();
 
-            Debug.WriteLine(board.ToString());
-            Debug.WriteLine(expected.ToString());
+            logger.Info(board.ToString());
+            logger.Info(expected.ToString());
 
             Assert.True(SquaresEqual(expected, board));
         }
