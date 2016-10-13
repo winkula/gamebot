@@ -7,7 +7,7 @@ namespace GameBot.Game.Tetris.Searching
     {
         public Node Parent { get; set; }
         public GameState GameState { get; set; }
-        public Way Moves { get; set; }
+        public Way Way { get; set; }
         public double Score { get; set; }
 
         public Node(GameState gameState, Node parent)
@@ -36,7 +36,7 @@ namespace GameBot.Game.Tetris.Searching
                         var fall = successor.Drop();
 
                         var node = new Node(successor, this);
-                        node.Moves = new Way(orientation, translation, fall);
+                        node.Way = new Way(orientation, translation, fall);
 
                         yield return node;
                     }

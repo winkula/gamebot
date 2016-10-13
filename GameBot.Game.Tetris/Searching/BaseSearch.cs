@@ -53,7 +53,7 @@ namespace GameBot.Game.Tetris.Searching
                 var result = new SearchResult();
                 result.CurrentGameState = root?.GameState;
                 result.GoalGameState = goal?.Parent.GameState;
-                result.Way = goal?.Parent.Moves;
+                result.Way = goal?.Parent.Way;
                 result.Moves = GetMoves(result.Way);
                 return result;
             }

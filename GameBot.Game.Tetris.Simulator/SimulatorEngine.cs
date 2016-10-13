@@ -111,12 +111,14 @@ namespace GameBot.Game.Tetris.Simulator
             logger.Error("Game over");
             Console.WriteLine("Game over");
 
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "/game_log.csv");
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Simulator_Results.csv");
 
             if (!File.Exists(path))
             {
-                File.Create(path);
-                File.AppendAllText(path, "Rounds,Lines,Score,Level,Time\n");
+                using (var writer = File.CreateText(path))
+                {
+                    writer.WriteLine("Rounds,Lines,Score,Level,Time");
+                }
             }
 
             string message = $"{rounds},{simulator.GameState.Lines},{simulator.GameState.Score},{simulator.GameState.Level},{time}\n";

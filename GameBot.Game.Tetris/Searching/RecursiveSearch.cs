@@ -26,23 +26,36 @@ namespace GameBot.Game.Tetris.Searching
             var goal = SearchRecursive(root, 0);
             
             var result = new SearchResult();
-            result.CurrentGameState = root?.GameState;
+            result.CurrentGameState = gameState;
             if (goal != null)
             {
                 result.GoalGameState = goal?.GameState;
-                result.Way = goal?.Moves;
+                result.Way = GetWayToNextSuccessor(goal);
                 result.Moves = GetMoves(result.Way);
             }
 
             return result;
         }
 
+        private Way GetWayToNextSuccessor(Node goal)
+        {
+            Way way = null;
+
+            Node parent = goal;
+            while (parent != null && parent.Way != null)
+            {
+                way = parent.Way;
+                parent = parent.Parent;
+            }
+
+            return way;
+        }
+
         protected Node SearchRecursive(Node parent, int depth)
         {
             if (depth >= this.depth)
             {
-                // score
-
+                // depth limit is reached -> score the game state
                 parent.Score = heuristic.Score(parent.GameState);
                 return parent;
             }
@@ -69,7 +82,7 @@ namespace GameBot.Game.Tetris.Searching
             {
                 // search probabilistic
 
-                double expected = double.NegativeInfinity;
+                double expected = 0;
                 bestNode = parent;
 
                 // test each tetromino with its chance to appear
@@ -77,8 +90,8 @@ namespace GameBot.Game.Tetris.Searching
                 {
                     double chance = tetromino.GetChance();
 
-                    //TetrisNode probabBestNode = null;
-                    double probabBestScore = double.NegativeInfinity;
+                    //Node bestNodeForThisTetromino = null;
+                    double bestScoreForThisTetromino = double.NegativeInfinity;
 
                     var newState = new GameState(parent.GameState, new Piece(tetromino));
                     var newNode = new Node(newState, parent);
@@ -86,14 +99,14 @@ namespace GameBot.Game.Tetris.Searching
                     foreach (var successor in newNode.GetSuccessors())
                     {
                         var best = SearchRecursive(successor, depth + 1);
-                        if (best?.Score > probabBestScore)
+                        if (best?.Score > bestScoreForThisTetromino)
                         {
-                            //probabBestNode = best;
-                            probabBestScore = best.Score;
+                            //bestNodeForThisTetromino = best;
+                            bestScoreForThisTetromino = best.Score;
                         }
                     }
 
-                    expected += chance * probabBestScore;
+                    expected += chance * bestScoreForThisTetromino;
                 }
 
                 bestNode.Score = expected;
