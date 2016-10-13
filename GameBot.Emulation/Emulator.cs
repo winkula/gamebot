@@ -34,8 +34,8 @@ namespace GameBot.Emulation
         private const int FramesPerSecond = 60;
         private const int MaxFramesSkipped = 10;
 
-        private const int DisplayWidth = 160;
-        private const int DisplayHeight = 144;
+        private const int DisplayWidth = GameBoyConstants.ScreenWidth;
+        private const int DisplayHeight = GameBoyConstants.ScreenHeight;
 
         private const int FramesAfterButton = 2;
 

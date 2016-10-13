@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
+using GameBot.Core;
 using NLog;
 using NUnit.Framework;
 using System.Diagnostics;
@@ -34,11 +35,11 @@ namespace GameBot.Test.Robot.Quantizers
 
             // calculate transformation matrix
             Matrix<float> srcKeypoints = new Matrix<float>(new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } });
-            Matrix<float> destKeypoints = new Matrix<float>(new float[,] { { 0, 0 }, { 160, 0 }, { 0, 144 }, { 160, 144 } });
+            Matrix<float> destKeypoints = new Matrix<float>(new float[,] { { 0, 0 }, { GameBoyConstants.ScreenWidth, 0 }, { 0, GameBoyConstants.ScreenHeight }, { GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight } });
             var matrix = CvInvoke.GetPerspectiveTransform(srcKeypoints, destKeypoints);
 
             // transform (unwarp and resize to gameboy screen size 160x144)
-            CvInvoke.WarpPerspective(sourceImage, destImage, matrix, new Size(160, 144), Inter.Linear, Warp.Default);
+            CvInvoke.WarpPerspective(sourceImage, destImage, matrix, new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), Inter.Linear, Warp.Default);
 
             // playground....
 

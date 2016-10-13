@@ -9,19 +9,23 @@ namespace GameBot.Game.Tetris.Extraction
 {
     public class TetrisExtractor : IExtractor<GameState>
     {
+        // this probability must be reached to accept a piece
+        // if not, the piece is rejected and the search continues
+        private const double MinimalProbability = 0.9375;
+
+        // where is the threshold of the mean value of a tile, that it is interpreted as a block
+        // optimum is between 185 and 195
+        public const int MeanThreshold = 195;
+
         // this coordinates are in the coordinate system of the tile system of the game boy screen (origin is top left)
         private static Point BoardTileOrigin = new Point(2, 0);
         private static Point CurrentTileOrigin = new Point(5, 0);
         private static Point PreviewTileOrigin = new Point(15, 13);
-
+        
         private readonly IConfig config;
 
         public float BlockThreshold { get; set; }
-
-        // where is the threshold of the mean value of a tile, that it is interpreted as a block
-        // optimum is between 185 and 195
-        public static int MeanThreshold = 195;
-
+        
         // debugging/visualization only
         public IList<Point> Rectangles { get; private set; } = new List<Point>();
 
@@ -245,15 +249,15 @@ namespace GameBot.Game.Tetris.Extraction
             
             for (int i = 0; i <= maxFallDistance; i++)
             {
-                var probailityExpected = GetProbability(screenshot, expectedPosition);
-                if (probailityExpected > highestProbability)
+                var probabilityExpected = GetProbability(screenshot, expectedPosition);
+                if (probabilityExpected > MinimalProbability && probabilityExpected > highestProbability)
                 {
-                    highestProbability = probailityExpected;
+                    highestProbability = probabilityExpected;
                     mostProbablePiece = new Piece(expectedPosition);
                 }
 
                 var probabilityLast = GetProbability(screenshot, lastPositionTemp);
-                if (probabilityLast > highestProbability)
+                if (probabilityLast > MinimalProbability && probabilityLast > highestProbability)
                 {
                     highestProbability = probabilityLast;
                     mostProbablePiece = new Piece(lastPositionTemp);

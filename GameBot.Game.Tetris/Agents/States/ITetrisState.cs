@@ -1,4 +1,4 @@
-﻿namespace GameBot.Game.Tetris.States
+﻿namespace GameBot.Game.Tetris.Agents.States
 {
     public interface ITetrisState
     {

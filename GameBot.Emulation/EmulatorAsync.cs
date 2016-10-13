@@ -19,6 +19,7 @@
  * 
  */
 
+using GameBot.Core;
 using GameBot.Core.Data;
 using System;
 using System.Diagnostics;
@@ -50,8 +51,8 @@ namespace GameBot.Emulation
         const int FRAMES_PER_SECOND = 60;
         const int MAX_FRAMES_SKIPPED = 10;
 
-        const int WIDTH = 160;
-        const int HEIGHT = 144;
+        const int WIDTH = GameBoyConstants.ScreenWidth;
+        const int HEIGHT = GameBoyConstants.ScreenHeight;
 
         private string output;
         public long FREQUENCY = Stopwatch.Frequency;

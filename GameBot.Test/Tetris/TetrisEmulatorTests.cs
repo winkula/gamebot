@@ -24,11 +24,12 @@ namespace GameBot.Test.Tetris
             
             logger.Info(emulator.GameState);
 
-            emulator.Simulate(new HitCommand(Button.Down));
-            emulator.Simulate(new HitCommand(Button.Down));
-            emulator.Simulate(new HitCommand(Button.Down));
-            emulator.Simulate(new HitCommand(Button.Down));
-            emulator.Simulate(new HitCommand(Button.Down));
+            // TODO: implement
+            //emulator.Simulate(new HitCommand(Button.Down));
+            //emulator.Simulate(new HitCommand(Button.Down));
+            //emulator.Simulate(new HitCommand(Button.Down));
+            //emulator.Simulate(new HitCommand(Button.Down));
+            //emulator.Simulate(new HitCommand(Button.Down));
 
             logger.Info(emulator.GameState);
         }

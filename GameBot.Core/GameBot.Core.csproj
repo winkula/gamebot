@@ -144,7 +144,6 @@
     <Compile Include="ICamera.cs" />
     <Compile Include="IConfig.cs" />
     <Compile Include="IEngine.cs" />
-    <Compile Include="ISimulator.cs" />
     <Compile Include="IPlayer.cs" />
     <Compile Include="IAgent.cs" />
     <Compile Include="IExtractor.cs" />

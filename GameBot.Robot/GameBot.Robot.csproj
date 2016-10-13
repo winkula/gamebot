@@ -161,7 +161,6 @@
     <Compile Include="Engines\FastEngine.cs" />
     <Compile Include="Engines\Engine.cs" />
     <Compile Include="Package.cs" />
-    <Compile Include="Quantizers\BlockQuantizer.cs" />
     <Compile Include="Quantizers\PassthroughQuantizer.cs" />
     <Compile Include="Quantizers\Quantizer.cs" />
     <Compile Include="Quantizers\AdaptiveThresholdQuantizer.cs" />

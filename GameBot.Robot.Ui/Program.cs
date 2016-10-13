@@ -4,6 +4,7 @@ using NLog.Targets;
 using SimpleInjector;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
@@ -42,11 +43,18 @@ namespace GameBot.Robot.Ui
         {
             var config = new LoggingConfiguration();
 
-            var target = new TraceTarget();
-            target.Layout = @"${message}";
-            config.AddTarget("debugger", target);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, target));
+            var traceTarget = new TraceTarget();
+            traceTarget.Layout = @"${message}";
+            config.AddTarget("debugger", traceTarget);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, traceTarget));
 
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Log.txt");
+            var fileTarget = new FileTarget();
+            fileTarget.Layout = @"${longdate}|${level:uppercase=true}|${logger}|${message}";
+            fileTarget.FileName = path;
+            config.AddTarget("file", fileTarget);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, fileTarget));
+            
             LogManager.Configuration = config;
         }
     }

@@ -38,7 +38,7 @@ namespace GameBot.Robot.Quantizers
             var destImage = new Mat(sourceImage.Size, DepthType.Default, 1);
             var destImageBin = new Mat(sourceImage.Size, DepthType.Default, 1);            
             Matrix<float> srcKeypoints = new Matrix<float>(keypoints);
-            Matrix<float> destKeypoints = new Matrix<float>(new float[,] { { 0, 0 }, { 160, 0 }, { 0, 144 }, { 160, 144 } });
+            Matrix<float> destKeypoints = new Matrix<float>(new float[,] { { 0, 0 }, { GameBoyConstants.ScreenWidth, 0 }, { 0, GameBoyConstants.ScreenHeight }, { GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight } });
 
             // calculate transformation matrix
             var transform = CvInvoke.GetPerspectiveTransform(srcKeypoints, destKeypoints);
@@ -47,7 +47,7 @@ namespace GameBot.Robot.Quantizers
             stopwatch.Restart();
 
             // transform
-            CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(160, 144), Inter.Linear, Warp.Default);
+            CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), Inter.Linear, Warp.Default);
 
             logger.Info($"{stopwatch.ElapsedMilliseconds} ms, WarpPerspective");
             stopwatch.Restart();

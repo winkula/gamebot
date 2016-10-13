@@ -1,12 +1,11 @@
 ﻿using GameBot.Core.Data;
-using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Data;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GameBot.Game.Tetris.States
+namespace GameBot.Game.Tetris.Agents.States
 {
     public class TetrisExecuteState : ITetrisState
     {

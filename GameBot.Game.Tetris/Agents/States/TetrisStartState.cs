@@ -6,7 +6,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 
-namespace GameBot.Game.Tetris.States
+namespace GameBot.Game.Tetris.Agents.States
 {
     public class TetrisStartState : ITetrisState
     {

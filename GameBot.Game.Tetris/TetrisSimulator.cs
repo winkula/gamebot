@@ -1,11 +1,9 @@
-﻿using GameBot.Core;
-using System;
-using GameBot.Core.Data;
+﻿using System;
 using GameBot.Game.Tetris.Data;
 
 namespace GameBot.Game.Tetris
 {
-    public class TetrisSimulator : ISimulator<GameState>, IActuator
+    public class TetrisSimulator
     {
         private readonly Random random = new Random();
 
@@ -15,36 +13,19 @@ namespace GameBot.Game.Tetris
         }
 
         public GameState GameState { get; }
-
-        public void Simulate(ICommand command)
+        
+        public void Simulate(Move move)
         {
-            command.Execute(this);
-        }
-
-        public void Hit(Button button)
-        {
-            switch (button)
+            switch (move)
             {
-                case Button.Left: GameState.Left(); break;
-                case Button.Right: GameState.Right(); break;
-                case Button.A: GameState.Rotate(); break;
-                case Button.B: GameState.RotateCounterclockwise(); break;
-                case Button.Down: GameState.Fall(); break;
+                case Move.Left: GameState.Left(); break;
+                case Move.Right: GameState.Right(); break;
+                case Move.Rotate: GameState.Rotate(); break;
+                case Move.RotateCounterclockwise: GameState.RotateCounterclockwise(); break;
+                case Move.Fall: GameState.Fall(); break;
+                case Move.Drop: GameState.Drop(); break;
                 default: break;
             }
-        }
-
-        public void Press(Button button)
-        {
-            if (button == Button.Down)
-            {
-                GameState.Drop();
-            }
-        }
-
-        public void Release(Button button)
-        {
-            // ignore
         }
 
         public override string ToString()

@@ -3,11 +3,11 @@ using Emgu.CV.Structure;
 using GameBot.Core;
 using System.Drawing;
 using GameBot.Core.Data;
-using GameBot.Game.Tetris.States;
 using System;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Data;
+using GameBot.Game.Tetris.Agents.States;
 
 namespace GameBot.Game.Tetris.Agents
 {

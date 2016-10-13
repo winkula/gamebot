@@ -12,9 +12,9 @@ namespace GameBot.Core.Data
     /// </summary>
     public class EmguScreenshot : IScreenshot
     {
-        public const int TileSize = 8;
+        public const int TileSize = GameBoyConstants.TileSize;
         public static Mat Black;
-                
+
         private readonly IImage image;
 
         public byte[] Pixels { get; private set; }
@@ -24,10 +24,10 @@ namespace GameBot.Core.Data
 
         static EmguScreenshot()
         {
-            Black = new Mat(new Size(160, 144), DepthType.Cv8U, 1);
+            Black = new Mat(new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), DepthType.Cv8U, 1);
             Black.SetTo(new MCvScalar(0, 0, 0));
         }
-        
+
         public EmguScreenshot(IImage image, TimeSpan timestamp)
         {
             this.image = image;
@@ -82,9 +82,9 @@ namespace GameBot.Core.Data
             var mask = Black.Clone();
             var roi = new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize);
             CvInvoke.Rectangle(mask, roi, new MCvScalar(255, 255, 255), -1);
-            
+
             var mean = CvInvoke.Mean(image, mask);
-            return (byte) mean.V0;
+            return (byte)mean.V0;
         }
     }
 }

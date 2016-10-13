@@ -161,10 +161,10 @@
     <Compile Include="Searching\Heuristics\ExperimentalHeuristic.cs" />
     <Compile Include="Searching\Heuristics\YiyuanLeeHeuristic.cs" />
     <Compile Include="Package.cs" />
-    <Compile Include="States\ITetrisState.cs" />
-    <Compile Include="States\TetrisExecuteState.cs" />
-    <Compile Include="States\TetrisAnalyzeState.cs" />
-    <Compile Include="States\TetrisStartState.cs" />
+    <Compile Include="Agents\States\ITetrisState.cs" />
+    <Compile Include="Agents\States\TetrisExecuteState.cs" />
+    <Compile Include="Agents\States\TetrisAnalyzeState.cs" />
+    <Compile Include="Agents\States\TetrisStartState.cs" />
     <Compile Include="TetrisLevel.cs" />
     <Compile Include="TetrisScore.cs" />
     <Compile Include="Searching\RecursiveSearch.cs" />

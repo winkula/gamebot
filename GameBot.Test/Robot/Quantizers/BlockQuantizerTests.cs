@@ -1,7 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core;
-using GameBot.Robot.Quantizers;
 using NUnit.Framework;
 using System.Diagnostics;
 
@@ -12,15 +11,6 @@ namespace GameBot.Test.Robot.Quantizers
     {
         private const bool adjust = false;
         
-        [Test]
-        public void BlockQuantizer()
-        {
-            string path = "Images/tetris_1.jpg";
-            var keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
-
-            TestQuantizer(path, new BlockQuantizer(adjust, keypoints, 5, 13));
-        }
-
         private void TestQuantizer(string path, IQuantizer quantizer)
         {
             var image = new Mat(path, LoadImageType.Grayscale);

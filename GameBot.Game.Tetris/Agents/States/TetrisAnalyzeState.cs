@@ -1,12 +1,11 @@
 ﻿using GameBot.Core.Data;
-using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Searching;
 using NLog;
 using System;
 using System.Collections.Generic;
 
-namespace GameBot.Game.Tetris.States
+namespace GameBot.Game.Tetris.Agents.States
 {
     public class TetrisAnalyzeState : ITetrisState
     {
@@ -51,7 +50,7 @@ namespace GameBot.Game.Tetris.States
                 if (results != null)
                 {
                     logger.Info("> AI found a solution.");
-                    logger.Info(results.GoalGameState);
+                    logger.Info("> Goal game state:\n" + results.GoalGameState);
                     foreach (var move in results.Moves)
                     {
                         logger.Info(move);
