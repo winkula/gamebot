@@ -45,7 +45,7 @@ namespace GameBot.Game.Tetris.States
                 var expectedFallDistance = GetExpectedFallDistance(now);
                 Debug.WriteLine("> Check command. Maximal expected fall distance is " + expectedFallDistance);
                                 
-                var piece = agent.Extractor.ExtractMovedPiece(agent.Screenshot, lastPosition, lastMove.Value, expectedFallDistance);
+                var piece = agent.Extractor.ExtractMovedPieceWithErrorTolerance(agent.Screenshot, lastPosition, lastMove.Value, expectedFallDistance);
                 if (piece == null)
                 {
                     Debug.WriteLine("> PIECE NOT FOUND! Looking for " + lastPosition.Tetromino + ". Try again.");

@@ -6,7 +6,6 @@ using GameBot.Robot.Configuration;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
-using System.Drawing;
 
 namespace GameBot.Test.Tetris.Extraction
 {
@@ -27,8 +26,7 @@ namespace GameBot.Test.Tetris.Extraction
             var config = new Config();
 
             var extractor = new TetrisExtractor(config);
-            var image = Image.FromFile("Screenshots/tetris_play_1.png");
-            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -111,8 +109,7 @@ namespace GameBot.Test.Tetris.Extraction
             var config = new Config();
 
             var extractor = new TetrisExtractor(config);
-            var image = Image.FromFile("Screenshots/tetris_play_2.png");
-            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
 
             var mask = extractor.GetPieceMask(screenshot, x, y);
 
@@ -125,12 +122,11 @@ namespace GameBot.Test.Tetris.Extraction
             var config = new Config();
 
             var extractor = new TetrisExtractor(config);
-            var image = Image.FromFile("Screenshots/tetris_play_2.png");
-            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
 
             var lastPosition = new Piece(Tetromino.Z, 0, 1, -6);
             
-            var newPosition = extractor.ExtractMovedPiece(screenshot, lastPosition, Move.Left, 0);
+            var newPosition = extractor.ExtractMovedPieceWithoutErrorTolerance(screenshot, lastPosition, Move.Left, 0);
 
             Assert.NotNull(newPosition);
 
@@ -146,21 +142,40 @@ namespace GameBot.Test.Tetris.Extraction
             var config = new Config();
 
             var extractor = new TetrisExtractor(config);
-            var image = Image.FromFile("Screenshots/tetris_play_2.png");
-            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
 
             var lastPosition = new Piece(Tetromino.Z, 0, 1, 0);
 
-            var newPosition = extractor.ExtractMovedPiece(screenshot, lastPosition, Move.Left, 5);
+            var newPosition = extractor.ExtractMovedPieceWithoutErrorTolerance(screenshot, lastPosition, Move.Left, 5);
             Assert.Null(newPosition);
 
-            newPosition = extractor.ExtractMovedPiece(screenshot, lastPosition, Move.Left, 6);
+            newPosition = extractor.ExtractMovedPieceWithoutErrorTolerance(screenshot, lastPosition, Move.Left, 6);
             Assert.NotNull(newPosition);
 
             Assert.AreEqual(Tetromino.Z, newPosition.Tetromino);
             Assert.AreEqual(0, newPosition.Orientation);
             Assert.AreEqual(0, newPosition.X);
             Assert.AreEqual(-6, newPosition.Y);
+        }
+
+        [TestCase(Tetromino.Z, 0, -6, 1.0)]
+        [TestCase(Tetromino.Z, 0, -5, 1.0 - (4 / 16.0))]
+        [TestCase(Tetromino.Z, 0, -4, 1.0 - (4 / 16.0))]
+        [TestCase(Tetromino.Z, -1, -6, 1.0 - (4 / 16.0))]
+        public void GetProbability(Tetromino tetromino, int x, int y, double expectedProbability)
+        {
+            var config = new Config();
+
+            var extractor = new TetrisExtractor(config);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+
+            var piece = new Piece(tetromino, 0, x, y);
+
+            var probability = extractor.GetProbability(screenshot, piece);
+
+            Assert.LessOrEqual(probability, 1.0);
+            Assert.GreaterOrEqual(probability, 0.0);
+            Assert.AreEqual(expectedProbability, probability);
         }
     }
 }

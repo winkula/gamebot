@@ -15,7 +15,7 @@ namespace GameBot.Game.Tetris.Extraction
         private static Point BoardTileOrigin = new Point(2, 0);
         private static Point CurrentTileOrigin = new Point(5, 0);
         private static Point PreviewTileOrigin = new Point(15, 13);
-        
+
         private readonly IConfig config;
 
         public float BlockThreshold { get; set; }
@@ -94,6 +94,17 @@ namespace GameBot.Game.Tetris.Extraction
             return IsBlock(mean);
         }
 
+        // x and y are in board coordinates
+        private byte GetTileBlockMean(IScreenshot screenshot, int x, int y)
+        {
+            // TODO: make relative to board size?
+            // ignore walls
+            if (x < 2 || x > 11) return 255;
+            if (y < 0 || y > 17) return 255;
+
+            return screenshot.GetTileMean(x, y);
+        }
+
         // Tiles: x : 5 - 8, y : 0 - 2
         public Board ExtractBoard(IScreenshot screenshot)
         {
@@ -135,8 +146,7 @@ namespace GameBot.Game.Tetris.Extraction
             }
             return Piece.FromMask(mask);
         }
-
-        // TODO: fix this!
+        
         // Searches the piece only in the spawning area on top of the board and a specifiec number of tiles below
         // Searches only pieces with the orientation 0
         // returns null, if the piece was not found in the spawning area or the specifiec number of tiles below
@@ -145,7 +155,7 @@ namespace GameBot.Game.Tetris.Extraction
             if (searchHeight < 0)
                 throw new ArgumentException("searchHeight must be positive.");
 
-            for (int yDelta = 0; yDelta < searchHeight; yDelta++)
+            for (int yDelta = 0; yDelta <= searchHeight; yDelta++)
             {
                 ushort mask = 0;
                 for (int x = 0; x < 4; x++)
@@ -178,10 +188,12 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         // Confirms that the piece has moved or roteted according to the command
-        public Piece ExtractMovedPiece(IScreenshot screenshot, Piece lastPosition, Move move, int maxFallDistance)
+        public Piece ExtractMovedPieceWithoutErrorTolerance(IScreenshot screenshot, Piece lastPosition, Move move, int maxFallDistance)
         {
             if (maxFallDistance < 0)
                 throw new ArgumentException("searchHeight must be positive.");
+
+            // TODO: upper bound for maxFallDistance
 
             if (move == Move.None) return lastPosition;
 
@@ -216,7 +228,79 @@ namespace GameBot.Game.Tetris.Extraction
             // TODO: search with more sophisticated search algorithms
             return null;
         }
-        
+
+        // Confirms that the piece has moved or roteted according to the command
+        public Piece ExtractMovedPieceWithErrorTolerance(IScreenshot screenshot, Piece lastPosition, Move move, int maxFallDistance)
+        {
+            if (maxFallDistance < 0)
+                throw new ArgumentException("searchHeight must be positive.");
+
+            // TODO: upper bound for maxFallDistance
+
+            if (move == Move.None) return lastPosition;
+
+            var lastPositionTemp = new Piece(lastPosition);
+            var expectedPosition = new Piece(lastPosition).Apply(move);
+
+            double highestProbability = double.NegativeInfinity;
+            Piece mostProbablePiece = null;
+            
+            for (int i = 0; i <= maxFallDistance; i++)
+            {
+                var probailityExpected = GetProbability(screenshot, expectedPosition);
+                if (probailityExpected > highestProbability)
+                {
+                    highestProbability = probailityExpected;
+                    mostProbablePiece = new Piece(expectedPosition);
+                }
+
+                var probabilityLast = GetProbability(screenshot, lastPositionTemp);
+                if (probabilityLast > highestProbability)
+                {
+                    highestProbability = probabilityLast;
+                    mostProbablePiece = new Piece(lastPositionTemp);
+                }
+
+                expectedPosition.Fall();
+                lastPositionTemp.Fall();
+            }
+
+            if (mostProbablePiece == null)
+            {
+                // piece not found
+                // TODO: search with more sophisticated search algorithms
+            }
+
+            return mostProbablePiece;
+        }
+
+        public double GetProbability(IScreenshot screenshot, Piece expected)
+        {
+            int errors = 0;
+
+            for (int x = -1; x < 3; x++)
+            {
+                for (int y = -1; y < 3; y++)
+                {
+                    var coordinates = Coordinates.PieceToTile(expected.X + x, expected.Y + y);
+                    var isBlockReal = expected.Shape.IsSquareOccupied(x, y);
+                    var isBlockExpected = IsTileBlock(screenshot, coordinates.X, coordinates.Y);
+                    
+                    if (isBlockReal != isBlockExpected) errors++;
+                }
+            }
+
+            if (errors > 0 && expected.Tetromino == Tetromino.I && expected.Y == 0 && expected.Orientation == 1)
+            {
+                // TODO: remove this ugly hack
+                // subtract one because the I piece is not completly visible in upright position
+                errors--;
+            }
+
+            double normalizedError = errors / 16.0;
+            return 1 - normalizedError;
+        }
+
         public int GetErrors(IScreenshot screenshot, Piece expected)
         {
             int errors = 0;

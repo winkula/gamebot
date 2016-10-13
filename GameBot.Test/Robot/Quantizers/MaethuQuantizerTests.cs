@@ -1,8 +1,10 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using NUnit.Framework;
+using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 
 namespace GameBot.Test.Robot.Quantizers
 {
@@ -44,8 +46,10 @@ namespace GameBot.Test.Robot.Quantizers
             stopwatch.Stop();
             Debug.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
 
-            // show/save image
-            img.Save(@"C:\users\winkler\desktop\output.png");
+            // show/save 
+            string outputFilename = "output.png";
+            string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), outputFilename);
+            img.Save(outputPath);
             CvInvoke.Imshow("Test", img);
             CvInvoke.WaitKey(0);
         }  
