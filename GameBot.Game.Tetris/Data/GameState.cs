@@ -9,7 +9,7 @@ namespace GameBot.Game.Tetris.Data
         public Board Board { get; private set; }
         public Piece Piece { get; set; }
         public Tetromino? NextPiece { get; set; }
-        public Way Move { get; set; }
+        
         public int Lines { get; set; }
         public int Score { get; set; }
         public int StartLevel { get; set; }
@@ -207,7 +207,15 @@ namespace GameBot.Game.Tetris.Data
                         else builder.Append(' ');
                     }
                 }
-                builder.AppendLine("|");
+                builder.Append("|");
+
+                if (y == Board.Height - 1) builder.AppendFormat(" Score: {0}", Score);
+                else if (y == Board.Height - 2) builder.AppendFormat(" Level: {0}", Level);
+                else if (y == Board.Height - 3) builder.AppendFormat(" Lines: {0}", Lines);
+                else if (y == Board.Height - 5) builder.AppendFormat(" Curr.: {0}", Piece.Tetromino);
+                else if (y == Board.Height - 6) builder.AppendFormat(" Next : {0}", NextPiece);
+
+                builder.AppendLine();
             }
             builder.Append(" ");
             builder.Append(new string('-', Board.Width));

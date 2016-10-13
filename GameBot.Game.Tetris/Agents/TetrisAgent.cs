@@ -15,8 +15,7 @@ namespace GameBot.Game.Tetris.Agents
     {
         // current state of the ai (state pattern)
         private ITetrisState State;
-
-
+        
         // global services
         public IConfig Config { get; private set; }
         public ITimeProvider TimeProvider { get; private set; }

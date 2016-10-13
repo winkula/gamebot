@@ -1,4 +1,5 @@
 ﻿using GameBot.Game.Tetris.Data;
+using NLog;
 using NUnit.Framework;
 
 namespace GameBot.Test.Tetris
@@ -6,6 +7,8 @@ namespace GameBot.Test.Tetris
     [TestFixture]
     public class GameStateTests
     {
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         [TestCase(Tetromino.L, Tetromino.O, 0, 10, new[] {
             0,0,0,0,0,0,0,0,0,0,
             0,0,0,2,2,2,0,0,0,0,
@@ -121,6 +124,17 @@ namespace GameBot.Test.Tetris
 
             Assert.AreEqual(next, gameState.Piece.Tetromino);
             Assert.AreEqual(1, gameState.Board.Pieces);
+        }
+        
+        [Test]
+        public void StringRepresentation()
+        {
+            var gameState = new GameState();
+
+            var str = gameState.ToString();
+            logger.Info(str);
+
+            Assert.NotNull(str);
         }
     }
 }

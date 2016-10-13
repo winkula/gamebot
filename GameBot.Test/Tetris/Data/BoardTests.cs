@@ -459,6 +459,17 @@ namespace GameBot.Test.Tetris.Data
             Assert.AreNotEqual(board1, board2);
         }
 
+        [Test]
+        public void StringRepresentation()
+        {
+            var board = new Board();
+
+            var str = board.ToString();
+            logger.Info(str);
+
+            Assert.NotNull(str);
+        }
+
         private Board Build(int[] squares)
         {
             var board = new Board();
