@@ -146,6 +146,7 @@
     <Compile Include="Robot\Cameras\PerformanceTests.cs" />
     <Compile Include="Robot\Actuators\ActuatorTests.cs" />
     <Compile Include="Robot\Quantizers\BlockQuantizerTests.cs" />
+    <Compile Include="Robot\Quantizers\MaethuQuantizerTests.cs" />
     <Compile Include="Robot\Quantizers\PaeduQuantizerTests.cs" />
     <Compile Include="Tetris\Data\CoordinatesTest.cs" />
     <Compile Include="Tetris\Data\PieceDeltaTests.cs" />
