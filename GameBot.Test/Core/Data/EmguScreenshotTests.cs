@@ -15,17 +15,17 @@ namespace GameBot.Test.Core.Data
         {
             var image = Image.FromFile("Screenshots/tetris_start.png");
             Assert.NotNull(image);
-            
+
             var width = image.Width;
             var height = image.Height;
             var timestamp = TimeSpan.FromSeconds(6);
-            
+
             IScreenshot screenshot = new EmguScreenshot(image, timestamp);
-            
+
             Assert.AreEqual(width, screenshot.Width);
             Assert.AreEqual(height, screenshot.Height);
 
-            Assert.AreEqual(timestamp, screenshot.Timestamp);            
+            Assert.AreEqual(timestamp, screenshot.Timestamp);
         }
 
         [Test]
@@ -63,11 +63,11 @@ namespace GameBot.Test.Core.Data
         {
             var image = Image.FromFile("Screenshots/tetris_start.png");
             Assert.NotNull(image);
-            
+
             var timestamp = TimeSpan.FromSeconds(6);
 
             IScreenshot screenshot = new EmguScreenshot(image, timestamp);
-            
+
             Assert.AreEqual(0, screenshot.GetPixel(0, 0));
             Assert.AreEqual(255, screenshot.GetPixel(160 - 1, 144 - 1));
 
@@ -80,14 +80,10 @@ namespace GameBot.Test.Core.Data
         [Test]
         public void GetTileMean()
         {
-            var image = Image.FromFile("Screenshots/tetris_play_2.png");
-            Assert.NotNull(image);
-
             var timestamp = TimeSpan.FromSeconds(6);
+            IScreenshot screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", timestamp);
 
-            IScreenshot screenshot = new EmguScreenshot(image, timestamp);
-
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 5; i++)
             {
                 // test multiple time
                 Assert.AreEqual(41, screenshot.GetTileMean(0, 0));
@@ -97,6 +93,33 @@ namespace GameBot.Test.Core.Data
             Assert.AreEqual(255, screenshot.GetTileMean(2, 0));
 
             Assert.AreEqual(92, screenshot.GetTileMean(5, 7));
+        }
+
+        [Test]
+        public void GetTileMeanException()
+        {
+            var timestamp = TimeSpan.FromSeconds(6);
+            IScreenshot screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", timestamp);
+
+            screenshot.GetTileMean(0, 0);
+            screenshot.GetTileMean(19, 17);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                screenshot.GetTileMean(-1, 0);
+            });
+            Assert.Throws<ArgumentException>(() =>
+            {
+                screenshot.GetTileMean(0, -1);
+            });
+            Assert.Throws<ArgumentException>(() =>
+            {
+                screenshot.GetTileMean(20, 0);
+            });
+            Assert.Throws<ArgumentException>(() =>
+            {
+                screenshot.GetTileMean(0, 18);
+            });
         }
     }
 }

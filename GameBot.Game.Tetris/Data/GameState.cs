@@ -47,7 +47,7 @@ namespace GameBot.Game.Tetris.Data
             NextPiece = nextPiece;
         }
 
-        public GameState(Board board, Piece piece, Tetromino? nextPiece)
+        public GameState(Board board, Piece piece, Tetromino? nextPiece = null)
         {
             Board = board;
             Piece = piece;

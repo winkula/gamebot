@@ -17,7 +17,7 @@ namespace GameBot.Test.Misc
         [Test]
         public void TestMe()
         {
-            // TODO: test cann edge detector or other sophisticated filters
+            // TODO: test canny edge detector or other sophisticated filters
             // http://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html
             // http://www.emgu.com/wiki/index.php/Documentation
 

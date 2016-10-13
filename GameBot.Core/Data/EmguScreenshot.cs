@@ -72,13 +72,11 @@ namespace GameBot.Core.Data
 
         public byte GetTileMean(int x, int y)
         {
-            // this makes tiles white which are above the board (for easier piece matching)
-            // TODO: solve better
-            if (y < 0) return 255;
+            if (x < 0 || x >= Width / TileSize) throw new ArgumentException("x is off the screen");
+            if (y < 0 || y >= Height / TileSize) throw new ArgumentException("y is off the screen");
 
             // TODO: implement faster? (with ROI maybe)
             // TODO: cache mean values for fast multiple lookup
-
             var mask = Black.Clone();
             var roi = new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize);
             CvInvoke.Rectangle(mask, roi, new MCvScalar(255, 255, 255), -1);

@@ -344,14 +344,5 @@ namespace GameBot.Game.Tetris.Extraction
             }
             return Piece.FromMask(mask)?.Tetromino;
         }
-
-        public PieceDelta FindPiece(IScreenshot screenshot, Piece last, Piece target)
-        {
-            var delta = new PieceDelta(last, target);
-
-            // TODO: implement
-
-            return delta;
-        }
     }
 }

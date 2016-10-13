@@ -12,8 +12,7 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
         {
             return Math.Max(min, value) - min;
         }
-
-        // TODO: implement faster
+        
         // http://www.diva-portal.se/smash/get/diva2:815662/FULLTEXT01.pdf
         protected int HolesValue(Board board, Func<int, int> f, Func<int, int> g)
         {

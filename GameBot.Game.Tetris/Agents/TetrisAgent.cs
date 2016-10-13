@@ -20,7 +20,6 @@ namespace GameBot.Game.Tetris.Agents
         public IConfig Config { get; private set; }
         public IClock Clock { get; private set; }
         public TetrisExtractor Extractor { get; private set; }
-        public TetrisAi Ai { get; private set; }
         public ISearch Search { get; private set; }
         public IScreenshot Screenshot { get; private set; }
         public IActuator Actuator { get; private set; }
@@ -28,12 +27,11 @@ namespace GameBot.Game.Tetris.Agents
         // global data
         public GameState GameState { get; set; }
 
-        public TetrisAgent(IConfig config, TetrisExtractor extractor, TetrisAi ai, ISearch search, IClock clock)
+        public TetrisAgent(IConfig config, TetrisExtractor extractor, ISearch search, IClock clock)
         {
             Config = config;
             Clock = clock;
             Extractor = extractor;
-            Ai = ai;
             Search = search;
 
             int startLevel = config.Read("Game.Tetris.StartLevel", 0);

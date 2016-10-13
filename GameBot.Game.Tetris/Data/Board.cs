@@ -217,6 +217,7 @@ namespace GameBot.Game.Tetris.Data
             return x >= 0 && x < Width && y >= 0 && y < Height;
         }
 
+        // TODO: make private?
         public void Place(Piece piece)
         {
             foreach (var block in piece.Shape.Body)
@@ -230,11 +231,11 @@ namespace GameBot.Game.Tetris.Data
             Pieces++;
         }
 
-        // TODO: merge with drop?
+        // TODO: make private?
         public int RemoveLines()
         {
             int removed = 0;
-            for (int i = 0; i < Height; i++) // TODO: replace with simple while-true-loop?
+            for (int i = 0; i < Height; i++)
             {
                 // AND every column
                 int mask = ~0;
@@ -250,7 +251,7 @@ namespace GameBot.Game.Tetris.Data
             }
             return removed;
         }
-
+        
         private void CopySquaresDown(int yCompleteLine)
         {
             for (int x = 0; x < Width; x++)
