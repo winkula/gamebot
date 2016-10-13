@@ -1,6 +1,4 @@
 ﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using GameBot.Core;
 using System;
@@ -10,7 +8,6 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-using System.Configuration;
 using GameBot.Core.Ui;
 using GameBot.Robot.Quantizers;
 using GameBot.Core.Exceptions;
@@ -19,67 +16,73 @@ namespace GameBot.Robot.Ui
 {
     public partial class Window : Form, IUi
     {
-        private int leftWidth;
-        private int leftHeight;
-        private int rightWidth;
-        private int rightHeight;
-        private int textWidth = 200;
+        private int originalWidth;
+        private int originalHeight;
+        private int processedWidth;
+        private int processedHeight;
 
         private readonly IConfig config;
         private readonly IEngine engine;
         private readonly ICamera camera;
         private readonly IActuator actuator;
         private readonly Quantizer quantizer;
-        private readonly IDebugger debugger;
 
         private bool play = false;
 
         private List<int> keypoints = new List<int>();
         private List<int> keypointsApplied = new List<int>();
 
-        public Window(IConfig config, IEngine engine, ICamera camera, IActuator actuator, IDebugger debugger, IQuantizer quantizer)
+        public Window(IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
         {
             this.config = config;
             this.engine = engine;
             this.camera = camera;
             this.actuator = actuator;
-            this.debugger = debugger;
             this.quantizer = quantizer as Quantizer;
 
             InitializeComponent();
 
             CheckForIllegalCrossThreadCalls = false;
 
-            InitDimensions();
-
-            ImageBoxLeft.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
-            ImageBoxLeft.Width = leftWidth;
-            ImageBoxLeft.Height = leftHeight;
-            ImageBoxRight.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
-            ImageBoxRight.Width = rightWidth;
-            ImageBoxRight.Height = rightHeight;
-            TextboxStatic.Width = textWidth;
-            TextboxStatic.Height = rightHeight;
-            TextboxDynamic.Width = textWidth;
-            TextboxDynamic.Height = rightHeight;
-
-            var size = new Size(leftWidth + rightWidth + 2 * textWidth, leftHeight);
-            MinimumSize = size;
-            ClientSize = size;
-            AutoSize = true;
-
+            InitImageBoxes();
+            InitForm();
+            
             Load += Loaded;
-            ImageBoxLeft.MouseClick += MouseClicked;
+            ImageBoxOriginal.MouseClick += MouseClicked;
             KeyPreview = true;
             KeyPress += KeyPressed;
         }
 
-        private void InitDimensions()
+        private void InitImageBoxes()
         {
-            leftWidth = camera.Width;
-            leftHeight = camera.Height;
-            rightWidth = (leftHeight * 160) / 144;
-            rightHeight = leftHeight;
+            originalWidth = 800;// camera.Width;
+            originalHeight = 600;// camera.Height;
+            processedWidth = GameBoyConstants.ScreenWidth;
+            processedHeight = GameBoyConstants.ScreenHeight;
+
+            ImageBoxOriginal.Size = new Size(originalWidth, originalHeight);
+            ImageBoxOriginal.Location = new Point(0, 0);
+            ImageBoxOriginal.Width = originalWidth;
+            ImageBoxOriginal.Height = originalHeight;
+            ImageBoxOriginal.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
+
+            ImageBoxProcessed.Size = new Size(processedWidth, processedHeight);
+            ImageBoxProcessed.Location = new Point(originalWidth - processedWidth, 0);
+            ImageBoxProcessed.Width = processedWidth;
+            ImageBoxProcessed.Height = processedHeight;
+            ImageBoxProcessed.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
+        }
+
+        private void InitForm()
+        {
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            
+            AutoSize = true;
+            ClientSize = new Size(originalWidth, originalHeight);
+
+            CenterToScreen();
         }
 
         private float Clamp(float value, float min, float max)
@@ -94,38 +97,38 @@ namespace GameBot.Robot.Ui
             if (e.KeyChar == 'y')
             {
                 actuator.Hit(Core.Data.Button.A);
-                debugger.WriteDynamic("> press A");
+                Debug.WriteLine("> press A");
             }
             if (e.KeyChar == 'x')
             {
                 actuator.Hit(Core.Data.Button.B);
-                debugger.WriteDynamic("> press B");
+                Debug.WriteLine("> press B");
             }
             if (e.KeyChar == 'a')
             {
                 actuator.Hit(Core.Data.Button.Left);
-                debugger.WriteDynamic("> press Left");
+                Debug.WriteLine("> press Left");
             }
             if (e.KeyChar == 'd')
             {
                 actuator.Hit(Core.Data.Button.Right);
-                debugger.WriteDynamic("> press Right");
+                Debug.WriteLine("> press Right");
             }
             if (e.KeyChar == 'c')
             {
                 actuator.Hit(Core.Data.Button.Start);
-                debugger.WriteDynamic("> press Start");
+                Debug.WriteLine("> press Start");
             }
             if (e.KeyChar == 'v')
             {
                 actuator.Hit(Core.Data.Button.Select);
-                debugger.WriteDynamic("> press Select");
+                Debug.WriteLine("> press Select");
             }
 
             if (e.KeyChar == 'p')
             {
                 play = !play;
-                debugger.WriteDynamic(play ? "> play" : "> don't play");
+                Debug.WriteLine(play ? "> play" : "> don't play");
             }
             if (e.KeyChar == 'q')
             {
@@ -135,7 +138,6 @@ namespace GameBot.Robot.Ui
             {
                 // clear
                 keypoints.Clear();
-                debugger.ClearDynamic();
                 Debug.WriteLine("reset temp stuff");
             }
             if (e.KeyChar == 's')
@@ -192,16 +194,12 @@ namespace GameBot.Robot.Ui
                     stopwatch.Restart();
                     if (ms != 0)
                     {
-                        debugger.WriteStatic($"FPS: {1000 / ms}");
+                        Text = $"GameBot.Robot.Ui ({1000 / ms} fps)";
                     }
-
-                    TextboxDynamic.Text = string.Join(Environment.NewLine, debugger.ReadDynamic());
-                    TextboxStatic.Text = string.Join(Environment.NewLine, debugger.ReadStatic());
-                    debugger.ClearStatic();
                 }
                 catch (GameOverException)
                 {
-                    debugger.WriteDynamic("> Game over!");
+                    Debug.WriteLine("> Game over!");
                     play = false;
                 }
             }
@@ -211,11 +209,8 @@ namespace GameBot.Robot.Ui
         {
             try
             {
-                // TODO:
-                //processed = processed.Resize(rightWidth, rightHeight, Inter.Linear);
-
-                ImageBoxLeft.Image = original;
-                ImageBoxRight.Image = processed;
+                ImageBoxOriginal.Image = original;
+                ImageBoxProcessed.Image = processed;
             }
             catch (ObjectDisposedException)
             {
