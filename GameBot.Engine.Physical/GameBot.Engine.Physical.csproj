@@ -126,6 +126,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actuators\LazyActuator.cs" />
     <Compile Include="Actuators\PhysicalActuator.cs" />
     <Compile Include="Cameras\PhysicalCamera.cs" />
     <Compile Include="Engine.cs" />

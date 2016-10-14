@@ -2,9 +2,7 @@
 using GameBot.Engine.Physical.Actuators;
 using NUnit.Framework;
 using System.Threading;
-using System;
-using System.Collections.Generic;
-using GameBot.Core;
+using GameBot.Core.Configuration;
 
 namespace GameBot.Test.Engine.Physical.Actuators
 {
@@ -14,7 +12,7 @@ namespace GameBot.Test.Engine.Physical.Actuators
         [Test]
         public void ConstructDispose()
         {
-            using (var actuator = new PhysicalActuator(new MockConfig()))
+            using (var actuator = new PhysicalActuator(new AppSettingsConfig()))
             {
             }
         }
@@ -22,7 +20,7 @@ namespace GameBot.Test.Engine.Physical.Actuators
         [Test]
         public void TestAll()
         {
-            using (var actuator = new PhysicalActuator(new MockConfig()))
+            using (var actuator = new PhysicalActuator(new AppSettingsConfig()))
             {
                 actuator.Hit(Button.Up);
                 Thread.Sleep(1000);
@@ -49,44 +47,5 @@ namespace GameBot.Test.Engine.Physical.Actuators
                 Thread.Sleep(1000);
             }
         }
-    }
-
-    // TODO: use moq?
-    internal class MockConfig : IConfig
-    {
-        public T Read<T>(string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T Read<T>(string key, T defaultValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<T> ReadCollection<T>(string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<T> ReadCollection<T>(string key, IEnumerable<T> defaultValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Save()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Write<T>(string key, T value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void WriteCollection<T>(string key, IEnumerable<T> values)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    }    
 }

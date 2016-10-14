@@ -10,6 +10,8 @@ namespace GameBot.Game.Tetris.Agents.States
     public class TetrisExecuteState : ITetrisState
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger loggerCamera = LogManager.GetLogger("Stats.Camera");
+        private static Logger loggerActuator = LogManager.GetLogger("Stats.Actuator");
 
         private TetrisAgent agent;
 
