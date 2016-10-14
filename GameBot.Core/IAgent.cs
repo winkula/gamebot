@@ -23,5 +23,7 @@ namespace GameBot.Core
         /// <param name="image">The quantized image.</param>
         /// <returns>A visualization on the quantized image.</returns>
         IImage Visualize(IImage image);
+
+        void Reset();
     }
 }

@@ -114,6 +114,14 @@ namespace GameBot.Robot.Ui
             {
                 actuator.Hit(Core.Data.Button.Right);
             }
+            if (e.KeyChar == 'w')
+            {
+                actuator.Hit(Core.Data.Button.Up);
+            }
+            if (e.KeyChar == 's')
+            {
+                actuator.Hit(Core.Data.Button.Down);
+            }
             if (e.KeyChar == 'c')
             {
                 actuator.Hit(Core.Data.Button.Start);
@@ -121,6 +129,10 @@ namespace GameBot.Robot.Ui
             if (e.KeyChar == 'v')
             {
                 actuator.Hit(Core.Data.Button.Select);
+            }
+            if (e.KeyChar == 'r')
+            {
+                engine.Reset();
             }
 
             if (e.KeyChar == 'p')
@@ -132,7 +144,7 @@ namespace GameBot.Robot.Ui
             {
                 Application.Exit();
             }
-            if (e.KeyChar == 'r')
+            if (e.KeyChar == 'k')
             {
                 // clear
                 keypoints.Clear();

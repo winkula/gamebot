@@ -49,6 +49,8 @@ namespace GameBot.Game.Tetris.Agents.States
 
                 if (results != null)
                 {
+                    logger.Info("Current game state:\n" + agent.GameState);
+
                     logger.Info("> AI found a solution.");
                     logger.Info("> Goal game state:\n" + results.GoalGameState);
                     foreach (var move in results.Moves)

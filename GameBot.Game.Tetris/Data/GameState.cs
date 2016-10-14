@@ -211,7 +211,7 @@ namespace GameBot.Game.Tetris.Data
                 if (y == Board.Height - 1) builder.AppendFormat(" Score: {0}", Score);
                 else if (y == Board.Height - 2) builder.AppendFormat(" Level: {0}", Level);
                 else if (y == Board.Height - 3) builder.AppendFormat(" Lines: {0}", Lines);
-                else if (y == Board.Height - 5) builder.AppendFormat(" Curr.: {0}", Piece.Tetromino);
+                else if (y == Board.Height - 5) builder.AppendFormat(" Curr.: {0}", Piece?.Tetromino);
                 else if (y == Board.Height - 6) builder.AppendFormat(" Next : {0}", NextPiece);
 
                 builder.AppendLine();

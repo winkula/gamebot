@@ -16,14 +16,14 @@ namespace GameBot.Game.Tetris.Agents
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly IClock clock;
-        private readonly IExtractor<GameState> extractor;
+        private readonly TetrisExtractor extractor;
         private readonly TetrisAi ai;
 
         private bool initialized = false;
         private bool awaitNextTetromino = true;
         private TimeSpan timeNextAction = TimeSpan.Zero;
         
-        public OptimisticTetrisAgent(IExtractor<GameState> extractor, TetrisAi ai, IClock clock)
+        public OptimisticTetrisAgent(TetrisExtractor extractor, TetrisAi ai, IClock clock)
         {
             this.clock = clock;
             this.extractor = extractor;
@@ -99,6 +99,11 @@ namespace GameBot.Game.Tetris.Agents
                 return visualization;
             }
             return image;
+        }
+
+        public void Reset()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -55,5 +55,10 @@ namespace GameBot.Engine.Physical
                 agent.Act(screenshot, actuator);
             }
         }
+
+        public void Reset()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
