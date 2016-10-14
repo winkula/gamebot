@@ -97,26 +97,26 @@ namespace GameBot.Engine.Physical.Actuators
                     HandleState1Bit(1 << 0, pressOrRelease);
                     break;
                 case Button.Down:
-                    HandleState1Bit(1 << 1, pressOrRelease);
+                    HandleState1Bit(1 << 3, pressOrRelease);
                     break;
                 case Button.Left:
-                    HandleState1Bit(1 << 2, pressOrRelease);
+                    HandleState1Bit(1 << 1, pressOrRelease);
                     break;
                 case Button.Right:
-                    HandleState1Bit(1 << 3, pressOrRelease);
+                    HandleState1Bit(1 << 2, pressOrRelease);
                     break;
 
                 case Button.Start:
-                    HandleState2Bit(1 << 2, pressOrRelease);
+                    HandleState2Bit(1 << 3, pressOrRelease);
                     break;
                 case Button.A:
-                    HandleState2Bit(1 << 1, pressOrRelease);
+                    HandleState2Bit(1 << 2, pressOrRelease);
                     break;
                 case Button.Select:
-                    HandleState2Bit(1 << 0, pressOrRelease);
+                    HandleState2Bit(1 << 1, pressOrRelease);
                     break;
                 case Button.B:
-                    HandleState2Bit(1 << 3, pressOrRelease);
+                    HandleState2Bit(1 << 0, pressOrRelease);
                     break;
 
                 default:
