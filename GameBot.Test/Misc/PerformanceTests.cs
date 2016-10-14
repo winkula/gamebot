@@ -7,7 +7,7 @@ namespace GameBot.Test.Misc
     [Ignore]
     [TestFixture]
     public class PerformanceTests
-    {
+    {   
         private readonly Stopwatch stopwatch = new Stopwatch();
         private Capture capture;
         private IImage image;

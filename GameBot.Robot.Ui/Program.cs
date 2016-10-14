@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using GameBot.Robot.Ui.Configuration;
+using NLog;
 using NLog.Config;
 using NLog.Targets;
 using SimpleInjector;
@@ -21,8 +22,13 @@ namespace GameBot.Robot.Ui
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
-                container.RegisterPackages(GetEmulatedEngineAssembies());
-                //container.RegisterPackages(GetPhysicalEngineAssembies());
+                var config = new ExeConfig();
+                var engineMode = config.Read("Robot.Engine.Mode", "Emulated");
+
+                if (engineMode == "Emulated")
+                    container.RegisterPackages(GetEmulatedEngineAssembies());
+                if (engineMode == "Physical")
+                    container.RegisterPackages(GetPhysicalEngineAssembies());
                 container.Verify();
 
                 ConfigureLogging();

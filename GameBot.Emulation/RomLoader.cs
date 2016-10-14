@@ -7,6 +7,7 @@ namespace GameBot.Emulation
         public Game Load(string fileName)
         {
             FileInfo fileInfo = new FileInfo(fileName);
+
             byte[] fileData = new byte[fileInfo.Length];
             FileStream fileStream = fileInfo.OpenRead();
             fileStream.Read(fileData, 0, fileData.Length);

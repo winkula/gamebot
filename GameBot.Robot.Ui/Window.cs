@@ -27,7 +27,8 @@ namespace GameBot.Robot.Ui
         private readonly ICamera camera;
         private readonly IActuator actuator;
         private readonly ICalibrateableQuantizer quantizer;
-        
+
+        private const int maxKeypointCount = 4;
         private List<Point> keypoints = new List<Point>();
         private List<Point> keypointsApplied = new List<Point>();
 
@@ -38,6 +39,10 @@ namespace GameBot.Robot.Ui
             this.camera = camera;
             this.actuator = actuator;
             this.quantizer = quantizer as ICalibrateableQuantizer;
+            if (quantizer == null)
+            {
+                logger.Warn("Quantizer is not calibrateable");
+            }
 
             InitializeComponent();
 
@@ -54,8 +59,8 @@ namespace GameBot.Robot.Ui
 
         private void InitImageBoxes()
         {
-            originalWidth = 800;// camera.Width;
-            originalHeight = 600;// camera.Height;
+            originalWidth = camera.Width;
+            originalHeight = camera.Height;
             processedWidth = GameBoyConstants.ScreenWidth;
             processedHeight = GameBoyConstants.ScreenHeight;
 
@@ -136,7 +141,7 @@ namespace GameBot.Robot.Ui
             if (e.KeyChar == 's')
             {
                 // save
-                if (keypointsApplied.Count == 8)
+                if (keypointsApplied.Count == maxKeypointCount)
                 {
                     logger.Info("Keypoints: " + string.Join(",", keypointsApplied));
 
@@ -153,9 +158,9 @@ namespace GameBot.Robot.Ui
             keypoints.Add(new Point(e.X, e.Y));
             logger.Info($"Added keypoint ({e.X}, {e.Y})");
 
-            if (keypoints.Count >= 8 && quantizer != null)
+            if (keypoints.Count >= maxKeypointCount && quantizer != null)
             {
-                keypointsApplied = keypoints.Take(8).ToList();
+                keypointsApplied = keypoints.Take(maxKeypointCount).ToList();
                 quantizer.Calibrate(keypointsApplied);
                 keypoints.Clear();
                 logger.Info($"Applied keypoints {keypointsApplied}");

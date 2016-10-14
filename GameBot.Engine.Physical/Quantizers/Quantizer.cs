@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace GameBot.Engine.Physical.Quantizers
 {
-    public class Quantizer : IQuantizer
+    public class Quantizer : ICalibrateableQuantizer
     {
         private const int GameBoyScreenWidth = GameBoyConstants.ScreenWidth;
         private const int GameBoyScreenHeight = GameBoyConstants.ScreenHeight;
@@ -67,6 +67,9 @@ namespace GameBot.Engine.Physical.Quantizers
             // transform
             var imageWarped = new Mat(new Size(GameBoyScreenWidth, GameBoyScreenHeight), DepthType.Default, 1);
             CvInvoke.WarpPerspective(imageGray, imageWarped, transform, new Size(GameBoyScreenWidth, GameBoyScreenHeight), Inter.Linear, Warp.Default);
+
+            // gauss
+            CvInvoke.GaussianBlur(imageWarped, imageWarped, new Size(3, 3), 0.6, 0.6, BorderType.Default);
 
             // threshold
             var imageBinarized = new Mat(new Size(GameBoyScreenWidth, GameBoyScreenHeight), DepthType.Default, 1);
