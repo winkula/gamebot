@@ -1,9 +1,8 @@
-﻿using GameBot.Core.Data;
-using GameBot.Core.Data.Commands;
+﻿using GameBot.Core;
+using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using NLog;
 using System;
-using System.Collections.Generic;
 
 namespace GameBot.Game.Tetris.Agents.States
 {
@@ -29,12 +28,8 @@ namespace GameBot.Game.Tetris.Agents.States
             var randomTime = 2.1 + 0.5 * random.NextDouble();
             if (agent.Clock.Time >= TimeSpan.FromSeconds(randomTime))
             {
-                var commands = Initialize();
-
-                foreach (var command in commands)
-                {
-                    command.Execute(agent.Actuator);
-                }
+                // handle start menu
+                Start(agent.Actuator);
 
                 // init game state
                 agent.GameState = new GameState();
@@ -44,48 +39,38 @@ namespace GameBot.Game.Tetris.Agents.States
                 agent.SetState(new TetrisAnalyzeState(agent, null));
             }
         }
-
-        private IEnumerable<ICommand> Initialize()
+        
+        private void Start(IActuator actuator)
         {
-            var commands = new CommandCollection();
-            Start(commands);
-            return commands;
-        }
-
-        private void Start(CommandCollection commands)
-        {
-            // skip credits
-            double waitingTime = 2.2 + new Random().NextDouble();
-
             // start 1 player mode
-            commands.Hit(Button.Start, waitingTime);
+            actuator.Hit(Button.Start);
 
             // choose a-type
-            commands.HitDelta(Button.A);
+            actuator.Hit(Button.A);
 
             // choose music
-            commands.HitDelta(Button.Right);
-            commands.HitDelta(Button.Down);
-            commands.HitDelta(Button.A);
+            actuator.Hit(Button.Right);
+            actuator.Hit(Button.Down);
+            actuator.Hit(Button.A);
 
             // select level
-            SelectLevel(commands, startLevel);
+            SelectLevel(actuator, startLevel);
         }
 
-        private void SelectLevel(CommandCollection commands, int startLevel)
+        private void SelectLevel(IActuator actuator, int startLevel)
         {
             if (startLevel < 0 || startLevel > 9)
                 throw new ArgumentException("startLevel must be between 0 and 9 (inclusive)");
 
             if (startLevel >= 5)
             {
-                commands.HitDelta(Button.Down);
+                actuator.Hit(Button.Down);
             }
             for (int i = 0; i < (startLevel % 5); i++)
             {
-                commands.HitDelta(Button.Right);
+                actuator.Hit(Button.Right);
             }
-            commands.HitDelta(Button.A);
+            actuator.Hit(Button.A);
         }
     }
 }
