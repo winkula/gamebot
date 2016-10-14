@@ -9,30 +9,24 @@ namespace GameBot.Game.Tetris.Extraction
 {
     public class TetrisExtractor : IExtractor<GameState>
     {
-        // this probability must be reached to accept a piece
-        // if not, the piece is rejected and the search continues
-        private const double MinimalProbability = 0.9375;
-
-        // where is the threshold of the mean value of a tile, that it is interpreted as a block
-        // optimum is between 185 and 195
-        public const int MeanThreshold = 195;
-
         // this coordinates are in the coordinate system of the tile system of the game boy screen (origin is top left)
         private static Point BoardTileOrigin = new Point(2, 0);
         private static Point CurrentTileOrigin = new Point(5, 0);
         private static Point PreviewTileOrigin = new Point(15, 13);
-        
+
         private readonly IConfig config;
 
-        public float BlockThreshold { get; set; }
-        
+        public int MeanThreshold { get; private set; }
+        public double MinimalProbability { get; private set;}
+
         // debugging/visualization only
         public IList<Point> Rectangles { get; private set; } = new List<Point>();
 
         public TetrisExtractor(IConfig config)
         {
             this.config = config;
-            this.BlockThreshold = config.Read<float>("Game.Tetris.Extractor.BlockThreshold");
+            this.MeanThreshold = config.Read<int>("Game.Tetris.Extractor.MeanThreshold");
+            this.MinimalProbability = config.Read<double>("Game.Tetris.Extractor.MinimalProbability");
         }
 
         public GameState Extract(IScreenshot screenshot, GameState currentGameState)
@@ -79,7 +73,7 @@ namespace GameBot.Game.Tetris.Extraction
             return GetPieceMask(screenshot, pieceExpected.X, pieceExpected.Y);
         }
 
-        public static bool IsBlock(byte mean)
+        public bool IsBlock(byte mean)
         {
             return mean < MeanThreshold;
         }
@@ -93,7 +87,12 @@ namespace GameBot.Game.Tetris.Extraction
             if (y < 0 || y > 17) return false;
 
             var mean = screenshot.GetTileMean(x, y);
-            return IsBlock(mean);
+            if (IsBlock(mean))
+            {
+                Rectangles.Add(new Point(x, y));
+                return true;
+            }
+            return false;
         }
 
         // x and y are in board coordinates

@@ -59,8 +59,8 @@ namespace GameBot.Robot.Ui
 
         private void InitImageBoxes()
         {
-            originalWidth = camera.Width;
-            originalHeight = camera.Height;
+            originalWidth = Math.Max(camera.Width, 2 * GameBoyConstants.ScreenWidth);
+            originalHeight = Math.Max(camera.Height, GameBoyConstants.ScreenHeight);
             processedWidth = GameBoyConstants.ScreenWidth;
             processedHeight = GameBoyConstants.ScreenHeight;
 
@@ -160,7 +160,7 @@ namespace GameBot.Robot.Ui
             logger.Info($"Added keypoint ({e.X}, {e.Y})");
 
             if (keypoints.Count >= maxKeypointCount && quantizer != null)
-            {                
+            {
                 keypointsApplied = keypoints.Take(maxKeypointCount).ToList();
 
                 var keypointsList = new int[] { keypointsApplied[0].X, keypointsApplied[0].Y, keypointsApplied[1].X, keypointsApplied[1].Y, keypointsApplied[2].X, keypointsApplied[2].Y, keypointsApplied[3].X, keypointsApplied[3].Y };

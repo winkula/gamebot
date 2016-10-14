@@ -59,9 +59,7 @@ namespace GameBot.Engine.Emulated
             // process image and get display data
             TimeSpan time = clock.Time;
             IImage processed = quantizer.Quantize(image);
-
-            callback?.Invoke(image, processed);
-
+            
             if (Play)
             {
                 IScreenshot screenshot = new EmguScreenshot(processed, time);
@@ -71,7 +69,10 @@ namespace GameBot.Engine.Emulated
                 //  - decides which commands to press
                 //  - presses the commands
                 agent.Act(screenshot, actuator);
+                processed = agent.Visualize(processed);
             }
+
+            callback?.Invoke(image, processed);
 
             emulator.Execute();
         }

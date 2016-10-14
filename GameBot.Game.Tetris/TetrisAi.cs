@@ -20,23 +20,16 @@ namespace GameBot.Game.Tetris
         public GameState CurrentGameState { get; private set; }
         public Way LastWay { get; private set; }
 
-        public TetrisAi(IConfig config)
+        public TetrisAi(IConfig config, ISearch search)
         {
             this.config = config;
 
-            this.search = new SimpleSearch(BuildHeuristic());
+            this.search = search;
 
             CurrentGameState = new GameState();
             CurrentGameState.StartLevel = config.Read("Game.Tetris.StartLevel", 0);
             CurrentGameState.Piece = null;
             CurrentGameState.NextPiece = null;
-        }
-
-        private IHeuristic BuildHeuristic()
-        {
-            var typeName = config.Read("Game.Tetris.Heuristic", "GameBot.Game.Tetris.Searching.Heuristics.YiyuanLeeHeuristic");
-            var type = Type.GetType(typeName);
-            return (IHeuristic)Activator.CreateInstance(type);
         }
 
         public IEnumerable<ICommand> Initialize()

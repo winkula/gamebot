@@ -25,7 +25,9 @@ namespace GameBot.Game.Tetris.Agents.States
         public void Act()
         {
             // wait before start
-            if (agent.Clock.Time >= TimeSpan.FromSeconds(2.2))
+            var random = new Random();
+            var randomTime = 2.1 + 0.5 * random.NextDouble();
+            if (agent.Clock.Time >= TimeSpan.FromSeconds(randomTime))
             {
                 var commands = Initialize();
 

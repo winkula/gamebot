@@ -51,6 +51,11 @@ namespace GameBot.Game.Tetris.Agents
             Screenshot = screenshot;
             Actuator = actuator;
             
+            if (Extractor != null)
+            {
+                Extractor.Rectangles.Clear();
+            }
+
             State.Act();
         }
 
@@ -61,7 +66,7 @@ namespace GameBot.Game.Tetris.Agents
             {
                 foreach (var rectangle in Extractor.Rectangles)
                 {
-                    visualization.Draw(new Rectangle(8 * rectangle.X, 8 * rectangle.Y, 8, 8), new Bgr(0, 0, 255), 1);
+                    visualization.Draw(new Rectangle(8 * rectangle.X, 8 * rectangle.Y, 8, 8), new Bgr(0, 0, 255), 2);
                 }
                 return visualization;
             }
