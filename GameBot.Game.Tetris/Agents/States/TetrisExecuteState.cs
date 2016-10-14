@@ -51,6 +51,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 var piece = agent.Extractor.ExtractMovedPieceWithErrorTolerance(agent.Screenshot, lastPosition, lastMove.Value, expectedFallDistance);
                 if (piece == null)
                 {
+                    loggerCamera.Info("Piece not recognized");
                     logger.Info("> PIECE NOT FOUND! Looking for " + lastPosition.Tetromino + ". Try again.");
                     return;
                 }
@@ -62,12 +63,16 @@ namespace GameBot.Game.Tetris.Agents.States
                 UpdateLastPosition(piece, now);
                 if (delta.IsTargetPosition)
                 {
+                    loggerActuator.Info("Command executed");
+
                     // move was successfully executed
                     // we remove it from the queue
                     ProceedToNextCommand();
                 }
                 else
                 {
+                    loggerActuator.Info("Command failed");
+
                     // the command was not executed and the tile is in the old position
                     logger.Info("> Failed to execute the command.");
                     RepeatCommand();
@@ -153,6 +158,7 @@ namespace GameBot.Game.Tetris.Agents.States
         private void Execute(Move move)
         {
             logger.Info("> Execute " + move);
+            loggerActuator.Info("Command: " + move);
             switch (move)
             {
                 case Move.Left:

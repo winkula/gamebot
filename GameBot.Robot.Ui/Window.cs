@@ -50,7 +50,7 @@ namespace GameBot.Robot.Ui
 
             InitImageBoxes();
             InitForm();
-            
+
             Load += Loaded;
             ImageBoxOriginal.MouseClick += MouseClicked;
             KeyPreview = true;
@@ -82,7 +82,7 @@ namespace GameBot.Robot.Ui
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
-            
+
             AutoSize = true;
             ClientSize = new Size(originalWidth, originalHeight);
 
@@ -145,7 +145,8 @@ namespace GameBot.Robot.Ui
                 {
                     logger.Info("Keypoints: " + string.Join(",", keypointsApplied));
 
-                    config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsApplied));
+                    var keypointsList = new int[] { keypointsApplied[0].X, keypointsApplied[0].Y, keypointsApplied[1].X, keypointsApplied[1].Y, keypointsApplied[2].X, keypointsApplied[2].Y, keypointsApplied[3].X, keypointsApplied[3].Y };
+                    config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsList));
                     config.Save();
 
                     logger.Info("Saved configuration");
@@ -159,11 +160,14 @@ namespace GameBot.Robot.Ui
             logger.Info($"Added keypoint ({e.X}, {e.Y})");
 
             if (keypoints.Count >= maxKeypointCount && quantizer != null)
-            {
+            {                
                 keypointsApplied = keypoints.Take(maxKeypointCount).ToList();
+
+                var keypointsList = new int[] { keypointsApplied[0].X, keypointsApplied[0].Y, keypointsApplied[1].X, keypointsApplied[1].Y, keypointsApplied[2].X, keypointsApplied[2].Y, keypointsApplied[3].X, keypointsApplied[3].Y };
+
                 quantizer.Calibrate(keypointsApplied);
                 keypoints.Clear();
-                logger.Info($"Applied keypoints {keypointsApplied}");
+                logger.Info($"Applied keypoints {string.Join(",", keypointsList)}");
             }
         }
 
