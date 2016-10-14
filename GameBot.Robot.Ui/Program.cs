@@ -21,8 +21,8 @@ namespace GameBot.Robot.Ui
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
-                container.RegisterPackages(GetEmulatedEngineAssembies());
-                //container.RegisterPackages(GetPhysicalEngineAssembies());
+                //container.RegisterPackages(GetEmulatedEngineAssembies());
+                container.RegisterPackages(GetPhysicalEngineAssembies());
                 container.Verify();
 
                 ConfigureLogging();

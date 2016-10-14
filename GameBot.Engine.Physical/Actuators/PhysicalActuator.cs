@@ -59,8 +59,8 @@ namespace GameBot.Engine.Physical.Actuators
             int stackCurrent = master.GetStackCurrent();
             logger.Info("Stack Current: " + stackCurrent / 1000.0 + " A");
 
-            short ChipTemp = tir.GetAmbientTemperature();
-            logger.Info("Chibi master address: " + ChipTemp / 10 + "°/C");
+            //short ChipTemp = tir.GetAmbientTemperature();
+            //logger.Info("Chibi master address: " + ChipTemp / 10 + "°/C");
         }
 
         public void Hit(Button button)
