@@ -6,26 +6,26 @@ namespace GameBot.Engine.Emulated.Actuators
 {
     public class EmulatedActuator : IActuator
     {
-        private readonly Emulator emulator;
+        private readonly Emulator _emulator;
         
         public EmulatedActuator(Emulator emulator)
         {
-            this.emulator = emulator;
+            _emulator = emulator;
         }
 
         public void Hit(Button button)
         {
-            emulator.Hit(button);
+            _emulator.Hit(button);
         }
 
         public void Press(Button button)
         {
-            emulator.Press(button);
+            _emulator.Press(button);
         }
 
         public void Release(Button button)
         {
-            emulator.Release(button);
+            _emulator.Release(button);
         }        
     }
 }

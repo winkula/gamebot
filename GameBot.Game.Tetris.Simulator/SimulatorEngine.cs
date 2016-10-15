@@ -11,18 +11,18 @@ namespace GameBot.Game.Tetris.Simulator
 {
     public class SimulatorEngine
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly ISearch search;
-        private readonly TetrisSimulator simulator;
+        private readonly ISearch _search;
+        private readonly TetrisSimulator _simulator;
 
         // in ms
         public int PauseTime { get; set; }
 
         public SimulatorEngine(ISearch search, TetrisSimulator simulator)
         {
-            this.search = search;
-            this.simulator = simulator;
+            _search = search;
+            _simulator = simulator;
         }
 
         public void Run()
@@ -60,7 +60,7 @@ namespace GameBot.Game.Tetris.Simulator
                     }
 
                     Update();
-                    logger.Info($"Round {round + 1}");
+                    _logger.Info($"Round {round + 1}");
                     Render();
 
                     round++;
@@ -80,26 +80,26 @@ namespace GameBot.Game.Tetris.Simulator
             Console.WriteLine($"Running {animation}");
             Console.WriteLine($"Round {round}");
             Console.WriteLine($"---------------------");
-            Console.WriteLine($"Level {simulator.GameState.Level}");
-            Console.WriteLine($"Score {simulator.GameState.Score}");
-            Console.WriteLine($"Lines {simulator.GameState.Lines}");
+            Console.WriteLine($"Level {_simulator.GameState.Level}");
+            Console.WriteLine($"Score {_simulator.GameState.Score}");
+            Console.WriteLine($"Lines {_simulator.GameState.Lines}");
         }
 
         protected void Update()
         {
-            var result = search.Search(simulator.GameState);
+            var result = _search.Search(_simulator.GameState);
             if (result != null && result.Moves.Any())
             {
                 foreach (var move in result.Moves)
                 {
-                    simulator.Simulate(move);
+                    _simulator.Simulate(move);
                 }
             }
         }
 
         protected void Render()
         {
-            logger.Info(simulator.GameState);
+            _logger.Info(_simulator.GameState);
             if (PauseTime > 0)
             {
                 Thread.Sleep(PauseTime);
@@ -108,7 +108,7 @@ namespace GameBot.Game.Tetris.Simulator
 
         protected void LogResults(int rounds, long time)
         {
-            logger.Error("Game over");
+            _logger.Error("Game over");
             Console.WriteLine("Game over");
 
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Simulator_Results.csv");
@@ -121,7 +121,7 @@ namespace GameBot.Game.Tetris.Simulator
                 }
             }
 
-            string message = $"{rounds},{simulator.GameState.Lines},{simulator.GameState.Score},{simulator.GameState.Level},{time}\n";
+            string message = $"{rounds},{_simulator.GameState.Lines},{_simulator.GameState.Score},{_simulator.GameState.Level},{time}\n";
             File.AppendAllText(path, message);
         }
     }

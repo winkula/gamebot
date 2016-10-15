@@ -15,33 +15,33 @@ namespace GameBot.Robot.Ui
 {
     public partial class Window : Form
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private int originalWidth;
-        private int originalHeight;
-        private int processedWidth;
-        private int processedHeight;
+        private int _originalWidth;
+        private int _originalHeight;
+        private int _processedWidth;
+        private int _processedHeight;
 
-        private readonly IConfig config;
-        private readonly IEngine engine;
-        private readonly ICamera camera;
-        private readonly IActuator actuator;
-        private readonly ICalibrateableQuantizer quantizer;
+        private readonly IConfig _config;
+        private readonly IEngine _engine;
+        private readonly ICamera _camera;
+        private readonly IActuator _actuator;
+        private readonly ICalibrateableQuantizer _quantizer;
 
-        private const int maxKeypointCount = 4;
-        private List<Point> keypoints = new List<Point>();
-        private List<Point> keypointsApplied = new List<Point>();
+        private const int MaxKeypointCount = 4;
+        private List<Point> _keypoints = new List<Point>();
+        private List<Point> _keypointsApplied = new List<Point>();
 
         public Window(IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
         {
-            this.config = config;
-            this.engine = engine;
-            this.camera = camera;
-            this.actuator = actuator;
-            this.quantizer = quantizer as ICalibrateableQuantizer;
+            _config = config;
+            _engine = engine;
+            _camera = camera;
+            _actuator = actuator;
+            _quantizer = quantizer as ICalibrateableQuantizer;
             if (quantizer == null)
             {
-                logger.Warn("Quantizer is not calibrateable");
+                _logger.Warn("Quantizer is not calibrateable");
             }
 
             InitializeComponent();
@@ -59,21 +59,21 @@ namespace GameBot.Robot.Ui
 
         private void InitImageBoxes()
         {
-            originalWidth = Math.Max(camera.Width, 2 * GameBoyConstants.ScreenWidth);
-            originalHeight = Math.Max(camera.Height, GameBoyConstants.ScreenHeight);
-            processedWidth = GameBoyConstants.ScreenWidth;
-            processedHeight = GameBoyConstants.ScreenHeight;
+            _originalWidth = Math.Max(_camera.Width, 2 * GameBoyConstants.ScreenWidth);
+            _originalHeight = Math.Max(_camera.Height, GameBoyConstants.ScreenHeight);
+            _processedWidth = GameBoyConstants.ScreenWidth;
+            _processedHeight = GameBoyConstants.ScreenHeight;
 
-            ImageBoxOriginal.Size = new Size(originalWidth, originalHeight);
+            ImageBoxOriginal.Size = new Size(_originalWidth, _originalHeight);
             ImageBoxOriginal.Location = new Point(0, 0);
-            ImageBoxOriginal.Width = originalWidth;
-            ImageBoxOriginal.Height = originalHeight;
+            ImageBoxOriginal.Width = _originalWidth;
+            ImageBoxOriginal.Height = _originalHeight;
             ImageBoxOriginal.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
 
-            ImageBoxProcessed.Size = new Size(processedWidth, processedHeight);
-            ImageBoxProcessed.Location = new Point(originalWidth - processedWidth, 0);
-            ImageBoxProcessed.Width = processedWidth;
-            ImageBoxProcessed.Height = processedHeight;
+            ImageBoxProcessed.Size = new Size(_processedWidth, _processedHeight);
+            ImageBoxProcessed.Location = new Point(_originalWidth - _processedWidth, 0);
+            ImageBoxProcessed.Width = _processedWidth;
+            ImageBoxProcessed.Height = _processedHeight;
             ImageBoxProcessed.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
         }
 
@@ -84,7 +84,7 @@ namespace GameBot.Robot.Ui
             MinimizeBox = false;
 
             AutoSize = true;
-            ClientSize = new Size(originalWidth, originalHeight);
+            ClientSize = new Size(_originalWidth, _originalHeight);
 
             CenterToScreen();
         }
@@ -100,45 +100,45 @@ namespace GameBot.Robot.Ui
         {
             if (e.KeyChar == 'y')
             {
-                actuator.Hit(Core.Data.Button.A);
+                _actuator.Hit(Core.Data.Button.A);
             }
             if (e.KeyChar == 'x')
             {
-                actuator.Hit(Core.Data.Button.B);
+                _actuator.Hit(Core.Data.Button.B);
             }
             if (e.KeyChar == 'a')
             {
-                actuator.Hit(Core.Data.Button.Left);
+                _actuator.Hit(Core.Data.Button.Left);
             }
             if (e.KeyChar == 'd')
             {
-                actuator.Hit(Core.Data.Button.Right);
+                _actuator.Hit(Core.Data.Button.Right);
             }
             if (e.KeyChar == 'w')
             {
-                actuator.Hit(Core.Data.Button.Up);
+                _actuator.Hit(Core.Data.Button.Up);
             }
             if (e.KeyChar == 's')
             {
-                actuator.Hit(Core.Data.Button.Down);
+                _actuator.Hit(Core.Data.Button.Down);
             }
             if (e.KeyChar == 'c')
             {
-                actuator.Hit(Core.Data.Button.Start);
+                _actuator.Hit(Core.Data.Button.Start);
             }
             if (e.KeyChar == 'v')
             {
-                actuator.Hit(Core.Data.Button.Select);
+                _actuator.Hit(Core.Data.Button.Select);
             }
             if (e.KeyChar == 'r')
             {
-                engine.Reset();
+                _engine.Reset();
             }
 
             if (e.KeyChar == 'p')
             {
-                engine.Play = !engine.Play;
-                logger.Info(engine.Play ? "Play A.I." : "Pause A.I.");
+                _engine.Play = !_engine.Play;
+                _logger.Info(_engine.Play ? "Play A.I." : "Pause A.I.");
             }
             if (e.KeyChar == 'q')
             {
@@ -147,39 +147,39 @@ namespace GameBot.Robot.Ui
             if (e.KeyChar == 'k')
             {
                 // clear
-                keypoints.Clear();
-                logger.Info("Reset temporary keypoints");
+                _keypoints.Clear();
+                _logger.Info("Reset temporary keypoints");
             }
             if (e.KeyChar == 's')
             {
                 // save
-                if (keypointsApplied.Count == maxKeypointCount)
+                if (_keypointsApplied.Count == MaxKeypointCount)
                 {
-                    logger.Info("Keypoints: " + string.Join(",", keypointsApplied));
+                    _logger.Info("Keypoints: " + string.Join(",", _keypointsApplied));
 
-                    var keypointsList = new int[] { keypointsApplied[0].X, keypointsApplied[0].Y, keypointsApplied[1].X, keypointsApplied[1].Y, keypointsApplied[2].X, keypointsApplied[2].Y, keypointsApplied[3].X, keypointsApplied[3].Y };
-                    config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsList));
-                    config.Save();
+                    var keypointsList = new int[] { _keypointsApplied[0].X, _keypointsApplied[0].Y, _keypointsApplied[1].X, _keypointsApplied[1].Y, _keypointsApplied[2].X, _keypointsApplied[2].Y, _keypointsApplied[3].X, _keypointsApplied[3].Y };
+                    _config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsList));
+                    _config.Save();
 
-                    logger.Info("Saved configuration");
+                    _logger.Info("Saved configuration");
                 }
             }
         }
 
         private void MouseClicked(object sender, MouseEventArgs e)
         {
-            keypoints.Add(new Point(e.X, e.Y));
-            logger.Info($"Added keypoint ({e.X}, {e.Y})");
+            _keypoints.Add(new Point(e.X, e.Y));
+            _logger.Info($"Added keypoint ({e.X}, {e.Y})");
 
-            if (keypoints.Count >= maxKeypointCount && quantizer != null)
+            if (_keypoints.Count >= MaxKeypointCount && _quantizer != null)
             {
-                keypointsApplied = keypoints.Take(maxKeypointCount).ToList();
+                _keypointsApplied = _keypoints.Take(MaxKeypointCount).ToList();
 
-                var keypointsList = new int[] { keypointsApplied[0].X, keypointsApplied[0].Y, keypointsApplied[1].X, keypointsApplied[1].Y, keypointsApplied[2].X, keypointsApplied[2].Y, keypointsApplied[3].X, keypointsApplied[3].Y };
+                var keypointsList = new int[] { _keypointsApplied[0].X, _keypointsApplied[0].Y, _keypointsApplied[1].X, _keypointsApplied[1].Y, _keypointsApplied[2].X, _keypointsApplied[2].Y, _keypointsApplied[3].X, _keypointsApplied[3].Y };
 
-                quantizer.Calibrate(keypointsApplied);
-                keypoints.Clear();
-                logger.Info($"Applied keypoints {string.Join(",", keypointsList)}");
+                _quantizer.Calibrate(_keypointsApplied);
+                _keypoints.Clear();
+                _logger.Info($"Applied keypoints {string.Join(",", keypointsList)}");
             }
         }
 
@@ -194,13 +194,13 @@ namespace GameBot.Robot.Ui
         {
             var stopwatch = new Stopwatch();
 
-            engine.Initialize();
+            _engine.Initialize();
 
             while (true)
             {
                 try
                 {
-                    engine.Step(Show);
+                    _engine.Step(Show);
 
                     stopwatch.Stop();
                     long ms = stopwatch.ElapsedMilliseconds;
@@ -212,8 +212,8 @@ namespace GameBot.Robot.Ui
                 }
                 catch (GameOverException)
                 {
-                    logger.Info("Game over");
-                    engine.Play = false;
+                    _logger.Info("Game over");
+                    _engine.Play = false;
                 }
             }
         }

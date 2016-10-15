@@ -4,7 +4,7 @@ namespace GameBot.Game.Tetris.Data
 {
     public class Piece
     {
-        private static readonly Random random = new Random();
+        private static readonly Random Random = new Random();
 
         public Tetromino Tetromino { get; private set; }
         public Shape Shape { get; private set; }

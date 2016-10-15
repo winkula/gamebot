@@ -9,53 +9,53 @@ namespace GameBot.Game.Tetris.Agents.States
 {
     public class TetrisAnalyzeState : ITetrisState
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private TetrisAgent agent;
+        private TetrisAgent _agent;
 
-        private Tetromino? currentTetromino;
+        private Tetromino? _currentTetromino;
 
-        private Piece extractedPiece;
-        private Tetromino? extractedNextPiece;
+        private Piece _extractedPiece;
+        private Tetromino? _extractedNextPiece;
 
-        private TimeSpan timeNextAction = TimeSpan.Zero;
+        private TimeSpan _timeNextAction = TimeSpan.Zero;
         
         public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)
         {
-            this.agent = agent;
+            _agent = agent;
 
-            this.currentTetromino = currentTetromino;
+            _currentTetromino = currentTetromino;
         }
 
         public void Act()
         {
             // TODO: calculate duration as the time that passed since the initialization of this state
             var duration = TimeSpan.FromMilliseconds(Timing.ExpectedFallDurationPadding);
-            int searchHeight = TetrisLevel.GetMaxFallDistance(agent.GameState.StartLevel, duration);
+            int searchHeight = TetrisLevel.GetMaxFallDistance(_agent.GameState.StartLevel, duration);
 
             if (Extract(searchHeight))
             {
                 // update global game state
-                agent.GameState.Piece = extractedPiece;
-                agent.GameState.NextPiece = extractedNextPiece;
+                _agent.GameState.Piece = _extractedPiece;
+                _agent.GameState.NextPiece = _extractedNextPiece;
 
                 // we found a new piece. release the down key (end the drop)
-                agent.Executor.Release(Button.Down);
-                logger.Info("> End the drop.");
+                _agent.Executor.Release(Button.Down);
+                _logger.Info("> End the drop.");
 
                 // do the search
                 // this is the essence of the a.i.
-                var results = agent.Search.Search(agent.GameState);
+                var results = _agent.Search.Search(_agent.GameState);
 
                 if (results != null)
                 {
-                    logger.Info("Current game state:\n" + agent.GameState);
+                    _logger.Info("Current game state:\n" + _agent.GameState);
 
-                    logger.Info("> AI found a solution.");
-                    logger.Info("> Goal game state:\n" + results.GoalGameState);
+                    _logger.Info("> AI found a solution.");
+                    _logger.Info("> Goal game state:\n" + results.GoalGameState);
                     foreach (var move in results.Moves)
                     {
-                        logger.Info(move);
+                        _logger.Info(move);
                     }
 
                     // somthing found.. we can execute now
@@ -68,24 +68,24 @@ namespace GameBot.Game.Tetris.Agents.States
         // only then can we start the search and proceed to the execute-state
         private bool Extract(int searchHeight)
         {
-            var screenshot = agent.Screenshot;
+            var screenshot = _agent.Screenshot;
 
             // we dont extract the board (too error prone)
             // instead we carry along the game state
 
             // extract the pieces
             // TODO: if currentTetromino.HasValue, then we know, which tetromino we look for, so we can optimize the piece matching
-            extractedPiece = agent.Extractor.ExtractSpawnedPiece(screenshot, searchHeight);
-            if (extractedPiece == null) return false;
-            if (extractedPiece.Orientation != 0) return false; // spawned piece must have orientation 0
-            if (extractedPiece.X != 0) return false; // spawned piece must have x coordinate 0
+            _extractedPiece = _agent.Extractor.ExtractSpawnedPiece(screenshot, searchHeight);
+            if (_extractedPiece == null) return false;
+            if (_extractedPiece.Orientation != 0) return false; // spawned piece must have orientation 0
+            if (_extractedPiece.X != 0) return false; // spawned piece must have x coordinate 0
 
-            extractedNextPiece = agent.Extractor.ExtractNextPiece(screenshot);
-            if (extractedNextPiece == null) return false;
+            _extractedNextPiece = _agent.Extractor.ExtractNextPiece(screenshot);
+            if (_extractedNextPiece == null) return false;
 
-            if (currentTetromino.HasValue && currentTetromino.Value != extractedPiece.Tetromino)
+            if (_currentTetromino.HasValue && _currentTetromino.Value != _extractedPiece.Tetromino)
             {
-                logger.Info("> Extracted inconsistent current piece!");
+                _logger.Info("> Extracted inconsistent current piece!");
                 return false;
             }
 
@@ -95,7 +95,7 @@ namespace GameBot.Game.Tetris.Agents.States
         private void Execute(SearchResult results)
         {
             var moves = new Queue<Move>(results.Moves);
-            agent.SetState(new TetrisExecuteState(agent, moves, agent.Screenshot.Timestamp));
+            _agent.SetState(new TetrisExecuteState(_agent, moves, _agent.Screenshot.Timestamp));
         }
     }
 }

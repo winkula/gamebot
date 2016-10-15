@@ -8,18 +8,18 @@ namespace GameBot.Game.Tetris.Agents.States
 {
     public class TetrisStartState : ITetrisState
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private TetrisAgent agent;
+        private TetrisAgent _agent;
 
-        private readonly bool startFromGameover; 
-        private readonly int startLevel;
+        private readonly bool _startFromGameover; 
+        private readonly int _startLevel;
 
         public TetrisStartState(TetrisAgent agent, int startLevel, bool startFromGameOver)
         {
-            this.agent = agent;
-            this.startFromGameover = startFromGameOver;
-            this.startLevel = startLevel;
+            _agent = agent;
+            _startFromGameover = startFromGameOver;
+            _startLevel = startLevel;
         }
 
         public void Act()
@@ -27,25 +27,25 @@ namespace GameBot.Game.Tetris.Agents.States
             // wait before start
             var random = new Random();
             var randomTime = 2.1 + 0.5 * random.NextDouble();
-            if (agent.Clock.Time >= TimeSpan.FromSeconds(randomTime))
+            if (_agent.Clock.Time >= TimeSpan.FromSeconds(randomTime))
             {
-                if (startFromGameover)
+                if (_startFromGameover)
                 {
                     // handle start menu
-                    StartFromGameOver(agent.Executor);
+                    StartFromGameOver(_agent.Executor);
                 }
                 else
                 {
                     // restart from game over screen (good for testing multiple games)
-                    StartFromMenu(agent.Executor);
+                    StartFromMenu(_agent.Executor);
                 }
 
                 // init game state
-                agent.GameState = new GameState();
-                agent.GameState.StartLevel = startLevel;
+                _agent.GameState = new GameState();
+                _agent.GameState.StartLevel = _startLevel;
 
-                logger.Info("> Game started. Initialization sequence executed.");
-                agent.SetState(new TetrisAnalyzeState(agent, null));
+                _logger.Info("> Game started. Initialization sequence executed.");
+                _agent.SetState(new TetrisAnalyzeState(_agent, null));
             }
         }
         
@@ -63,7 +63,7 @@ namespace GameBot.Game.Tetris.Agents.States
             actuator.Hit(Button.A);
 
             // select level
-            SelectLevel(actuator, startLevel);
+            SelectLevel(actuator, _startLevel);
         }
 
         private void StartFromGameOver(IExecutor actuator)

@@ -5,7 +5,7 @@ namespace GameBot.Game.Tetris
 {
     public class TetrisSimulator
     {
-        private readonly Random random = new Random();
+        private readonly Random _random = new Random();
 
         public TetrisSimulator()
         {

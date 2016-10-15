@@ -12,19 +12,19 @@ namespace GameBot.Game.Tetris
 {
     public class TetrisAi
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IConfig config;
-        private readonly ISearch search;
+        private readonly IConfig _config;
+        private readonly ISearch _search;
 
         public GameState CurrentGameState { get; private set; }
         public Way LastWay { get; private set; }
 
         public TetrisAi(IConfig config, ISearch search)
         {
-            this.config = config;
+            _config = config;
 
-            this.search = search;
+            _search = search;
 
             CurrentGameState = new GameState();
             CurrentGameState.StartLevel = config.Read("Game.Tetris.StartLevel", 0);
@@ -35,7 +35,7 @@ namespace GameBot.Game.Tetris
         public IEnumerable<ICommand> Initialize()
         {
             var commands = new CommandCollection();
-            if (config.Read<bool>("Game.Tetris.Initialize"))
+            if (_config.Read<bool>("Game.Tetris.Initialize"))
             {
                 Start(commands);
             }
@@ -57,7 +57,7 @@ namespace GameBot.Game.Tetris
             CurrentGameState.Piece = gameState.Piece;
             CurrentGameState.NextPiece = gameState.NextPiece;
             
-            var result = search.Search(new GameState(CurrentGameState));
+            var result = _search.Search(new GameState(CurrentGameState));
 
             foreach (var move in result.Moves)
             {
@@ -99,7 +99,7 @@ namespace GameBot.Game.Tetris
                 }
             }
 
-            logger.Info(CurrentGameState);
+            Logger.Info(CurrentGameState);
             return commands;
         }
 

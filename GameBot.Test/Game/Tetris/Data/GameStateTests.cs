@@ -7,7 +7,7 @@ namespace GameBot.Test.Game.Tetris
     [TestFixture]
     public class GameStateTests
     {
-        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [TestCase(Tetromino.L, Tetromino.O, 0, 10, new[] {
             0,0,0,0,0,0,0,0,0,0,
@@ -132,7 +132,7 @@ namespace GameBot.Test.Game.Tetris
             var gameState = new GameState();
 
             var str = gameState.ToString();
-            logger.Info(str);
+            _logger.Info(str);
 
             Assert.NotNull(str);
         }

@@ -10,23 +10,23 @@ namespace GameBot.Test.Game.Tetris.Searching
     [TestFixture]
     public class TetrisSearchTests
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private IHeuristic heuristic;
+        private IHeuristic _heuristic;
 
-        private SimpleSearch simpleSearch;
-        private ProbabilisticSearch probabilisticSearch;
-        private RecursiveSearch recursiveSearch;
+        private SimpleSearch _simpleSearch;
+        private ProbabilisticSearch _probabilisticSearch;
+        private RecursiveSearch _recursiveSearch;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            heuristic = new YiyuanLeeHeuristic();
+            _heuristic = new YiyuanLeeHeuristic();
 
-            simpleSearch = new SimpleSearch(heuristic);
-            probabilisticSearch = new ProbabilisticSearch(heuristic);
-            recursiveSearch = new RecursiveSearch(heuristic);
-            recursiveSearch.Depth = 2;
+            _simpleSearch = new SimpleSearch(_heuristic);
+            _probabilisticSearch = new ProbabilisticSearch(_heuristic);
+            _recursiveSearch = new RecursiveSearch(_heuristic);
+            _recursiveSearch.Depth = 2;
         }
 
         [TestCase(Tetromino.O, Tetromino.S)]
@@ -40,8 +40,8 @@ namespace GameBot.Test.Game.Tetris.Searching
         {
             var gameState = new GameState(current, next);
             
-            var result = simpleSearch.Search(gameState);
-            logger.Info(result.GoalGameState);
+            var result = _simpleSearch.Search(gameState);
+            _logger.Info(result.GoalGameState);
         }
 
         [TestCase(Tetromino.T, Tetromino.J)]
@@ -50,10 +50,10 @@ namespace GameBot.Test.Game.Tetris.Searching
             var simpleSearchLocal = new SimpleSearch(new YiyuanLeeHeuristic());
 
             var gameState = new GameState(current, next);
-            logger.Info(gameState);
+            _logger.Info(gameState);
 
             var result = simpleSearchLocal.Search(gameState);
-            logger.Info(result.GoalGameState);
+            _logger.Info(result.GoalGameState);
 
             Assert.AreEqual(3, result.Moves.Count());
             Assert.AreEqual(Move.Rotate, result.Moves.ToList()[0]);
@@ -72,8 +72,8 @@ namespace GameBot.Test.Game.Tetris.Searching
         {
             var gameState = new GameState(current, next);
 
-            var result = probabilisticSearch.Search(gameState);
-            logger.Info(result.GoalGameState);
+            var result = _probabilisticSearch.Search(gameState);
+            _logger.Info(result.GoalGameState);
         }
 
         [TestCase(Tetromino.O, Tetromino.S)]
@@ -87,8 +87,8 @@ namespace GameBot.Test.Game.Tetris.Searching
         {
             var gameState = new GameState(current, next);
 
-            var result = recursiveSearch.Search(gameState);
-            logger.Info(result.GoalGameState);
+            var result = _recursiveSearch.Search(gameState);
+            _logger.Info(result.GoalGameState);
         }
     }
 }

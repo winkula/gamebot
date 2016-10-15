@@ -12,7 +12,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
     [TestFixture]
     public class TetrisExtractorTests
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Test]
         public void Constructor()
@@ -43,11 +43,11 @@ namespace GameBot.Test.Game.Tetris.Extraction
             Assert.NotNull(gameState.Piece);
             Assert.NotNull(gameState.NextPiece);
 
-            logger.Info(gameState.Piece);
-            logger.Info(gameState.NextPiece);
+            _logger.Info(gameState.Piece);
+            _logger.Info(gameState.NextPiece);
 
-            logger.Info(gameState);
-            logger.Info(gameState.Board);
+            _logger.Info(gameState);
+            _logger.Info(gameState.Board);
         }
 
         [Test]

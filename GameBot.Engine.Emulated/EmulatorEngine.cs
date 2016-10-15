@@ -9,56 +9,56 @@ namespace GameBot.Engine.Emulated
 {
     public class EmulatorEngine : IEngine
     {
-        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IConfig config;
+        private readonly IConfig _config;
         
-        private readonly ICamera camera;
-        private readonly IClock clock;
-        private readonly IExecutor executor;
-        private readonly IQuantizer quantizer;
+        private readonly ICamera _camera;
+        private readonly IClock _clock;
+        private readonly IExecutor _executor;
+        private readonly IQuantizer _quantizer;
 
-        private readonly IAgent agent;
+        private readonly IAgent _agent;
 
-        private readonly Emulator emulator;
+        private readonly Emulator _emulator;
 
         public bool Play { get; set; }
 
         public EmulatorEngine(IConfig config, ICamera camera, IClock clock, IExecutor executor, IQuantizer quantizer, IAgent agent, Emulator emulator)
         {
-            this.config = config;
+            _config = config;
             
-            this.camera = camera;
-            this.clock = clock;
-            this.executor = executor;
-            this.quantizer = quantizer;
+            _camera = camera;
+            _clock = clock;
+            _executor = executor;
+            _quantizer = quantizer;
 
-            this.agent = agent;
+            _agent = agent;
 
-            this.emulator = emulator;
+            _emulator = emulator;
             LoadRom();
         }
 
         private void LoadRom()
         {
             var loader = new RomLoader();
-            var game = loader.Load(config.Read("Emulator.Rom.Path", "Roms/tetris.gb"));
-            emulator.Load(game);
+            var game = loader.Load(_config.Read("Emulator.Rom.Path", "Roms/tetris.gb"));
+            _emulator.Load(game);
         }
 
         public void Initialize()
         {
-            clock.Start();
+            _clock.Start();
         }
 
         public void Step(Action<IImage,IImage> callback = null)
         {
             // get image as photo of the gameboy screen (input)
-            IImage image = camera.Capture();
+            IImage image = _camera.Capture();
 
             // process image and get display data
-            TimeSpan time = clock.Time;
-            IImage processed = quantizer.Quantize(image);
+            TimeSpan time = _clock.Time;
+            IImage processed = _quantizer.Quantize(image);
             
             if (Play)
             {
@@ -68,13 +68,13 @@ namespace GameBot.Engine.Emulated
                 //  - extracts the game state
                 //  - decides which commands to press
                 //  - presses the commands
-                agent.Act(screenshot, executor);
-                processed = agent.Visualize(processed);
+                _agent.Act(screenshot, _executor);
+                processed = _agent.Visualize(processed);
             }
 
             callback?.Invoke(image, processed);
 
-            emulator.Execute();
+            _emulator.Execute();
         }
 
         public void Reset()

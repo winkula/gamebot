@@ -6,12 +6,12 @@ namespace GameBot.Test.Game.Tetris.Extraction
     [TestFixture]
     public class PieceMatcherTests
     {
-        private PieceMatcher matcher;
+        private PieceMatcher _matcher;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            matcher = PieceMatcher.Instance;
+            _matcher = PieceMatcher.Instance;
         }
 
         [TestCase(new[] {

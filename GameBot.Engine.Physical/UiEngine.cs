@@ -7,43 +7,43 @@ namespace GameBot.Engine.Physical
 {
     public class UiEngine : IEngine
     {
-        private readonly IConfig config;
+        private readonly IConfig _config;
 
-        private readonly IActuator actuator;
-        private readonly ICamera camera;
-        private readonly IClock clock;
-        private readonly IExecutor executor;
-        private readonly IQuantizer quantizer;
+        private readonly IActuator _actuator;
+        private readonly ICamera _camera;
+        private readonly IClock _clock;
+        private readonly IExecutor _executor;
+        private readonly IQuantizer _quantizer;
 
-        private readonly IAgent agent;
+        private readonly IAgent _agent;
 
         public bool Play { get; set; }
 
         public UiEngine( ICamera camera, IConfig config, IExecutor executor, IQuantizer quantizer, IAgent agent, IActuator actuator, IClock clock)
         {
-            this.config = config;
+            _config = config;
 
-            this.camera = camera;
-            this.clock = clock;
-            this.executor = executor;
-            this.quantizer = quantizer;
-            this.agent = agent;
-            this.actuator = actuator;
+            _camera = camera;
+            _clock = clock;
+            _executor = executor;
+            _quantizer = quantizer;
+            _agent = agent;
+            _actuator = actuator;
         }
 
         public void Initialize()
         {
-            clock.Start();
+            _clock.Start();
         }
 
         public void Step(Action<IImage, IImage> callback = null)
         {
             // get image as photo of the gameboy screen (input)
-            IImage image = camera.Capture();
+            IImage image = _camera.Capture();
 
             // process image and get display data
-            TimeSpan time = clock.Time;
-            IImage processed = quantizer.Quantize(image);
+            TimeSpan time = _clock.Time;
+            IImage processed = _quantizer.Quantize(image);
             
             if (Play)
             {
@@ -53,8 +53,8 @@ namespace GameBot.Engine.Physical
                 //  - extracts the game state
                 //  - decides which commands to press
                 //  - presses the buttons
-                agent.Act(screenshot, executor);
-                processed = agent.Visualize(processed);
+                _agent.Act(screenshot, _executor);
+                processed = _agent.Visualize(processed);
             }
 
             callback?.Invoke(image, processed);
@@ -63,7 +63,7 @@ namespace GameBot.Engine.Physical
         public void Reset()
         {
             Play = false;
-            agent.Reset();
+            _agent.Reset();
         }
     }
 }

@@ -7,7 +7,7 @@ namespace GameBot.Test.Game.Tetris.Data
     [TestFixture]
     public class BoardTests
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Test]
         public void Constructor()
@@ -40,7 +40,7 @@ namespace GameBot.Test.Game.Tetris.Data
             Assert.AreEqual(19, board.Height);
             Assert.AreEqual(0, board.Pieces);
 
-            logger.Info(board.ToString());
+            _logger.Info(board.ToString());
 
             for (int x = 0; x < board.Width; x++)
             {
@@ -136,7 +136,7 @@ namespace GameBot.Test.Game.Tetris.Data
             {
                 for (int _y = 0; _y < board.Height; _y++)
                 {
-                    logger.Info(_x + "," + _y);
+                    _logger.Info(_x + "," + _y);
                     if (_x != x || _y != y)
                     {
                         Assert.True(board.IsOccupied(_x, _y));
@@ -385,8 +385,8 @@ namespace GameBot.Test.Game.Tetris.Data
             board.Place(piece);
             board.RemoveLines();
 
-            logger.Info(board.ToString());
-            logger.Info(expected.ToString());
+            _logger.Info(board.ToString());
+            _logger.Info(expected.ToString());
 
             Assert.True(SquaresEqual(expected, board));
         }
@@ -465,7 +465,7 @@ namespace GameBot.Test.Game.Tetris.Data
             var board = new Board();
 
             var str = board.ToString();
-            logger.Info(str);
+            _logger.Info(str);
 
             Assert.NotNull(str);
         }

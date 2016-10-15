@@ -11,19 +11,19 @@ namespace GameBot.Game.Tetris.Data
     {
         #region Static part
 
-        private static int[] columnHeights;
-        private static int[] columnHoles;
-        private static int[] linePosition;
+        private static int[] _columnHeights;
+        private static int[] _columnHoles;
+        private static int[] _linePosition;
 
         private static void CalculateLookupTables()
         {
-            columnHeights = new int[0x7FFFF + 1];
-            columnHoles = new int[0x7FFFF + 1];
-            linePosition = new int[0x7FFFF + 1];
+            _columnHeights = new int[0x7FFFF + 1];
+            _columnHoles = new int[0x7FFFF + 1];
+            _linePosition = new int[0x7FFFF + 1];
             for (int i = 1; i < 0x7FFFF + 1; i++)
             {
                 // calculate heights
-                columnHeights[i] = 1 + (int)Math.Log(i, 2);
+                _columnHeights[i] = 1 + (int)Math.Log(i, 2);
 
                 // calculate holes
                 int holes = 0;
@@ -40,15 +40,15 @@ namespace GameBot.Game.Tetris.Data
                         tempCount++;
                     }
                 }
-                columnHoles[i] = holes;
+                _columnHoles[i] = holes;
 
                 // calculate line position
-                linePosition[i] = -1;
+                _linePosition[i] = -1;
                 for (int y = 0; y < 32; y++)
                 {
                     if ((i & (1 << y)) > 0)
                     {
-                        linePosition[i] = y;
+                        _linePosition[i] = y;
                         break;
                     }
                 }
@@ -57,29 +57,29 @@ namespace GameBot.Game.Tetris.Data
 
         private static int GetColumnHeight(int column)
         {
-            if (columnHeights == null)
+            if (_columnHeights == null)
             {
                 CalculateLookupTables();
             }
-            return columnHeights[column];
+            return _columnHeights[column];
         }
 
         private static int GetColumnHoles(int column)
         {
-            if (columnHoles == null)
+            if (_columnHoles == null)
             {
                 CalculateLookupTables();
             }
-            return columnHoles[column];
+            return _columnHoles[column];
         }
 
         private static int GetLinePosition(int columns)
         {
-            if (linePosition == null)
+            if (_linePosition == null)
             {
                 CalculateLookupTables();
             }
-            return linePosition[columns];
+            return _linePosition[columns];
         }
 
         #endregion
@@ -151,7 +151,7 @@ namespace GameBot.Game.Tetris.Data
                 {
                     mask &= Columns[x];
                 }
-                return columnHeights[mask];
+                return _columnHeights[mask];
             }
         }
 

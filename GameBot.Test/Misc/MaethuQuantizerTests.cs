@@ -15,7 +15,7 @@ namespace GameBot.Test.Misc
     [TestFixture]
     public class MaethuQuantizerTests
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Test]
         public void TestMe()
@@ -50,7 +50,7 @@ namespace GameBot.Test.Misc
                 //TemplateMatching(img);
             }
             stopwatch.Stop();
-            logger.Info($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
+            _logger.Info($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
 
             // show/save 
             string outputFilename = "output.png";

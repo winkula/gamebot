@@ -14,7 +14,7 @@ namespace GameBot.Game.Tetris.Agents
     public class TetrisAgent : IAgent
     {
         // current state of the ai (state pattern)
-        private ITetrisState State;
+        private ITetrisState _state;
         
         // global services
         public IConfig Config { get; private set; }
@@ -51,7 +51,7 @@ namespace GameBot.Game.Tetris.Agents
             if (newState == null)
                 throw new ArgumentNullException("newState");
 
-            State = newState;
+            _state = newState;
         }
 
         public void Act(IScreenshot screenshot, IExecutor executor)
@@ -64,7 +64,7 @@ namespace GameBot.Game.Tetris.Agents
                 Extractor.Rectangles.Clear();
             }
 
-            State.Act();
+            _state.Act();
         }
 
         public IImage Visualize(IImage image)

@@ -9,55 +9,55 @@ namespace GameBot.Engine.Physical.Actuators
 {
     public class PhysicalActuator : IActuator, IDisposable
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         private const int DelayHit = 100; // was 40
         private const int DelayCommand = 500; // was 50
 
-        private readonly IConfig config;
+        private readonly IConfig _config;
 
-        private string host;
-        private int port;
-        private string uidMaster;
-        private string uidRelay1;
-        private string uidRelay2;
-        private string uidTemp;
+        private string _host;
+        private int _port;
+        private string _uidMaster;
+        private string _uidRelay1;
+        private string _uidRelay2;
+        private string _uidTemp;
 
-        private int State1;
-        private int State2;
+        private int _state1;
+        private int _state2;
 
-        private IPConnection ipcon;
-        private BrickMaster master;
-        private BrickletIndustrialQuadRelay or1;
-        private BrickletIndustrialQuadRelay or2;
-        private BrickletTemperatureIR tir;
+        private IPConnection _ipcon;
+        private BrickMaster _master;
+        private BrickletIndustrialQuadRelay _or1;
+        private BrickletIndustrialQuadRelay _or2;
+        private BrickletTemperatureIR _tir;
 
         public PhysicalActuator(IConfig config)
         {
-            this.config = config;
+            _config = config;
 
-            this.host = config.Read<string>("Robot.Actuator.Host");
-            this.port = config.Read<int>("Robot.Actuator.Port");
-            this.uidMaster = config.Read<string>("Robot.Actuator.UidMaster");
-            this.uidRelay1 = config.Read<string>("Robot.Actuator.UidRelay1");
-            this.uidRelay2 = config.Read<string>("Robot.Actuator.UidRelay2");
-            this.uidTemp = config.Read<string>("Robot.Actuator.UidTemp");
+            _host = config.Read<string>("Robot.Actuator.Host");
+            _port = config.Read<int>("Robot.Actuator.Port");
+            _uidMaster = config.Read<string>("Robot.Actuator.UidMaster");
+            _uidRelay1 = config.Read<string>("Robot.Actuator.UidRelay1");
+            _uidRelay2 = config.Read<string>("Robot.Actuator.UidRelay2");
+            _uidTemp = config.Read<string>("Robot.Actuator.UidTemp");
             
-            ipcon = new IPConnection(); // Create IP connection
-            ipcon.Connect(host, port); // Connect to brickd. Don't use device before ipcon is connected
+            _ipcon = new IPConnection(); // Create IP connection
+            _ipcon.Connect(_host, _port); // Connect to brickd. Don't use device before ipcon is connected
             
-            master = new BrickMaster(uidMaster, ipcon); // Create device object
-            or1 = new BrickletIndustrialQuadRelay(uidRelay1, ipcon);
-            or2 = new BrickletIndustrialQuadRelay(uidRelay2, ipcon);
-            tir = new BrickletTemperatureIR(uidTemp, ipcon);
+            _master = new BrickMaster(_uidMaster, _ipcon); // Create device object
+            _or1 = new BrickletIndustrialQuadRelay(_uidRelay1, _ipcon);
+            _or2 = new BrickletIndustrialQuadRelay(_uidRelay2, _ipcon);
+            _tir = new BrickletTemperatureIR(_uidTemp, _ipcon);
             
             // Get current stack voltage (unit is mV)
-            int stackVoltage = master.GetStackVoltage();
-            logger.Info("Stack Voltage: " + stackVoltage / 1000.0 + " V");
+            int stackVoltage = _master.GetStackVoltage();
+            _logger.Info("Stack Voltage: " + stackVoltage / 1000.0 + " V");
 
             // Get current stack current (unit is mA)
-            int stackCurrent = master.GetStackCurrent();
-            logger.Info("Stack Current: " + stackCurrent / 1000.0 + " A");
+            int stackCurrent = _master.GetStackCurrent();
+            _logger.Info("Stack Current: " + stackCurrent / 1000.0 + " A");
 
             //short ChipTemp = tir.GetAmbientTemperature();
             //logger.Info("Chibi master address: " + ChipTemp / 10 + "°/C");
@@ -65,7 +65,7 @@ namespace GameBot.Engine.Physical.Actuators
 
         public void Hit(Button button)
         {
-            logger.Info($"Hit button {button}");
+            _logger.Info($"Hit button {button}");
 
             HandleState(button, true);
             Thread.Sleep(DelayHit);
@@ -75,7 +75,7 @@ namespace GameBot.Engine.Physical.Actuators
 
         public void Press(Button button)
         {
-            logger.Info($"Press button {button}");
+            _logger.Info($"Press button {button}");
 
             HandleState(button, true);
             Thread.Sleep(DelayCommand);
@@ -83,7 +83,7 @@ namespace GameBot.Engine.Physical.Actuators
 
         public void Release(Button button)
         {
-            logger.Info($"Release button {button}");
+            _logger.Info($"Release button {button}");
 
             HandleState(button, false);
             Thread.Sleep(DelayCommand);
@@ -128,33 +128,33 @@ namespace GameBot.Engine.Physical.Actuators
         {
             if (pressOrRelease)
             {
-                State1 |= bitmask;
+                _state1 |= bitmask;
             }
             else
             {
-                State1 &= ~bitmask;
+                _state1 &= ~bitmask;
             }
-            or1.SetValue(State1);
+            _or1.SetValue(_state1);
         }
 
         private void HandleState2Bit(int bitmask, bool pressOrRelease)
         {
             if (pressOrRelease)
             {
-                State2 |= bitmask;
+                _state2 |= bitmask;
             }
             else
             {
-                State2 &= ~bitmask;
+                _state2 &= ~bitmask;
             }
-            or2.SetValue(State2);
+            _or2.SetValue(_state2);
         }
 
         public void Dispose()
         {
-            or1.SetValue(0);
-            or2.SetValue(0);
-            ipcon.Disconnect();
+            _or1.SetValue(0);
+            _or2.SetValue(0);
+            _ipcon.Disconnect();
         }
     }
 }

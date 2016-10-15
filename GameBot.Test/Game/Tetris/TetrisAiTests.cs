@@ -11,26 +11,26 @@ namespace GameBot.Test.Game.Tetris
     [TestFixture]
     public class TetrisAiTests
     {
-        private IConfig config;
-        private ISearch search;
+        private IConfig _config;
+        private ISearch _search;
 
         [SetUp]
         public void Init()
         {
-            config = new AppSettingsConfig();
-            search = new SimpleSearch(new YiyuanLeeHeuristic());
+            _config = new AppSettingsConfig();
+            _search = new SimpleSearch(new YiyuanLeeHeuristic());
         }
 
         [Test]
         public void Constructor()
         {
-            var player = new TetrisAi(config, search);
+            var player = new TetrisAi(_config, _search);
         }
 
         [Test]
         public void Play()
         {
-            var player = new TetrisAi(config, search);
+            var player = new TetrisAi(_config, _search);
             var gameState = new GameState(Tetromino.L, Tetromino.Z);
             
             var commands = player.Play(gameState);

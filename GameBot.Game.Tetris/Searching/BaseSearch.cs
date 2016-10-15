@@ -9,11 +9,11 @@ namespace GameBot.Game.Tetris.Searching
     // Tetris breadth first search
     public abstract class BaseSearch : ISearch
     {
-        protected readonly IHeuristic heuristic;
+        protected readonly IHeuristic Heuristic;
 
         public BaseSearch(IHeuristic heuristic)
         {
-            this.heuristic = heuristic;
+            Heuristic = heuristic;
         }
 
         public virtual SearchResult Search(GameState gameState)
@@ -112,7 +112,7 @@ namespace GameBot.Game.Tetris.Searching
 
         protected double ScoreSimple(Node parent)
         {
-            return heuristic.Score(parent.GameState);
+            return Heuristic.Score(parent.GameState);
         }
 
         protected double ScoreProbabilisticExpected(Node parent)
@@ -159,7 +159,7 @@ namespace GameBot.Game.Tetris.Searching
 
             foreach (var successor in successors)
             {
-                var score = heuristic.Score(successor.GameState);
+                var score = Heuristic.Score(successor.GameState);
                 bestScore = Math.Max(bestScore, score);
             }
 

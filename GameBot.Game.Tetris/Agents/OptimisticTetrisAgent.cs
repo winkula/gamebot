@@ -13,38 +13,38 @@ namespace GameBot.Game.Tetris.Agents
 {
     public class OptimisticTetrisAgent : IAgent
     {
-        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IActuator actuator;
-        private readonly IClock clock;
-        private readonly TetrisExtractor extractor;
-        private readonly TetrisAi ai;
+        private readonly IActuator _actuator;
+        private readonly IClock _clock;
+        private readonly TetrisExtractor _extractor;
+        private readonly TetrisAi _ai;
 
-        private bool initialized = false;
-        private bool awaitNextTetromino = true;
-        private TimeSpan timeNextAction = TimeSpan.Zero;
+        private bool _initialized = false;
+        private bool _awaitNextTetromino = true;
+        private TimeSpan _timeNextAction = TimeSpan.Zero;
         
         public OptimisticTetrisAgent(IActuator actuator, TetrisExtractor extractor, TetrisAi ai, IClock clock)
         {
-            this.actuator = actuator;
-            this.clock = clock;
-            this.extractor = extractor;
-            this.ai = ai;
+            _actuator = actuator;
+            _clock = clock;
+            _extractor = extractor;
+            _ai = ai;
         }
 
         public void Act(IScreenshot screenshot, IExecutor executor)
         {
-            var gameState = extractor.Extract(screenshot, ai.CurrentGameState);
+            var gameState = _extractor.Extract(screenshot, _ai.CurrentGameState);
             
-            if (!initialized)
+            if (!_initialized)
             {
-                initialized = true;
-                var commands = ai.Initialize();
+                _initialized = true;
+                var commands = _ai.Initialize();
                 Execute(commands, executor);
             }
             else if (MustPlay(gameState))
             {
-                var commands = ai.Play(gameState);
+                var commands = _ai.Play(gameState);
                 Execute(commands, executor);
                 AfterPlay();
             }
@@ -56,7 +56,7 @@ namespace GameBot.Game.Tetris.Agents
             {
                 foreach (var nextCommand in commands)
                 {
-                    nextCommand.Execute(actuator);
+                    nextCommand.Execute(_actuator);
                 }
             }
         }
@@ -65,16 +65,16 @@ namespace GameBot.Game.Tetris.Agents
         {
             if (gameState == null) throw new ArgumentNullException(nameof(gameState));
 
-            if (gameState.Piece == null && timeNextAction <= clock.Time)
+            if (gameState.Piece == null && _timeNextAction <= _clock.Time)
             {
                 // await next tetromino when the piece was null some time in the past
                 // and the timer to look for the next piece is exceeded
-                awaitNextTetromino = true;
+                _awaitNextTetromino = true;
             }
             
-            logger.Info("Current game state: " + ai.CurrentGameState);
+            _logger.Info("Current game state: " + _ai.CurrentGameState);
 
-            return awaitNextTetromino &&
+            return _awaitNextTetromino &&
                 gameState.Piece != null &&
                 gameState.NextPiece != null;
         }
@@ -82,16 +82,16 @@ namespace GameBot.Game.Tetris.Agents
         public void AfterPlay()
         {
             // start next timer
-            var duration = TetrisLevel.GetFreeFallDuration(ai.LastWay.Fall);
+            var duration = TetrisLevel.GetFreeFallDuration(_ai.LastWay.Fall);
 
-            timeNextAction = clock.Time.Add(duration);
-            awaitNextTetromino = false;
+            _timeNextAction = _clock.Time.Add(duration);
+            _awaitNextTetromino = false;
         }
 
         public IImage Visualize(IImage image)
         {
             var visualization = new Image<Bgr, byte>(image.Bitmap);
-            var tetrisExtractor = extractor as TetrisExtractor;
+            var tetrisExtractor = _extractor as TetrisExtractor;
             if (tetrisExtractor != null)
             {
                 foreach (var rectangle in tetrisExtractor.Rectangles)

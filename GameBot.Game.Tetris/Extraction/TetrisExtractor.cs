@@ -10,11 +10,11 @@ namespace GameBot.Game.Tetris.Extraction
     public class TetrisExtractor : IExtractor<GameState>
     {
         // this coordinates are in the coordinate system of the tile system of the game boy screen (origin is top left)
-        private static Point BoardTileOrigin = new Point(2, 0);
-        private static Point CurrentTileOrigin = new Point(5, 0);
-        private static Point PreviewTileOrigin = new Point(15, 13);
+        private static Point _boardTileOrigin = new Point(2, 0);
+        private static Point _currentTileOrigin = new Point(5, 0);
+        private static Point _previewTileOrigin = new Point(15, 13);
 
-        private readonly IConfig config;
+        private readonly IConfig _config;
 
         public int MeanThreshold { get; private set; }
         public double MinimalProbability { get; private set;}
@@ -24,9 +24,9 @@ namespace GameBot.Game.Tetris.Extraction
 
         public TetrisExtractor(IConfig config)
         {
-            this.config = config;
-            this.MeanThreshold = config.Read<int>("Game.Tetris.Extractor.MeanThreshold");
-            this.MinimalProbability = config.Read<double>("Game.Tetris.Extractor.MinimalProbability");
+            _config = config;
+            MeanThreshold = config.Read<int>("Game.Tetris.Extractor.MeanThreshold");
+            MinimalProbability = config.Read<double>("Game.Tetris.Extractor.MinimalProbability");
         }
 
         public GameState Extract(IScreenshot screenshot, GameState currentGameState)
@@ -115,11 +115,11 @@ namespace GameBot.Game.Tetris.Extraction
                 // TODO: extract whole board but subtract current piece
                 for (int y = 3; y < 18; y++)
                 {
-                    byte mean = screenshot.GetTileMean(BoardTileOrigin.X + x, BoardTileOrigin.Y + y);
+                    byte mean = screenshot.GetTileMean(_boardTileOrigin.X + x, _boardTileOrigin.Y + y);
                     if (IsBlock(mean))
                     {
                         board.Occupy(x, 17 - y);
-                        Rectangles.Add(new Point(BoardTileOrigin.X + x, BoardTileOrigin.Y + y));
+                        Rectangles.Add(new Point(_boardTileOrigin.X + x, _boardTileOrigin.Y + y));
                     }
                 }
             }
@@ -137,11 +137,11 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 for (int y = 0; y < 3; y++)
                 {
-                    if (IsTileBlock(screenshot, CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y))
+                    if (IsTileBlock(screenshot, _currentTileOrigin.X + x, _currentTileOrigin.Y + y))
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);
-                        Rectangles.Add(new Point(CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y));
+                        Rectangles.Add(new Point(_currentTileOrigin.X + x, _currentTileOrigin.Y + y));
                     }
                 }
             }
@@ -163,7 +163,7 @@ namespace GameBot.Game.Tetris.Extraction
                 {
                     for (int y = 0; y < 3; y++)
                     {
-                        if (IsTileBlock(screenshot, CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y + yDelta))
+                        if (IsTileBlock(screenshot, _currentTileOrigin.X + x, _currentTileOrigin.Y + y + yDelta))
                         {
                             int index = 4 * (2 - y) + (x);
                             mask |= (ushort)(1 << index);
@@ -333,12 +333,12 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    byte mean = screenshot.GetTileMean(PreviewTileOrigin.X + x, PreviewTileOrigin.Y + y);
+                    byte mean = screenshot.GetTileMean(_previewTileOrigin.X + x, _previewTileOrigin.Y + y);
                     if (IsBlock(mean))
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);
-                        Rectangles.Add(new Point(PreviewTileOrigin.X + x, PreviewTileOrigin.Y + y));
+                        Rectangles.Add(new Point(_previewTileOrigin.X + x, _previewTileOrigin.Y + y));
                     }
                 }
             }

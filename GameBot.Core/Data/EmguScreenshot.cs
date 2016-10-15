@@ -15,7 +15,7 @@ namespace GameBot.Core.Data
         public const int TileSize = GameBoyConstants.TileSize;
         public static Mat Black;
 
-        private readonly IImage image;
+        private readonly IImage _image;
 
         public byte[] Pixels { get; private set; }
         public int Width { get; private set; }
@@ -30,7 +30,7 @@ namespace GameBot.Core.Data
 
         public EmguScreenshot(IImage image, TimeSpan timestamp)
         {
-            this.image = image;
+            _image = image;
 
             var mat = image.GetInputArray().GetMat();
             Width = mat.Width;
@@ -81,7 +81,7 @@ namespace GameBot.Core.Data
             var roi = new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize);
             CvInvoke.Rectangle(mask, roi, new MCvScalar(255, 255, 255), -1);
 
-            var mean = CvInvoke.Mean(image, mask);
+            var mean = CvInvoke.Mean(_image, mask);
             return (byte)mean.V0;
         }
     }

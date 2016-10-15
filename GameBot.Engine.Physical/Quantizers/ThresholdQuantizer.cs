@@ -9,11 +9,11 @@ namespace GameBot.Engine.Physical.Quantizers
 {
     public class ThresholdQuantizer : IQuantizer
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private bool adjust;
-        private int threshold = 50;
-        private float[,] keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
+        private bool _adjust;
+        private int _threshold = 50;
+        private float[,] _keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
 
         public ThresholdQuantizer()
         {
@@ -21,9 +21,9 @@ namespace GameBot.Engine.Physical.Quantizers
 
         public ThresholdQuantizer(bool adjust, float[,] keypoints, int threshold)
         {
-            this.adjust = adjust;
-            this.keypoints = keypoints;
-            this.threshold = threshold;
+            _adjust = adjust;
+            _keypoints = keypoints;
+            _threshold = threshold;
         }
         
         public IImage Quantize(IImage image)
@@ -34,40 +34,40 @@ namespace GameBot.Engine.Physical.Quantizers
             var sourceImage = image;
             var destImage = new Mat(sourceImage.Size, DepthType.Default, 1);
             var destImageBin = new Mat(sourceImage.Size, DepthType.Default, 1);
-            Matrix<float> srcKeypoints = new Matrix<float>(keypoints);
+            Matrix<float> srcKeypoints = new Matrix<float>(_keypoints);
             Matrix<float> destKeypoints = new Matrix<float>(new float[,] { { 0, 0 }, { GameBoyConstants.ScreenWidth, 0 }, { 0, GameBoyConstants.ScreenHeight }, { GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight } });
             
             // calculate transformation matrix
             var transform = CvInvoke.GetPerspectiveTransform(srcKeypoints, destKeypoints);
 
-            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, GetPerspectiveTransform");
+            _logger.Info($"{stopwatch.ElapsedMilliseconds} ms, GetPerspectiveTransform");
             stopwatch.Restart();
 
             // transform
             CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), Inter.Linear, Warp.Default);
 
-            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, WarpPerspective");
+            _logger.Info($"{stopwatch.ElapsedMilliseconds} ms, WarpPerspective");
             stopwatch.Restart();
 
             // threshold
-            CvInvoke.Threshold(destImage, destImageBin, threshold, 255, ThresholdType.Binary);
+            CvInvoke.Threshold(destImage, destImageBin, _threshold, 255, ThresholdType.Binary);
 
-            logger.Info($"{stopwatch.ElapsedMilliseconds} ms, Threshold");
+            _logger.Info($"{stopwatch.ElapsedMilliseconds} ms, Threshold");
             stopwatch.Restart();
 
-            while (adjust)
+            while (_adjust)
             {
-                CvInvoke.Threshold(destImage, destImageBin, threshold, 255, ThresholdType.Binary);
+                CvInvoke.Threshold(destImage, destImageBin, _threshold, 255, ThresholdType.Binary);
 
                 CvInvoke.NamedWindow("Test");
                 CvInvoke.Imshow("Test", destImageBin);
 
                 int key = CvInvoke.WaitKey();
-                if (key == 2424832) threshold++;
-                if (key == 2555904) threshold--;
+                if (key == 2424832) _threshold++;
+                if (key == 2555904) _threshold--;
                 if (key == 27) break;
 
-                logger.Info("Threshold: " + threshold);
+                _logger.Info("Threshold: " + _threshold);
             }
 
             return destImageBin;
