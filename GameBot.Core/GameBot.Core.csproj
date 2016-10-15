@@ -140,6 +140,7 @@
     <Compile Include="Data\ICommand.cs" />
     <Compile Include="Data\IGameState.cs" />
     <Compile Include="Exceptions\GameOverException.cs" />
+    <Compile Include="Executors\Executor.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="GameBoyConstants.cs" />
     <Compile Include="IActuator.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="IConfig.cs" />
     <Compile Include="IEngine.cs" />
     <Compile Include="IAgent.cs" />
+    <Compile Include="IExecutor.cs" />
     <Compile Include="IExtractor.cs" />
     <Compile Include="ICalibrateableQuantizer.cs" />
     <Compile Include="IQuantizer.cs" />

@@ -9,23 +9,26 @@ namespace GameBot.Engine.Physical
     {
         private readonly IConfig config;
 
-        private readonly ICamera camera;
-        private readonly IQuantizer quantizer;
-        private readonly IAgent agent;
         private readonly IActuator actuator;
+        private readonly ICamera camera;
         private readonly IClock clock;
+        private readonly IExecutor executor;
+        private readonly IQuantizer quantizer;
+
+        private readonly IAgent agent;
 
         public bool Play { get; set; }
 
-        public UiEngine(IConfig config, ICamera camera, IQuantizer quantizer, IAgent agent, IActuator actuator, IClock clock)
+        public UiEngine( ICamera camera, IConfig config, IExecutor executor, IQuantizer quantizer, IAgent agent, IActuator actuator, IClock clock)
         {
             this.config = config;
 
             this.camera = camera;
+            this.clock = clock;
+            this.executor = executor;
             this.quantizer = quantizer;
             this.agent = agent;
             this.actuator = actuator;
-            this.clock = clock;
         }
 
         public void Initialize()
@@ -50,7 +53,7 @@ namespace GameBot.Engine.Physical
                 //  - extracts the game state
                 //  - decides which commands to press
                 //  - presses the buttons
-                agent.Act(screenshot, actuator);
+                agent.Act(screenshot, executor);
                 processed = agent.Visualize(processed);
             }
 

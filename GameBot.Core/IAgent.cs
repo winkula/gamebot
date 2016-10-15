@@ -13,8 +13,8 @@ namespace GameBot.Core
         /// Acts based on the current screenshot.
         /// </summary>
         /// <param name="screenshot">The current screenshot of the device's display.</param>
-        /// <param name="actuator">The actuator to press buttons on the game boy.</param>
-        void Act(IScreenshot screenshot, IActuator actuator);
+        /// <param name="executor">The executor to press buttons on the game boy.</param>
+        void Act(IScreenshot screenshot, IExecutor executor);
         
         /// <summary>
         /// Visualizes the current game state or the extracted information on the quantized image.

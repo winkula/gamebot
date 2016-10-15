@@ -15,6 +15,7 @@ namespace GameBot.Game.Tetris.Agents
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+        private readonly IActuator actuator;
         private readonly IClock clock;
         private readonly IExtractor<GameState> extractor;
         private readonly TetrisAi ai;
@@ -23,14 +24,15 @@ namespace GameBot.Game.Tetris.Agents
         private bool awaitNextTetromino = true;
         private TimeSpan timeNextAction = TimeSpan.Zero;
         
-        public OptimisticTetrisAgent(IExtractor<GameState> extractor, TetrisAi ai, IClock clock)
+        public OptimisticTetrisAgent(IActuator actuator, IExtractor<GameState> extractor, TetrisAi ai, IClock clock)
         {
+            this.actuator = actuator;
             this.clock = clock;
             this.extractor = extractor;
             this.ai = ai;
         }
 
-        public void Act(IScreenshot screenshot, IActuator actuator)
+        public void Act(IScreenshot screenshot, IExecutor executor)
         {
             var gameState = extractor.Extract(screenshot, ai.CurrentGameState);
             
@@ -38,17 +40,17 @@ namespace GameBot.Game.Tetris.Agents
             {
                 initialized = true;
                 var commands = ai.Initialize();
-                Execute(commands, actuator);
+                Execute(commands, executor);
             }
             else if (MustPlay(gameState))
             {
                 var commands = ai.Play(gameState);
-                Execute(commands, actuator);
+                Execute(commands, executor);
                 AfterPlay();
             }
         }
 
-        private void Execute(IEnumerable<ICommand> commands, IActuator actuator)
+        private void Execute(IEnumerable<ICommand> commands, IExecutor executor)
         {
             if (commands != null)
             {

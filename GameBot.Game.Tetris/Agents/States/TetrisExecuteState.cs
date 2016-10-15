@@ -162,23 +162,23 @@ namespace GameBot.Game.Tetris.Agents.States
             switch (move)
             {
                 case Move.Left:
-                    agent.Actuator.Hit(Button.Left);
+                    agent.Executor.Hit(Button.Left);
                     break;
 
                 case Move.Right:
-                    agent.Actuator.Hit(Button.Right);
+                    agent.Executor.Hit(Button.Right);
                     break;
 
                 case Move.Rotate:
-                    agent.Actuator.Hit(Button.A); // clockwise rotation
+                    agent.Executor.Hit(Button.A); // clockwise rotation
                     break;
 
                 case Move.RotateCounterclockwise:
-                    agent.Actuator.Hit(Button.B); // counterclockwise rotation
+                    agent.Executor.Hit(Button.B); // counterclockwise rotation
                     break;
 
                 case Move.Drop:
-                    agent.Actuator.Press(Button.Down); // drop
+                    agent.Executor.Press(Button.Down); // drop
 
                     // calculates the score and the level
                     var dropDistance = agent.GameState.Drop();

@@ -40,7 +40,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 agent.GameState.NextPiece = extractedNextPiece;
 
                 // we found a new piece. release the down key (end the drop)
-                agent.Actuator.Release(Button.Down);
+                agent.Executor.Release(Button.Down);
                 logger.Info("> End the drop.");
 
                 // do the search

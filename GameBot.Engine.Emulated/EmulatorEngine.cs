@@ -12,10 +12,10 @@ namespace GameBot.Engine.Emulated
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly IConfig config;
-
-        private readonly IActuator actuator;
+        
         private readonly ICamera camera;
         private readonly IClock clock;
+        private readonly IExecutor executor;
         private readonly IQuantizer quantizer;
 
         private readonly IAgent agent;
@@ -24,13 +24,13 @@ namespace GameBot.Engine.Emulated
 
         public bool Play { get; set; }
 
-        public EmulatorEngine(IConfig config, IActuator actuator, ICamera camera, IClock clock, IQuantizer quantizer, IAgent agent, Emulator emulator)
+        public EmulatorEngine(IConfig config, ICamera camera, IClock clock, IExecutor executor, IQuantizer quantizer, IAgent agent, Emulator emulator)
         {
             this.config = config;
-
-            this.actuator = actuator;
+            
             this.camera = camera;
             this.clock = clock;
+            this.executor = executor;
             this.quantizer = quantizer;
 
             this.agent = agent;
@@ -68,7 +68,7 @@ namespace GameBot.Engine.Emulated
                 //  - extracts the game state
                 //  - decides which commands to press
                 //  - presses the commands
-                agent.Act(screenshot, actuator);
+                agent.Act(screenshot, executor);
                 processed = agent.Visualize(processed);
             }
 

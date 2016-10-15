@@ -255,6 +255,7 @@ namespace GameBot.Game.Tetris.Extraction
                     mostProbablePiece = new Piece(expectedPosition);
                 }
 
+
                 var probabilityLast = GetProbability(screenshot, lastPositionTemp);
                 if (probabilityLast > MinimalProbability && probabilityLast > highestProbability)
                 {

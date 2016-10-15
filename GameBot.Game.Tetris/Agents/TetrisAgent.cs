@@ -18,11 +18,13 @@ namespace GameBot.Game.Tetris.Agents
         
         // global services
         public IConfig Config { get; private set; }
+
         public IClock Clock { get; private set; }
+        public IExecutor Executor { get; private set; }
+        public IScreenshot Screenshot { get; private set; }
+
         public TetrisExtractor Extractor { get; private set; }
         public ISearch Search { get; private set; }
-        public IScreenshot Screenshot { get; private set; }
-        public IActuator Actuator { get; private set; }
 
         // global data
         public GameState GameState { get; set; }
@@ -46,10 +48,10 @@ namespace GameBot.Game.Tetris.Agents
             State = newState;
         }
 
-        public void Act(IScreenshot screenshot, IActuator actuator)
+        public void Act(IScreenshot screenshot, IExecutor executor)
         {
             Screenshot = screenshot;
-            Actuator = actuator;
+            Executor = executor;
             
             if (Extractor != null)
             {
