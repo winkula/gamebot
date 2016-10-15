@@ -18,7 +18,7 @@ namespace GameBot.Test.Engine.Physical.Actuators
         }
 
         [Test]
-        public void TestAll()
+        public void AllButtonsInSequence()
         {
             using (var actuator = new PhysicalActuator(new AppSettingsConfig()))
             {
@@ -45,6 +45,28 @@ namespace GameBot.Test.Engine.Physical.Actuators
 
                 actuator.Hit(Button.Select);
                 Thread.Sleep(1000);
+            }
+        }
+
+        [Test]
+        public void MenuTestRoutine()
+        {
+            using (var actuator = new PhysicalActuator(new AppSettingsConfig()))
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    actuator.Hit(Button.Right);
+                    actuator.Hit(Button.Left);
+
+                    actuator.Hit(Button.A);
+
+                    actuator.Hit(Button.Right);
+                    actuator.Hit(Button.Down);
+                    actuator.Hit(Button.Left);
+                    actuator.Hit(Button.Up);
+
+                    actuator.Hit(Button.B);
+                }
             }
         }
     }    

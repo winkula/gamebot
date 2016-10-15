@@ -11,8 +11,8 @@ namespace GameBot.Engine.Physical.Actuators
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        private const int DelayHit = 40;
-        private const int DelayCommand = 50;
+        private const int DelayHit = 100; // was 40
+        private const int DelayCommand = 500; // was 50
 
         private readonly IConfig config;
 

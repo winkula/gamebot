@@ -36,7 +36,12 @@ namespace GameBot.Game.Tetris.Agents
             Extractor = extractor;
             Search = search;
 
-            int startLevel = config.Read("Game.Tetris.StartLevel", 0);
+            Init();
+        }
+
+        private void Init()
+        {
+            int startLevel = Config.Read("Game.Tetris.StartLevel", 0);
             SetState(new TetrisStartState(this, startLevel));
         }
         
@@ -73,6 +78,11 @@ namespace GameBot.Game.Tetris.Agents
                 return visualization;
             }
             return image;
+        }
+
+        public void Reset()
+        {
+            Init();
         }
     }
 }

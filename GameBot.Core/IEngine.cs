@@ -27,5 +27,7 @@ namespace GameBot.Core
         /// <param name="callback">Callback with the extracted images.</param>
         /// <returns>The engines result.</returns>
         void Step(Action<IImage, IImage> callback = null);
+
+        void Reset();
     }
 }

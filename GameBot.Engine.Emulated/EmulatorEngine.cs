@@ -76,5 +76,10 @@ namespace GameBot.Engine.Emulated
 
             emulator.Execute();
         }
+
+        public void Reset()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -29,7 +29,8 @@ namespace GameBot.Game.Tetris.Agents.States
             if (agent.Clock.Time >= TimeSpan.FromSeconds(randomTime))
             {
                 // handle start menu
-                Start(agent.Executor);
+                //StartFromMenu(agent.Actuator);
+                StartFromGameOver(agent.Actuator);
 
                 // init game state
                 agent.GameState = new GameState();
@@ -40,7 +41,7 @@ namespace GameBot.Game.Tetris.Agents.States
             }
         }
         
-        private void Start(IExecutor actuator)
+        private void StartFromMenu(IActuator actuator)
         {
             // start 1 player mode
             actuator.Hit(Button.Start);
@@ -57,7 +58,13 @@ namespace GameBot.Game.Tetris.Agents.States
             SelectLevel(actuator, startLevel);
         }
 
-        private void SelectLevel(IExecutor actuator, int startLevel)
+        private void StartFromGameOver(IActuator actuator)
+        {
+            actuator.Hit(Button.Start);
+            actuator.Hit(Button.Start);
+        }
+
+        private void SelectLevel(IActuator actuator, int startLevel)
         {
             if (startLevel < 0 || startLevel > 9)
                 throw new ArgumentException("startLevel must be between 0 and 9 (inclusive)");

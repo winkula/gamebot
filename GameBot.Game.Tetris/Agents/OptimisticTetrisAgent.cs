@@ -17,7 +17,7 @@ namespace GameBot.Game.Tetris.Agents
 
         private readonly IActuator actuator;
         private readonly IClock clock;
-        private readonly IExtractor<GameState> extractor;
+        private readonly TetrisExtractor extractor;
         private readonly TetrisAi ai;
 
         private bool initialized = false;
@@ -101,6 +101,11 @@ namespace GameBot.Game.Tetris.Agents
                 return visualization;
             }
             return image;
+        }
+
+        public void Reset()
+        {
+            throw new NotImplementedException();
         }
     }
 }

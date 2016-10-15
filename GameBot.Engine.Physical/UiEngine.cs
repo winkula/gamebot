@@ -59,5 +59,11 @@ namespace GameBot.Engine.Physical
 
             callback?.Invoke(image, processed);
         }
+
+        public void Reset()
+        {
+            Play = false;
+            agent.Reset();
+        }
     }
 }
