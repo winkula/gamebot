@@ -24,7 +24,7 @@ namespace GameBot.Game.Tetris.Agents
         private bool awaitNextTetromino = true;
         private TimeSpan timeNextAction = TimeSpan.Zero;
         
-        public OptimisticTetrisAgent(IActuator actuator, IExtractor<GameState> extractor, TetrisAi ai, IClock clock)
+        public OptimisticTetrisAgent(IActuator actuator, TetrisExtractor extractor, TetrisAi ai, IClock clock)
         {
             this.actuator = actuator;
             this.clock = clock;

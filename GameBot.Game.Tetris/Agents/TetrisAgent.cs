@@ -42,7 +42,8 @@ namespace GameBot.Game.Tetris.Agents
         private void Init()
         {
             int startLevel = Config.Read("Game.Tetris.StartLevel", 0);
-            SetState(new TetrisStartState(this, startLevel));
+            bool startFromGameOver = Config.Read("Game.Tetris.StartFromGameOver", false);
+            SetState(new TetrisStartState(this, startLevel, startFromGameOver));
         }
         
         public void SetState(ITetrisState newState)

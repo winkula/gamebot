@@ -12,12 +12,13 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private TetrisAgent agent;
 
+        private readonly bool startFromGameover; 
         private readonly int startLevel;
 
-        public TetrisStartState(TetrisAgent agent, int startLevel)
+        public TetrisStartState(TetrisAgent agent, int startLevel, bool startFromGameOver)
         {
             this.agent = agent;
-
+            this.startFromGameover = startFromGameOver;
             this.startLevel = startLevel;
         }
 
@@ -28,9 +29,16 @@ namespace GameBot.Game.Tetris.Agents.States
             var randomTime = 2.1 + 0.5 * random.NextDouble();
             if (agent.Clock.Time >= TimeSpan.FromSeconds(randomTime))
             {
-                // handle start menu
-                //StartFromMenu(agent.Actuator);
-                StartFromGameOver(agent.Actuator);
+                if (startFromGameover)
+                {
+                    // handle start menu
+                    StartFromGameOver(agent.Executor);
+                }
+                else
+                {
+                    // restart from game over screen (good for testing multiple games)
+                    StartFromMenu(agent.Executor);
+                }
 
                 // init game state
                 agent.GameState = new GameState();
@@ -41,7 +49,7 @@ namespace GameBot.Game.Tetris.Agents.States
             }
         }
         
-        private void StartFromMenu(IActuator actuator)
+        private void StartFromMenu(IExecutor actuator)
         {
             // start 1 player mode
             actuator.Hit(Button.Start);
@@ -58,13 +66,13 @@ namespace GameBot.Game.Tetris.Agents.States
             SelectLevel(actuator, startLevel);
         }
 
-        private void StartFromGameOver(IActuator actuator)
+        private void StartFromGameOver(IExecutor actuator)
         {
             actuator.Hit(Button.Start);
             actuator.Hit(Button.Start);
         }
 
-        private void SelectLevel(IActuator actuator, int startLevel)
+        private void SelectLevel(IExecutor actuator, int startLevel)
         {
             if (startLevel < 0 || startLevel > 9)
                 throw new ArgumentException("startLevel must be between 0 and 9 (inclusive)");
