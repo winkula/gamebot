@@ -13,7 +13,7 @@ namespace GameBot.Engine.Physical
     {
         public void RegisterServices(Container container)
         {
-            container.RegisterSingleton<IEngine, UiEngine>();
+            container.RegisterSingleton<IEngine, PhysicalEngine>();
 
             container.RegisterSingleton<IActuator, PhysicalActuator>();
             //container.RegisterSingleton<IActuator, LazyActuator>();

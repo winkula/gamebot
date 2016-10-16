@@ -28,6 +28,9 @@ namespace GameBot.Core
         /// <returns>The engines result.</returns>
         void Step(Action<IImage, IImage> callback = null);
 
+        /// <summary>
+        /// Resets the underlying agent.
+        /// </summary>
         void Reset();
     }
 }

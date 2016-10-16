@@ -31,38 +31,38 @@ namespace GameBot.Emulation
 {
     public class Emulator
     {
-        private const int FramesPerSecond = 60;
-        private const int MaxFramesSkipped = 10;
+        private const int _framesPerSecond = 60;
+        private const int _maxFramesSkipped = 10;
 
-        private const int DisplayWidth = GameBoyConstants.ScreenWidth;
-        private const int DisplayHeight = GameBoyConstants.ScreenHeight;
+        private const int _displayWidth = GameBoyConstants.ScreenWidth;
+        private const int _displayHeight = GameBoyConstants.ScreenHeight;
 
-        private const int FramesAfterButton = 2;
+        private const int _framesAfterButton = 2;
 
         private readonly Random _random = new Random();
         private readonly X80 _cpu;
         private double _scanLineTicks;
-        private uint[] _pixels = new uint[DisplayWidth * DisplayHeight];
+        private readonly uint[] _pixels = new uint[_displayWidth * _displayHeight];
 
-        private Graphics _graphics;
-        private Bitmap _bitmap;
+        private readonly Graphics _graphics;
+        private readonly Bitmap _bitmap;
 
         public bool Running { get; private set; }
         public int Frames { get; private set; }
-        public TimeSpan Time { get { return TimeSpan.FromSeconds((double)Frames / FramesPerSecond); } }
-        public Bitmap Display { get { return _bitmap; } }
+        public TimeSpan Time => TimeSpan.FromSeconds((double)Frames / _framesPerSecond);
+        public Bitmap Display => _bitmap;
         public Game Game { get; private set; }
-        private Size DisplaySize { get { return new Size(DisplayWidth, DisplayHeight); } }
-        
+        private Size DisplaySize => new Size(_displayWidth, _displayHeight);
+
         private bool _anyButtonsPressed = false;
-        private double _errorProbability;
+        private readonly double _errorProbability;
 
         public Emulator(double errorProbability = 0)
         {
             _cpu = new X80();
             _errorProbability = errorProbability;
 
-            _graphics = Graphics.FromImage(new Bitmap(DisplayWidth, DisplayHeight));
+            _graphics = Graphics.FromImage(new Bitmap(_displayWidth, _displayHeight));
             _graphics.CompositingQuality = CompositingQuality.HighSpeed;
             _graphics.CompositingMode = CompositingMode.SourceCopy;
             _graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -71,7 +71,7 @@ namespace GameBot.Emulation
             for (int i = 0; i < _pixels.Length; i++) { _pixels[i] = 0xFF000000; }
             GCHandle handle = GCHandle.Alloc(_pixels, GCHandleType.Pinned);
             IntPtr pointer = Marshal.UnsafeAddrOfPinnedArrayElement(_pixels, 0);
-            _bitmap = new Bitmap(DisplayWidth, DisplayHeight, DisplayWidth * 4, PixelFormat.Format32bppPArgb, pointer);
+            _bitmap = new Bitmap(_displayWidth, _displayHeight, _displayWidth * 4, PixelFormat.Format32bppPArgb, pointer);
         }
 
         public void Load(Game game)
@@ -397,7 +397,7 @@ namespace GameBot.Emulation
 
         private void RenderFrame()
         {
-            _graphics.DrawImage(Display, 0, 0, DisplayWidth, DisplayHeight);
+            _graphics.DrawImage(Display, 0, 0, _displayWidth, _displayHeight);
         }
 
         public void ExecuteFrame()
@@ -421,7 +421,7 @@ namespace GameBot.Emulation
 
         public void Execute(TimeSpan time)
         {
-            int frames = (int)(time.TotalSeconds * FramesPerSecond);
+            int frames = (int)(time.TotalSeconds * _framesPerSecond);
             Execute(frames);
         }
 
@@ -472,9 +472,9 @@ namespace GameBot.Emulation
                 _anyButtonsPressed = true;
 
                 PressButtonInternal(button);
-                Execute(FramesAfterButton);
+                Execute(_framesAfterButton);
                 ReleaseButtonInternal(button);
-                Execute(FramesAfterButton);
+                Execute(_framesAfterButton);
             }
         }
 
@@ -485,7 +485,7 @@ namespace GameBot.Emulation
                 _anyButtonsPressed = true;
 
                 PressButtonInternal(button);
-                Execute(FramesAfterButton);
+                Execute(_framesAfterButton);
             }
         }
 
@@ -496,7 +496,7 @@ namespace GameBot.Emulation
                 _anyButtonsPressed = true;
 
                 ReleaseButtonInternal(button);
-                Execute(FramesAfterButton);
+                Execute(_framesAfterButton);
             }
         }
     }

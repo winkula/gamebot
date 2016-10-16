@@ -7,7 +7,7 @@ namespace GameBot.Test.Game.Tetris.Data
     [TestFixture]
     public class BoardTests
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Test]
         public void Constructor()

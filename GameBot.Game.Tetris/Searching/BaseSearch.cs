@@ -11,7 +11,7 @@ namespace GameBot.Game.Tetris.Searching
     {
         protected readonly IHeuristic Heuristic;
 
-        public BaseSearch(IHeuristic heuristic)
+        protected BaseSearch(IHeuristic heuristic)
         {
             Heuristic = heuristic;
         }
@@ -50,10 +50,12 @@ namespace GameBot.Game.Tetris.Searching
             
             if (goal?.Parent != null)
             {
-                var result = new SearchResult();
-                result.CurrentGameState = root?.GameState;
-                result.GoalGameState = goal?.Parent.GameState;
-                result.Way = goal?.Parent.Way;
+                var result = new SearchResult
+                {
+                    CurrentGameState = root.GameState,
+                    GoalGameState = goal.Parent.GameState,
+                    Way = goal.Parent.Way
+                };
                 result.Moves = GetMoves(result.Way);
                 return result;
             }
@@ -110,7 +112,7 @@ namespace GameBot.Game.Tetris.Searching
             return ScoreSimple(node);
         }
 
-        protected double ScoreSimple(Node parent)
+        private double ScoreSimple(Node parent)
         {
             return Heuristic.Score(parent.GameState);
         }

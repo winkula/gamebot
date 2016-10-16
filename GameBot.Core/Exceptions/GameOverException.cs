@@ -4,7 +4,7 @@ namespace GameBot.Core.Exceptions
 {
     public class GameOverException : Exception
     {        
-        public GameOverException() : base()
+        public GameOverException()
         {
         }
 

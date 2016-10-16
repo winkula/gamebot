@@ -48,24 +48,24 @@ namespace GameBot.Emulation
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         public static extern bool PeekMessage(out PeekMsg msg, IntPtr hWnd, uint messageFilterMin, uint messageFilterMax, uint flags);
 
-        const int FramesPerSecond = 60;
-        const int MaxFramesSkipped = 10;
+        const int _framesPerSecond = 60;
+        const int _maxFramesSkipped = 10;
 
-        const int Width = GameBoyConstants.ScreenWidth;
-        const int Height = GameBoyConstants.ScreenHeight;
+        const int _width = GameBoyConstants.ScreenWidth;
+        const int _height = GameBoyConstants.ScreenHeight;
 
         private string _output;
         public long Frequency = Stopwatch.Frequency;
-        public long TicksPerFrame = Stopwatch.Frequency / FramesPerSecond;
+        public long TicksPerFrame = Stopwatch.Frequency / _framesPerSecond;
         private Bitmap _bitmap;
         public Stopwatch Stopwatch = new Stopwatch();
         public long NextFrameStart;
         private X80 _x80;
         private Rectangle _rect;
         private double _scanLineTicks;
-        private uint[] _pixels = new uint[Width * Height];
+        private readonly uint[] _pixels = new uint[_width * _height];
         private Game _game;
-        private Size _clientSize = new Size(Width, Height);
+        private Size _clientSize = new Size(_width, _height);
         public Graphics Graphics;
 
         public EmulatorAsync()
@@ -394,7 +394,7 @@ namespace GameBot.Emulation
 
         private void RenderFrame(Graphics g)
         {
-            g.DrawImage(_bitmap, 0, 0, Width, Height);
+            g.DrawImage(_bitmap, 0, 0, _width, _height);
         }
 
         private void Init(Graphics g)
@@ -451,7 +451,7 @@ namespace GameBot.Emulation
                     UpdateModel(updateBitmap);
                     updateBitmap = false;
                     NextFrameStart += TicksPerFrame;
-                } while (NextFrameStart < Stopwatch.ElapsedTicks && ++updates < MaxFramesSkipped);
+                } while (NextFrameStart < Stopwatch.ElapsedTicks && ++updates < _maxFramesSkipped);
                 RenderFrame(Graphics);
                 _bitmap.Save(_output);
                 long remainingTicks = NextFrameStart - Stopwatch.ElapsedTicks;
@@ -459,7 +459,7 @@ namespace GameBot.Emulation
                 {
                     Thread.Sleep((int)(1000 * remainingTicks / Frequency));
                 }
-                else if (updates == MaxFramesSkipped)
+                else if (updates == _maxFramesSkipped)
                 {
                     NextFrameStart = Stopwatch.ElapsedTicks;
                 }

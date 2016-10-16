@@ -6,13 +6,14 @@ using System;
 
 namespace GameBot.Game.Tetris.Agents.States
 {
-    public class TetrisStartState : ITetrisState
+    public class TetrisStartState : ITetrisAgentState
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Random _random = new Random();
 
-        private TetrisAgent _agent;
+        private readonly TetrisAgent _agent;
 
-        private readonly bool _startFromGameover; 
+        private readonly bool _startFromGameover;
         private readonly int _startLevel;
 
         public TetrisStartState(TetrisAgent agent, int startLevel, bool startFromGameOver)
@@ -25,30 +26,30 @@ namespace GameBot.Game.Tetris.Agents.States
         public void Act()
         {
             // wait before start
-            var random = new Random();
-            var randomTime = 2.1 + 0.5 * random.NextDouble();
+            var randomTime = 2.0 + _random.NextDouble();
             if (_agent.Clock.Time >= TimeSpan.FromSeconds(randomTime))
             {
                 if (_startFromGameover)
                 {
+                    _logger.Info("Game started from game over screen");
+
                     // handle start menu
                     StartFromGameOver(_agent.Executor);
                 }
                 else
                 {
+                    _logger.Info("Game started from start menu");
+
                     // restart from game over screen (good for testing multiple games)
                     StartFromMenu(_agent.Executor);
                 }
 
                 // init game state
-                _agent.GameState = new GameState();
-                _agent.GameState.StartLevel = _startLevel;
-
-                _logger.Info("> Game started. Initialization sequence executed.");
+                _agent.GameState = new GameState { StartLevel = _startLevel };
                 _agent.SetState(new TetrisAnalyzeState(_agent, null));
             }
         }
-        
+
         private void StartFromMenu(IExecutor actuator)
         {
             // start 1 player mode
@@ -69,6 +70,8 @@ namespace GameBot.Game.Tetris.Agents.States
         private void StartFromGameOver(IExecutor actuator)
         {
             actuator.Hit(Button.Start);
+            actuator.Hit(Button.Start);
+            actuator.Hit(Button.B);
             actuator.Hit(Button.Start);
         }
 

@@ -6,8 +6,8 @@ namespace GameBot.Core.Configuration
 {
     public class AppSettingsConfig : IConfig
     {
-        private const char Delimiter = ',';
-
+        private const char _delimiter = ',';
+        
         public T Read<T>(string key)
         {
             string value = ConfigurationManager.AppSettings[key];
@@ -37,7 +37,7 @@ namespace GameBot.Core.Configuration
             string values = ConfigurationManager.AppSettings[key];
             if (values == null) throw new ArgumentException($"config value with key {key} not found.");
 
-            foreach (var value in values.Split(Delimiter))
+            foreach (var value in values.Split(_delimiter))
             {
                 yield return Get<T>(value);
             }
@@ -55,7 +55,7 @@ namespace GameBot.Core.Configuration
                 yield break;
             }
 
-            foreach (var value in values.Split(Delimiter))
+            foreach (var value in values.Split(_delimiter))
             {
                 yield return Get<T>(value);
             }

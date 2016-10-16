@@ -38,27 +38,27 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void Delta1()
         {
-            var current = new Piece(Tetromino.O, 1, 10, 4);
-            var target = new Piece(Tetromino.O, 2, 8, 7);
+            var current = new Piece(Tetromino.O, 1, 10, -4);
+            var target = new Piece(Tetromino.O, 2, 8, -7);
 
             var delta = new PieceDelta(current, target);
 
             Assert.AreEqual(1, delta.Orientation);
             Assert.AreEqual(-2, delta.X);
-            Assert.AreEqual(3, delta.Y);
+            Assert.AreEqual(-3, delta.Y);
         }
 
         [Test]
         public void Delta2()
         {
-            var current = new Piece(Tetromino.O, 3, 3, 4);
-            var target = new Piece(Tetromino.O, 1, 8, 1);
+            var current = new Piece(Tetromino.O, 3, 3, -4);
+            var target = new Piece(Tetromino.O, 1, 8, -1);
 
             var delta = new PieceDelta(current, target);
 
             Assert.AreEqual(-2, delta.Orientation);
             Assert.AreEqual(5, delta.X);
-            Assert.AreEqual(-3, delta.Y);
+            Assert.AreEqual(3, delta.Y);
         }
     }
 }

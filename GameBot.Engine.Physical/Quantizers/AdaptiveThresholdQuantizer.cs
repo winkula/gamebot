@@ -9,13 +9,13 @@ namespace GameBot.Engine.Physical.Quantizers
 {
     public class AdaptiveThresholdQuantizer : IQuantizer
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private bool _adjust;
+        private readonly bool _adjust;
         private int _c = 5;
         private int _block = 13;
         private AdaptiveThresholdType _mode = AdaptiveThresholdType.MeanC; 
-        private float[,] _keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
+        private readonly float[,] _keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
 
         public AdaptiveThresholdQuantizer()
         {

@@ -40,7 +40,7 @@ namespace GameBot.Game.Tetris.Data
         {
         }
 
-        public Piece() : this(Tetrominos.GetRandom(), 0, 0, 0)
+        public Piece() : this(Tetrominos.GetRandom())
         {
         }
 
@@ -101,7 +101,6 @@ namespace GameBot.Game.Tetris.Data
             // TODO: lookup table
             switch (move)
             {
-                case Move.None: break;
                 case Move.Left: Left(); break;
                 case Move.Right: Right(); break;
                 case Move.Rotate: Rotate(); break;
@@ -142,7 +141,7 @@ namespace GameBot.Game.Tetris.Data
 
         public override string ToString()
         {
-            return string.Format("Piece({0}, o:{1}, x:{2}, y:{3})", Tetromino, Orientation, X, Y);
+            return $"Piece({Tetromino}, o:{Orientation}, x:{X}, y:{Y})";
         }
     }
 }

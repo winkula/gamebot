@@ -4,16 +4,16 @@ namespace GameBot.Game.Tetris.Data
 {
     public class PieceDelta
     {
-        public int Orientation { get; private set; }
-        public int X { get; private set; }
+        public int Orientation { get; }
+        public int X { get; }
         public int Y { get; private set; }
 
         /// <summary>
-        /// Current piece is in target position, if orientation and x coordinate are equals.
+        /// Current piece is in spawn position, if orientation and x coordinate are equals.
         /// The y coordinate (fall distance) may be different.
         /// </summary>
-        public bool IsTargetPosition { get { return Orientation == 0 && X == 0; } }
-
+        public bool IsMaybeSpawned => Orientation == 0 && X == 0;
+        
         public PieceDelta(Piece current, Piece target)
         {
             if (current == null) throw new ArgumentNullException(nameof(current));

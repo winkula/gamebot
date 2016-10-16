@@ -10,7 +10,7 @@ namespace GameBot.Test.Game.Tetris.Searching
     [TestFixture]
     public class TetrisSearchTests
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private IHeuristic _heuristic;
 

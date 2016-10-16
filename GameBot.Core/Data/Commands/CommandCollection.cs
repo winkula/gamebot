@@ -8,18 +8,18 @@ namespace GameBot.Core.Data.Commands
 {
     public class CommandCollection : IEnumerable<ICommand>
     {
-        private const double DefaultTimeDelta = 0.1;
-
+        private const double _defaultTimeDelta = 0.1;
+        
         private readonly IList<ICommand> _commands;
         private readonly double _timeDelta;
 
-        public CommandCollection(double timeDelta = DefaultTimeDelta)
+        public CommandCollection(double timeDelta = _defaultTimeDelta)
         {
             _commands = new List<ICommand>();
             _timeDelta = timeDelta;
         }
 
-        public CommandCollection(IEnumerable<ICommand> commands, double timeDelta = DefaultTimeDelta)
+        public CommandCollection(IEnumerable<ICommand> commands, double timeDelta = _defaultTimeDelta)
         {
             _commands = commands.ToList();
             _timeDelta = timeDelta;

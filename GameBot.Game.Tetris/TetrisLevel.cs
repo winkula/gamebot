@@ -9,10 +9,10 @@ namespace GameBot.Game.Tetris
     /// </summary>
     public class TetrisLevel
     {
-        private static double _framerate = 59.73;
+        private static readonly double _framerate = 59.73;
 
         // frames per row
-        private static int[] _levelSpeeds = new[] { 53, 49, 45, 41, 37, 33, 28, 22, 17, 11, 10, 9, 8, 7, 6, 6, 5, 5, 4, 4, 3 };
+        private static readonly int[] _levelSpeeds = { 53, 49, 45, 41, 37, 33, 28, 22, 17, 11, 10, 9, 8, 7, 6, 6, 5, 5, 4, 4, 3 };
 
         // For A Type
         public static int GetLevel(int startLevel, int clearedLines)
@@ -51,7 +51,7 @@ namespace GameBot.Game.Tetris
             double frames = duration.TotalSeconds * _framerate;
             int framePerRow = GetFramesPerRow(level);
 
-            return (int) Math.Ceiling(frames / framePerRow);
+            return (int)Math.Ceiling(frames / framePerRow);
         }
     }
 }

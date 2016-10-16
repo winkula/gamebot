@@ -167,7 +167,7 @@ namespace GameBot.Emulation
                     Cartridge = new Mbc2(fileData, RomType, RomSize, RomBanks);
                     break;
                 default:
-                    throw new Exception(string.Format("Cannot emulate cartridge type {0}.", RomType));
+                    throw new Exception($"Cannot emulate cartridge type {RomType}.");
             }
         }
 

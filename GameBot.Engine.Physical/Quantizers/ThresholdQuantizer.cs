@@ -9,11 +9,11 @@ namespace GameBot.Engine.Physical.Quantizers
 {
     public class ThresholdQuantizer : IQuantizer
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private bool _adjust;
+        private readonly bool _adjust;
         private int _threshold = 50;
-        private float[,] _keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
+        private readonly float[,] _keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
 
         public ThresholdQuantizer()
         {

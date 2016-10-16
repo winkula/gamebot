@@ -1,6 +1,6 @@
 ﻿namespace GameBot.Game.Tetris.Agents.States
 {
-    public interface ITetrisState
+    public interface ITetrisAgentState
     {
         void Act();
     }

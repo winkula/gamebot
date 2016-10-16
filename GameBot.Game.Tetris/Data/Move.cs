@@ -2,16 +2,14 @@
 {
     public enum Move
     {
-        // TODO: do we need this?
-        None = 0,
-        
-        Left = 1,
-        Right = 2,
+        Left = 0,
+        Right = 1,
 
-        Rotate = 3,
-        RotateCounterclockwise = 4,
+        Rotate = 2,
+        RotateCounterclockwise = 3,
 
-        Fall = 5,
-        Drop = 6
+        Fall = 4,
+
+        Drop = 5
     }
 }

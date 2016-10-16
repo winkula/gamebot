@@ -8,26 +8,23 @@ namespace GameBot.Game.Tetris.Data
         public int Translation { get; }
         public int Fall { get; }
 
-        public Way(int rotation, int translation, int fall)
+        public Way(int rotation, int translation, int fall = 0)
         {
             Rotation = rotation;
             Translation = translation;
             Fall = fall;
         }
 
-        public Way(int rotation, int translation) : this(rotation, translation, 0)
-        {
-        }
-
         // TODO: make separate class for start settings?
-        public static IEnumerable<Way> GetAllSettings(Tetromino tetromino)
+        public static IEnumerable<Way> GetAll(Tetromino tetromino)
         {
             Shape shape;
+
             // TODO: make static lookup table
             switch (tetromino)
             {
                 case Tetromino.O:
-                    shape = Shape.Get(tetromino, 0);
+                    shape = Shape.Get(tetromino);
                     for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
                         yield return new Way(0, translation);
                     break;
@@ -79,14 +76,12 @@ namespace GameBot.Game.Tetris.Data
                             yield return new Way(rotation, translation);
                     }
                     break;
-                default:
-                    break;
-            };
+            }
         }
 
         public override string ToString()
         {
-            return string.Format("Move {{ Rotation: {0}, Translation: {1}, Fall: {2} }}", Rotation, Translation, Fall);
+            return $"Move {{ Rotation: {Rotation}, Translation: {Translation}, Fall: {Fall} }}";
         }
     }
 }

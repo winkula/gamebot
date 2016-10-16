@@ -9,12 +9,12 @@ namespace GameBot.Test.Misc
     [TestFixture]
     public class TinkerforgeTests
     {
-        private string _host = "localhost";
-        private int _port = 4223;
-        private string _uidMaster = "6JKbWn";
-        private string _uidRelay1 = "r5F";
-        private string _uidRelay2 = "mTC";
-        private string _uidTemp = "qBx";
+        private readonly string _host = "localhost";
+        private readonly int _port = 4223;
+        private readonly string _uidMaster = "6JKbWn";
+        private readonly string _uidRelay1 = "r5F";
+        private readonly string _uidRelay2 = "mTC";
+        private readonly string _uidTemp = "qBx";
 
         [Test]
         public void TestConnection()

@@ -1,19 +1,18 @@
-﻿using GameBot.Core.Data;
-using GameBot.Core.Exceptions;
+﻿using GameBot.Core.Exceptions;
 using System.Text;
 
 namespace GameBot.Game.Tetris.Data
 {
-    public class GameState : AbstractGameState
+    public class GameState
     {
-        public Board Board { get; private set; }
+        public Board Board { get; }
         public Piece Piece { get; set; }
         public Tetromino? NextPiece { get; set; }
         
         public int Lines { get; set; }
         public int Score { get; set; }
         public int StartLevel { get; set; }
-        public int Level { get { return TetrisLevel.GetLevel(StartLevel, Lines); } }
+        public int Level => TetrisLevel.GetLevel(StartLevel, Lines);
 
         public GameState()
         {
@@ -62,10 +61,7 @@ namespace GameBot.Game.Tetris.Data
         {
         }
 
-        public bool IsPieceLanded
-        {
-            get { return Board.Intersects(new Piece(Piece).Fall()); }
-        }
+        public bool IsPieceLanded => Board.Intersects(new Piece(Piece).Fall());
 
         public bool Fall()
         {

@@ -11,10 +11,10 @@ namespace GameBot.Game.Tetris.Extraction
 {
     public class PieceMatcher
     {
-        private const int TemplateSize = 4 * GameBoyConstants.TileSize;
-        private static readonly Mat Black = new Mat(new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), DepthType.Cv8U, 1);
+        private const int _templateSize = 4 * GameBoyConstants.TileSize;
+        private static readonly Mat _black = new Mat(new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), DepthType.Cv8U, 1);
 
-        private static readonly int[,] TemplateIndexTable =
+        private static readonly int[,] _templateIndexTable =
         {
            { 0, 0, 0, 0 },
            { 1, 2, 1, 2 },
@@ -34,7 +34,7 @@ namespace GameBot.Game.Tetris.Extraction
 
         private int GetTemplateIndex(Piece piece)
         {
-            return TemplateIndexTable[(int)piece.Tetromino, piece.Orientation];
+            return _templateIndexTable[(int)piece.Tetromino, piece.Orientation];
         }
 
         private double GetError(double sum)
@@ -70,11 +70,11 @@ namespace GameBot.Game.Tetris.Extraction
             
             // get template and it's mask
             var templateIndex = GetTemplateIndex(piece);
-            var template = new Image<Gray, byte>(TemplateSize, TemplateSize);
-            var templateMask = new Image<Gray, byte>(TemplateSize, TemplateSize);
-            _templates.ROI = new Rectangle(0, templateIndex * TemplateSize, TemplateSize, TemplateSize);
+            var template = new Image<Gray, byte>(_templateSize, _templateSize);
+            var templateMask = new Image<Gray, byte>(_templateSize, _templateSize);
+            _templates.ROI = new Rectangle(0, templateIndex * _templateSize, _templateSize, _templateSize);
             _templates.CopyTo(template);
-            _templates.ROI = new Rectangle(TemplateSize, templateIndex * TemplateSize, TemplateSize, TemplateSize);
+            _templates.ROI = new Rectangle(_templateSize, templateIndex * _templateSize, _templateSize, _templateSize);
             _templates.CopyTo(templateMask);
 
             double bestProbability = 0;
@@ -100,7 +100,7 @@ namespace GameBot.Game.Tetris.Extraction
                 var roiY = tileCoordinates.Y * GameBoyConstants.TileSize + yTopPadding + shift.Y;
                 combined.ROI = new Rectangle(
                     roiX, roiY,
-                    TemplateSize, TemplateSize);
+                    _templateSize, _templateSize);
                 template.Copy(combined, templateMask);
                 reference.ROI = combined.ROI;
 

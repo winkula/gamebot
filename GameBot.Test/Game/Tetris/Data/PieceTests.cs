@@ -114,8 +114,8 @@ namespace GameBot.Test.Game.Tetris.Data
 
             Assert.AreEqual(piece1, piece2);
 
-            piece1 = new Piece(Tetromino.Z, 3, 7, 2);
-            piece2 = new Piece(Tetromino.Z, 3, 7, 2);
+            piece1 = new Piece(Tetromino.Z, 3, 7, -2);
+            piece2 = new Piece(Tetromino.Z, 3, 7, -2);
 
             Assert.AreEqual(piece1, piece2);
         }
@@ -133,8 +133,8 @@ namespace GameBot.Test.Game.Tetris.Data
 
             Assert.AreNotEqual(piece1, piece2);
 
-            piece1 = new Piece(Tetromino.Z, 3, 6, 2);
-            piece2 = new Piece(Tetromino.Z, 3, 7, 1);
+            piece1 = new Piece(Tetromino.Z, 3, 6, -2);
+            piece2 = new Piece(Tetromino.Z, 3, 7, -1);
 
             Assert.AreNotEqual(piece1, piece2);
         }

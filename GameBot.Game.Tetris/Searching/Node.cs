@@ -5,9 +5,9 @@ namespace GameBot.Game.Tetris.Searching
 {
     public class Node
     {
-        public Node Parent { get; set; }
-        public GameState GameState { get; set; }
-        public Way Way { get; set; }
+        public Node Parent { get; }
+        public GameState GameState { get; }
+        public Way Way { get; private set; }
         public double Score { get; set; }
 
         public Node(GameState gameState, Node parent)
@@ -24,7 +24,7 @@ namespace GameBot.Game.Tetris.Searching
         {
             if (GameState.Piece != null)
             {
-                foreach (var setting in Way.GetAllSettings(GameState.Piece.Tetromino))
+                foreach (var setting in Way.GetAll(GameState.Piece.Tetromino))
                 {
                     var orientation = setting.Rotation;
                     var translation = setting.Translation;
@@ -46,7 +46,7 @@ namespace GameBot.Game.Tetris.Searching
 
         public override string ToString()
         {
-            return string.Format("Node {{ State: \n{0} }}", GameState);
+            return $"Node {{ State: \n{GameState} }}";
         }
     }
 }

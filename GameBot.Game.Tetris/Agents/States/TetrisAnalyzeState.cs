@@ -1,5 +1,4 @@
-﻿using GameBot.Core.Data;
-using GameBot.Game.Tetris.Data;
+﻿using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Searching;
 using NLog;
 using System;
@@ -8,31 +7,35 @@ using System.Linq;
 
 namespace GameBot.Game.Tetris.Agents.States
 {
-    public class TetrisAnalyzeState : ITetrisState
+    public class TetrisAnalyzeState : ITetrisAgentState
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private TetrisAgent _agent;
+        private readonly TetrisAgent _agent;
 
+        private readonly TimeSpan _beginTime;
         private Tetromino? _currentTetromino;
 
         private Piece _extractedPiece;
         private Tetromino? _extractedNextPiece;
 
-        private TimeSpan _timeNextAction = TimeSpan.Zero;
-
         public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)
         {
             _agent = agent;
 
+            _beginTime = agent.Clock.Time;
             _currentTetromino = currentTetromino;
         }
 
         public void Act()
         {
-            // TODO: calculate duration as the time that passed since the initialization of this state
-            var duration = TimeSpan.FromMilliseconds(Timing.ExpectedFallDurationPadding);
-            int searchHeight = TetrisLevel.GetMaxFallDistance(_agent.GameState.StartLevel, duration);
+            var passedTime = _agent.Clock.Time
+                .Subtract(_beginTime)
+                .Add(TimeSpan.FromMilliseconds(Timing.ExpectedFallDurationPadding));
+            int searchHeight = TetrisLevel.GetMaxFallDistance(_agent.GameState.Level, passedTime);
+            // TODO: make upper limit for the search height
+            
+            _logger.Info($"Search height for extraction is {searchHeight}");
 
             if (Extract(searchHeight))
             {
@@ -54,7 +57,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 if (results != null)
                 {
                     _logger.Info("A.I. found a solution");
-                    _logger.Info($"Solution: {string.Join(",", results.Moves.Select(x => x.ToString()))}");
+                    _logger.Info($"Solution: {string.Join(", ", results.Moves.Select(x => x.ToString()))}");
                     
                     // we can execute now
                     Execute(results);
@@ -62,7 +65,7 @@ namespace GameBot.Game.Tetris.Agents.States
             }
             else
             {
-                _logger.Info("Game state extraction failed");
+                _logger.Info("Game state extraction skipped");
                 _agent.ExtractedPiece = null;
                 _agent.ExtractedNextPiece = null;
             }

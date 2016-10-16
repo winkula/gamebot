@@ -8,7 +8,7 @@ namespace GameBot.Robot.Ui.Configuration
 {
     public class ExeConfig : IConfig
     {
-        private const char Delimiter = ',';
+        private const char _delimiter = ',';
         private readonly System.Configuration.Configuration _configuration;
 
         public ExeConfig()
@@ -45,7 +45,7 @@ namespace GameBot.Robot.Ui.Configuration
             string values = ConfigurationManager.AppSettings[key];
             if (values == null) throw new ArgumentException($"config value with key {key} not found.");
 
-            foreach (var value in values.Split(Delimiter))
+            foreach (var value in values.Split(_delimiter))
             {
                 yield return Get<T>(value);
             }
@@ -63,7 +63,7 @@ namespace GameBot.Robot.Ui.Configuration
                 yield break;
             }
 
-            foreach (var value in values.Split(Delimiter))
+            foreach (var value in values.Split(_delimiter))
             {
                 yield return Get<T>(value);
             }

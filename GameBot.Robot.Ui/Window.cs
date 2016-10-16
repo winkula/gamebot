@@ -15,7 +15,7 @@ namespace GameBot.Robot.Ui
 {
     public partial class Window : Form
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private int _originalWidth;
         private int _originalHeight;
@@ -28,8 +28,8 @@ namespace GameBot.Robot.Ui
         private readonly IActuator _actuator;
         private readonly ICalibrateableQuantizer _quantizer;
 
-        private const int MaxKeypointCount = 4;
-        private List<Point> _keypoints = new List<Point>();
+        private const int _maxKeypointCount = 4;
+        private readonly List<Point> _keypoints = new List<Point>();
         private List<Point> _keypointsApplied = new List<Point>();
 
         public Window(IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
@@ -45,6 +45,7 @@ namespace GameBot.Robot.Ui
             }
 
             InitializeComponent();
+            FormClosed += (sender, args) => Application.Exit();
 
             CheckForIllegalCrossThreadCalls = false;
 
@@ -153,7 +154,7 @@ namespace GameBot.Robot.Ui
             if (e.KeyChar == 's')
             {
                 // save
-                if (_keypointsApplied.Count == MaxKeypointCount)
+                if (_keypointsApplied.Count == _maxKeypointCount)
                 {
                     _logger.Info("Keypoints: " + string.Join(",", _keypointsApplied));
 
@@ -171,9 +172,9 @@ namespace GameBot.Robot.Ui
             _keypoints.Add(new Point(e.X, e.Y));
             _logger.Info($"Added keypoint ({e.X}, {e.Y})");
 
-            if (_keypoints.Count >= MaxKeypointCount && _quantizer != null)
+            if (_keypoints.Count >= _maxKeypointCount && _quantizer != null)
             {
-                _keypointsApplied = _keypoints.Take(MaxKeypointCount).ToList();
+                _keypointsApplied = _keypoints.Take(_maxKeypointCount).ToList();
 
                 var keypointsList = new int[] { _keypointsApplied[0].X, _keypointsApplied[0].Y, _keypointsApplied[1].X, _keypointsApplied[1].Y, _keypointsApplied[2].X, _keypointsApplied[2].Y, _keypointsApplied[3].X, _keypointsApplied[3].Y };
 

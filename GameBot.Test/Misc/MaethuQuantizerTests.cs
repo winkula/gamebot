@@ -15,7 +15,7 @@ namespace GameBot.Test.Misc
     [TestFixture]
     public class MaethuQuantizerTests
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Test]
         public void TestMe()

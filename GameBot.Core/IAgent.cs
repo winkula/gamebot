@@ -24,6 +24,9 @@ namespace GameBot.Core
         /// <returns>A visualization on the quantized image.</returns>
         IImage Visualize(IImage image);
 
+        /// <summary>
+        /// Resets the internal state of the agent.
+        /// </summary>
         void Reset();
     }
 }

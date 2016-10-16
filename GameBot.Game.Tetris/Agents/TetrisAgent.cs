@@ -15,10 +15,10 @@ namespace GameBot.Game.Tetris.Agents
     public class TetrisAgent : IAgent
     {
         // current state of the ai (state pattern)
-        private ITetrisState _state;
+        private ITetrisAgentState _state;
 
         // global services
-        public IConfig Config { get; private set; }
+        private IConfig _config;
 
         public IClock Clock { get; private set; }
         public IExecutor Executor { get; private set; }
@@ -38,24 +38,24 @@ namespace GameBot.Game.Tetris.Agents
 
         public TetrisAgent(IConfig config, PieceExtractor pieceExtractor, ISearch search, IClock clock)
         {
-            Config = config;
+            _config = config;
             Clock = clock;
             PieceExtractor = pieceExtractor;
             Search = search;
 
-            ProbabilityThreshold = Config.Read<double>("Game.Tetris.Extractor.ProbabilityThreshold");
+            ProbabilityThreshold = _config.Read<double>("Game.Tetris.Extractor.ProbabilityThreshold");
 
             Init();
         }
 
         private void Init()
         {
-            int startLevel = Config.Read("Game.Tetris.StartLevel", 0);
-            bool startFromGameOver = Config.Read("Game.Tetris.StartFromGameOver", false);
+            var startLevel = _config.Read("Game.Tetris.StartLevel", 0);
+            var startFromGameOver = _config.Read("Game.Tetris.StartFromGameOver", false);
             SetState(new TetrisStartState(this, startLevel, startFromGameOver));
         }
 
-        public void SetState(ITetrisState newState)
+        public void SetState(ITetrisAgentState newState)
         {
             if (newState == null)
                 throw new ArgumentNullException(nameof(newState));

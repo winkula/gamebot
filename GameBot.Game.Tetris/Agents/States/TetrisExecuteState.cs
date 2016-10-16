@@ -7,15 +7,13 @@ using System.Linq;
 
 namespace GameBot.Game.Tetris.Agents.States
 {
-    public class TetrisExecuteState : ITetrisState
+    public class TetrisExecuteState : ITetrisAgentState
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
-        private static Logger _loggerCamera = LogManager.GetLogger("Stats.Camera");
-        private static Logger _loggerActuator = LogManager.GetLogger("Stats.Actuator");
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private TetrisAgent _agent;
+        private readonly TetrisAgent _agent;
 
-        private Queue<Move> _moves;
+        private readonly Queue<Move> _moves;
 
         private Move? _lastMove;
         private Piece _lastPosition;
@@ -46,7 +44,8 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 var now = _agent.Clock.Time;
                 var expectedFallDistance = GetExpectedFallDistance(now);
-                _logger.Info("> Check command. Maximal expected fall distance is " + expectedFallDistance);
+                _logger.Info("Check command");
+                _logger.Info($"Search piece with search height {expectedFallDistance}");
 
                 var pieceNotMoved = _lastPosition;
                 var pieceMoved = new Piece(_lastPosition).Apply(_lastMove.Value);
@@ -63,7 +62,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 
                 if (resultPieceNotMoved.Item1 == null || resultPieceMoved.Item2 >= resultPieceNotMoved.Item2)
                 {
-                    _loggerActuator.Info("Command executed");
+                    _logger.Info("Command executed");
 
                     // move was successfully executed
                     // we remove it from the queue
@@ -72,8 +71,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 }
                 else if (resultPieceMoved.Item1 == null || resultPieceNotMoved.Item2 >= resultPieceMoved.Item2)
                 {
-                    _loggerActuator.Info("Command failed");
-                    _logger.Info("> Failed to execute the command.");
+                    _logger.Warn("Command failed");
 
                     // the command was not executed and the tile is in the old position
                     UpdateLastPosition(resultPieceNotMoved.Item1, now);
@@ -111,8 +109,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void PieceNotFound(Tetromino tetromino)
         {
-            _loggerCamera.Info("Piece not recognized");
-            _logger.Info($"> Piece not found! ({tetromino}). Try again.");
+            _logger.Warn($"Piece not recognized ({tetromino})");
         }
 
         private int GetExpectedFallDistance(TimeSpan now)
@@ -165,8 +162,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void Execute(Move move)
         {
-            _logger.Info("> Execute " + move);
-            _loggerActuator.Info("Command: " + move);
+            _logger.Info("Execute " + move);
             switch (move)
             {
                 case Move.Left:

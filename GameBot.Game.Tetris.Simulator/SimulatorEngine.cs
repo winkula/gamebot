@@ -11,7 +11,7 @@ namespace GameBot.Game.Tetris.Simulator
 {
     public class SimulatorEngine
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly ISearch _search;
         private readonly TetrisSimulator _simulator;

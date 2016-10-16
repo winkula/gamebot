@@ -4,7 +4,7 @@ namespace GameBot.Emulation
 {
     public class Rom : ICartridge
     {
-        private byte[] _fileData;
+        private readonly byte[] _fileData;
 
         public Rom(byte[] fileData)
         {
@@ -27,8 +27,8 @@ namespace GameBot.Emulation
         private bool _ramBankingMode;
         private int _selectedRomBank = 1;
         private int _selectedRamBank;
-        private byte[,] _ram = new byte[4, 8 * 1024];
-        private byte[,] _rom;
+        private readonly byte[,] _ram = new byte[4, 8 * 1024];
+        private readonly byte[,] _rom;
 
         public Mbc1(byte[] fileData, RomType romType, int romSize, int romBanks)
         {
@@ -58,7 +58,7 @@ namespace GameBot.Emulation
             {
                 return _ram[_selectedRamBank, address - 0xA000];
             }
-            throw new Exception(string.Format("Invalid cartridge read: {0:X}", address));
+            throw new Exception($"Invalid cartridge read: {address:X}");
         }
 
         public void WriteByte(int address, int value)
@@ -98,8 +98,8 @@ namespace GameBot.Emulation
     {
         private RomType _romType;
         private int _selectedRomBank = 1;
-        private byte[] _ram = new byte[512];
-        private byte[,] _rom;
+        private readonly byte[] _ram = new byte[512];
+        private readonly byte[,] _rom;
 
         public Mbc2(byte[] fileData, RomType romType, int romSize, int romBanks)
         {
@@ -129,7 +129,7 @@ namespace GameBot.Emulation
             {
                 return _ram[address - 0xA000];
             }
-            throw new Exception(string.Format("Invalid cartridge address: {0}", address));
+            throw new Exception($"Invalid cartridge address: {address}");
         }
 
         public void WriteByte(int address, int value)

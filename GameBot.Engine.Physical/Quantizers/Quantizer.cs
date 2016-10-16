@@ -10,24 +10,20 @@ namespace GameBot.Engine.Physical.Quantizers
 {
     public class Quantizer : ICalibrateableQuantizer
     {
-        private const int GameBoyScreenWidth = GameBoyConstants.ScreenWidth;
-        private const int GameBoyScreenHeight = GameBoyConstants.ScreenHeight;
+        private const int _gameBoyScreenWidth = GameBoyConstants.ScreenWidth;
+        private const int _gameBoyScreenHeight = GameBoyConstants.ScreenHeight;
 
-        private readonly IConfig _config;
+        private readonly int _thresholdConstant;
+        private readonly int _thresholdBlockSize;
+        private readonly int _thresholdMaxValue;
+        private readonly AdaptiveThresholdType _thresholdAdaptiveThresholdType;
+        private readonly ThresholdType _thresholdType;
 
-        private int _thresholdConstant;
-        private int _thresholdBlockSize;
-        private int _thresholdMaxValue;
-        private AdaptiveThresholdType _thresholdAdaptiveThresholdType;
-        private ThresholdType _thresholdType;
-
-        public Mat Transform { get; private set; }
+        private Mat Transform { get; set; }
 
         public Quantizer(IConfig config)
         {
-            _config = config;
-
-            var keypoints = config.ReadCollection("Robot.Quantizer.Transformation.KeyPoints", new int[] { 0 + 100, 0, 640 - 100, 0, 0, 480, 640, 480 }).ToList();
+            var keypoints = config.ReadCollection("Robot.Quantizer.Transformation.KeyPoints", new[] { 0 + 100, 0, 640 - 100, 0, 0, 480, 640, 480 }).ToList();
             if (keypoints.Count != 8) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Transformation.KeyPoints'.");
 
             _thresholdConstant = config.Read("Robot.Quantizer.Threshold.Constant", 5);
@@ -50,11 +46,11 @@ namespace GameBot.Engine.Physical.Quantizers
         public void Calibrate(IEnumerable<Point> keypoints)
         {
             if (keypoints == null) throw new ArgumentNullException(nameof(keypoints));
-            if (keypoints.Count() != 4) throw new ArgumentException("keypoints must be four points");
+            var keypointList = keypoints.ToList();
+            if (keypointList.Count != 4) throw new ArgumentException("keypoints must be four points");
 
-            var keypointsArray = keypoints.ToArray();
-            var srcKeypoints = new Matrix<float>(new float[,] { { keypointsArray[0].X, keypointsArray[0].Y }, { keypointsArray[1].X, keypointsArray[1].Y }, { keypointsArray[2].X, keypointsArray[2].Y }, { keypointsArray[3].X, keypointsArray[3].Y } });
-            var destKeypoints = new Matrix<float>(new float[,] { { 0, 0 }, { GameBoyScreenWidth, 0 }, { 0, GameBoyScreenHeight }, { GameBoyScreenWidth, GameBoyScreenHeight } });
+            var srcKeypoints = new Matrix<float>(new float[,] { { keypointList[0].X, keypointList[0].Y }, { keypointList[1].X, keypointList[1].Y }, { keypointList[2].X, keypointList[2].Y }, { keypointList[3].X, keypointList[3].Y } });
+            var destKeypoints = new Matrix<float>(new float[,] { { 0, 0 }, { _gameBoyScreenWidth, 0 }, { 0, _gameBoyScreenHeight }, { _gameBoyScreenWidth, _gameBoyScreenHeight } });
             Transform = CvInvoke.GetPerspectiveTransform(srcKeypoints, destKeypoints);
         }
 
@@ -65,15 +61,15 @@ namespace GameBot.Engine.Physical.Quantizers
             CvInvoke.CvtColor(image, imageGray, ColorConversion.Rgb2Gray);
 
             // transform
-            var imageWarped = new Mat(new Size(GameBoyScreenWidth, GameBoyScreenHeight), DepthType.Default, 1);
-            CvInvoke.WarpPerspective(imageGray, imageWarped, Transform, new Size(GameBoyScreenWidth, GameBoyScreenHeight), Inter.Linear, Warp.Default);
+            var imageWarped = new Mat(new Size(_gameBoyScreenWidth, _gameBoyScreenHeight), DepthType.Default, 1);
+            CvInvoke.WarpPerspective(imageGray, imageWarped, Transform, new Size(_gameBoyScreenWidth, _gameBoyScreenHeight));
 
             // gauss
-            CvInvoke.GaussianBlur(imageWarped, imageWarped, new Size(3, 3), 0.6, 0.6, BorderType.Default);
+            CvInvoke.GaussianBlur(imageWarped, imageWarped, new Size(3, 3), 0.6, 0.6);
 
             // threshold
-            var imageBinarized = new Mat(new Size(GameBoyScreenWidth, GameBoyScreenHeight), DepthType.Default, 1);
-            CvInvoke.AdaptiveThreshold(imageWarped, imageBinarized, _thresholdMaxValue, AdaptiveThresholdType.MeanC, ThresholdType.Binary, _thresholdBlockSize, _thresholdConstant);
+            var imageBinarized = new Mat(new Size(_gameBoyScreenWidth, _gameBoyScreenHeight), DepthType.Default, 1);
+            CvInvoke.AdaptiveThreshold(imageWarped, imageBinarized, _thresholdMaxValue, _thresholdAdaptiveThresholdType, _thresholdType, _thresholdBlockSize, _thresholdConstant);
 
             return imageBinarized;
         }

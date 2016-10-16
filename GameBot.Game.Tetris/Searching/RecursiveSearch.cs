@@ -24,12 +24,11 @@ namespace GameBot.Game.Tetris.Searching
 
             var root = new Node(gameState);
             var goal = SearchRecursive(root, 0);
-            
-            var result = new SearchResult();
-            result.CurrentGameState = gameState;
+
+            var result = new SearchResult { CurrentGameState = gameState };
             if (goal != null)
             {
-                result.GoalGameState = goal?.GameState;
+                result.GoalGameState = goal.GameState;
                 result.Way = GetWayToNextSuccessor(goal);
                 result.Moves = GetMoves(result.Way);
             }

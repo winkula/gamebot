@@ -7,7 +7,7 @@ namespace GameBot.Engine.Physical.Clocks
     public class PhysicalClock : IClock
     {
         private DateTime StartTime { get; set; }
-        public TimeSpan Time { get { return DateTime.Now - StartTime; } }
+        public TimeSpan Time => DateTime.Now - StartTime;
 
         public void Start()
         {

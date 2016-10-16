@@ -96,16 +96,16 @@ namespace GameBot.Emulation
         public TimerFrequencyType TimerFrequency;
         public int Ticks;
 
-        private byte[] _highRam = new byte[256];
-        private byte[] _videoRam = new byte[8 * 1024];
-        private byte[] _workRam = new byte[8 * 1024];
+        private readonly byte[] _highRam = new byte[256];
+        private readonly byte[] _videoRam = new byte[8 * 1024];
+        private readonly byte[] _workRam = new byte[8 * 1024];
         public byte[] Oam = new byte[256];
 
         public uint[,] BackgroundBuffer = new uint[256, 256];
-        private bool[,] _backgroundTileInvalidated = new bool[32, 32];
+        private readonly bool[,] _backgroundTileInvalidated = new bool[32, 32];
         private bool _invalidateAllBackgroundTilesRequest;
         public uint[,,,] SpriteTile = new uint[256, 8, 8, 2];
-        private bool[] _spriteTileInvalidated = new bool[256];
+        private readonly bool[] _spriteTileInvalidated = new bool[256];
         private bool _invalidateAllSpriteTilesRequest;
         public uint[,] WindowBuffer = new uint[144, 168];
 
@@ -1686,7 +1686,7 @@ namespace GameBot.Emulation
                     Restart(0x0038);
                     break;
                 default:
-                    throw new Exception(string.Format("Unknown instruction: {0:X} at PC={1:X}", opCode, _pc));
+                    throw new Exception($"Unknown instruction: {opCode:X} at PC={_pc:X}");
             }
         }
 
@@ -2956,9 +2956,9 @@ namespace GameBot.Emulation
                         break;
                     case 0xFF40:
                         { // LCDC control
-                            bool _backgroundAndWindowTileDataSelect = BackgroundAndWindowTileDataSelect;
-                            bool _backgroundTileMapDisplaySelect = BackgroundTileMapDisplaySelect;
-                            bool _windowTileMapDisplaySelect = WindowTileMapDisplaySelect;
+                            bool backgroundAndWindowTileDataSelect = BackgroundAndWindowTileDataSelect;
+                            bool backgroundTileMapDisplaySelect = BackgroundTileMapDisplaySelect;
+                            bool windowTileMapDisplaySelect = WindowTileMapDisplaySelect;
 
                             LcdControlOperationEnabled = (value & 0x80) == 0x80;
                             WindowTileMapDisplaySelect = (value & 0x40) == 0x40;
@@ -2969,9 +2969,9 @@ namespace GameBot.Emulation
                             SpritesDisplayed = (value & 0x02) == 0x02;
                             BackgroundDisplayed = (value & 0x01) == 0x01;
 
-                            if (_backgroundAndWindowTileDataSelect != BackgroundAndWindowTileDataSelect
-                                || _backgroundTileMapDisplaySelect != BackgroundTileMapDisplaySelect
-                                || _windowTileMapDisplaySelect != WindowTileMapDisplaySelect)
+                            if (backgroundAndWindowTileDataSelect != BackgroundAndWindowTileDataSelect
+                                || backgroundTileMapDisplaySelect != BackgroundTileMapDisplaySelect
+                                || windowTileMapDisplaySelect != WindowTileMapDisplaySelect)
                             {
                                 _invalidateAllBackgroundTilesRequest = true;
                             }

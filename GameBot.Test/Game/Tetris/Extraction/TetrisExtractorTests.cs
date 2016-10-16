@@ -12,7 +12,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
     [TestFixture]
     public class TetrisExtractorTests
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Test]
         public void Constructor()

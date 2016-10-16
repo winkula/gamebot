@@ -7,24 +7,17 @@ using System.Collections.Generic;
 
 namespace GameBot.Game.Tetris.Extraction
 {
+    // TODO: remove this class?
     public class TetrisExtractor
     {
-        // this coordinates are in the coordinate system of the tile system of the game boy screen (origin is top left)
-        private static Point _boardTileOrigin = new Point(2, 0);
-        private static Point _currentTileOrigin = new Point(5, 0);
-        private static Point _previewTileOrigin = new Point(15, 13);
-
-        private readonly IConfig _config;
-
         private int MeanThreshold { get; }
         private double MinimalProbability { get; }
 
         // debugging/visualization only
-        public IList<Point> Rectangles { get; private set; } = new List<Point>();
+        public IList<Point> Rectangles { get; } = new List<Point>();
 
         public TetrisExtractor(IConfig config)
         {
-            _config = config;
             MeanThreshold = config.Read<int>("Game.Tetris.Extractor.MeanThreshold");
             MinimalProbability = config.Read<double>("Game.Tetris.Extractor.MinimalProbability");
         }
@@ -115,11 +108,11 @@ namespace GameBot.Game.Tetris.Extraction
                 // TODO: extract whole board but subtract current piece
                 for (int y = 3; y < 18; y++)
                 {
-                    byte mean = screenshot.GetTileMean(_boardTileOrigin.X + x, _boardTileOrigin.Y + y);
+                    byte mean = screenshot.GetTileMean(TetrisConstants.BoardTileOrigin.X + x, TetrisConstants.BoardTileOrigin.Y + y);
                     if (IsBlock(mean))
                     {
                         board.Occupy(x, 17 - y);
-                        Rectangles.Add(new Point(_boardTileOrigin.X + x, _boardTileOrigin.Y + y));
+                        Rectangles.Add(new Point(TetrisConstants.BoardTileOrigin.X + x, TetrisConstants.BoardTileOrigin.Y + y));
                     }
                 }
             }
@@ -137,11 +130,11 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 for (int y = 0; y < 3; y++)
                 {
-                    if (IsTileBlock(screenshot, _currentTileOrigin.X + x, _currentTileOrigin.Y + y))
+                    if (IsTileBlock(screenshot, TetrisConstants.CurrentTileOrigin.X + x, TetrisConstants.CurrentTileOrigin.Y + y))
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);
-                        Rectangles.Add(new Point(_currentTileOrigin.X + x, _currentTileOrigin.Y + y));
+                        Rectangles.Add(new Point(TetrisConstants.CurrentTileOrigin.X + x, TetrisConstants.CurrentTileOrigin.Y + y));
                     }
                 }
             }
@@ -163,7 +156,7 @@ namespace GameBot.Game.Tetris.Extraction
                 {
                     for (int y = 0; y < 3; y++)
                     {
-                        if (IsTileBlock(screenshot, _currentTileOrigin.X + x, _currentTileOrigin.Y + y + yDelta))
+                        if (IsTileBlock(screenshot, TetrisConstants.CurrentTileOrigin.X + x, TetrisConstants.CurrentTileOrigin.Y + y + yDelta))
                         {
                             int index = 4 * (2 - y) + (x);
                             mask |= (ushort)(1 << index);
@@ -195,9 +188,7 @@ namespace GameBot.Game.Tetris.Extraction
                 throw new ArgumentException("searchHeight must be positive.");
 
             // TODO: upper bound for maxFallDistance
-
-            if (move == Move.None) return lastPosition;
-
+            
             var lastPositionTemp = new Piece(lastPosition);
             var expectedPosition = new Piece(lastPosition).Apply(move);
 
@@ -237,9 +228,7 @@ namespace GameBot.Game.Tetris.Extraction
                 throw new ArgumentException("searchHeight must be positive.");
 
             // TODO: upper bound for maxFallDistance
-
-            if (move == Move.None) return lastPosition;
-
+            
             var lastPositionTemp = new Piece(lastPosition);
             var expectedPosition = new Piece(lastPosition).Apply(move);
 
@@ -333,12 +322,12 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    byte mean = screenshot.GetTileMean(_previewTileOrigin.X + x, _previewTileOrigin.Y + y);
+                    byte mean = screenshot.GetTileMean(TetrisConstants.NextPieceTileOrigin.X + x, TetrisConstants.NextPieceTileOrigin.Y + y);
                     if (IsBlock(mean))
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);
-                        Rectangles.Add(new Point(_previewTileOrigin.X + x, _previewTileOrigin.Y + y));
+                        Rectangles.Add(new Point(TetrisConstants.NextPieceTileOrigin.X + x, TetrisConstants.NextPieceTileOrigin.Y + y));
                     }
                 }
             }

@@ -6,9 +6,9 @@ namespace GameBot.Engine.Emulated.Clocks
 {
     public class EmulatedClock : IClock
     {
-        private Emulator _emulator;
+        private readonly Emulator _emulator;
 
-        public TimeSpan Time { get { return _emulator.Time; } }
+        public TimeSpan Time => _emulator.Time;
 
         public EmulatedClock(Emulator emulator)
         {

@@ -9,8 +9,8 @@ namespace GameBot.Engine.Emulated.Cameras
     {
         private readonly Emulator _emulator;
 
-        public int Width { get { return GameBoyConstants.ScreenWidth; } }
-        public int Height { get { return GameBoyConstants.ScreenHeight; } }
+        public int Width => GameBoyConstants.ScreenWidth;
+        public int Height => GameBoyConstants.ScreenHeight;
 
         public EmulatedCamera(Emulator emulator)
         {

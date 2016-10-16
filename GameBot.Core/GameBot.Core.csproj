@@ -130,7 +130,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\AppSettingsConfig.cs" />
-    <Compile Include="Data\AbstractGameState.cs" />
     <Compile Include="Data\Button.cs" />
     <Compile Include="Data\Commands\CommandCollection.cs" />
     <Compile Include="Data\Commands\HitCommand.cs" />
@@ -138,7 +137,6 @@
     <Compile Include="Data\Commands\ReleaseCommand.cs" />
     <Compile Include="Data\EmguScreenshot.cs" />
     <Compile Include="Data\ICommand.cs" />
-    <Compile Include="Data\IGameState.cs" />
     <Compile Include="Exceptions\GameOverException.cs" />
     <Compile Include="Executors\Executor.cs" />
     <Compile Include="Extensions\Extensions.cs" />

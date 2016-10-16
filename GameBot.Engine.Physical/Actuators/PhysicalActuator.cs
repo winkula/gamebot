@@ -9,27 +9,27 @@ namespace GameBot.Engine.Physical.Actuators
 {
     public class PhysicalActuator : IActuator, IDisposable
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
-
-        private const int DelayHit = 100; // was 40
-        private const int DelayCommand = 500; // was 50
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        
+        private const int _delayHit = 100; // was 40
+        private const int _delayCommand = 500; // was 50
 
         private readonly IConfig _config;
 
-        private string _host;
-        private int _port;
-        private string _uidMaster;
-        private string _uidRelay1;
-        private string _uidRelay2;
-        private string _uidTemp;
+        private readonly string _host;
+        private readonly int _port;
+        private readonly string _uidMaster;
+        private readonly string _uidRelay1;
+        private readonly string _uidRelay2;
+        private readonly string _uidTemp;
 
         private int _state1;
         private int _state2;
 
-        private IPConnection _ipcon;
-        private BrickMaster _master;
-        private BrickletIndustrialQuadRelay _or1;
-        private BrickletIndustrialQuadRelay _or2;
+        private readonly IPConnection _ipcon;
+        private readonly BrickMaster _master;
+        private readonly BrickletIndustrialQuadRelay _or1;
+        private readonly BrickletIndustrialQuadRelay _or2;
         private BrickletTemperatureIR _tir;
 
         public PhysicalActuator(IConfig config)
@@ -68,9 +68,9 @@ namespace GameBot.Engine.Physical.Actuators
             _logger.Info($"Hit button {button}");
 
             HandleState(button, true);
-            Thread.Sleep(DelayHit);
+            Thread.Sleep(_delayHit);
             HandleState(button, false);
-            Thread.Sleep(DelayCommand);
+            Thread.Sleep(_delayCommand);
         }
 
         public void Press(Button button)
@@ -78,7 +78,7 @@ namespace GameBot.Engine.Physical.Actuators
             _logger.Info($"Press button {button}");
 
             HandleState(button, true);
-            Thread.Sleep(DelayCommand);
+            Thread.Sleep(_delayCommand);
         }
 
         public void Release(Button button)
@@ -86,7 +86,7 @@ namespace GameBot.Engine.Physical.Actuators
             _logger.Info($"Release button {button}");
 
             HandleState(button, false);
-            Thread.Sleep(DelayCommand);
+            Thread.Sleep(_delayCommand);
         }
 
         private void HandleState(Button button, bool pressOrRelease)
