@@ -24,16 +24,18 @@ namespace GameBot.Game.Tetris.Agents
         public IScreenshot Screenshot { get; private set; }
 
         public TetrisExtractor Extractor { get; private set; }
+        public PieceExtractor PieceExtractor { get; private set; }
         public ISearch Search { get; private set; }
 
         // global data
         public GameState GameState { get; set; }
 
-        public TetrisAgent(IConfig config, TetrisExtractor extractor, ISearch search, IClock clock)
+        public TetrisAgent(IConfig config, TetrisExtractor extractor, PieceExtractor pieceExtractor, ISearch search, IClock clock)
         {
             Config = config;
             Clock = clock;
             Extractor = extractor;
+            PieceExtractor = pieceExtractor;
             Search = search;
 
             Init();

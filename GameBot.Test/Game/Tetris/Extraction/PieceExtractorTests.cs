@@ -9,6 +9,8 @@ namespace GameBot.Test.Game.Tetris.Extraction
     [TestFixture]
     public class PieceExtractorTests
     {
+        private const double ProbabilityThreshold = 0.8;
+
         private PieceMatcher _pieceMatcher;
         private PieceExtractor _pieceExtractor;
 
@@ -18,7 +20,54 @@ namespace GameBot.Test.Game.Tetris.Extraction
             _pieceMatcher = new PieceMatcher();
             _pieceExtractor = new PieceExtractor(_pieceMatcher);
         }
-        
+
+        [Test]
+        public void ExtractPieceSpawnedFuzzy1()
+        {
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+
+            var result = _pieceExtractor.ExtractPieceSpawnedFuzzy(screenshot, 3, 0.5);
+
+            Assert.NotNull(result.Item1);
+            Assert.AreEqual(Tetromino.S, result.Item1.Tetromino);
+        }
+
+        [Test]
+        public void ExtractPieceSpawnedFuzzy2()
+        {
+
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+
+            var result = _pieceExtractor.ExtractPieceSpawnedFuzzy(screenshot, 5, ProbabilityThreshold);
+
+            Assert.Null(result.Item1);
+
+            result = _pieceExtractor.ExtractPieceSpawnedFuzzy(screenshot, 6, ProbabilityThreshold);
+
+            Assert.NotNull(result.Item1);
+            Assert.AreEqual(Tetromino.Z, result.Item1.Tetromino);
+        }
+
+        [Test]
+        public void ExtractPieceFuzzy()
+        {
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+
+            var result = _pieceExtractor.ExtractPieceFuzzy(screenshot, new Piece(Tetromino.Z, 0, 0, -6), 0, ProbabilityThreshold);
+            
+            Assert.NotNull(result.Item1);
+            Assert.AreEqual(Tetromino.Z, result.Item1.Tetromino);
+
+            result = _pieceExtractor.ExtractPieceFuzzy(screenshot, new Piece(Tetromino.Z, 0, 0, -4), 0, ProbabilityThreshold);
+
+            Assert.Null(result.Item1);
+
+            result = _pieceExtractor.ExtractPieceFuzzy(screenshot, new Piece(Tetromino.Z, 0, 0, -4), 2, ProbabilityThreshold);
+
+            Assert.NotNull(result.Item1);
+            Assert.AreEqual(Tetromino.Z, result.Item1.Tetromino);
+        }
+
         [Test]
         public void ExtractNextPiece()
         {
