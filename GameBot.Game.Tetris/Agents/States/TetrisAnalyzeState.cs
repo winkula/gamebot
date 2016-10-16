@@ -4,6 +4,7 @@ using GameBot.Game.Tetris.Searching;
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GameBot.Game.Tetris.Agents.States
 {
@@ -19,7 +20,7 @@ namespace GameBot.Game.Tetris.Agents.States
         private Tetromino? _extractedNextPiece;
 
         private TimeSpan _timeNextAction = TimeSpan.Zero;
-        
+
         public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)
         {
             _agent = agent;
@@ -37,30 +38,33 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 // update global game state
                 _agent.GameState.Piece = _extractedPiece;
+                _agent.ExtractedPiece = _extractedPiece;
                 _agent.GameState.NextPiece = _extractedNextPiece;
+                _agent.ExtractedNextPiece = _extractedNextPiece;
 
+                _logger.Info($"Game state extraction successfully:\n{_agent.GameState}");
+                
                 // we found a new piece. release the down key (end the drop)
-                _agent.Executor.Release(Button.Down);
-                _logger.Info("> End the drop.");
+                //_agent.Executor.Release(Button.Down);
+                //_logger.Info("> End the drop.");
 
                 // do the search
                 // this is the essence of the a.i.
                 var results = _agent.Search.Search(_agent.GameState);
-
                 if (results != null)
                 {
-                    _logger.Info("Current game state:\n" + _agent.GameState);
-
-                    _logger.Info("> AI found a solution.");
-                    _logger.Info("> Goal game state:\n" + results.GoalGameState);
-                    foreach (var move in results.Moves)
-                    {
-                        _logger.Info(move);
-                    }
-
-                    // somthing found.. we can execute now
+                    _logger.Info("A.I. found a solution");
+                    _logger.Info($"Solution: {string.Join(",", results.Moves.Select(x => x.ToString()))}");
+                    
+                    // we can execute now
                     Execute(results);
                 }
+            }
+            else
+            {
+                _logger.Info("Game state extraction failed");
+                _agent.ExtractedPiece = null;
+                _agent.ExtractedNextPiece = null;
             }
         }
 
@@ -73,21 +77,19 @@ namespace GameBot.Game.Tetris.Agents.States
             // we dont extract the board (too error prone)
             // instead we carry along the game state
 
-            // extract the pieces
-            // TODO: if currentTetromino.HasValue, then we know, which tetromino we look for, so we can optimize the piece matching
-            _extractedPiece = _agent.Extractor.ExtractSpawnedPiece(screenshot, searchHeight);
-            if (_extractedPiece == null) return false;
+            // extract the current piece
+            var result = _currentTetromino.HasValue ? 
+                _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(_currentTetromino.Value), searchHeight, _agent.ProbabilityThreshold) :
+                _agent.PieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, searchHeight, _agent.ProbabilityThreshold);
+
+            if (result.Item1 == null) return false;
+            _extractedPiece = result.Item1;
             if (_extractedPiece.Orientation != 0) return false; // spawned piece must have orientation 0
             if (_extractedPiece.X != 0) return false; // spawned piece must have x coordinate 0
 
-            _extractedNextPiece = _agent.Extractor.ExtractNextPiece(screenshot);
+            // extract the next piece
+            _extractedNextPiece = _agent.PieceExtractor.ExtractNextPieceFuzzy(screenshot, _agent.ProbabilityThreshold);
             if (_extractedNextPiece == null) return false;
-
-            if (_currentTetromino.HasValue && _currentTetromino.Value != _extractedPiece.Tetromino)
-            {
-                _logger.Info("> Extracted inconsistent current piece!");
-                return false;
-            }
 
             return true;
         }

@@ -107,8 +107,8 @@ namespace GameBot.Game.Tetris.Data
                 case Move.Rotate: Rotate(); break;
                 case Move.RotateCounterclockwise: RotateCounterclockwise(); break;
                 case Move.Fall: Fall(); break;
-                default:
-                    throw new ArgumentException("only None, Left, Right, Rotate and RotateCounterclockwise are allowed.");
+                //default:
+                    //throw new ArgumentException("only None, Left, Right, Rotate and RotateCounterclockwise are allowed.");
             }
             return this;
         }

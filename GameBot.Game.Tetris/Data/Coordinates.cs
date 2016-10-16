@@ -17,6 +17,7 @@ namespace GameBot.Game.Tetris.Data
         // origin of spawning pieces (center of the piece)
         // in absolute game coordinates (origin in bottom left of the board)
         public static Point PieceOrigin = new Point(4, 16);
+        public static Point NextPieceTileOrigin = new Point(15, 13);
 
         #region To board coordinate system
 
@@ -70,6 +71,16 @@ namespace GameBot.Game.Tetris.Data
         public static Point PieceToSearchWindow(Point coordinates)
         {
             return PieceToSearchWindow(coordinates.X, coordinates.Y);
+        }
+        
+        public static Point PieceToTilePreview(int x, int y)
+        {
+            return new Point(x + 5 + 11, -y - 1 + 15);
+        }
+
+        public static Point PieceToTilePreview(Point coordinates)
+        {
+            return PieceToTilePreview(coordinates.X, coordinates.Y);
         }
 
         #endregion

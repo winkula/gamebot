@@ -11,11 +11,12 @@ using GameBot.Game.Tetris.Agents.States;
 
 namespace GameBot.Game.Tetris.Agents
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class TetrisAgent : IAgent
     {
         // current state of the ai (state pattern)
         private ITetrisState _state;
-        
+
         // global services
         public IConfig Config { get; private set; }
 
@@ -23,20 +24,26 @@ namespace GameBot.Game.Tetris.Agents
         public IExecutor Executor { get; private set; }
         public IScreenshot Screenshot { get; private set; }
 
-        public TetrisExtractor Extractor { get; private set; }
         public PieceExtractor PieceExtractor { get; private set; }
         public ISearch Search { get; private set; }
+
+        public double ProbabilityThreshold { get; }
 
         // global data
         public GameState GameState { get; set; }
 
-        public TetrisAgent(IConfig config, TetrisExtractor extractor, PieceExtractor pieceExtractor, ISearch search, IClock clock)
+        // for visualization only
+        public Piece ExtractedPiece { get; set; }
+        public Tetromino? ExtractedNextPiece { get; set; }
+
+        public TetrisAgent(IConfig config, PieceExtractor pieceExtractor, ISearch search, IClock clock)
         {
             Config = config;
             Clock = clock;
-            Extractor = extractor;
             PieceExtractor = pieceExtractor;
             Search = search;
+
+            ProbabilityThreshold = Config.Read<double>("Game.Tetris.Extractor.ProbabilityThreshold");
 
             Init();
         }
@@ -47,11 +54,11 @@ namespace GameBot.Game.Tetris.Agents
             bool startFromGameOver = Config.Read("Game.Tetris.StartFromGameOver", false);
             SetState(new TetrisStartState(this, startLevel, startFromGameOver));
         }
-        
+
         public void SetState(ITetrisState newState)
         {
             if (newState == null)
-                throw new ArgumentNullException("newState");
+                throw new ArgumentNullException(nameof(newState));
 
             _state = newState;
         }
@@ -60,11 +67,6 @@ namespace GameBot.Game.Tetris.Agents
         {
             Screenshot = screenshot;
             Executor = executor;
-            
-            if (Extractor != null)
-            {
-                Extractor.Rectangles.Clear();
-            }
 
             _state.Act();
         }
@@ -72,15 +74,34 @@ namespace GameBot.Game.Tetris.Agents
         public IImage Visualize(IImage image)
         {
             var visualization = new Image<Bgr, byte>(image.Bitmap);
-            if (Extractor != null)
+
+            if (ExtractedPiece != null)
             {
-                foreach (var rectangle in Extractor.Rectangles)
+                // current piece
+                foreach (var block in ExtractedPiece.Shape.Body)
                 {
-                    visualization.Draw(new Rectangle(8 * rectangle.X, 8 * rectangle.Y, 8, 8), new Bgr(0, 0, 255), 2);
+                    var tileCoordinates = Coordinates.PieceToTile(ExtractedPiece.X + block.X, ExtractedPiece.Y + block.Y);
+                    int x = tileCoordinates.X;
+                    int y = tileCoordinates.Y;
+
+                    visualization.Draw(new Rectangle(8 * x, 8 * y, 8, 8), new Bgr(0, 255, 0), 2);
                 }
-                return visualization;
             }
-            return image;
+
+            if (ExtractedNextPiece != null)
+            {
+                // next piece
+                foreach (var block in Shape.Get(ExtractedNextPiece.Value).Body)
+                {
+                    var tileCoordinates = Coordinates.PieceToTilePreview(block);
+                    int x = tileCoordinates.X;
+                    int y = tileCoordinates.Y;
+
+                    visualization.Draw(new Rectangle(8 * x, 8 * y, 8, 8), new Bgr(0, 0, 255), 2);
+                }
+            }
+
+            return visualization;
         }
 
         public void Reset()

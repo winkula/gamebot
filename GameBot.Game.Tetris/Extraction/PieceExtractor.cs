@@ -22,7 +22,7 @@ namespace GameBot.Game.Tetris.Extraction
         /// <param name="maxFallingDistance">Expected maximal falling distance.</param>
         /// <param name="probabilityThreshold">Probability that must be reached.</param>
         /// <returns>The piece and it's probability.</returns>
-        public Tuple<Piece, double> ExtractPieceSpawnedFuzzy(IScreenshot screenshot, int maxFallingDistance, double probabilityThreshold = 0.0)
+        public Tuple<Piece, double> ExtractSpawnedPieceFuzzy(IScreenshot screenshot, int maxFallingDistance, double probabilityThreshold = 0.0)
         {
             if (screenshot == null)
                 throw new ArgumentNullException(nameof(screenshot));
@@ -50,7 +50,7 @@ namespace GameBot.Game.Tetris.Extraction
 
             return new Tuple<Piece, double>(expectedPiece, bestProbability);
         }
-
+        
         /// <summary>
         /// Extracts the current piece from the board.
         /// </summary>
@@ -59,7 +59,7 @@ namespace GameBot.Game.Tetris.Extraction
         /// <param name="maxFallingDistance">Expected maximal falling distance.</param>
         /// <param name="probabilityThreshold">Probability that must be reached.</param>
         /// <returns>The piece and it's probability.</returns>
-        public Tuple<Piece, double> ExtractPieceFuzzy(IScreenshot screenshot, Piece piece, int maxFallingDistance, double probabilityThreshold = 0.0)
+        public Tuple<Piece, double> ExtractKnownPieceFuzzy(IScreenshot screenshot, Piece piece, int maxFallingDistance, double probabilityThreshold = 0.0)
         {
             if (screenshot == null)
                 throw new ArgumentNullException(nameof(screenshot));
@@ -89,7 +89,7 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         #endregion
-        
+
         #region Next piece
 
         /// <summary>

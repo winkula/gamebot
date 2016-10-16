@@ -42,39 +42,41 @@ namespace GameBot.Game.Tetris.Agents.States
         public void Act()
         {
             // first we have to check if the last command was successful
-            if (_lastMove.HasValue)
+            if (_lastMove != null)
             {
                 var now = _agent.Clock.Time;
                 var expectedFallDistance = GetExpectedFallDistance(now);
                 _logger.Info("> Check command. Maximal expected fall distance is " + expectedFallDistance);
-                                
-                var piece = _agent.Extractor.ExtractMovedPieceWithErrorTolerance(_agent.Screenshot, _lastPosition, _lastMove.Value, expectedFallDistance);
-                if (piece == null)
+
+                var pieceNotMoved = _lastPosition;
+                var pieceMoved = new Piece(_lastPosition).Apply(_lastMove.Value);
+
+                var resultPieceNotMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(_agent.Screenshot, pieceNotMoved,expectedFallDistance, _agent.ProbabilityThreshold);
+                var resultPieceMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(_agent.Screenshot, pieceMoved,expectedFallDistance, _agent.ProbabilityThreshold);
+
+                if (resultPieceNotMoved.Item1 == null && resultPieceMoved.Item1 == null)
                 {
-                    _loggerCamera.Info("Piece not recognized");
-                    _logger.Info("> PIECE NOT FOUND! Looking for " + _lastPosition.Tetromino + ". Try again.");
+                    // piece not found
+                    PieceNotFound(_lastPosition.Tetromino);
                     return;
                 }
-
-                // check if last command was executed
-                // if not, repeat      
-                var delta = piece.Delta(new Piece(_lastPosition).Apply(_lastMove.Value));
-
-                UpdateLastPosition(piece, now);
-                if (delta.IsTargetPosition)
+                
+                if (resultPieceNotMoved.Item1 == null || resultPieceMoved.Item2 >= resultPieceNotMoved.Item2)
                 {
                     _loggerActuator.Info("Command executed");
 
                     // move was successfully executed
                     // we remove it from the queue
+                    UpdateLastPosition(resultPieceMoved.Item1, now);
                     ProceedToNextCommand();
                 }
-                else
+                else if (resultPieceMoved.Item1 == null || resultPieceNotMoved.Item2 >= resultPieceMoved.Item2)
                 {
                     _loggerActuator.Info("Command failed");
+                    _logger.Info("> Failed to execute the command.");
 
                     // the command was not executed and the tile is in the old position
-                    _logger.Info("> Failed to execute the command.");
+                    UpdateLastPosition(resultPieceNotMoved.Item1, now);
                     RepeatCommand();
                     return; // we return here because we need a new screenshot
                 }
@@ -105,6 +107,12 @@ namespace GameBot.Game.Tetris.Agents.States
                     Analyze();
                 }
             }
+        }
+
+        private void PieceNotFound(Tetromino tetromino)
+        {
+            _loggerCamera.Info("Piece not recognized");
+            _logger.Info($"> Piece not found! ({tetromino}). Try again.");
         }
 
         private int GetExpectedFallDistance(TimeSpan now)
@@ -178,18 +186,20 @@ namespace GameBot.Game.Tetris.Agents.States
                     break;
 
                 case Move.Drop:
-                    _agent.Executor.Press(Button.Down); // drop
-
-                    // calculates the score and the level
+                    // calculates drop distance, score and new level
                     var dropDistance = _agent.GameState.Drop();
+                    var dropDuration = TetrisLevel.GetFreeFallDuration(dropDistance);
+
+                    // we ececute the drop as a blocking hit with long duration
+                    // we must wait until the drop is ended to continue
+                    _agent.Executor.Hit(Button.Down, dropDuration);
+                    // TODO: here we could to some precalculations for the next search???
+                    
+                    //_agent.Executor.Press(Button.Down); // drop
 
                     // let time lapse away
                     // (the tetromino falls and we must pause
-                    // TODO: here we could to some precalculations for the next search???
-                    AwaitDrop(dropDistance);
-                    break;
-
-                default:
+                    //AwaitDrop(dropDistance);
                     break;
             }
         }

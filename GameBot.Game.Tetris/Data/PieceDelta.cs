@@ -16,8 +16,8 @@ namespace GameBot.Game.Tetris.Data
 
         public PieceDelta(Piece current, Piece target)
         {
-            if (current == null) throw new ArgumentNullException("current");
-            if (target == null) throw new ArgumentNullException("target");
+            if (current == null) throw new ArgumentNullException(nameof(current));
+            if (target == null) throw new ArgumentNullException(nameof(target));
 
             Orientation = target.Orientation - current.Orientation;
             X = target.X - current.X;
