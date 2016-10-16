@@ -9,6 +9,12 @@ namespace GameBot.Test.Engine.Physical.Actuators
     [TestFixture]
     public class PhysicalActuatorTests
     {
+        [SetUp]
+        public void Init()
+        {
+            //if ()
+        }
+        
         [Test]
         public void ConstructDispose()
         {

@@ -1,4 +1,6 @@
-﻿using Emgu.CV;
+﻿using System;
+using System.IO;
+using Emgu.CV;
 using GameBot.Core;
 
 namespace GameBot.Engine.Physical.Cameras
@@ -23,6 +25,15 @@ namespace GameBot.Engine.Physical.Cameras
             var src = new Mat();
             _capture.Grab();
             _capture.Retrieve(src);
+
+            // save every 30th image
+            var tick = DateTime.Now.Ticks;
+            if (tick % 30 == 0)
+            {
+                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Images"));
+                string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Images", $"image{tick}.png");
+                src.Save(path);
+            }
 
             return src;
         }
