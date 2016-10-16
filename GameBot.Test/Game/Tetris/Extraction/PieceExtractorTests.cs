@@ -9,12 +9,14 @@ namespace GameBot.Test.Game.Tetris.Extraction
     [TestFixture]
     public class PieceExtractorTests
     {
+        private PieceMatcher _pieceMatcher;
         private PieceExtractor _pieceExtractor;
 
         [SetUp]
         public void Init()
         {
-            _pieceExtractor = new PieceExtractor();
+            _pieceMatcher = new PieceMatcher();
+            _pieceExtractor = new PieceExtractor(_pieceMatcher);
         }
         
         [Test]
@@ -36,6 +38,17 @@ namespace GameBot.Test.Game.Tetris.Extraction
             {
                 _pieceExtractor.ExtractNextPiece(screenshot);
             });
+        }
+
+        [Test]
+        public void ExtractNextPieceFuzzy()
+        {
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+
+            var tetromino = _pieceExtractor.ExtractNextPieceFuzzy(screenshot, 0.5);
+
+            Assert.NotNull(tetromino);
+            Assert.AreEqual(Tetromino.L, tetromino);
         }
     }
 }

@@ -14,12 +14,14 @@ namespace GameBot.Game.Tetris.Data
         T = 6
     }
 
-    public class Tetrominos
+    public static class Tetrominos
     {
         private static readonly Random Random = new Random();
 
         // Chances found by sampling dozens of emulator tetris game states
-        private static readonly double[] Chances = new double[] { 0.149, 0.130, 0.196, 0.100, 0.113, 0.145, 0.167 };
+        private static readonly double[] Chances = { 0.149, 0.130, 0.196, 0.100, 0.113, 0.145, 0.167 };
+
+        public static readonly Tetromino[] All = { Tetromino.O, Tetromino.I, Tetromino.S, Tetromino.Z, Tetromino.L, Tetromino.J, Tetromino.T };
 
         public static Tetromino GetRandom()
         {

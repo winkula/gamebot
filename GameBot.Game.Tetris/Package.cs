@@ -21,6 +21,7 @@ namespace GameBot.Game.Tetris
             container.RegisterSingleton<TetrisExtractor>();
             container.RegisterSingleton<TetrisAi>();
             container.RegisterSingleton<PieceExtractor>();
+            container.RegisterSingleton<PieceMatcher>();
         }
     }
 }

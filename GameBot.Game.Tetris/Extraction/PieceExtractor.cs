@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 
@@ -7,9 +6,12 @@ namespace GameBot.Game.Tetris.Extraction
 {
     public class PieceExtractor
     {
-        // this coordinates are in the coordinate system of the tile system of the game boy screen (origin is top left)
-        private static Point _currentTileOrigin = new Point(5, 0);
-        private static Point _previewTileOrigin = new Point(15, 13);
+        private readonly PieceMatcher _pieceMatcher;
+
+        public PieceExtractor(PieceMatcher pieceMatcher)
+        {
+            _pieceMatcher = pieceMatcher;
+        }
 
         #region Current piece
         
@@ -34,7 +36,7 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    byte mean = screenshot.GetTileMean(_previewTileOrigin.X + x, _previewTileOrigin.Y + y);
+                    byte mean = screenshot.GetTileMean(TetrisConstants.NextPieceTileOrigin.X + x, TetrisConstants.NextPieceTileOrigin.Y + y);
                     if (IsBlock(mean))
                     {
                         int index = 4 * (2 - y) + (x);
@@ -53,18 +55,38 @@ namespace GameBot.Game.Tetris.Extraction
         /// <summary>
         /// Extracts the next piece visible on the screenshot.
         /// </summary>
-        /// <param name="screenshot"></param>
-        /// <param name="probabilityThreshold"></param>
-        /// <returns></returns>
-        public Tetromino? ExtractNextPieceFuzzy(IScreenshot screenshot, double probabilityThreshold)
+        /// <param name="screenshot">The screenshot to extract the piece from.</param>
+        /// <param name="probabilityThreshold">Probability that must be reached.</param>
+        /// <returns>The next Tetromino, or null if no matching piece was found.</returns>
+        public Tetromino? ExtractNextPieceFuzzy(IScreenshot screenshot, double probabilityThreshold = 0.0)
         {
-            throw new NotImplementedException();
+            // relevant tiles on the screen: x : 14 - 17, y : 13 - 16 
+
+            if (probabilityThreshold < 0.0 || probabilityThreshold > 1.0)
+                throw new ArgumentException("probabilityThreshold must be between 0.0 and 1.0");
+
+            double bestProbability = 0;
+            Tetromino? bestTetromino = null;
+            
+            foreach (var tetromino in Tetrominos.All)
+            {
+                var piece = new Piece(tetromino, 0, TetrisConstants.NextPieceTemplateTileCoordinates.X, TetrisConstants.NextPieceTemplateTileCoordinates.Y);
+                var probability = _pieceMatcher.GetProbability(screenshot, piece);
+                if (probability > bestProbability && probability >= probabilityThreshold)
+                {
+                    bestProbability = probability;
+                    bestTetromino = tetromino;
+                }
+            }
+
+            return bestTetromino;
         }
 
         #endregion
 
         private bool IsBlock(byte mean)
         {
+            // TODO: better threshold here?
             return mean < 255;
         }
     }
