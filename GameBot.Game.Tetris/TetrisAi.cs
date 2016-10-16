@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using GameBot.Core.Data.Commands;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Searching;
-using GameBot.Game.Tetris.Searching.Heuristics;
 using NLog;
 
 namespace GameBot.Game.Tetris

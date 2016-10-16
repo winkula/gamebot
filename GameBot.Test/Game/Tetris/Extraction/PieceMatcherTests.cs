@@ -30,5 +30,28 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
             Assert.GreaterOrEqual(probability, expectedProbability);
         }
+
+        [Test]
+        public void GetProbabilityPerformance()
+        {
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            
+            // 4 x 10 x 17
+            for (int orientation = 0; orientation < 4; orientation++)
+            {
+                for (int x = -4; x <= 5; x++)
+                {
+                    for (int y = -16; y <= 0; y++)
+                    {
+                        var piece = new Piece(Tetromino.T, orientation, x, y);
+
+                        var probability = _pieceMatcher.GetProbability(screenshot, piece);
+
+                        Assert.GreaterOrEqual(probability, 0.0);
+                        Assert.LessOrEqual(probability, 1.0);
+                    }
+                }
+            }
+        }
     }
 }
