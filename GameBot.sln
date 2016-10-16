@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Roms", "Roms", "{A0DC8FE0-E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Screenshots", "Screenshots", "{E0A43A0F-42AB-477B-B844-D61E5D13E692}"
 	ProjectSection(SolutionItems) = preProject
+		Screenshots\templates.png = Screenshots\templates.png
 		Screenshots\tetris_credits.png = Screenshots\tetris_credits.png
 		Screenshots\tetris_menu.png = Screenshots\tetris_menu.png
 		Screenshots\tetris_menu_atype.png = Screenshots\tetris_menu_atype.png

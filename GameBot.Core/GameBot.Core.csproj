@@ -149,7 +149,6 @@
     <Compile Include="IEngine.cs" />
     <Compile Include="IAgent.cs" />
     <Compile Include="IExecutor.cs" />
-    <Compile Include="IExtractor.cs" />
     <Compile Include="ICalibrateableQuantizer.cs" />
     <Compile Include="IQuantizer.cs" />
     <Compile Include="Data\IScreenshot.cs" />

@@ -12,7 +12,7 @@ namespace GameBot.Game.Tetris.Data
     ///     The origin is top left on the game boy screen)
     ///     Every tile is a 8 by 8 pixel block
     /// </summary>
-    public class Coordinates
+    public static class Coordinates
     {
         // origin of spawning pieces (center of the piece)
         // in absolute game coordinates (origin in bottom left of the board)

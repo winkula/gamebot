@@ -4,9 +4,7 @@ namespace GameBot.Game.Tetris.Data
 {
     public class Piece
     {
-        private static readonly Random Random = new Random();
-
-        public Tetromino Tetromino { get; private set; }
+        public Tetromino Tetromino { get; }
         public Shape Shape { get; private set; }
 
         /// <summary>
@@ -23,10 +21,13 @@ namespace GameBot.Game.Tetris.Data
         /// Y axis is from bottom to top. The origin is the spawning point of the Tetromino.
         /// </summary>
         public int Y { get; private set; }
-
+        
         public Piece(Tetromino tetromino, int orientation = 0, int x = 0, int y = 0)
         {
-            if (orientation < 0 || orientation > 3) throw new ArgumentException("orientation must be between 0 and 3");
+            if (orientation < 0 || orientation > 3)
+                throw new ArgumentException("orientation must be between 0 and 3");
+            if (y > 0)
+                throw new ArgumentException("y must be 0 or negative");
 
             Tetromino = tetromino;
             Shape = Shape.Get(tetromino, orientation);

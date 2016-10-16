@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace GameBot.Game.Tetris.Extraction
 {
-    public class TetrisExtractor : IExtractor<GameState>
+    public class TetrisExtractor
     {
         // this coordinates are in the coordinate system of the tile system of the game boy screen (origin is top left)
         private static Point _boardTileOrigin = new Point(2, 0);
@@ -16,8 +16,8 @@ namespace GameBot.Game.Tetris.Extraction
 
         private readonly IConfig _config;
 
-        public int MeanThreshold { get; private set; }
-        public double MinimalProbability { get; private set;}
+        private int MeanThreshold { get; }
+        private double MinimalProbability { get; }
 
         // debugging/visualization only
         public IList<Point> Rectangles { get; private set; } = new List<Point>();

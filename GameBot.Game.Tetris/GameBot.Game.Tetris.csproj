@@ -155,7 +155,6 @@
     <Compile Include="Data\PieceDelta.cs" />
     <Compile Include="Data\Pose.cs" />
     <Compile Include="Data\Shape.cs" />
-    <Compile Include="Extraction\PieceExtractionResult.cs" />
     <Compile Include="Extraction\PieceExtractor.cs" />
     <Compile Include="Searching\Heuristics\BasicTetrisHeuristic.cs" />
     <Compile Include="Searching\Heuristics\ExperimentalHeuristic.cs" />
@@ -165,6 +164,7 @@
     <Compile Include="Agents\States\TetrisExecuteState.cs" />
     <Compile Include="Agents\States\TetrisAnalyzeState.cs" />
     <Compile Include="Agents\States\TetrisStartState.cs" />
+    <Compile Include="TetrisConstants.cs" />
     <Compile Include="TetrisLevel.cs" />
     <Compile Include="TetrisScore.cs" />
     <Compile Include="Searching\RecursiveSearch.cs" />

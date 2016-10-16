@@ -12,15 +12,14 @@ namespace GameBot.Core.Data
     /// </summary>
     public class EmguScreenshot : IScreenshot
     {
-        public const int TileSize = GameBoyConstants.TileSize;
-        public static Mat Black;
+        private const int TileSize = GameBoyConstants.TileSize;
+        private static readonly Mat Black;
 
-        private readonly IImage _image;
-
-        public byte[] Pixels { get; private set; }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public TimeSpan Timestamp { get; private set; }
+        public IImage Image { get; }
+        public byte[] Pixels { get; }
+        public int Width { get; }
+        public int Height { get; }
+        public TimeSpan Timestamp { get; }
 
         static EmguScreenshot()
         {
@@ -30,7 +29,7 @@ namespace GameBot.Core.Data
 
         public EmguScreenshot(IImage image, TimeSpan timestamp)
         {
-            _image = image;
+            Image = image;
 
             var mat = image.GetInputArray().GetMat();
             Width = mat.Width;
@@ -78,10 +77,10 @@ namespace GameBot.Core.Data
             // TODO: implement faster? (with ROI maybe)
             // TODO: cache mean values for fast multiple lookup
             var mask = Black.Clone();
-            var roi = new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize);
+            var roi = new Rectangle(x * TileSize, y * TileSize, TileSize - 1, TileSize - 1);
             CvInvoke.Rectangle(mask, roi, new MCvScalar(255, 255, 255), -1);
 
-            var mean = CvInvoke.Mean(_image, mask);
+            var mean = CvInvoke.Mean(Image, mask);
             return (byte)mean.V0;
         }
     }
