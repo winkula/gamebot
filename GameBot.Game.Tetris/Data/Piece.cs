@@ -22,10 +22,16 @@ namespace GameBot.Game.Tetris.Data
         /// </summary>
         public int Y { get; private set; }
 
+        public int FallHeight => -Y;
+
         /// <summary>
         /// The piece is untouched, when it's not moved or rotated. But the piece could have fallen.
         /// </summary>
         public bool IsUntouched => Orientation == 0 && X == 0;
+
+        public bool IsFallen => Y < 0;
+
+        public bool IsOrigin => IsUntouched && !IsFallen;
 
         public Piece(Tetromino tetromino, int orientation = 0, int x = 0, int y = 0)
         {

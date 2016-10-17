@@ -63,6 +63,16 @@ namespace GameBot.Game.Tetris {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap TemplatesBinary {
+            get {
+                object obj = ResourceManager.GetObject("TemplatesBinary", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap TemplatesGrayscale {
             get {
                 object obj = ResourceManager.GetObject("TemplatesGrayscale", resourceCulture);

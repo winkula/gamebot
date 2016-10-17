@@ -22,7 +22,8 @@ namespace GameBot.Game.Tetris.Extraction
         public PieceMatcher()
         {
             // init template tiles
-            var templateTiles = new Image<Gray, byte>(Resources.TemplatesGrayscale);
+            //var templateTiles = new Image<Gray, byte>(Resources.TemplatesGrayscale);
+            var templateTiles = new Image<Gray, byte>(Resources.TemplatesBinary);
             for (int i = 0; i < Tetrominos.AllPossibleOrientations; i++)
             {
                 var template = new Image<Gray, byte>(_templateSize, _templateSize);

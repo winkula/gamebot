@@ -21,7 +21,7 @@ namespace GameBot.Test
             new [] { new Point(583,361), new Point(206,358), new Point(569,59), new Point(229,59) }, // series 00
             new [] { new Point(585,360), new Point(207,359), new Point(571,58), new Point(228,57) }, // series 01
             new [] { new Point(593,357), new Point(206,354), new Point(574,53), new Point(230,53) }, // series 02
-            new [] { new Point(593,357), new Point(206,354), new Point(574,53), new Point(230,53) } // series 03
+            new [] { new Point(590,367), new Point(211,365), new Point(572,67), new Point(235,67) } // series 03
         };
 
         private static readonly object[][] _data =
@@ -64,8 +64,8 @@ namespace GameBot.Test
 
             new object[] { "0300", null, null }
         };
-
-        public static IEnumerable TestCases
+        
+        public static IEnumerable TestCasesCurrentPiece
         {
             get
             {
@@ -74,15 +74,48 @@ namespace GameBot.Test
                     var imageKey = (string)data[0];
                     var imagePath = $"Images/test{imageKey}.jpg";
                     var keypoints = _keypoints[int.Parse(imageKey.Substring(0, 2))];
-                    var currentPiece = data[1];
-                    var nextPiece = data[2];
+                    var currentPiece = (Piece) data[1];
 
-                    yield return new TestCaseData(imagePath, keypoints, currentPiece, nextPiece);
+                    if (currentPiece != null)
+                    {
+                        _quantizer.Calibrate(keypoints);
+
+                        var image = new Mat(imagePath, LoadImageType.AnyColor);
+                        var quantizedImage = _quantizer.Quantize(image);
+                        var screenshot = new EmguScreenshot(quantizedImage, TimeSpan.Zero);
+                        
+                        yield return new TestCaseData(imageKey, screenshot, currentPiece);
+                    }
+                }
+            }
+        }
+        
+        public static IEnumerable TestCasesCurrentPieceNull
+        {
+            get
+            {
+                foreach (var data in _data)
+                {
+                    var imageKey = (string)data[0];
+                    var imagePath = $"Images/test{imageKey}.jpg";
+                    var keypoints = _keypoints[int.Parse(imageKey.Substring(0, 2))];
+                    var currentPiece = (Piece)data[1];
+
+                    if (currentPiece == null)
+                    {
+                        _quantizer.Calibrate(keypoints);
+
+                        var image = new Mat(imagePath, LoadImageType.AnyColor);
+                        var quantizedImage = _quantizer.Quantize(image);
+                        var screenshot = new EmguScreenshot(quantizedImage, TimeSpan.Zero);
+
+                        yield return new TestCaseData(imageKey, screenshot);
+                    }
                 }
             }
         }
 
-        public static IEnumerable TestCasesScreenshot
+        public static IEnumerable TestCasesSpawnedPiece
         {
             get
             {
@@ -91,16 +124,93 @@ namespace GameBot.Test
                     var imageKey = (string)data[0];
                     var imagePath = $"Images/test{imageKey}.jpg";
                     var keypoints = _keypoints[int.Parse(imageKey.Substring(0, 2))];
-                    var currentPiece = data[1];
-                    var nextPiece = data[2];
+                    var currentPiece = (Piece)data[1];
 
-                    _quantizer.Calibrate(keypoints);
+                    if (currentPiece != null && currentPiece.IsUntouched)
+                    {
+                        _quantizer.Calibrate(keypoints);
 
-                    var image = new Mat(imagePath, LoadImageType.AnyColor);
-                    var quantizedImage = _quantizer.Quantize(image);
-                    var screenshot = new EmguScreenshot(quantizedImage, TimeSpan.Zero);
+                        var image = new Mat(imagePath, LoadImageType.AnyColor);
+                        var quantizedImage = _quantizer.Quantize(image);
+                        var screenshot = new EmguScreenshot(quantizedImage, TimeSpan.Zero);
 
-                    yield return new TestCaseData(screenshot, currentPiece, nextPiece);
+                        yield return new TestCaseData(imageKey, screenshot, currentPiece);
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable TestCasesSpawnedPieceNull
+        {
+            get
+            {
+                foreach (var data in _data)
+                {
+                    var imageKey = (string)data[0];
+                    var imagePath = $"Images/test{imageKey}.jpg";
+                    var keypoints = _keypoints[int.Parse(imageKey.Substring(0, 2))];
+                    var currentPiece = (Piece)data[1];
+
+                    if (currentPiece == null || !currentPiece.IsUntouched)
+                    {
+                        _quantizer.Calibrate(keypoints);
+
+                        var image = new Mat(imagePath, LoadImageType.AnyColor);
+                        var quantizedImage = _quantizer.Quantize(image);
+                        var screenshot = new EmguScreenshot(quantizedImage, TimeSpan.Zero);
+
+                        yield return new TestCaseData(imageKey, screenshot);
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable TestCasesNextPiece
+        {
+            get
+            {
+                foreach (var data in _data)
+                {
+                    var imageKey = (string)data[0];
+                    var imagePath = $"Images/test{imageKey}.jpg";
+                    var keypoints = _keypoints[int.Parse(imageKey.Substring(0, 2))];
+                    var nextPiece = (Tetromino?)data[2];
+
+                    if (nextPiece.HasValue)
+                    {
+                        _quantizer.Calibrate(keypoints);
+
+                        var image = new Mat(imagePath, LoadImageType.AnyColor);
+                        var quantizedImage = _quantizer.Quantize(image);
+                        var screenshot = new EmguScreenshot(quantizedImage, TimeSpan.Zero);
+
+                        yield return new TestCaseData(imageKey, screenshot, nextPiece.Value);
+                    }
+                }
+            }
+        }
+        
+        public static IEnumerable TestCasesNextPieceNull
+        {
+            get
+            {
+                foreach (var data in _data)
+                {
+                    var imageKey = (string)data[0];
+                    var imagePath = $"Images/test{imageKey}.jpg";
+                    var keypoints = _keypoints[int.Parse(imageKey.Substring(0, 2))];
+                    var nextPiece = (Tetromino?) data[2];
+
+                    if (!nextPiece.HasValue)
+                    {
+                        _quantizer.Calibrate(keypoints);
+
+                        var image = new Mat(imagePath, LoadImageType.AnyColor);
+                        var quantizedImage = _quantizer.Quantize(image);
+                        var screenshot = new EmguScreenshot(quantizedImage, TimeSpan.Zero);
+
+                        yield return new TestCaseData(imageKey, screenshot);
+                    }
                 }
             }
         }

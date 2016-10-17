@@ -13,7 +13,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
     public class TetrisExtractorTests
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
+        
         [Test]
         public void Constructor()
         {
@@ -65,7 +65,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             Assert.AreEqual(0, piece.X);
             Assert.AreEqual(0, piece.Y);
         }
-
+        
         [Test]
         public void ExtractPieceSpawnedFalled()
         {

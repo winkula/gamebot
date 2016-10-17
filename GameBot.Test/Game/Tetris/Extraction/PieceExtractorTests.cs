@@ -35,7 +35,6 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ExtractPieceSpawnedFuzzy2()
         {
-
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
 
             var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, 5, _probabilityThreshold);
