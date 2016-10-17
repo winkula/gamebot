@@ -153,7 +153,7 @@
     <Compile Include="Core\Data\Commands\PressCommandTests.cs" />
     <Compile Include="Core\Data\Commands\HitCommandTests.cs" />
     <Compile Include="Core\Executors\ExecutorTests.cs" />
-    <Compile Include="Engine\Physical\Quantizers\ImageProcessingTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\ExtractionFromImagesTests.cs" />
     <Compile Include="Game\Tetris\Extraction\PieceMatcherTests.cs" />
     <Compile Include="Misc\PerformanceTests.cs" />
     <Compile Include="Engine\Physical\Actuators\PhysicalActuatorTests.cs" />
@@ -178,11 +178,7 @@
     <Compile Include="Game\Tetris\Data\PieceTests.cs" />
     <Compile Include="Game\Tetris\Data\BoardTests.cs" />
     <Compile Include="Game\Tetris\Data\TetrominoTests.cs" />
-    <Compile Include="TestImages.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TestImages.resx</DependentUpon>
-    </Compile>
+    <Compile Include="TestImageFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -221,21 +217,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="TestImages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>TestImages.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\BlockTemplate.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\block.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\dilate.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

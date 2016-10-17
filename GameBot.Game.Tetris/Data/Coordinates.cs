@@ -63,14 +63,14 @@ namespace GameBot.Game.Tetris.Data
         
         // converts game coordinates (X and Y of Piece) to the origin (top left) of the search window (4 by 4)
         // this is used for creating bitmasks for piece matching        
-        public static Point PieceToSearchWindow(int x, int y)
+        public static Point PieceToTileSearchWindowOrigin(int x, int y)
         {
             return new Point(x + 5, -y - 1);
         }
 
-        public static Point PieceToSearchWindow(Point coordinates)
+        public static Point PieceToTileSearchWindowOrigin(Point coordinates)
         {
-            return PieceToSearchWindow(coordinates.X, coordinates.Y);
+            return PieceToTileSearchWindowOrigin(coordinates.X, coordinates.Y);
         }
         
         public static Point PieceToTilePreview(int x, int y)

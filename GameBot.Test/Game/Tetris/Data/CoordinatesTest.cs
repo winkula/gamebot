@@ -41,12 +41,12 @@ namespace GameBot.Test.Game.Tetris.Data
         [TestCase(-5, -1, 0, 0)]
         public void PieceToSearchWindow(int x, int y, int xExpected, int yExpected)
         {
-            var result = Coordinates.PieceToSearchWindow(x, y);
+            var result = Coordinates.PieceToTileSearchWindowOrigin(x, y);
 
             Assert.AreEqual(xExpected, result.X);
             Assert.AreEqual(yExpected, result.Y);
 
-            result = Coordinates.PieceToSearchWindow(new Point(x, y));
+            result = Coordinates.PieceToTileSearchWindowOrigin(new Point(x, y));
 
             Assert.AreEqual(xExpected, result.X);
             Assert.AreEqual(yExpected, result.Y);

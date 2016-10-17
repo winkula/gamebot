@@ -46,7 +46,7 @@ namespace GameBot.Test.Misc
                 //GaussAndAdaptive(img);
                 //GaussContrastAndAdaptive(img);
                 //Canny(img);
-                CannyDilate(img);
+                //CannyDilate(img);
                 //TemplateMatching(img);
             }
             stopwatch.Stop();
@@ -79,6 +79,7 @@ namespace GameBot.Test.Misc
             CvInvoke.Canny(img, img, 200, 900, 5);
         }
 
+        /*
         private void CannyDilate(IImage img)
         {
             var dilate = new Image<Gray, byte>(TestImages.dilate);
@@ -99,6 +100,6 @@ namespace GameBot.Test.Misc
             CvInvoke.GaussianBlur(img, img, new Size(3, 3), 0.3, 0.3, BorderType.Default);
             //CvInvoke.AdaptiveThreshold(img, img, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 5, 5);
             CvInvoke.MatchTemplate(img, template, img, TemplateMatchingType.CcoeffNormed);
-        }
+        }*/
     }
 }

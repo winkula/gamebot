@@ -45,7 +45,7 @@ namespace GameBot.Game.Tetris.Extraction
         //
         public ushort GetPieceMask(IScreenshot screenshot, int pieceX, int pieceY)
         {
-            var tileCoordinates = Coordinates.PieceToSearchWindow(pieceX, pieceY);
+            var tileCoordinates = Coordinates.PieceToTileSearchWindowOrigin(pieceX, pieceY);
             ushort mask = 0;
             for (int x = 0; x < 4; x++)
             {

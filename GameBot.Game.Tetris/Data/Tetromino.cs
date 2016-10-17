@@ -16,6 +16,8 @@ namespace GameBot.Game.Tetris.Data
 
     public static class Tetrominos
     {
+        public const int AllPossibleOrientations = 19;
+
         /// <summary>
         /// All possible Tetrominos.
         /// </summary>
