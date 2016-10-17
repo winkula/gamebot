@@ -26,12 +26,7 @@ namespace GameBot.Game.Tetris.Extraction
         };
 
         private readonly Image<Gray, byte> _templates = new Image<Gray, byte>("Screenshots/templates.png");
-
-        public PieceMatcher()
-        {
-
-        }
-
+        
         private int GetTemplateIndex(Piece piece)
         {
             return _templateIndexTable[(int)piece.Tetromino, piece.Orientation];
@@ -50,6 +45,9 @@ namespace GameBot.Game.Tetris.Extraction
 
         /// <summary>
         /// Gets the probability that a specific piece is visible on the screenshot.
+        /// Test results:
+        /// - With adaptive binarization:     piece (68 - 91 %), empty (41 - 45 %)
+        /// - Without any filter (greyscale): piece (%), empty (%)        
         /// </summary>
         /// <param name="screenshot">The screenshot.</param>
         /// <param name="piece">The piece to match.</param>

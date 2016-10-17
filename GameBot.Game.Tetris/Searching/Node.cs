@@ -24,21 +24,15 @@ namespace GameBot.Game.Tetris.Searching
         {
             if (GameState.Piece != null)
             {
-                foreach (var setting in Way.GetAll(GameState.Piece.Tetromino))
+                foreach (var pose in GameState.Piece.Tetromino.GetPoses())
                 {
-                    var orientation = setting.Rotation;
-                    var translation = setting.Translation;
-
-                    var newPiece = new Piece(GameState.Piece.Tetromino, orientation, translation);
+                    var newPiece = pose;
                     if (GameState.Board.CanDrop(newPiece))
                     {
                         var successor = new GameState(GameState, newPiece);
                         var fall = successor.Drop();
 
-                        var node = new Node(successor, this);
-                        node.Way = new Way(orientation, translation, fall);
-
-                        yield return node;
+                        yield return new Node(successor, this) { Way = new Way(pose.Orientation, pose.X, fall) };
                     }
                 }
             }

@@ -21,7 +21,12 @@ namespace GameBot.Game.Tetris.Data
         /// Y axis is from bottom to top. The origin is the spawning point of the Tetromino.
         /// </summary>
         public int Y { get; private set; }
-        
+
+        /// <summary>
+        /// The piece is untouched, when it's not moved or rotated. But the piece could have fallen.
+        /// </summary>
+        public bool IsUntouched => Orientation == 0 && X == 0;
+
         public Piece(Tetromino tetromino, int orientation = 0, int x = 0, int y = 0)
         {
             if (orientation < 0 || orientation > 3)

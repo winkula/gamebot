@@ -12,7 +12,7 @@ namespace GameBot.Game.Tetris.Data
         /// Current piece is in spawn position, if orientation and x coordinate are equals.
         /// The y coordinate (fall distance) may be different.
         /// </summary>
-        public bool IsMaybeSpawned => Orientation == 0 && X == 0;
+        public bool IsUntouched => Orientation == 0 && X == 0;
         
         public PieceDelta(Piece current, Piece target)
         {

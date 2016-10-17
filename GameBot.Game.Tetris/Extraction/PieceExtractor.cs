@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
+using NLog;
 
 namespace GameBot.Game.Tetris.Extraction
 {
     public class PieceExtractor
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private readonly PieceMatcher _pieceMatcher;
 
         public PieceExtractor(PieceMatcher pieceMatcher)
@@ -14,9 +19,49 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         #region Current piece
+        
+        /// <summary>
+        /// Extracts the current piece from the board.
+        /// </summary>
+        /// <param name="screenshot">The screenshot to extract the piece from.</param>
+        /// <param name="maxFallingDistance">Expected maximal falling distance.</param>
+        /// <param name="probabilityThreshold">Probability that must be reached.</param>
+        /// <returns>The piece and it's probability.</returns>
+        public Tuple<Piece, double> ExtractPieceFuzzy(IScreenshot screenshot, int maxFallingDistance, double probabilityThreshold = 0.0)
+        {
+            if (screenshot == null)
+                throw new ArgumentNullException(nameof(screenshot));
+            if (maxFallingDistance < 0)
+                throw new ArgumentException("maxFallingDistance must be positive");
+            if (probabilityThreshold < 0.0 || probabilityThreshold > 1.0)
+                throw new ArgumentException("probabilityThreshold must be between 0.0 and 1.0");
+
+            double bestProbability = 0;
+            Piece expectedPiece = null;
+
+            for (int yDelta = 0; yDelta <= maxFallingDistance; yDelta++)
+            {
+                foreach (var tetromino in Tetrominos.All)
+                {
+                    foreach (var pose in tetromino.GetPoses())
+                    {
+                        var piece = pose.Fall(yDelta);
+                        var probability = _pieceMatcher.GetProbability(screenshot, piece);
+                        if (probability >= probabilityThreshold && probability > bestProbability)
+                        {
+                            bestProbability = probability;
+                            expectedPiece = piece;
+                        }
+                    }
+                }
+            }
+
+            return new Tuple<Piece, double>(expectedPiece, bestProbability);
+        }
 
         /// <summary>
-        /// Extracts the current piece from the board. The piece is only searched in the original orientation and x coordinate.
+        /// Extracts the current piece from the board.
+        /// The piece is only searched in the original orientation and x coordinate, must therefore be untouched.
         /// </summary>
         /// <param name="screenshot">The screenshot to extract the piece from.</param>
         /// <param name="maxFallingDistance">Expected maximal falling distance.</param>
@@ -138,6 +183,7 @@ namespace GameBot.Game.Tetris.Extraction
 
             double bestProbability = 0;
             Tetromino? bestTetromino = null;
+            var probabilities = new List<Tuple<Tetromino, double>>();
             
             foreach (var tetromino in Tetrominos.All)
             {
@@ -148,7 +194,11 @@ namespace GameBot.Game.Tetris.Extraction
                     bestProbability = probability;
                     bestTetromino = tetromino;
                 }
+                probabilities.Add(new Tuple<Tetromino, double>(tetromino, probability));
             }
+
+            var stats = string.Join(", ", probabilities.OrderByDescending(x => x.Item2).Select(x => $"({x.Item1}:{x.Item2:F})"));
+            _logger.Info($"Extraction statistics: {stats}");
 
             return bestTetromino;
         }
