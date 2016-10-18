@@ -18,7 +18,6 @@ namespace GameBot.Game.Tetris.Agents.States
         private Move? _lastMove;
         private Piece _lastPosition;
         private TimeSpan _lastPositionTimeStamp;
-        private TimeSpan _timeNextSpawn;
         
         public TetrisExecuteState(TetrisAgent agent, Queue<Move> moves, TimeSpan analyzeTimestamp)
         {
@@ -99,24 +98,25 @@ namespace GameBot.Game.Tetris.Agents.States
                     ProceedToNextCommand();
 
                     // calculates drop distance, score and new level
+                    int linesBefore = _agent.GameState.Lines;
                     var dropDistance = _agent.GameState.Drop();
                     var dropDuration = TetrisTiming.GetDropDuration(dropDistance);
-                    var lineRemoveDuration = TetrisTiming.GetLineRemovingDuration();
+                    if (_agent.GameState.Lines > linesBefore)
+                    {
+                        // lines were removed, add extra time
+                        var lineRemoveDuration = TetrisTiming.GetLineRemovingDuration();
+                        dropDuration += lineRemoveDuration;
+                    }
 
                     // we subtract a time padding, because we dont want to wait the
                     // theoretical drop duration, but the real drop duration
                     // (we lose some overhead time)  
-                    var waitDuration = 
-                          dropDuration
-                        + lineRemoveDuration
-                        - TimeSpan.FromMilliseconds(Timing.NegativeDropDurationPadding);
+                    var waitDuration = dropDuration - TimeSpan.FromMilliseconds(Timing.DropDurationPadding);
 
                     // execute the drop blocking
                     // we must wait until the drop is ended before we can continue
                     // TODO: here we could to some precalculations for the next search (and execute the drop asynchronous)???
                     _agent.Executor.Hit(Button.Down, waitDuration);
-                    
-                    _timeNextSpawn = _agent.Clock.Time - TimeSpan.FromMilliseconds(Timing.TimeAfterButtonPress);
                 }
                 else
                 {
@@ -205,7 +205,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void SetStateAnalyze()
         {
-            _agent.SetState(new TetrisAnalyzeState(_agent, _agent.GameState.Piece.Tetromino, _timeNextSpawn));
+            _agent.SetState(new TetrisAnalyzeState(_agent, _agent.GameState.Piece.Tetromino));
         }
     }
 }

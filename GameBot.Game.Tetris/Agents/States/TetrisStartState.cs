@@ -43,12 +43,10 @@ namespace GameBot.Game.Tetris.Agents.States
                     // restart from game over screen (good for testing multiple games)
                     StartFromMenu(_agent.Executor);
                 }
-
-                var timeNextSpawn = _agent.Clock.Time - TimeSpan.FromMilliseconds(Timing.TimeAfterButtonPress);
-
+                
                 // init game state
                 _agent.GameState = new GameState { StartLevel = _startLevel };
-                _agent.SetState(new TetrisAnalyzeState(_agent, null, timeNextSpawn));
+                _agent.SetState(new TetrisAnalyzeState(_agent, null));
             }
         }
 

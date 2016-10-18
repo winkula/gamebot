@@ -22,7 +22,7 @@ namespace GameBot.Game.Tetris
         public static TimeSpan GetLineRemovingDuration()
         {
             // this is just an estimate
-            const int framesForRemovingLines = 80;
+            const int framesForRemovingLines = 79;
 
             return GetDurationFormFrames(framesForRemovingLines);
         }

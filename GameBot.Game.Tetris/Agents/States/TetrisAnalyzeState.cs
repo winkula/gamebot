@@ -19,14 +19,14 @@ namespace GameBot.Game.Tetris.Agents.States
         private Tetromino? _extractedNextPiece;
 
         // should never be overestimated!
-        private readonly TimeSpan _timeNextSpawn;
+        private readonly TimeSpan _beginTime;
 
-        public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino, TimeSpan timeNextSpawn)
+        public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)
         {
             _agent = agent;
 
             _currentTetromino = currentTetromino;
-            _timeNextSpawn = timeNextSpawn;
+            _beginTime = _agent.Clock.Time;
         }
 
         public void Act()
@@ -97,7 +97,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private int CalulateSearchHeight(Tetromino? tetromino)
         {
-            var passedTime = (_agent.Clock.Time - _timeNextSpawn)
+            var passedTime = (_agent.Clock.Time - _beginTime)
                 + TimeSpan.FromMilliseconds(Timing.PaddingAnalyze);
 
             int searchHeightTime = TetrisLevel.GetMaxFallDistance(_agent.GameState.Level, passedTime);
