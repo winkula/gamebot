@@ -15,7 +15,7 @@ namespace GameBot.Test.Game.Tetris.Searching
         private IHeuristic _heuristic;
 
         private SimpleSearch _simpleSearch;
-        private ProbabilisticSearch _probabilisticSearch;
+        private PredictiveSearch _predictiveSearch;
         private RecursiveSearch _recursiveSearch;
 
         [TestFixtureSetUp]
@@ -24,7 +24,7 @@ namespace GameBot.Test.Game.Tetris.Searching
             _heuristic = new YiyuanLeeHeuristic();
 
             _simpleSearch = new SimpleSearch(_heuristic);
-            _probabilisticSearch = new ProbabilisticSearch(_heuristic);
+            _predictiveSearch = new PredictiveSearch(_heuristic);
             _recursiveSearch = new RecursiveSearch(_heuristic);
             _recursiveSearch.Depth = 2;
         }
@@ -68,11 +68,11 @@ namespace GameBot.Test.Game.Tetris.Searching
         [TestCase(Tetromino.L, Tetromino.O)]
         [TestCase(Tetromino.J, Tetromino.T)]
         [TestCase(Tetromino.T, Tetromino.J)]
-        public void ProbabilisticSearch(Tetromino current, Tetromino next)
+        public void PredictiveSearch(Tetromino current, Tetromino next)
         {
             var gameState = new GameState(current, next);
 
-            var result = _probabilisticSearch.Search(gameState);
+            var result = _predictiveSearch.Search(gameState);
             _logger.Info(result.GoalGameState);
         }
 

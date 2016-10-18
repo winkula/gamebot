@@ -14,9 +14,9 @@ using System.Linq;
 
 namespace GameBot.Test
 {
-    public class TestImageFactory
+    public class ImageTestCaseFactory
     {
-        public class TestData
+        private class TestData
         {
             public string ImageKey { get; }
             private string ImagePath => $"Images/test{ImageKey}.jpg";

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace GameBot.Game.Tetris.Data
@@ -107,6 +108,30 @@ namespace GameBot.Game.Tetris.Data
             Array.Copy(board.Columns, Columns, board.Columns.Length);
         }
 
+        public Board Random(Random random = null)
+        {
+            const double chanceForBlock = 0.8;
+            const double chanceToBreak = 0.3;
+            random = random ?? new Random();
+
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    if (random.NextDouble() < chanceForBlock)
+                    {
+                        Occupy(x, y);
+                    }
+                    if (random.NextDouble() < (chanceToBreak + 0.05 * y))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return this;
+        }
+
         public bool IsOccupied(int x, int y)
         {
             return this[x, y] == true;
@@ -182,7 +207,7 @@ namespace GameBot.Game.Tetris.Data
             }
             return removed;
         }
-        
+
         private void CopySquaresDown(int yCompleteLine)
         {
             for (int x = 0; x < Width; x++)
@@ -221,11 +246,11 @@ namespace GameBot.Game.Tetris.Data
             }
             return false;
         }
-        
+
         public int DropDistance(Piece piece)
         {
             int distance = int.MaxValue;
-            
+
             foreach (var block in piece.Shape.Head)
             {
                 var distanceTest = (Coordinates.PieceOrigin.Y + block.Y + piece.Y) - ColumnHeight(Coordinates.PieceOrigin.X + block.X + piece.X);
@@ -252,13 +277,13 @@ namespace GameBot.Game.Tetris.Data
         {
             return DropDistance(piece) >= 0;
         }
-        
+
         public override int GetHashCode()
         {
             int hashCode = 0;
             for (int x = 0; x < Width; x++)
             {
-                hashCode ^= Columns[x];
+                hashCode ^= Columns[x] << (3 * x);
             }
             return hashCode;
         }
@@ -270,9 +295,9 @@ namespace GameBot.Game.Tetris.Data
             Board other = obj as Board;
             if (other != null)
             {
-                return 
-                    Width == other.Width && 
-                    Height == other.Height && 
+                return
+                    Width == other.Width &&
+                    Height == other.Height &&
                     Columns.SequenceEqual(other.Columns);
             }
             return false;

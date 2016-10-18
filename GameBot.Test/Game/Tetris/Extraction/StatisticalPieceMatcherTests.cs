@@ -30,7 +30,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             _pieceMatcher = new PieceMatcher();
         }
 
-        [TestCaseSource(typeof(TestImageFactory), nameof(TestImageFactory.TestCasesCurrentPiecePositives))]
+        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesCurrentPiecePositives))]
         public void PieceMatchingCurrentPiece(string imageKey, IScreenshot screenshot, Piece currentPieceExpected)
         {
             _currentPiecesTotal++;
@@ -43,7 +43,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             Assert.True(currentPieceFound);
         }
 
-        [TestCaseSource(typeof(TestImageFactory), nameof(TestImageFactory.TestCasesNextPiecePositives))]
+        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPiecePositives))]
         public void PieceMatchingNextPiecePositives(string imageKey, IScreenshot screenshot, Tetromino nextPieceExpected)
         {
             _nextPiecesTotal++;

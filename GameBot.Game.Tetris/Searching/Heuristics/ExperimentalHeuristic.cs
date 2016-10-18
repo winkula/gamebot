@@ -10,11 +10,12 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
         {
             var board = gameState.Board;
 
-            var valueHoles = -1 * HolesValueStacking(board, (h => 10 + h), (h => 1));
-            var valueLines = 100 * Threshold(gameState.Lines, 3);
-            var valueMaxHeight = -100 * Threshold(MaximumHeight(board), 6);
+            var a = AggregateHeight(board);
+            var c = gameState.Lines;
+            var h = Holes(board);
+            var b = Bumpiness(board);
 
-            return valueHoles + valueLines + valueMaxHeight;
+            return -0.5 * a + 0.9 * c - 0.6 * h - 0.1 * b;
         }
     }
 }

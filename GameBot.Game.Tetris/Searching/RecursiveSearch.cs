@@ -22,10 +22,12 @@ namespace GameBot.Game.Tetris.Searching
             if (gameState == null)
                 throw new ArgumentNullException(nameof(gameState));
 
-            var root = new Node(gameState);
+            var gameStateBegin = new GameState(gameState).ResetLinesAndScore();
+
+            var root = new Node(gameStateBegin);
             var goal = SearchRecursive(root, 0);
 
-            var result = new SearchResult { CurrentGameState = gameState };
+            var result = new SearchResult { CurrentGameState = root.GameState };
             if (goal != null)
             {
                 result.GoalGameState = goal.GameState;

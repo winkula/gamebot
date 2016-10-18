@@ -29,9 +29,9 @@ namespace GameBot.Game.Tetris.Data
         private static readonly double[] _chances = { 0.149, 0.130, 0.196, 0.100, 0.113, 0.145, 0.167 };
         private static readonly int[][] _orientations = { new[] { 0 }, new[] { 0, 1 }, new[] { 0, 1 }, new[] { 0, 1 }, new[] { 0, 1, 2, 3 }, new[] { 0, 1, 2, 3 }, new[] { 0, 1, 2, 3 } };
 
-        public static Tetromino GetRandom()
+        public static Tetromino GetRandom(Random random = null)
         {
-            var p = _random.NextDouble();
+            var p = (random ?? _random).NextDouble();
             if (p < 0.149) return Tetromino.O;
             if (p < 0.279) return Tetromino.I;
             if (p < 0.475) return Tetromino.S;

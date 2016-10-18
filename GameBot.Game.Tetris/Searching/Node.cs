@@ -10,14 +10,10 @@ namespace GameBot.Game.Tetris.Searching
         public Way Way { get; private set; }
         public double Score { get; set; }
 
-        public Node(GameState gameState, Node parent)
+        public Node(GameState gameState, Node parent = null)
         {
             GameState = gameState;
             Parent = parent;
-        }
-
-        public Node(GameState gameState) : this(gameState, null)
-        {
         }
 
         public IEnumerable<Node> GetSuccessors()
@@ -36,6 +32,26 @@ namespace GameBot.Game.Tetris.Searching
                     }
                 }
             }
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = GameState.Board.GetHashCode();
+            hashCode ^= (GameState.Lines << 29);
+            return hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (obj == this) return true;
+            Node other = obj as Node;
+            if (other != null)
+            {
+                return GameState.Board.Equals(other.GameState.Board) 
+                    && GameState.Lines == other.GameState.Lines;
+            }
+            return false;
         }
 
         public override string ToString()

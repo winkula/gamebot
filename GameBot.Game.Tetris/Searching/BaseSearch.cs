@@ -21,7 +21,9 @@ namespace GameBot.Game.Tetris.Searching
             if (gameState == null)
                 throw new ArgumentNullException(nameof(gameState));
 
-            Node root = new Node(gameState);            
+            var gameStateBegin = new GameState(gameState).ResetLinesAndScore();
+
+            Node root = new Node(gameStateBegin);            
             Node goal = null;
             var bestScore = double.NegativeInfinity;
 
