@@ -18,7 +18,8 @@ namespace GameBot.Game.Tetris.Agents.States
         private Move? _lastMove;
         private Piece _lastPosition;
         private TimeSpan _lastPositionTimeStamp;
-
+        private TimeSpan _timeNextSpawn;
+        
         public TetrisExecuteState(TetrisAgent agent, Queue<Move> moves, TimeSpan analyzeTimestamp)
         {
             if (agent == null) throw new ArgumentNullException(nameof(agent));
@@ -85,24 +86,48 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 var move = _moves.Peek();
 
-                // first execution
+                // first execution...
+
                 if (move != Move.Drop)
                 {
                     ExecuteAndCheck(move);
                 }
+                else if (move == Move.Drop && _moves.Count == 1)
+                {
+                    // cleanup (not realy necessary, because we leave the state anyway)
+                    _lastMove = null;
+                    ProceedToNextCommand();
+
+                    // calculates drop distance, score and new level
+                    var dropDistance = _agent.GameState.Drop();
+                    var dropDuration = TetrisTiming.GetDropDuration(dropDistance);
+                    var lineRemoveDuration = TetrisTiming.GetLineRemovingDuration();
+
+                    // we subtract a time padding, because we dont want to wait the
+                    // theoretical drop duration, but the real drop duration
+                    // (we lose some overhead time)  
+                    var waitDuration = 
+                          dropDuration
+                        + lineRemoveDuration
+                        - TimeSpan.FromMilliseconds(Timing.NegativeDropDurationPadding);
+
+                    // execute the drop blocking
+                    // we must wait until the drop is ended before we can continue
+                    // TODO: here we could to some precalculations for the next search (and execute the drop asynchronous)???
+                    _agent.Executor.Hit(Button.Down, waitDuration);
+                    
+                    _timeNextSpawn = _agent.Clock.Time - TimeSpan.FromMilliseconds(Timing.TimeAfterButtonPress);
+                }
                 else
                 {
-                    if (_moves.Count != 1)
-                        throw new Exception("Drop must be the last move to execute.");
-
-                    ExecuteWithoutCheck(move);
+                    throw new Exception("Drop must be the last move to execute.");
                 }
 
                 if (!_moves.Any() && !_lastMove.HasValue)
                 {
                     // we executed all moves and have no comannd to check
                     // back to the analyze state
-                    Analyze();
+                    SetStateAnalyze();
                 }
             }
         }
@@ -151,15 +176,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
             Execute(move);
         }
-
-        private void ExecuteWithoutCheck(Move move)
-        {
-            _lastMove = null;
-            ProceedToNextCommand();
-
-            Execute(move);
-        }
-
+        
         private void Execute(Move move)
         {
             _logger.Info("Execute " + move);
@@ -182,42 +199,13 @@ namespace GameBot.Game.Tetris.Agents.States
                     break;
 
                 case Move.Drop:
-                    // calculates drop distance, score and new level
-                    var dropDistance = _agent.GameState.Drop();
-                    var dropDuration = TetrisLevel.GetFreeFallDuration(dropDistance);
-
-                    // we ececute the drop as a blocking hit with long duration
-                    // we must wait until the drop is ended to continue
-                    _agent.Executor.Hit(Button.Down, dropDuration);
-                    // TODO: here we could to some precalculations for the next search???
-                    
-                    //_agent.Executor.Press(Button.Down); // drop
-
-                    // let time lapse away
-                    // (the tetromino falls and we must pause
-                    //AwaitDrop(dropDistance);
-                    break;
+                    throw new ApplicationException("no drop allowed here!");
             }
         }
 
-        private void AwaitDrop(int fallDistanceRows)
+        private void SetStateAnalyze()
         {
-            // we subtract a time padding, because we dont want to wait the
-            // theoretical drop duration, but the real drop duration
-            // (we lose some overhead time)  
-            var dropDuration = TetrisLevel
-                .GetFreeFallDuration(fallDistanceRows)
-                .Subtract(TimeSpan.FromMilliseconds(Timing.NegativeDropDurationPadding));
-
-            if (dropDuration > TimeSpan.Zero)
-            {
-                _agent.Clock.Sleep((int)dropDuration.TotalMilliseconds);
-            }
-        }
-
-        private void Analyze()
-        {
-            _agent.SetState(new TetrisAnalyzeState(_agent, _agent.GameState.Piece.Tetromino));
+            _agent.SetState(new TetrisAnalyzeState(_agent, _agent.GameState.Piece.Tetromino, _timeNextSpawn));
         }
     }
 }

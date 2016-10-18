@@ -31,7 +31,7 @@ namespace GameBot.Engine.Physical
             _clock.Start();
         }
 
-        public void Step(Action<IImage, IImage> callback = null)
+        public void Step(Action<IImage> showImage = null, Action<IImage> showProcessedImage = null)
         {
             // get image as photo of the gameboy screen (input)
             IImage image = _camera.Capture();
@@ -39,6 +39,8 @@ namespace GameBot.Engine.Physical
             // process image and get display data
             TimeSpan time = _clock.Time;
             IImage processed = _quantizer.Quantize(image);
+
+            showImage?.Invoke(processed);
 
             if (Play)
             {
@@ -52,7 +54,7 @@ namespace GameBot.Engine.Physical
                 processed = _agent.Visualize(processed);
             }
 
-            callback?.Invoke(image, processed);
+            showProcessedImage?.Invoke(processed);
         }
 
         public void Reset()

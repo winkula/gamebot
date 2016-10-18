@@ -74,11 +74,11 @@ namespace GameBot.Game.Tetris.Data
         {
             get
             {
-                // AND every column
-                int mask = ~0;
+                // OR every column
+                int mask = 0;
                 for (int x = 0; x < Width; x++)
                 {
-                    mask &= Columns[x];
+                    mask |= Columns[x];
                 }
                 return BoardLookups.Instance.GetColumnHeight(mask);
             }
@@ -228,6 +228,19 @@ namespace GameBot.Game.Tetris.Data
             {
                 var distanceTest = (Coordinates.PieceOrigin.Y + block.Y + piece.Y) - ColumnHeight(Coordinates.PieceOrigin.X + block.X + piece.X);
                 distance = Math.Min(distance, distanceTest);
+            }
+
+            return distance;
+        }
+
+        public int MaxDropDistanceForSpawnedPiece()
+        {
+            int distance = 0;
+
+            foreach (var tetromino in Tetrominos.All)
+            {
+                var distanceTest = DropDistance(new Piece(tetromino));
+                distance = Math.Max(distance, distanceTest);
             }
 
             return distance;

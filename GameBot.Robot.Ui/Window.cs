@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GameBot.Core.Exceptions;
 using NLog;
@@ -196,12 +197,12 @@ namespace GameBot.Robot.Ui
             var stopwatch = new Stopwatch();
 
             _engine.Initialize();
-
+            
             while (true)
             {
                 try
                 {
-                    _engine.Step(Show);
+                    _engine.Step(ShowOriginal, ShowProcessed);
 
                     stopwatch.Stop();
                     long ms = stopwatch.ElapsedMilliseconds;
@@ -219,11 +220,22 @@ namespace GameBot.Robot.Ui
             }
         }
 
-        public void Show(IImage original, IImage processed)
+        public void ShowOriginal(IImage original)
         {
             try
             {
                 ImageBoxOriginal.Image = original;
+            }
+            catch (ObjectDisposedException)
+            {
+                // ignore
+            }
+        }
+
+        public void ShowProcessed(IImage processed)
+        {
+            try
+            {
                 ImageBoxProcessed.Image = processed;
             }
             catch (ObjectDisposedException)

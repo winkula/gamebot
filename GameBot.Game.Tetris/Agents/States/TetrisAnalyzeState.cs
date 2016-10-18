@@ -13,31 +13,25 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private readonly TetrisAgent _agent;
 
-        private readonly TimeSpan _beginTime;
         private Tetromino? _currentTetromino;
 
         private Piece _extractedPiece;
         private Tetromino? _extractedNextPiece;
 
-        public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)
+        // should never be overestimated!
+        private readonly TimeSpan _timeNextSpawn;
+
+        public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino, TimeSpan timeNextSpawn)
         {
             _agent = agent;
 
-            _beginTime = agent.Clock.Time;
             _currentTetromino = currentTetromino;
+            _timeNextSpawn = timeNextSpawn;
         }
 
         public void Act()
         {
-            var passedTime = _agent.Clock.Time
-                .Subtract(_beginTime)
-                .Add(TimeSpan.FromMilliseconds(Timing.ExpectedFallDurationPadding));
-            int searchHeight = TetrisLevel.GetMaxFallDistance(_agent.GameState.Level, passedTime);
-            // TODO: make upper limit for the search height
-            
-            _logger.Info($"Search height for extraction is {searchHeight}");
-
-            if (Extract(searchHeight))
+            if (Extract())
             {
                 // update global game state
                 _agent.GameState.Piece = _extractedPiece;
@@ -46,7 +40,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 _agent.ExtractedNextPiece = _extractedNextPiece;
 
                 _logger.Info($"Game state extraction successfully:\n{_agent.GameState}");
-                
+
                 // we found a new piece. release the down key (end the drop)
                 //_agent.Executor.Release(Button.Down);
                 //_logger.Info("> End the drop.");
@@ -58,9 +52,9 @@ namespace GameBot.Game.Tetris.Agents.States
                 {
                     _logger.Info("A.I. found a solution");
                     _logger.Info($"Solution: {string.Join(", ", results.Moves.Select(x => x.ToString()))}");
-                    
+
                     // we can execute now
-                    Execute(results);
+                    SetStateExecute(results);
                 }
             }
             else
@@ -73,15 +67,18 @@ namespace GameBot.Game.Tetris.Agents.States
 
         // this method return true, when the current and the next piece were extracted sucessfully
         // only then can we start the search and proceed to the execute-state
-        private bool Extract(int searchHeight)
+        private bool Extract()
         {
+            int searchHeight = CalulateSearchHeight(_currentTetromino);
+            _logger.Info($"Search height for extraction is {searchHeight}");
+
             var screenshot = _agent.Screenshot;
 
             // we dont extract the board (too error prone)
             // instead we carry along the game state
 
             // extract the current piece
-            var result = _currentTetromino.HasValue ? 
+            var result = _currentTetromino.HasValue ?
                 _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(_currentTetromino.Value), searchHeight, _agent.ProbabilityThreshold) :
                 _agent.PieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, searchHeight, _agent.ProbabilityThreshold);
 
@@ -98,7 +95,24 @@ namespace GameBot.Game.Tetris.Agents.States
             return true;
         }
 
-        private void Execute(SearchResult results)
+        private int CalulateSearchHeight(Tetromino? tetromino)
+        {
+            var passedTime = (_agent.Clock.Time - _timeNextSpawn)
+                + TimeSpan.FromMilliseconds(Timing.PaddingAnalyze);
+
+            int searchHeightTime = TetrisLevel.GetMaxFallDistance(_agent.GameState.Level, passedTime);
+
+            if (tetromino.HasValue)
+            {
+                int dropDistance = _agent.GameState.Board.DropDistance(new Piece(tetromino.Value));
+                return Math.Min(searchHeightTime, dropDistance);
+            }
+
+            int maxDropDistance = _agent.GameState.Board.MaxDropDistanceForSpawnedPiece();
+            return Math.Min(searchHeightTime, maxDropDistance);
+        }
+
+        private void SetStateExecute(SearchResult results)
         {
             var moves = new Queue<Move>(results.Moves);
             _agent.SetState(new TetrisExecuteState(_agent, moves, _agent.Screenshot.Timestamp));

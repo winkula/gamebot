@@ -9,8 +9,6 @@ namespace GameBot.Game.Tetris
     /// </summary>
     public class TetrisLevel
     {
-        private static readonly double _framerate = 59.73;
-
         // frames per row
         private static readonly int[] _levelSpeeds = { 53, 49, 45, 41, 37, 33, 28, 22, 17, 11, 10, 9, 8, 7, 6, 6, 5, 5, 4, 4, 3 };
 
@@ -35,20 +33,13 @@ namespace GameBot.Game.Tetris
             if (level < 0) throw new ArgumentException("Level must not be negative");
 
             if (level > 20) level = 20;
-            return TimeSpan.FromSeconds(rows * _levelSpeeds[level] / _framerate);
+            return TimeSpan.FromSeconds(rows * _levelSpeeds[level] / TetrisTiming.Framerate);
         }
-
-        public static TimeSpan GetFreeFallDuration(int rows)
-        {
-            // this is just an estimate
-            // the speed of the freefall is not documented anywhere
-            return GetDuration(20, rows);
-        }
-
+        
         // how many rows will a tile maximal fall in a specific time span?
         public static int GetMaxFallDistance(int level, TimeSpan duration)
         {
-            double frames = duration.TotalSeconds * _framerate;
+            double frames = duration.TotalSeconds * TetrisTiming.Framerate;
             int framePerRow = GetFramesPerRow(level);
 
             return (int)Math.Ceiling(frames / framePerRow);

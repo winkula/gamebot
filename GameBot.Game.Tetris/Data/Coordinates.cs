@@ -18,7 +18,7 @@ namespace GameBot.Game.Tetris.Data
         // in absolute game coordinates (origin in bottom left of the board)
         public static Point PieceOrigin = new Point(4, 16);
         public static Point NextPieceTileOrigin = new Point(15, 13);
-
+        
         #region To board coordinate system
 
 

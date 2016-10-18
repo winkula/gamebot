@@ -2,7 +2,7 @@
 using GameBot.Game.Tetris.Searching.Heuristics;
 using NUnit.Framework;
 
-namespace GameBot.Test.Game.Tetris.Searching.Heuristic
+namespace GameBot.Test.Game.Tetris.Searching.Heuristics
 {
     [TestFixture]
     public class YiyuanLeeHeuristicTests
@@ -13,19 +13,19 @@ namespace GameBot.Test.Game.Tetris.Searching.Heuristic
             var heuristic = new YiyuanLeeHeuristic();
         }
         
-        [TestCase(6, new int[] {
+        [TestCase(6, new [] {
             0,0,0,0,
             0,1,0,0,
             0,1,0,1,
             0,1,1,1
         })]
-        [TestCase(0, new int[] {
+        [TestCase(0, new [] {
             0,0,0,0,
             0,0,0,0,
             0,0,0,0,
             0,0,0,0
         })]
-        [TestCase(10, new int[] {
+        [TestCase(10, new [] {
             0,1,0,0,
             0,1,0,0,
             1,0,1,1,
@@ -41,19 +41,47 @@ namespace GameBot.Test.Game.Tetris.Searching.Heuristic
             Assert.AreEqual(expected, aggregateHeight);
         }
 
-        [TestCase(1, new int[] {
+        [TestCase(3, new [] {
+            0,0,0,0,
+            0,1,0,0,
+            0,1,0,1,
+            0,1,1,1
+        })]
+        [TestCase(0, new [] {
+            0,0,0,0,
+            0,0,0,0,
+            0,0,0,0,
+            0,0,0,0
+        })]
+        [TestCase(4, new [] {
+            0,1,0,0,
+            0,1,0,0,
+            1,0,1,1,
+            1,1,1,1
+        })]
+        public void MaximumHeight(int expected, int[] squares)
+        {
+            var heuristic = new YiyuanLeeHeuristic();
+            var board = Build(4, 4, squares);
+
+            var maximumHeight = heuristic.MaximumHeight(board);
+
+            Assert.AreEqual(expected, maximumHeight);
+        }
+
+        [TestCase(1, new [] {
             0,0,0,0,
             0,1,0,0,
             0,1,0,1,
             1,1,1,1
         })]
-        [TestCase(0, new int[] {
+        [TestCase(0, new [] {
             0,0,0,0,
             0,0,1,0,
             1,1,1,0,
             0,1,1,0
         })]
-        [TestCase(2, new int[] {
+        [TestCase(2, new [] {
             0,1,0,0,
             1,1,1,1,
             1,0,0,1,
@@ -69,19 +97,19 @@ namespace GameBot.Test.Game.Tetris.Searching.Heuristic
             Assert.AreEqual(expected, completeLines);
         }
 
-        [TestCase(0, new int[] {
+        [TestCase(0, new [] {
             0,0,0,0,
             0,1,0,0,
             0,1,0,1,
             1,1,1,1
         })]
-        [TestCase(3, new int[] {
+        [TestCase(3, new [] {
             0,0,0,0,
             0,0,1,1,
             1,1,1,0,
             0,1,1,0
         })]
-        [TestCase(1, new int[] {
+        [TestCase(1, new [] {
             0,0,0,0,
             1,0,1,1,
             1,0,0,1,
@@ -97,19 +125,19 @@ namespace GameBot.Test.Game.Tetris.Searching.Heuristic
             Assert.AreEqual(expected, holes);
         }
 
-        [TestCase(5, new int[] {
+        [TestCase(5, new [] {
             0,0,0,0,
             0,1,0,0,
             0,1,0,1,
             1,1,1,1
         })]
-        [TestCase(0, new int[] {
+        [TestCase(0, new [] {
             0,0,0,0,
             0,0,0,0,
             1,1,1,1,
             1,1,1,1
         })]
-        [TestCase(7, new int[] {
+        [TestCase(7, new [] {
             0,0,0,0,
             1,0,1,0,
             1,0,0,0,

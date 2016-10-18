@@ -242,9 +242,11 @@ namespace GameBot.Test.Game.Tetris.Data
             Assert.AreEqual(5, board.ColumnHeight(6));
             Assert.AreEqual(0, board.ColumnHeight(7));
             Assert.AreEqual(4, board.ColumnHeight(8));
-            Assert.AreEqual(0, board.ColumnHeight(9));            
+            Assert.AreEqual(0, board.ColumnHeight(9));     
+            
+            Assert.AreEqual(7, board.MaximumHeight);  
         }
-
+        
         [Test]
         public void ColumnHoles()
         {

@@ -26,7 +26,7 @@ namespace GameBot.Game.Tetris.Agents.States
         public void Act()
         {
             // wait before start
-            var randomTime = 2.0 + _random.NextDouble();
+            var randomTime = 2.5 + _random.NextDouble();
             if (_agent.Clock.Time >= TimeSpan.FromSeconds(randomTime))
             {
                 if (_startFromGameover)
@@ -44,9 +44,11 @@ namespace GameBot.Game.Tetris.Agents.States
                     StartFromMenu(_agent.Executor);
                 }
 
+                var timeNextSpawn = _agent.Clock.Time - TimeSpan.FromMilliseconds(Timing.TimeAfterButtonPress);
+
                 // init game state
                 _agent.GameState = new GameState { StartLevel = _startLevel };
-                _agent.SetState(new TetrisAnalyzeState(_agent, null));
+                _agent.SetState(new TetrisAnalyzeState(_agent, null, timeNextSpawn));
             }
         }
 

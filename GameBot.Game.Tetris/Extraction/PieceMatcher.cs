@@ -58,8 +58,17 @@ namespace GameBot.Game.Tetris.Extraction
             var tileCoordinates = Coordinates.PieceToTileSearchWindowOrigin(piece.X, piece.Y);
 
             // load screenshot
-            // TODO: this method only works with Mat. make compatible for IImage!
-            var original = (Mat) screenshot.Image;
+            // we handle to cases (one with more performance for the physical engine, the other for the emulator)
+            Mat originalMat = screenshot.Image as Mat;
+            Image<Gray, byte> originalImage = null;
+            if (originalMat == null)
+            {
+                originalImage = screenshot.Image as Image<Gray, byte>;
+                if (originalImage == null)
+                {
+                    originalImage = new Image<Gray, byte>(screenshot.Image.Bitmap);
+                }
+            }
 
             // get template and it's mask
             var templateIndex = GetTemplateIndex(piece);
@@ -76,7 +85,14 @@ namespace GameBot.Game.Tetris.Extraction
                 var combined = new Image<Gray, byte>(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight + yTopPadding + yBottomPadding);
                 var mainRoi = new Rectangle(0, yTopPadding, GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight);
                 combined.ROI = mainRoi;
-                original.CopyTo(combined);
+                if (originalMat != null)
+                {
+                    originalMat.CopyTo(combined);
+                }
+                else
+                {
+                    originalImage.CopyTo(combined);
+                }
                 combined.ROI = Rectangle.Empty;
                 var reference = combined.Clone();
                 combined.ROI = mainRoi;
