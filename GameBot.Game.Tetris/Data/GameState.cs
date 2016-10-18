@@ -8,9 +8,9 @@ namespace GameBot.Game.Tetris.Data
         public Board Board { get; }
         public Piece Piece { get; set; }
         public Tetromino? NextPiece { get; set; }
-        
-        public int Lines { get; set; }
-        public int Score { get; set; }
+
+        public int Lines { get; private set; }
+        public int Score { get; private set; }
         public int StartLevel { get; set; }
         public int Level => TetrisLevel.GetLevel(StartLevel, Lines);
 
@@ -18,7 +18,7 @@ namespace GameBot.Game.Tetris.Data
         {
             Board = new Board();
             Piece = new Piece();
-            NextPiece = Tetrominos.GetRandom(); // TODO: only generate if needed!
+            NextPiece = Tetrominos.GetRandom();
         }
 
         public GameState(GameState old)
@@ -143,7 +143,7 @@ namespace GameBot.Game.Tetris.Data
             if (Board.Intersects(new Piece(Piece).Right()))
                 throw new GameOverException("Right not possible");
 
-            Piece.Right();            
+            Piece.Right();
         }
 
         public void Rotate()
@@ -151,7 +151,7 @@ namespace GameBot.Game.Tetris.Data
             if (Board.Intersects(new Piece(Piece).Rotate()))
                 throw new GameOverException("Rotate not possible");
 
-            Piece.Rotate();            
+            Piece.Rotate();
         }
 
         public void RotateCounterclockwise()
@@ -164,7 +164,7 @@ namespace GameBot.Game.Tetris.Data
 
         public override int GetHashCode()
         {
-            return Lines ^ (Piece.GetHashCode() << 5) ^ ((int) NextPiece << 20);
+            return Lines ^ (Piece.GetHashCode() << 5) ^ ((int)NextPiece << 20);
         }
 
         public override bool Equals(object obj)

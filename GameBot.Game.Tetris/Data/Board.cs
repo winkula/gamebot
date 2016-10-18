@@ -146,7 +146,8 @@ namespace GameBot.Game.Tetris.Data
             return x >= 0 && x < Width && y >= 0 && y < Height;
         }
 
-        // TODO: make private?
+        // this should be private to guarantee consistent game state
+        // is public for testing purposes
         public void Place(Piece piece)
         {
             foreach (var block in piece.Shape.Body)
@@ -160,7 +161,8 @@ namespace GameBot.Game.Tetris.Data
             Pieces++;
         }
 
-        // TODO: make private?
+        // this should be private to guarantee consistent game state
+        // is public for testing purposes
         public int RemoveLines()
         {
             int removed = 0;
@@ -268,11 +270,9 @@ namespace GameBot.Game.Tetris.Data
             Board other = obj as Board;
             if (other != null)
             {
-                // TODO: implement faster!
-                return
-                    Width == other.Width &&
-                    Height == other.Height &&
-                    Pieces == other.Pieces &&
+                return 
+                    Width == other.Width && 
+                    Height == other.Height && 
                     Columns.SequenceEqual(other.Columns);
             }
             return false;

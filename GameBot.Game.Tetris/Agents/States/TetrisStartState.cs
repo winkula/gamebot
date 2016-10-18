@@ -23,7 +23,12 @@ namespace GameBot.Game.Tetris.Agents.States
             _startLevel = startLevel;
         }
 
-        public void Act()
+        public void Extract()
+        {
+            // do nothing
+        }
+
+        public void Play()
         {
             // wait before start
             var randomTime = 2.5 + _random.NextDouble();

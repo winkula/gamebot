@@ -21,6 +21,8 @@ namespace GameBot.Game.Tetris.Agents.States
         // should never be overestimated!
         private readonly TimeSpan _beginTime;
 
+        private bool _successfullyExtracted;
+
         public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)
         {
             _agent = agent;
@@ -29,22 +31,21 @@ namespace GameBot.Game.Tetris.Agents.States
             _beginTime = _agent.Clock.Time;
         }
 
-        public void Act()
+        public void Extract()
         {
-            if (Extract())
+            _successfullyExtracted = ExtractGameState();
+        }
+
+        public void Play()
+        {
+            if (_successfullyExtracted)
             {
                 // update global game state
                 _agent.GameState.Piece = _extractedPiece;
-                _agent.ExtractedPiece = _extractedPiece;
                 _agent.GameState.NextPiece = _extractedNextPiece;
-                _agent.ExtractedNextPiece = _extractedNextPiece;
 
                 _logger.Info($"Game state extraction successfully:\n{_agent.GameState}");
-
-                // we found a new piece. release the down key (end the drop)
-                //_agent.Executor.Release(Button.Down);
-                //_logger.Info("> End the drop.");
-
+                
                 // do the search
                 // this is the essence of the a.i.
                 var results = _agent.Search.Search(_agent.GameState);
@@ -67,7 +68,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
         // this method return true, when the current and the next piece were extracted sucessfully
         // only then can we start the search and proceed to the execute-state
-        private bool Extract()
+        private bool ExtractGameState()
         {
             int searchHeight = CalulateSearchHeight(_currentTetromino);
             _logger.Info($"Search height for extraction is {searchHeight}");
@@ -77,20 +78,30 @@ namespace GameBot.Game.Tetris.Agents.States
             // we dont extract the board (too error prone)
             // instead we carry along the game state
 
-            // extract the current piece
-            var result = _currentTetromino.HasValue ?
-                _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(_currentTetromino.Value), searchHeight, _agent.ProbabilityThreshold) :
-                _agent.PieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, searchHeight, _agent.ProbabilityThreshold);
+            if (_extractedPiece == null)
+            {
+                // extract the current piece
+                var result = _currentTetromino.HasValue
+                    ? _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(_currentTetromino.Value), searchHeight, _agent.ProbabilityThreshold)
+                    : _agent.PieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, searchHeight, _agent.ProbabilityThreshold);
 
-            if (result.Result == null) return false;
-            _extractedPiece = result.Result;
-            if (_extractedPiece.Orientation != 0) return false; // spawned piece must have orientation 0
-            if (_extractedPiece.X != 0) return false; // spawned piece must have x coordinate 0
+                if (result.Result == null) return false;
+                _extractedPiece = result.Result;
+                if (_extractedPiece.Orientation != 0) return false; // spawned piece must have orientation 0
+                if (_extractedPiece.X != 0) return false; // spawned piece must have x coordinate 0
 
-            // extract the next piece
-            var resultNextPiece = _agent.PieceExtractor.ExtractNextPieceFuzzy(screenshot, _agent.ProbabilityThreshold);
-            _extractedNextPiece = resultNextPiece.Result;
-            if (_extractedNextPiece == null) return false;
+                _agent.ExtractedPiece = _extractedPiece;
+            }
+
+            if (_extractedNextPiece == null)
+            {
+                // extract the next piece
+                var resultNextPiece = _agent.PieceExtractor.ExtractNextPieceFuzzy(screenshot, _agent.ProbabilityThreshold);
+                _extractedNextPiece = resultNextPiece.Result;
+                if (_extractedNextPiece == null) return false;
+
+                _agent.ExtractedNextPiece = _extractedNextPiece;
+            }
 
             return true;
         }

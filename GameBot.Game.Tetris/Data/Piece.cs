@@ -109,7 +109,7 @@ namespace GameBot.Game.Tetris.Data
 
         public Piece Apply(Move move)
         {
-            // TODO: lookup table
+            // we could use a lookup table to gain a little bit of performance
             switch (move)
             {
                 case Move.Left: Left(); break;
@@ -117,8 +117,7 @@ namespace GameBot.Game.Tetris.Data
                 case Move.Rotate: Rotate(); break;
                 case Move.RotateCounterclockwise: RotateCounterclockwise(); break;
                 case Move.Fall: Fall(); break;
-                //default:
-                    //throw new ArgumentException("only None, Left, Right, Rotate and RotateCounterclockwise are allowed.");
+                case Move.Drop: throw new ArgumentException("Drop is not possible on the piece itself");
             }
             return this;
         }

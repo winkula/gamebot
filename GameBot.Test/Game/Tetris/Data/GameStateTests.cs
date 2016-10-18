@@ -2,12 +2,23 @@
 using NLog;
 using NUnit.Framework;
 
-namespace GameBot.Test.Game.Tetris
+namespace GameBot.Test.Game.Tetris.Data
 {
     [TestFixture]
     public class GameStateTests
     {
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        [Test]
+        public void Constructor()
+        {
+            var gameState = new GameState();
+
+            Assert.AreEqual(0, gameState.Lines);
+            Assert.AreEqual(0, gameState.Score);
+            Assert.AreEqual(0, gameState.Level);
+            Assert.AreEqual(0, gameState.StartLevel);
+        }
 
         [TestCase(Tetromino.L, Tetromino.O, 0, 10, new[] {
             0,0,0,0,0,0,0,0,0,0,

@@ -74,8 +74,7 @@ namespace GameBot.Core.Data
             if (x < 0 || x >= Width / _tileSize) throw new ArgumentException("x is off the screen");
             if (y < 0 || y >= Height / _tileSize) throw new ArgumentException("y is off the screen");
 
-            // TODO: implement faster? (with ROI maybe)
-            // TODO: cache mean values for fast multiple lookup
+            // TODO: implement faster? (with ROI maybe), cache mean values for fast multiple lookup
             var mask = _black.Clone();
             var roi = new Rectangle(x * _tileSize, y * _tileSize, _tileSize - 1, _tileSize - 1);
             CvInvoke.Rectangle(mask, roi, new MCvScalar(255, 255, 255), -1);

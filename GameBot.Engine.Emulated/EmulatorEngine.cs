@@ -59,23 +59,23 @@ namespace GameBot.Engine.Emulated
             // process image and get display data
             TimeSpan time = _clock.Time;
             IImage processed = _quantizer.Quantize(image);
-
-            showImage?.Invoke(image);
-            //showProcessedImage?.Invoke(processed);
+            
+            showImage?.Invoke(processed);
+            showProcessedImage?.Invoke(processed);
 
             if (Play)
             {
                 IScreenshot screenshot = new EmguScreenshot(processed, time);
 
-                // handle input to the agent which
-                //  - extracts the game state
-                //  - decides which commands to press
-                //  - presses the commands
-                _agent.Act(screenshot, _executor);
-                processed = _agent.Visualize(processed);
-            }
+                // extracts the game state
+                _agent.Extract(screenshot);
 
-            showProcessedImage?.Invoke(processed);
+                processed = _agent.Visualize(processed);
+                showProcessedImage?.Invoke(processed);
+
+                // presses the buttons
+                _agent.Play(_executor);
+            }
 
             _emulator.Execute();
         }

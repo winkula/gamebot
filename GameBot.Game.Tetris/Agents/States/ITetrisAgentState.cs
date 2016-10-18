@@ -2,6 +2,8 @@
 {
     public interface ITetrisAgentState
     {
-        void Act();
+        void Extract();
+        
+        void Play();
     }
 }

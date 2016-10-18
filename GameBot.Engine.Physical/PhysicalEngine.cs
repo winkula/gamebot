@@ -41,20 +41,21 @@ namespace GameBot.Engine.Physical
             IImage processed = _quantizer.Quantize(image);
 
             showImage?.Invoke(processed);
+            showProcessedImage?.Invoke(processed);
 
             if (Play)
             {
                 IScreenshot screenshot = new EmguScreenshot(processed, time);
+                
+                // extracts the game state
+                _agent.Extract(screenshot);
 
-                // handle input to the agent which
-                //  - extracts the game state
-                //  - decides which commands to press
-                //  - presses the buttons
-                _agent.Act(screenshot, _executor);
                 processed = _agent.Visualize(processed);
-            }
+                showProcessedImage?.Invoke(processed);
 
-            showProcessedImage?.Invoke(processed);
+                // presses the buttons
+                _agent.Play(_executor);
+            }
         }
 
         public void Reset()

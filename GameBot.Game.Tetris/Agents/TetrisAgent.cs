@@ -62,13 +62,11 @@ namespace GameBot.Game.Tetris.Agents
 
             _state = newState;
         }
-
-        public void Act(IScreenshot screenshot, IExecutor executor)
+        
+        public void Extract(IScreenshot screenshot)
         {
             Screenshot = screenshot;
-            Executor = executor;
-
-            _state.Act();
+            _state.Extract();
         }
 
         public IImage Visualize(IImage image)
@@ -102,6 +100,12 @@ namespace GameBot.Game.Tetris.Agents
             }
 
             return visualization;
+        }
+
+        public void Play(IExecutor executor)
+        {
+            Executor = executor;
+            _state.Play();
         }
 
         public void Reset()

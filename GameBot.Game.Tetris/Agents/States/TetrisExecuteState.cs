@@ -37,7 +37,12 @@ namespace GameBot.Game.Tetris.Agents.States
             _lastPosition = new Piece(agent.GameState.Piece);
         }
 
-        public void Act()
+        public void Extract()
+        {
+            // do nothing
+        }
+        
+        public void Play()
         {
             // first we have to check if the last command was successful
             if (_lastMove != null)
