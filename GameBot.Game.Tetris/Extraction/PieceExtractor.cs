@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using NLog;
@@ -27,7 +25,7 @@ namespace GameBot.Game.Tetris.Extraction
         /// <param name="maxFallingDistance">Expected maximal falling distance.</param>
         /// <param name="probabilityThreshold">Probability that must be reached.</param>
         /// <returns>The piece and it's probability.</returns>
-        public Tuple<Piece, double> ExtractPieceFuzzy(IScreenshot screenshot, int maxFallingDistance, double probabilityThreshold = 0.0)
+        public ProbabilisticResult<Piece> ExtractPieceFuzzy(IScreenshot screenshot, int maxFallingDistance, double probabilityThreshold = 0.0)
         {
             if (screenshot == null)
                 throw new ArgumentNullException(nameof(screenshot));
@@ -47,16 +45,19 @@ namespace GameBot.Game.Tetris.Extraction
                     {
                         var piece = pose.Fall(yDelta);
                         var probability = _pieceMatcher.GetProbability(screenshot, piece);
-                        if (probability >= probabilityThreshold && probability > bestProbability)
+                        if (probability > bestProbability)
                         {
                             bestProbability = probability;
-                            expectedPiece = piece;
+                            if (probability >= probabilityThreshold)
+                            {
+                                expectedPiece = piece;
+                            }
                         }
                     }
                 }
             }
 
-            return new Tuple<Piece, double>(expectedPiece, bestProbability);
+            return new ProbabilisticResult<Piece>(expectedPiece, bestProbability);
         }
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace GameBot.Game.Tetris.Extraction
         /// <param name="maxFallingDistance">Expected maximal falling distance.</param>
         /// <param name="probabilityThreshold">Probability that must be reached.</param>
         /// <returns>The piece and it's probability.</returns>
-        public Tuple<Piece, double> ExtractSpawnedPieceFuzzy(IScreenshot screenshot, int maxFallingDistance, double probabilityThreshold = 0.0)
+        public ProbabilisticResult<Piece> ExtractSpawnedPieceFuzzy(IScreenshot screenshot, int maxFallingDistance, double probabilityThreshold = 0.0)
         {
             if (screenshot == null)
                 throw new ArgumentNullException(nameof(screenshot));
@@ -85,15 +86,18 @@ namespace GameBot.Game.Tetris.Extraction
                 {
                     var piece = new Piece(tetromino, 0, 0, -yDelta);
                     var probability = _pieceMatcher.GetProbability(screenshot, piece);
-                    if (probability >= probabilityThreshold && probability > bestProbability)
+                    if (probability > bestProbability)
                     {
                         bestProbability = probability;
-                        expectedPiece = piece;
+                        if (probability >= probabilityThreshold)
+                        {
+                            expectedPiece = piece;
+                        }
                     }
                 }
             }
 
-            return new Tuple<Piece, double>(expectedPiece, bestProbability);
+            return new ProbabilisticResult<Piece>(expectedPiece, bestProbability);
         }
         
         /// <summary>
@@ -104,7 +108,7 @@ namespace GameBot.Game.Tetris.Extraction
         /// <param name="maxFallingDistance">Expected maximal falling distance.</param>
         /// <param name="probabilityThreshold">Probability that must be reached.</param>
         /// <returns>The piece and it's probability.</returns>
-        public Tuple<Piece, double> ExtractKnownPieceFuzzy(IScreenshot screenshot, Piece piece, int maxFallingDistance, double probabilityThreshold = 0.0)
+        public ProbabilisticResult<Piece> ExtractKnownPieceFuzzy(IScreenshot screenshot, Piece piece, int maxFallingDistance, double probabilityThreshold = 0.0)
         {
             if (screenshot == null)
                 throw new ArgumentNullException(nameof(screenshot));
@@ -121,16 +125,19 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 var probability = _pieceMatcher.GetProbability(screenshot, testPiece);
 
-                if (probability >= probabilityThreshold && probability > bestProbability)
+                if (probability > bestProbability)
                 {
                     bestProbability = probability;
-                    expectedPiece = new Piece(testPiece);
+                    if (probability >= probabilityThreshold)
+                    {
+                        expectedPiece = new Piece(testPiece);
+                    }
                 }
 
                 testPiece.Fall();
             }
 
-            return new Tuple<Piece, double>(expectedPiece, bestProbability);
+            return new ProbabilisticResult<Piece>(expectedPiece, bestProbability);
         }
 
         #endregion
@@ -174,7 +181,7 @@ namespace GameBot.Game.Tetris.Extraction
         /// <param name="screenshot">The screenshot to extract the piece from.</param>
         /// <param name="probabilityThreshold">Probability that must be reached.</param>
         /// <returns>The next Tetromino, or null if no matching piece was found.</returns>
-        public Tetromino? ExtractNextPieceFuzzy(IScreenshot screenshot, double probabilityThreshold = 0.0)
+        public ProbabilisticResult<Tetromino?> ExtractNextPieceFuzzy(IScreenshot screenshot, double probabilityThreshold = 0.0)
         {
             // relevant tiles on the screen: x : 14 - 17, y : 13 - 16 
 
@@ -183,24 +190,22 @@ namespace GameBot.Game.Tetris.Extraction
 
             double bestProbability = 0;
             Tetromino? bestTetromino = null;
-            var probabilities = new List<Tuple<Tetromino, double>>();
             
             foreach (var tetromino in Tetrominos.All)
             {
                 var piece = new Piece(tetromino, 0, TetrisConstants.NextPieceTemplateTileCoordinates.X, TetrisConstants.NextPieceTemplateTileCoordinates.Y);
                 var probability = _pieceMatcher.GetProbability(screenshot, piece);
-                if (probability >= probabilityThreshold && probability > bestProbability)
+                if (probability > bestProbability)
                 {
                     bestProbability = probability;
-                    bestTetromino = tetromino;
+                    if (probability >= probabilityThreshold)
+                    {
+                        bestTetromino = tetromino;
+                    }
                 }
-                probabilities.Add(new Tuple<Tetromino, double>(tetromino, probability));
             }
-
-            var stats = string.Join(", ", probabilities.OrderByDescending(x => x.Item2).Select(x => $"({x.Item1}:{x.Item2:F})"));
-            _logger.Info($"Extraction statistics: {stats}");
-
-            return bestTetromino;
+            
+            return new ProbabilisticResult<Tetromino?>(bestTetromino, bestProbability);
         }
 
         #endregion

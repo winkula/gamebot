@@ -53,28 +53,28 @@ namespace GameBot.Game.Tetris.Agents.States
                 var resultPieceNotMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(_agent.Screenshot, pieceNotMoved,expectedFallDistance, _agent.ProbabilityThreshold);
                 var resultPieceMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(_agent.Screenshot, pieceMoved,expectedFallDistance, _agent.ProbabilityThreshold);
 
-                if (resultPieceNotMoved.Item1 == null && resultPieceMoved.Item1 == null)
+                if (resultPieceNotMoved.Result == null && resultPieceMoved.Result == null)
                 {
                     // piece not found
                     PieceNotFound(_lastPosition.Tetromino);
                     return;
                 }
                 
-                if (resultPieceNotMoved.Item1 == null || resultPieceMoved.Item2 >= resultPieceNotMoved.Item2)
+                if (resultPieceNotMoved.Result == null || resultPieceMoved.Probability >= resultPieceNotMoved.Probability)
                 {
                     _logger.Info("Command executed");
 
                     // move was successfully executed
                     // we remove it from the queue
-                    UpdateLastPosition(resultPieceMoved.Item1, now);
+                    UpdateLastPosition(resultPieceMoved.Result, now);
                     ProceedToNextCommand();
                 }
-                else if (resultPieceMoved.Item1 == null || resultPieceNotMoved.Item2 >= resultPieceMoved.Item2)
+                else if (resultPieceMoved.Result == null || resultPieceNotMoved.Probability >= resultPieceMoved.Probability)
                 {
                     _logger.Warn("Command failed");
 
                     // the command was not executed and the tile is in the old position
-                    UpdateLastPosition(resultPieceNotMoved.Item1, now);
+                    UpdateLastPosition(resultPieceNotMoved.Result, now);
                     RepeatCommand();
                     return; // we return here because we need a new screenshot
                 }

@@ -85,13 +85,14 @@ namespace GameBot.Game.Tetris.Agents.States
                 _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(_currentTetromino.Value), searchHeight, _agent.ProbabilityThreshold) :
                 _agent.PieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, searchHeight, _agent.ProbabilityThreshold);
 
-            if (result.Item1 == null) return false;
-            _extractedPiece = result.Item1;
+            if (result.Result == null) return false;
+            _extractedPiece = result.Result;
             if (_extractedPiece.Orientation != 0) return false; // spawned piece must have orientation 0
             if (_extractedPiece.X != 0) return false; // spawned piece must have x coordinate 0
 
             // extract the next piece
-            _extractedNextPiece = _agent.PieceExtractor.ExtractNextPieceFuzzy(screenshot, _agent.ProbabilityThreshold);
+            var resultNextPiece = _agent.PieceExtractor.ExtractNextPieceFuzzy(screenshot, _agent.ProbabilityThreshold);
+            _extractedNextPiece = resultNextPiece.Result;
             if (_extractedNextPiece == null) return false;
 
             return true;

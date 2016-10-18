@@ -153,9 +153,10 @@
     <Compile Include="Core\Data\Commands\PressCommandTests.cs" />
     <Compile Include="Core\Data\Commands\HitCommandTests.cs" />
     <Compile Include="Core\Executors\ExecutorTests.cs" />
-    <Compile Include="Game\Tetris\Extraction\RealPieceExtractorTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\StatisticalPieceMatcherTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\StatisticalPieceExtractorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\PieceMatcherTests.cs" />
-    <Compile Include="Game\Tetris\Extraction\RealTetrisExtractorTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\StatisticalTetrisExtractorTests.cs" />
     <Compile Include="Misc\Playground.cs" />
     <Compile Include="Misc\PerformanceTests.cs" />
     <Compile Include="Engine\Physical\Actuators\PhysicalActuatorTests.cs" />
