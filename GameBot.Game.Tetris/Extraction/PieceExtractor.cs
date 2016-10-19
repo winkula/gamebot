@@ -1,14 +1,11 @@
 ﻿using System;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
-using NLog;
 
 namespace GameBot.Game.Tetris.Extraction
 {
     public class PieceExtractor
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
         private readonly PieceMatcher _pieceMatcher;
 
         public PieceExtractor(PieceMatcher pieceMatcher)
@@ -17,22 +14,19 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         #region Current piece
-        
+
         /// <summary>
         /// Extracts the current piece from the board.
         /// </summary>
         /// <param name="screenshot">The screenshot to extract the piece from.</param>
         /// <param name="maxFallingDistance">Expected maximal falling distance.</param>
-        /// <param name="probabilityThreshold">Probability that must be reached.</param>
         /// <returns>The piece and it's probability.</returns>
-        public ProbabilisticResult<Piece> ExtractPieceFuzzy(IScreenshot screenshot, int maxFallingDistance, double probabilityThreshold = 0.0)
+        public ProbabilisticResult<Piece> ExtractPieceFuzzy(IScreenshot screenshot, int maxFallingDistance)
         {
             if (screenshot == null)
                 throw new ArgumentNullException(nameof(screenshot));
             if (maxFallingDistance < 0)
                 throw new ArgumentException("maxFallingDistance must be positive");
-            if (probabilityThreshold < 0.0 || probabilityThreshold > 1.0)
-                throw new ArgumentException("probabilityThreshold must be between 0.0 and 1.0");
 
             double bestProbability = 0;
             Piece expectedPiece = null;
@@ -48,10 +42,7 @@ namespace GameBot.Game.Tetris.Extraction
                         if (probability > bestProbability)
                         {
                             bestProbability = probability;
-                            if (probability >= probabilityThreshold)
-                            {
-                                expectedPiece = piece;
-                            }
+                            expectedPiece = piece;
                         }
                     }
                 }
@@ -66,16 +57,13 @@ namespace GameBot.Game.Tetris.Extraction
         /// </summary>
         /// <param name="screenshot">The screenshot to extract the piece from.</param>
         /// <param name="maxFallingDistance">Expected maximal falling distance.</param>
-        /// <param name="probabilityThreshold">Probability that must be reached.</param>
         /// <returns>The piece and it's probability.</returns>
-        public ProbabilisticResult<Piece> ExtractSpawnedPieceFuzzy(IScreenshot screenshot, int maxFallingDistance, double probabilityThreshold = 0.0)
+        public ProbabilisticResult<Piece> ExtractSpawnedPieceFuzzy(IScreenshot screenshot, int maxFallingDistance)
         {
             if (screenshot == null)
                 throw new ArgumentNullException(nameof(screenshot));
             if (maxFallingDistance < 0)
                 throw new ArgumentException("maxFallingDistance must be positive");
-            if (probabilityThreshold < 0.0 || probabilityThreshold > 1.0)
-                throw new ArgumentException("probabilityThreshold must be between 0.0 and 1.0");
 
             double bestProbability = 0;
             Piece expectedPiece = null;
@@ -89,33 +77,27 @@ namespace GameBot.Game.Tetris.Extraction
                     if (probability > bestProbability)
                     {
                         bestProbability = probability;
-                        if (probability >= probabilityThreshold)
-                        {
-                            expectedPiece = piece;
-                        }
+                        expectedPiece = piece;
                     }
                 }
             }
 
             return new ProbabilisticResult<Piece>(expectedPiece, bestProbability);
         }
-        
+
         /// <summary>
         /// Extracts the current piece from the board.
         /// </summary>
         /// <param name="screenshot">The screenshot to extract the piece from.</param>
         /// <param name="piece">The piece to search.</param>
         /// <param name="maxFallingDistance">Expected maximal falling distance.</param>
-        /// <param name="probabilityThreshold">Probability that must be reached.</param>
         /// <returns>The piece and it's probability.</returns>
-        public ProbabilisticResult<Piece> ExtractKnownPieceFuzzy(IScreenshot screenshot, Piece piece, int maxFallingDistance, double probabilityThreshold = 0.0)
+        public ProbabilisticResult<Piece> ExtractKnownPieceFuzzy(IScreenshot screenshot, Piece piece, int maxFallingDistance)
         {
             if (screenshot == null)
                 throw new ArgumentNullException(nameof(screenshot));
             if (maxFallingDistance < 0)
                 throw new ArgumentException("maxFallingDistance must be positive");
-            if (probabilityThreshold < 0.0 || probabilityThreshold > 1.0)
-                throw new ArgumentException("probabilityThreshold must be between 0.0 and 1.0");
 
             double bestProbability = 0;
             Piece expectedPiece = null;
@@ -128,10 +110,7 @@ namespace GameBot.Game.Tetris.Extraction
                 if (probability > bestProbability)
                 {
                     bestProbability = probability;
-                    if (probability >= probabilityThreshold)
-                    {
-                        expectedPiece = new Piece(testPiece);
-                    }
+                    expectedPiece = new Piece(testPiece);
                 }
 
                 testPiece.Fall();
@@ -179,18 +158,14 @@ namespace GameBot.Game.Tetris.Extraction
         /// Extracts the next piece visible on the screenshot.
         /// </summary>
         /// <param name="screenshot">The screenshot to extract the piece from.</param>
-        /// <param name="probabilityThreshold">Probability that must be reached.</param>
-        /// <returns>The next Tetromino, or null if no matching piece was found.</returns>
-        public ProbabilisticResult<Tetromino?> ExtractNextPieceFuzzy(IScreenshot screenshot, double probabilityThreshold = 0.0)
+        /// <returns>The next Tetromino.</returns>
+        public ProbabilisticResult<Tetromino> ExtractNextPieceFuzzy(IScreenshot screenshot)
         {
             // relevant tiles on the screen: x : 14 - 17, y : 13 - 16 
 
-            if (probabilityThreshold < 0.0 || probabilityThreshold > 1.0)
-                throw new ArgumentException("probabilityThreshold must be between 0.0 and 1.0");
-
             double bestProbability = 0;
             Tetromino? bestTetromino = null;
-            
+
             foreach (var tetromino in Tetrominos.All)
             {
                 var piece = new Piece(tetromino, 0, TetrisConstants.NextPieceTemplateTileCoordinates.X, TetrisConstants.NextPieceTemplateTileCoordinates.Y);
@@ -198,14 +173,12 @@ namespace GameBot.Game.Tetris.Extraction
                 if (probability > bestProbability)
                 {
                     bestProbability = probability;
-                    if (probability >= probabilityThreshold)
-                    {
-                        bestTetromino = tetromino;
-                    }
+                    bestTetromino = tetromino;
                 }
             }
-            
-            return new ProbabilisticResult<Tetromino?>(bestTetromino, bestProbability);
+
+            if (!bestTetromino.HasValue) throw new Exception("No possible value for tetromino found!");
+            return new ProbabilisticResult<Tetromino>(bestTetromino.Value, bestProbability);
         }
 
         #endregion

@@ -95,22 +95,27 @@ namespace GameBot.Game.Tetris.Agents.States
             _logger.Info($"Execute {move}");
             _agent.ExpectedPiece = new Piece(_tracedPiece).Apply(move);
 
+            var gameStateSimulation = new GameState(_agent.GameState);
             switch (move)
             {
                 case Move.Left:
                     _agent.Executor.Hit(Button.Left);
+                    gameStateSimulation.Left();
                     break;
 
                 case Move.Right:
                     _agent.Executor.Hit(Button.Right);
+                    gameStateSimulation.Right();
                     break;
 
                 case Move.Rotate:
                     _agent.Executor.Hit(Button.A); // clockwise rotation
+                    gameStateSimulation.Rotate();
                     break;
 
                 case Move.RotateCounterclockwise:
                     _agent.Executor.Hit(Button.B); // counterclockwise rotation
+                    gameStateSimulation.RotateCounterclockwise();
                     break;
 
                 case Move.Drop:

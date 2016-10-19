@@ -26,9 +26,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
 
-            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, 3, 0.5);
+            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, 3);
 
-            Assert.NotNull(result.Result);
+            Assert.True(result.IsAccepted(0.5));
             Assert.AreEqual(Tetromino.S, result.Result.Tetromino);
         }
 
@@ -37,13 +37,14 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
 
-            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, 5, _probabilityThreshold);
+            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, 5);
 
-            Assert.Null(result.Result);
+            Assert.True(result.IsRejected(_probabilityThreshold));
+            Assert.False(result.IsAccepted(_probabilityThreshold));
 
-            result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, 6, _probabilityThreshold);
+            result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, 6);
 
-            Assert.NotNull(result.Result);
+            Assert.True(result.IsAccepted(_probabilityThreshold));
             Assert.AreEqual(Tetromino.Z, result.Result.Tetromino);
         }
 
@@ -52,18 +53,21 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
 
-            var result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(Tetromino.Z, 0, 0, -6), 0, _probabilityThreshold);
-            
-            Assert.NotNull(result.Result);
+            var result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(Tetromino.Z, 0, 0, -6), 0);
+
+            Assert.True(result.IsAccepted(_probabilityThreshold));
+            Assert.False(result.IsRejected(_probabilityThreshold));
             Assert.AreEqual(Tetromino.Z, result.Result.Tetromino);
 
-            result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(Tetromino.Z, 0, 0, -4), 0, _probabilityThreshold);
+            result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(Tetromino.Z, 0, 0, -4), 0);
 
-            Assert.Null(result.Result);
+            Assert.True(result.IsRejected(_probabilityThreshold));
+            Assert.False(result.IsAccepted(_probabilityThreshold));
 
-            result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(Tetromino.Z, 0, 0, -4), 2, _probabilityThreshold);
+            result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(Tetromino.Z, 0, 0, -4), 2);
 
-            Assert.NotNull(result.Result);
+            Assert.True(result.IsAccepted(_probabilityThreshold));
+            Assert.False(result.IsRejected(_probabilityThreshold));
             Assert.AreEqual(Tetromino.Z, result.Result.Tetromino);
         }
 
@@ -93,9 +97,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
 
-            var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot, 0.5);
+            var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot);
 
-            Assert.NotNull(result.Result);
+            Assert.True(result.IsAccepted(0.5));
+            Assert.False(result.IsRejected(0.5));
             Assert.AreEqual(Tetromino.L, result.Result);
         }
     }

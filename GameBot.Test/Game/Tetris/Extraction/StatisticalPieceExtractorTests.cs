@@ -40,8 +40,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             _nextPiece++;
 
-            var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot, _probabilityThreshold);
+            var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot);
 
+            Assert.True(result.IsAccepted(_probabilityThreshold));
             Assert.AreEqual(nextPieceExpected, result.Result);
             Assert.GreaterOrEqual(result.Probability, _probabilityThreshold);
             Assert.LessOrEqual(result.Probability, 1.0);
@@ -53,9 +54,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPieceNegativesNull))]
         public void NotRecognizeNextPiece(string imageKey, IScreenshot screenshot)
         {
-            var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot, _probabilityThreshold);
+            var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot);
 
-            Assert.Null(result.Result);
+            Assert.True(result.IsRejected(_probabilityThreshold));
             Assert.GreaterOrEqual(result.Probability, 0.0);
             Assert.Less(result.Probability, _probabilityThreshold);
         }
@@ -67,8 +68,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
             // TODO: make tests with higher search distance!
             var maxFallingDistance = currentPieceExpected.FallHeight;
-            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, maxFallingDistance, _probabilityThreshold);
+            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, maxFallingDistance);
 
+            Assert.True(result.IsAccepted(_probabilityThreshold));
             Assert.AreEqual(currentPieceExpected, result.Result);
             Assert.GreaterOrEqual(result.Probability, _probabilityThreshold);
             Assert.LessOrEqual(result.Probability, 1.0);
@@ -83,9 +85,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
             // TODO: make tests with higher search distance!
             var maxFallingDistance = 3;
-            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, maxFallingDistance, _probabilityThreshold);
+            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, maxFallingDistance);
 
-            Assert.Null(result.Result);
+            Assert.True(result.IsRejected(_probabilityThreshold));
             Assert.GreaterOrEqual(result.Probability, 0.0);
             Assert.Less(result.Probability, _probabilityThreshold);
 
@@ -99,8 +101,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
             // TODO: make tests with higher search distance!
             var maxFallingDistance = currentPieceExpected.FallHeight;
-            var result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, currentPieceExpected, maxFallingDistance, _probabilityThreshold);
+            var result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, currentPieceExpected, maxFallingDistance);
 
+            Assert.True(result.IsAccepted(_probabilityThreshold));
             Assert.AreEqual(currentPieceExpected, result.Result);
             Assert.GreaterOrEqual(result.Probability, _probabilityThreshold);
             Assert.LessOrEqual(result.Probability, 1.0);
@@ -117,9 +120,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
             // TODO: make tests with higher search distance!
             var maxFallingDistance = currentPieceExpected.FallHeight;
-            var result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, spawned, maxFallingDistance, _probabilityThreshold);
+            var result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, spawned, maxFallingDistance);
 
-            Assert.Null(result.Result);
+            Assert.True(result.IsRejected(_probabilityThreshold));
             Assert.GreaterOrEqual(result.Probability, 0.0);
             Assert.Less(result.Probability, _probabilityThreshold);
 
@@ -137,11 +140,15 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var pieceTrue = new Piece(currentPieceExpected.Tetromino, currentPieceExpected.Orientation, currentPieceExpected.X);
             var pieceFalse = new Piece(pieceTrue).Apply(move);
 
-            var resultTrue = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceTrue, maxFallingDistance, _probabilityThreshold);
-            var resultFalse = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceFalse, maxFallingDistance, _probabilityThreshold);
+            var resultTrue = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceTrue, maxFallingDistance);
+            var resultFalse = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceFalse, maxFallingDistance);
             
             Assert.AreNotEqual(resultTrue.Result, resultFalse.Result);
             Assert.Greater(resultTrue.Probability, resultFalse.Probability);
+
+            //_logger.Info($"Probability: {resultTrue.Probability}, {resultFalse.Probability}");
+            _logger.Info($"{resultTrue.Result} | {resultFalse.Result}");
+            _logger.Info($"Probability difference: {resultTrue.Probability - resultFalse.Probability}");
 
             _movedPieceRecognized++;
         }

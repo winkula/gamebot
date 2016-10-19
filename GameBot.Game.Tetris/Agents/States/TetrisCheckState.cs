@@ -47,10 +47,11 @@ namespace GameBot.Game.Tetris.Agents.States
 
             // extract
             var screenshot = _agent.Screenshot;
-            var resultPieceNotMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceNotMoved, searchHeight, _agent.ProbabilityThreshold);
-            var resultPieceMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceMoved, searchHeight, _agent.ProbabilityThreshold);
+            var resultPieceNotMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceNotMoved, searchHeight);
+            var resultPieceMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceMoved, searchHeight);
 
-            if (resultPieceNotMoved.Result == null && resultPieceMoved.Result == null)
+            var lowerThreshold = _agent.ExtractionLowerThreshold;
+            if (resultPieceNotMoved.IsRejected(lowerThreshold) && resultPieceMoved.IsRejected(lowerThreshold))
             {
                 // piece not found
                 // no problem, we get a new screenshot and try it again ;)
@@ -58,15 +59,31 @@ namespace GameBot.Game.Tetris.Agents.States
             }
             else
             {
-                if (resultPieceNotMoved.Result == null || resultPieceMoved.Probability >= resultPieceNotMoved.Probability)
+                if (resultPieceMoved.Probability >= resultPieceNotMoved.Probability)
                 {
-                    var timestamp = screenshot.Timestamp; // TODO: take time from clock or from the screenshot? make time diagram
-                    Success(resultPieceMoved.Result, timestamp);
+                    // its more probable, that the piece moved
+                    if (resultPieceMoved.IsAccepted(lowerThreshold))
+                    {
+                        var timestamp = screenshot.Timestamp;
+                        Success(resultPieceMoved.Result, timestamp);
+                    }
+                    else
+                    {
+                        PositionUnclear(_tracedPiece.Tetromino);
+                    }
                 }
-                else if (resultPieceMoved.Result == null || resultPieceNotMoved.Probability >= resultPieceMoved.Probability)
+                else
                 {
-                    var timestamp = screenshot.Timestamp; // TODO: take time from clock or from the screenshot? make time diagram
-                    Fail(resultPieceNotMoved.Result, timestamp);
+                    if (resultPieceNotMoved.IsAccepted(lowerThreshold))
+                    {
+                        // its more probable, that the piece did not move
+                        var timestamp = screenshot.Timestamp;
+                        Fail(resultPieceNotMoved.Result, timestamp);
+                    }
+                    else
+                    {
+                        PositionUnclear(_tracedPiece.Tetromino);
+                    }
                 }
             }
         }
@@ -74,6 +91,11 @@ namespace GameBot.Game.Tetris.Agents.States
         private void PieceNotFound(Tetromino tetromino)
         {
             _logger.Warn($"Piece not recognized ({tetromino})");
+        }
+
+        private void PositionUnclear(Tetromino tetromino)
+        {
+            _logger.Warn($"Not clear, if piece moved or not ({tetromino})");
         }
 
         private void Success(Piece newPosition, TimeSpan now)
