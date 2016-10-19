@@ -18,6 +18,8 @@ namespace GameBot.Game.Tetris.Agents.States
 
         public TetrisStartState(TetrisAgent agent, int startLevel, bool startFromGameOver)
         {
+            if (agent == null) throw new ArgumentNullException(nameof(agent));
+
             _agent = agent;
             _startFromGameover = startFromGameOver;
             _startLevel = startLevel;
@@ -27,12 +29,10 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             // do nothing
         }
-
+        
         public void Play()
         {
-            // wait before start
-            var randomTime = 2.5 + _random.NextDouble();
-            if (_agent.Clock.Time >= TimeSpan.FromSeconds(randomTime))
+            if (IsStartScreenVisble())
             {
                 if (_startFromGameover)
                 {
@@ -51,8 +51,19 @@ namespace GameBot.Game.Tetris.Agents.States
                 
                 // init game state
                 _agent.GameState = new GameState { StartLevel = _startLevel };
-                _agent.SetState(new TetrisAnalyzeState(_agent, null));
+                SetStateAnalyze();
             }
+        }
+        
+        private bool IsStartScreenVisble()
+        {
+            var randomTime = 2.5 + _random.NextDouble();
+            return _agent.Clock.Time >= TimeSpan.FromSeconds(randomTime);
+        }
+
+        private void SetStateAnalyze()
+        {
+            _agent.SetState(new TetrisAnalyzeState(_agent));
         }
 
         private void StartFromMenu(IExecutor actuator)
@@ -74,6 +85,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void StartFromGameOver(IExecutor actuator)
         {
+            // sequence handles both cases (with and without entry in high score table)
             actuator.Hit(Button.Start);
             actuator.Hit(Button.Start);
             actuator.Hit(Button.B);

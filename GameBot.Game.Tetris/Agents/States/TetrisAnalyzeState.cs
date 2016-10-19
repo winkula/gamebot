@@ -21,10 +21,14 @@ namespace GameBot.Game.Tetris.Agents.States
         // should never be overestimated!
         private readonly TimeSpan _beginTime;
 
+        private Piece _tracedPiece;
+
         private bool _successfullyExtracted;
 
-        public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino)
+        public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino = null)
         {
+            if (agent == null) throw new ArgumentNullException(nameof(agent));
+
             _agent = agent;
 
             _currentTetromino = currentTetromino;
@@ -45,16 +49,15 @@ namespace GameBot.Game.Tetris.Agents.States
                 _agent.GameState.NextPiece = _extractedNextPiece;
 
                 _logger.Info($"Game state extraction successfully:\n{_agent.GameState}");
-                
+
                 // do the search
                 // this is the essence of the a.i.
                 var results = _agent.Search.Search(_agent.GameState);
                 if (results != null)
                 {
-                    _logger.Info("A.I. found a solution");
+                    _logger.Info("Agent found a solution");
                     _logger.Info($"Solution: {string.Join(", ", results.Moves.Select(x => x.ToString()))}");
 
-                    // we can execute now
                     SetStateExecute(results);
                 }
             }
@@ -126,7 +129,10 @@ namespace GameBot.Game.Tetris.Agents.States
         private void SetStateExecute(SearchResult results)
         {
             var moves = new Queue<Move>(results.Moves);
-            _agent.SetState(new TetrisExecuteState(_agent, moves, _agent.Screenshot.Timestamp));
+
+            var tracedPiece = new Piece(_agent.GameState.Piece);
+            // TODO: do we need this timestamp?
+            _agent.SetStateAndContinue(new TetrisExecuteState(_agent, moves, tracedPiece/*, _agent.Screenshot.Timestamp*/));
         }
     }
 }

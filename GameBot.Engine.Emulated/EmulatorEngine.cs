@@ -55,13 +55,12 @@ namespace GameBot.Engine.Emulated
         {
             // get image as photo of the gameboy screen (input)
             IImage image = _camera.Capture();
-
-            // process image and get display data
             TimeSpan time = _clock.Time;
+
+            // process image
             IImage processed = _quantizer.Quantize(image);
             
-            showImage?.Invoke(processed);
-            showProcessedImage?.Invoke(processed);
+            showImage?.Invoke(image);
 
             if (Play)
             {
@@ -75,6 +74,10 @@ namespace GameBot.Engine.Emulated
 
                 // presses the buttons
                 _agent.Play(_executor);
+            }
+            else
+            {
+                showProcessedImage?.Invoke(processed);
             }
 
             _emulator.Execute();

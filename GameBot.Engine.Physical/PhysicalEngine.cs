@@ -35,18 +35,17 @@ namespace GameBot.Engine.Physical
         {
             // get image as photo of the gameboy screen (input)
             IImage image = _camera.Capture();
-
-            // process image and get display data
             TimeSpan time = _clock.Time;
+
+            // process image
             IImage processed = _quantizer.Quantize(image);
 
-            showImage?.Invoke(processed);
-            showProcessedImage?.Invoke(processed);
+            showImage?.Invoke(image);
 
             if (Play)
             {
                 IScreenshot screenshot = new EmguScreenshot(processed, time);
-                
+
                 // extracts the game state
                 _agent.Extract(screenshot);
 
@@ -55,6 +54,10 @@ namespace GameBot.Engine.Physical
 
                 // presses the buttons
                 _agent.Play(_executor);
+            }
+            else
+            {
+                showProcessedImage?.Invoke(processed);
             }
         }
 
