@@ -4,6 +4,7 @@ using GameBot.Core;
 using System.Drawing;
 using GameBot.Core.Data;
 using System;
+using Emgu.CV.CvEnum;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Data;
@@ -14,34 +15,36 @@ namespace GameBot.Game.Tetris.Agents
     // ReSharper disable once ClassNeverInstantiated.Global
     public class TetrisAgent : IAgent
     {
-        // current state of the ai (state pattern)
+        private readonly IConfig _config;
+        private readonly bool _visualize;
+
+        // state informations
         private ITetrisAgentState _state;
         private bool _continue;
-
-        private readonly IConfig _config;
-
-        // services for the states
-        public IClock Clock { get; private set; }
+        
+        // services and data used by states
         public IExecutor Executor { get; private set; }
         public IScreenshot Screenshot { get; private set; }
-
         public PieceExtractor PieceExtractor { get; private set; }
         public ISearch Search { get; private set; }
 
-        public double ProbabilityThreshold { get; }
-
-        // global data
+        // data used by states
         public GameState GameState { get; set; }
-        public Piece TracedPiece { get; set; }
 
+        // config used by states
+        public double ProbabilityThreshold { get; }
+        
         // for visualization only
-        public Piece ExtractedPiece { get; set; }
-        public Tetromino? ExtractedNextPiece { get; set; }
+        public Piece ExtractedPiece { private get; set; }
+        public Piece TracedPiece { private get; set; }
+        public Piece ExpectedPiece { private get; set; }
+        public Tetromino? ExtractedNextPiece { private get; set; }
 
-        public TetrisAgent(IConfig config, PieceExtractor pieceExtractor, ISearch search, IClock clock)
+        public TetrisAgent(IConfig config, PieceExtractor pieceExtractor, ISearch search)
         {
             _config = config;
-            Clock = clock;
+            _visualize = config.Read("Game.Tetris.Visualize", false);
+
             PieceExtractor = pieceExtractor;
             Search = search;
 
@@ -85,32 +88,9 @@ namespace GameBot.Game.Tetris.Agents
 
         public IImage Visualize(IImage image)
         {
+            if (!_visualize) return image;
             var visualization = new Image<Bgr, byte>(image.Bitmap);
 
-            if (ExtractedPiece != null)
-            {
-                // current piece
-                foreach (var block in ExtractedPiece.Shape.Body)
-                {
-                    var tileCoordinates = Coordinates.PieceToTile(ExtractedPiece.X + block.X, ExtractedPiece.Y + block.Y);
-                    int x = tileCoordinates.X;
-                    int y = tileCoordinates.Y;
-
-                    visualization.Draw(new Rectangle(8 * x, 8 * y, 8, 8), new Bgr(0, 255, 0), 2);
-                }
-            }
-            if (ExtractedNextPiece != null)
-            {
-                // next piece
-                foreach (var block in Shape.Get(ExtractedNextPiece.Value).Body)
-                {
-                    var tileCoordinates = Coordinates.PieceToTilePreview(block);
-                    int x = tileCoordinates.X;
-                    int y = tileCoordinates.Y;
-
-                    visualization.Draw(new Rectangle(8 * x, 8 * y, 8, 8), new Bgr(0, 0, 255), 2);
-                }
-            }
             if (GameState?.Board != null)
             {
                 var board = GameState.Board;
@@ -121,13 +101,59 @@ namespace GameBot.Game.Tetris.Agents
                         if (board.IsOccupied(x, y))
                         {
                             var tileCoordinates = Coordinates.BoardToTile(x, y);
-                            visualization.Draw(new Rectangle(8 * tileCoordinates.X, 8 * tileCoordinates.Y, 8, 8), new Bgr(255, 0, 0), 2);
+                            Draw(visualization, tileCoordinates, Color.DodgerBlue);
                         }
                     }
                 }
             }
-
+            if (TracedPiece != null)
+            {
+                // current piece
+                var piece = TracedPiece;
+                foreach (var block in piece.Shape.Body)
+                {
+                    var tileCoordinates = Coordinates.PieceToTile(piece.X + block.X, piece.Y + block.Y);
+                    Draw(visualization, tileCoordinates, Color.Khaki);
+                }
+            }
+            if (ExpectedPiece != null)
+            {
+                // current piece
+                var piece = ExpectedPiece;
+                foreach (var block in piece.Shape.Body)
+                {
+                    var tileCoordinates = Coordinates.PieceToTile(piece.X + block.X, piece.Y + block.Y);
+                    Draw(visualization, tileCoordinates, Color.Orange);
+                }
+            }
+            if (ExtractedPiece != null)
+            {
+                // current piece
+                var piece = ExtractedPiece;
+                foreach (var block in piece.Shape.Body)
+                {
+                    var tileCoordinates = Coordinates.PieceToTile(piece.X + block.X, piece.Y + block.Y);
+                    Draw(visualization, tileCoordinates, Color.Red);
+                }
+            }
+            if (ExtractedNextPiece != null)
+            {
+                // next piece
+                foreach (var block in Shape.Get(ExtractedNextPiece.Value).Body)
+                {
+                    var tileCoordinates = Coordinates.PieceToTilePreview(block);
+                    Draw(visualization, tileCoordinates, Color.LimeGreen);
+                }
+            }
+            
             return visualization;
+        }
+
+        private void Draw(IImage image, Point tileCoordinates, Color color)
+        {
+            const int frameSize = 0;
+            var rectangle = new Rectangle(GameBoyConstants.TileSize * tileCoordinates.X + frameSize, GameBoyConstants.TileSize * tileCoordinates.Y + frameSize, GameBoyConstants.TileSize - 2 * frameSize - 1, GameBoyConstants.TileSize - 2 * frameSize - 1);
+            CvInvoke.Rectangle(image, rectangle, new Bgr(color).MCvScalar, 2, LineType.FourConnected);
         }
 
         public void Play(IExecutor executor)
@@ -136,6 +162,8 @@ namespace GameBot.Game.Tetris.Agents
 
             do
             {
+                // every state can directly execute the next state, when it changes
+                _continue = false;
                 _state.Play();
             } while (_continue);
         }

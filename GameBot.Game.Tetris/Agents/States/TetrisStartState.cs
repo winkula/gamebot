@@ -9,7 +9,6 @@ namespace GameBot.Game.Tetris.Agents.States
     public class TetrisStartState : ITetrisAgentState
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly Random _random = new Random();
 
         private readonly TetrisAgent _agent;
 
@@ -57,8 +56,9 @@ namespace GameBot.Game.Tetris.Agents.States
         
         private bool IsStartScreenVisble()
         {
-            var randomTime = 2.5 + _random.NextDouble();
-            return _agent.Clock.Time >= TimeSpan.FromSeconds(randomTime);
+            var random = new Random();
+            var randomTime = 2.5 + random.NextDouble();
+            return _agent.Screenshot.Timestamp >= TimeSpan.FromSeconds(randomTime);
         }
 
         private void SetStateAnalyze()

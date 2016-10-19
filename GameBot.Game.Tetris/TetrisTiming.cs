@@ -6,6 +6,9 @@ namespace GameBot.Game.Tetris
     {
         // source: http://harddrop.com/wiki/Tetris_(Game_Boy)
         public const double Framerate = 59.73;
+        
+        // this is just an estimate (experimentally verified)
+        public static TimeSpan LineRemovingDuration => GetDurationFormFrames(92);
 
         public static TimeSpan GetDropDuration(int rows)
         {
@@ -17,14 +20,6 @@ namespace GameBot.Game.Tetris
         private static TimeSpan GetDurationFormFrames(int frames)
         {
             return TimeSpan.FromSeconds(frames / Framerate);
-        }
-
-        public static TimeSpan GetLineRemovingDuration()
-        {
-            // this is just an estimate
-            const int framesForRemovingLines = 79;
-
-            return GetDurationFormFrames(framesForRemovingLines);
         }
     }
 }

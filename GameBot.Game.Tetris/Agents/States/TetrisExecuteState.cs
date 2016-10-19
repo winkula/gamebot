@@ -14,23 +14,24 @@ namespace GameBot.Game.Tetris.Agents.States
         private readonly TetrisAgent _agent;
 
         private readonly Queue<Move> _pendingMoves;
-        
         private readonly Piece _tracedPiece;
+        private readonly TimeSpan _tracedPieceTimestamp;
 
-        public TetrisExecuteState(TetrisAgent agent, Queue<Move> pendingMoves, Piece tracedPiece)
+        public TetrisExecuteState(TetrisAgent agent, Queue<Move> pendingMoves, Piece tracedPiece, TimeSpan tracedPieceTimestamp)
         {
             if (agent == null) throw new ArgumentNullException(nameof(agent));
             if (pendingMoves == null) throw new ArgumentNullException(nameof(pendingMoves));
             if (!pendingMoves.Any()) throw new ArgumentException("pendingMoves contains no elements");
             if (tracedPiece == null) throw new ArgumentNullException(nameof(tracedPiece));
 
+            if (agent.GameState == null) throw new ArgumentNullException(nameof(agent.GameState));
+            if (agent.GameState.Piece == null) throw new ArgumentNullException(nameof(agent.GameState.Piece));
+            if (agent.GameState.NextPiece == null) throw new ArgumentNullException(nameof(agent.GameState.NextPiece));
+
             _agent = agent;
             _pendingMoves = pendingMoves;
             _tracedPiece = tracedPiece;
-
-            if (_agent.GameState == null) throw new ArgumentNullException(nameof(agent.GameState));
-            if (_agent.GameState.Piece == null) throw new ArgumentNullException(nameof(agent.GameState.Piece));
-            if (_agent.GameState.NextPiece == null) throw new ArgumentNullException(nameof(agent.GameState.NextPiece));
+            _tracedPieceTimestamp = tracedPieceTimestamp;
         }
 
         public void Extract()
@@ -60,30 +61,40 @@ namespace GameBot.Game.Tetris.Agents.States
         private void ExecuteDrop()
         {
             // calculates drop distance, score and new level
-            int linesBefore = _agent.GameState.Lines;
+            var linesBefore = _agent.GameState.Lines;
             var dropDistance = _agent.GameState.Drop();
             var dropDuration = TetrisTiming.GetDropDuration(dropDistance);
+
+            _logger.Info("Execute Drop");
+            _logger.Info($"New score: {_agent.GameState.Score}");
+
             if (_agent.GameState.Lines > linesBefore)
             {
                 // lines were removed, add extra time
-                var lineRemoveDuration = TetrisTiming.GetLineRemovingDuration();
-                dropDuration += lineRemoveDuration;
+                //var lineRemoveDuration = TetrisTiming.LineRemovingDuration();
+                dropDuration += TetrisTiming.LineRemovingDuration;
+
+                var linesRemoved = _agent.GameState.Lines - linesBefore;
+                _logger.Info($"{linesRemoved} lines removed");
             }
 
             // we subtract a time padding, because we dont want to wait the
             // theoretical drop duration, but the real drop duration
-            // (we lose some overhead time)  
-            var waitDuration = dropDuration - TimeSpan.FromMilliseconds(Timing.DropDurationPadding);
+            // (we don't want to miss an important frame in analyze state)  
+            var waitDuration = dropDuration - Timing.DropDurationPaddingTime;
+            _logger.Info($"Wait {waitDuration.Milliseconds} ms before analyze");
 
             // execute the drop blocking
             // we must wait until the drop is ended before we can continue
-            // TODO: here we could to some precalculations for the next search (and execute the drop asynchronous)???
+            // TODO: here we could do some precalculations for the next search (and execute the drop asynchronous)???
             _agent.Executor.Hit(Button.Down, waitDuration);
         }
         
         private void Execute(Move move)
         {
-            _logger.Info("Execute " + move);
+            _logger.Info($"Execute {move}");
+            _agent.ExpectedPiece = new Piece(_tracedPiece).Apply(move);
+
             switch (move)
             {
                 case Move.Left:
@@ -111,7 +122,7 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             if (lastMove == Move.Drop) throw new Exception("Can't check drop");
 
-            _agent.SetState(new TetrisCheckState(_agent, lastMove, _pendingMoves, _tracedPiece));
+            _agent.SetState(new TetrisCheckState(_agent, lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
         }
 
         private void SetStateAnalyze()

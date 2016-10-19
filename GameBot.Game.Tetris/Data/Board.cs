@@ -260,7 +260,7 @@ namespace GameBot.Game.Tetris.Data
             return distance;
         }
 
-        public int MaxDropDistanceForSpawnedPiece()
+        public int MaximumDropDistanceForSpawnedPiece()
         {
             int distance = 0;
 

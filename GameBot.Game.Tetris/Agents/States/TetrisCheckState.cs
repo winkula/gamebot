@@ -15,19 +15,19 @@ namespace GameBot.Game.Tetris.Agents.States
         private readonly Queue<Move> _pendingMoves;
 
         private Piece _tracedPiece;
-        private TimeSpan _lastPositionTimeStamp;
+        private TimeSpan _tracedPieceTimestamp;
 
-        public TetrisCheckState(TetrisAgent agent, Move lastMove, Queue<Move> pendingMoves, Piece tracedPiece)
+        public TetrisCheckState(TetrisAgent agent, Move lastMove, Queue<Move> pendingMoves, Piece tracedPiece, TimeSpan tracedPieceTimestamp)
         {
             if (agent == null) throw new ArgumentNullException(nameof(agent));
             if (pendingMoves == null) throw new ArgumentNullException(nameof(pendingMoves));
             if (tracedPiece == null) throw new ArgumentNullException(nameof(tracedPiece));
 
             _agent = agent;
-
             _lastMove = lastMove;
             _pendingMoves = pendingMoves;
             _tracedPiece = tracedPiece;
+            _tracedPieceTimestamp = tracedPieceTimestamp;
         }
 
         public void Extract()
@@ -38,17 +38,17 @@ namespace GameBot.Game.Tetris.Agents.States
         public void Play()
         {
             _logger.Info($"Check command {_lastMove}");
-
-            var now = _agent.Clock.Time;
-            var expectedFallDistance = GetExpectedFallDistance(now);
-            _logger.Info($"Search piece with search height {expectedFallDistance}");
+            
+            var searchHeight = CalulateSearchHeight();
+            _logger.Info($"Search height for check is {searchHeight}");
 
             var pieceNotMoved = _tracedPiece;
             var pieceMoved = new Piece(_tracedPiece).Apply(_lastMove);
 
             // extract
-            var resultPieceNotMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(_agent.Screenshot, pieceNotMoved, expectedFallDistance, _agent.ProbabilityThreshold);
-            var resultPieceMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(_agent.Screenshot, pieceMoved, expectedFallDistance, _agent.ProbabilityThreshold);
+            var screenshot = _agent.Screenshot;
+            var resultPieceNotMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceNotMoved, searchHeight, _agent.ProbabilityThreshold);
+            var resultPieceMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceMoved, searchHeight, _agent.ProbabilityThreshold);
 
             if (resultPieceNotMoved.Result == null && resultPieceMoved.Result == null)
             {
@@ -60,11 +60,13 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 if (resultPieceNotMoved.Result == null || resultPieceMoved.Probability >= resultPieceNotMoved.Probability)
                 {
-                    Success(resultPieceMoved.Result, now);
+                    var timestamp = screenshot.Timestamp; // TODO: take time from clock or from the screenshot? make time diagram
+                    Success(resultPieceMoved.Result, timestamp);
                 }
                 else if (resultPieceMoved.Result == null || resultPieceNotMoved.Probability >= resultPieceMoved.Probability)
                 {
-                    Fail(resultPieceNotMoved.Result, now);
+                    var timestamp = screenshot.Timestamp; // TODO: take time from clock or from the screenshot? make time diagram
+                    Fail(resultPieceNotMoved.Result, timestamp);
                 }
             }
         }
@@ -80,8 +82,8 @@ namespace GameBot.Game.Tetris.Agents.States
 
             // move was successfully executed
             // we remove it from the queue
-            UpdateLastPosition(newPosition, now);
-            
+            UpdateCurrentPiece(newPosition, now);
+
             // command was executed successfully
             // we go now to the next command
             SetStateExecute();
@@ -92,20 +94,20 @@ namespace GameBot.Game.Tetris.Agents.States
             _logger.Warn("Command failed");
 
             // the command was not executed and the tile is in the old position
-            UpdateLastPosition(newPosition, now);
-            
+            UpdateCurrentPiece(newPosition, now);
+
             // repeat the command
             SetStateRepeat();
         }
-        
-        private int GetExpectedFallDistance(TimeSpan now)
+
+        private int CalulateSearchHeight()
         {
             // we add some time to the theoretical duration between now and the
             // timestamp of the last analyzed screenshot
             // so we are sure, that we don't miss the piece
-            var duration =
-                (now - _lastPositionTimeStamp) +
-                TimeSpan.FromMilliseconds(Timing.ExpectedFallDurationPadding);
+            var duration = _agent.Screenshot.Timestamp
+                - _tracedPieceTimestamp
+                + Timing.CheckFallDurationPaddingTime;
 
             var searchHeightTime = TetrisLevel.GetMaxFallDistance(_agent.GameState.Level, duration);
             var searchHeightMax = _agent.GameState.Board.DropDistance(_tracedPiece);
@@ -113,22 +115,23 @@ namespace GameBot.Game.Tetris.Agents.States
             return Math.Min(searchHeightTime, searchHeightMax);
         }
 
-        private void UpdateLastPosition(Piece newLastPosition, TimeSpan newLastPositionTimestamp)
+        private void UpdateCurrentPiece(Piece tracedPieceNew, TimeSpan tracedPiecetTimestampNew)
         {
-            _tracedPiece = newLastPosition;
+            _tracedPiece = tracedPieceNew;
+            _agent.TracedPiece = tracedPieceNew;
+            
             _agent.GameState.Piece = new Piece(_tracedPiece);
-            _lastPositionTimeStamp = newLastPositionTimestamp;
+            _tracedPieceTimestamp = tracedPiecetTimestampNew;
         }
-        
+
         private void SetStateRepeat()
         {
-            _agent.SetStateAndContinue(new TetrisRepeatState(_agent, _lastMove, _pendingMoves, _tracedPiece));
+            _agent.SetStateAndContinue(new TetrisRepeatState(_agent, _lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
         }
 
         private void SetStateExecute()
         {
-            // TODO: do we need this timestamp??
-            _agent.SetStateAndContinue(new TetrisExecuteState(_agent, _pendingMoves, _tracedPiece/*, _lastPositionTimeStamp*/));
+            _agent.SetStateAndContinue(new TetrisExecuteState(_agent, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
         }
     }
 }

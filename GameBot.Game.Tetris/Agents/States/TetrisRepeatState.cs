@@ -15,18 +15,19 @@ namespace GameBot.Game.Tetris.Agents.States
         private readonly Move _lastMove;
         private readonly Queue<Move> _pendingMoves;
         private readonly Piece _tracedPiece;
+        private readonly TimeSpan _tracedPieceTimestamp;
 
-        public TetrisRepeatState(TetrisAgent agent, Move lastMove, Queue<Move> pendingMoves, Piece tracedPiece)
+        public TetrisRepeatState(TetrisAgent agent, Move lastMove, Queue<Move> pendingMoves, Piece tracedPiece, TimeSpan tracedPieceTimestamp)
         {
             if (agent == null) throw new ArgumentNullException(nameof(agent));
             if (pendingMoves == null) throw new ArgumentNullException(nameof(pendingMoves));
             if (tracedPiece == null) throw new ArgumentNullException(nameof(tracedPiece));
 
             _agent = agent;
-
             _lastMove = lastMove;
             _pendingMoves = pendingMoves;
             _tracedPiece = tracedPiece;
+            _tracedPieceTimestamp = tracedPieceTimestamp;
         }
 
         public void Extract()
@@ -45,12 +46,13 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void SetStateCheck()
         {
-            _agent.SetStateAndContinue(new TetrisCheckState(_agent, _lastMove, _pendingMoves, _tracedPiece));
+            _agent.SetStateAndContinue(new TetrisCheckState(_agent, _lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
         }
         
         private void Repeat(Move move)
         {
             _logger.Info($"Repeat command {move}");
+            _agent.ExpectedPiece = new Piece(_tracedPiece).Apply(move);
 
             switch (move)
             {

@@ -85,7 +85,8 @@ namespace GameBot.Engine.Emulated
 
         public void Reset()
         {
-            throw new NotImplementedException();
+            Play = false;
+            _agent.Reset();
         }
     }
 }

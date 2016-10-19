@@ -140,7 +140,7 @@ namespace GameBot.Robot.Ui
             if (e.KeyChar == 'p')
             {
                 _engine.Play = !_engine.Play;
-                _logger.Info(_engine.Play ? "Play A.I." : "Pause A.I.");
+                _logger.Info(_engine.Play ? "Play Agent" : "Pause Agent");
             }
             if (e.KeyChar == 'q')
             {
