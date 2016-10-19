@@ -30,8 +30,9 @@ namespace GameBot.Game.Tetris.Agents
 
         // data used by states
         public GameState GameState { get; set; }
-
+        
         // config used by states
+        public int CheckSamples { get; }
         public int ExtractionSamples { get; }
         public double ExtractionLowerThreshold { get; }
         public double ExtractionUpperThreshold { get; }
@@ -50,6 +51,7 @@ namespace GameBot.Game.Tetris.Agents
             PieceExtractor = pieceExtractor;
             Search = search;
 
+            CheckSamples = _config.Read("Game.Tetris.Check.Samples", 1);
             ExtractionSamples = _config.Read("Game.Tetris.Extractor.Samples", 1);
             ExtractionUpperThreshold = _config.Read<double>("Game.Tetris.Extractor.UpperThreshold");
             ExtractionLowerThreshold = _config.Read<double>("Game.Tetris.Extractor.LowerThreshold");

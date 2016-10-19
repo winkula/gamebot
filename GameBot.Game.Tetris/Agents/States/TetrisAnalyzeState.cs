@@ -63,9 +63,9 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             if (ExtractionComplete)
             {
-                _logger.Info($"Game state extraction successfully:\n{_agent.GameState}");
-
                 UpdateGlobalGameState();
+
+                _logger.Info($"Game state extraction successfully:\n{_agent.GameState}");
 
                 // perform the search
                 // here we decide, where we want to place our tetromino on the board
@@ -90,40 +90,6 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 ExtractNextPieceSampling();
             }
-
-            // TODO: remove!
-            /*
-            int searchHeight = CalulateSearchHeight(_currentTetromino);
-            _logger.Info($"Search height for extraction is {searchHeight}");
-
-            // just extract the current and next piece
-            // we dont extract the board (too error prone), instead we carry along the game state
-
-            if (_extractedPiece == null)
-            {
-                // extract the current piece
-                var result = ExtractCurrentPiece(searchHeight);
-
-                if (result.Result == null) return false;
-                if (!result.Result.IsUntouched) return false; // spawned piece must be untouched
-
-                _extractedPiece = result.Result;
-                _extractedPieceTimestamp = _agent.Screenshot.Timestamp; // TODO: take time from clock or from the screenshot? make time diagram
-                _agent.ExtractedPiece = _extractedPiece;
-            }
-
-            if (_extractedNextPiece == null)
-            {
-                // extract the next piece
-                var result = ExtractNextPiece();
-
-                if (result.Result == null) return false;
-
-                _extractedNextPiece = result.Result;
-                _agent.ExtractedNextPiece = _extractedNextPiece;
-            }
-
-            return true;*/
         }
 
         private void ExtractCurrentPieceSampling(int searchHeight)
@@ -159,18 +125,30 @@ namespace GameBot.Game.Tetris.Agents.States
             _extractedPieceSamples.Add(result);
 
             // do we have enougt samples?
+            // TODO: outsource in separate class, break early, if we reach the majority (2 of 3 for example)
             if (_extractedPieceSamples.Count >= _agent.ExtractionSamples)
             {
                 // evaluate samples
+                // group by tetromino, orientation and x coordinate to make evaluation Y invariant
+                // we then take the last matching sample and take its y coordinate
                 var samplesOrderedGrouped = _extractedPieceSamples
-                    .GroupBy(x => x.Result, y => y.Probability)
+                    .GroupBy(x => new { x.Result.Tetromino, x.Result.Orientation, x.Result.X }, y => y.Probability)
                     .Select(x => new { Piece = x.Key, Number = x.Count(), ProbabilityAvg = x.Average(), ProbabilityMax = x.Max() })
                     .OrderByDescending(x => x.Number)
                     .ThenByDescending(x => x.ProbabilityAvg)
                     .ToList();
+                var invariantPiece = samplesOrderedGrouped.First().Piece;
+                var yCoordinate = _extractedPieceSamples
+                    .Reverse()
+                    .First(x => 
+                        x.Result.Tetromino == invariantPiece.Tetromino && 
+                        x.Result.Orientation == invariantPiece.Orientation && 
+                        x.Result.X == invariantPiece.X)
+                    .Result.Y;
+                var piece = new Piece(invariantPiece.Tetromino, invariantPiece.Orientation, invariantPiece.X, yCoordinate);
 
                 _logger.Info($"Accept extracted current piece by sampling ({result.Result}, {samplesOrderedGrouped.First().Number} samples)");
-                AcceptCurrentPiece(samplesOrderedGrouped.First().Piece);
+                AcceptCurrentPiece(piece);
             }
         }
 
@@ -208,6 +186,7 @@ namespace GameBot.Game.Tetris.Agents.States
             _extractedNextPieceSamples.Add(result);
 
             // do we have enougt samples?
+            // TODO: outsource in separate class, break early, if we reach the majority (2 of 3 for example)
             if (_extractedNextPieceSamples.Count >= _agent.ExtractionSamples)
             {
                 // evaluate samples
@@ -217,9 +196,10 @@ namespace GameBot.Game.Tetris.Agents.States
                     .OrderByDescending(x => x.Number)
                     .ThenByDescending(x => x.ProbabilityAvg)
                     .ToList();
+                var nextPiece = samplesOrderedGrouped.First().NextPiece;
 
                 _logger.Info($"Accept extracted next piece by sampling ({result.Result}, {samplesOrderedGrouped.First().Number} samples)");
-                AcceptNextPiece(samplesOrderedGrouped.First().NextPiece);
+                AcceptNextPiece(nextPiece);
             }
         }
         

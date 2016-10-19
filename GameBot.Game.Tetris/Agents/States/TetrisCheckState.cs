@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GameBot.Game.Tetris.Data;
 using NLog;
 
@@ -16,6 +17,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private Piece _tracedPiece;
         private TimeSpan _tracedPieceTimestamp;
+        private IList<bool> _movedSamples;
 
         public TetrisCheckState(TetrisAgent agent, Move lastMove, Queue<Move> pendingMoves, Piece tracedPiece, TimeSpan tracedPieceTimestamp)
         {
@@ -28,6 +30,7 @@ namespace GameBot.Game.Tetris.Agents.States
             _pendingMoves = pendingMoves;
             _tracedPiece = tracedPiece;
             _tracedPieceTimestamp = tracedPieceTimestamp;
+            _movedSamples = new List<bool>();
         }
 
         public void Extract()
@@ -38,7 +41,7 @@ namespace GameBot.Game.Tetris.Agents.States
         public void Play()
         {
             _logger.Info($"Check command {_lastMove}");
-            
+
             var searchHeight = CalulateSearchHeight();
             _logger.Info($"Search height for check is {searchHeight}");
 
@@ -53,36 +56,30 @@ namespace GameBot.Game.Tetris.Agents.States
             var lowerThreshold = _agent.ExtractionLowerThreshold;
             if (resultPieceNotMoved.IsRejected(lowerThreshold) && resultPieceMoved.IsRejected(lowerThreshold))
             {
-                // piece not found
+                // piece not found on the screenshot
                 // no problem, we get a new screenshot and try it again ;)
+                // TODO: maybe the piece is not visble at all? handle pasue menu and rocket cutscenes
                 PieceNotFound(_tracedPiece.Tetromino);
             }
             else
             {
-                if (resultPieceMoved.Probability >= resultPieceNotMoved.Probability)
+                // add sample
+                _movedSamples.Add(resultPieceMoved.Probability >= resultPieceNotMoved.Probability);
+                _logger.Info($"Add sample to decide movement ({_lastMove})");
+
+                // enought samples?
+                // TODO: outsource in separate class, break early, if we reach the majority (2 of 3 for example)
+                if (_movedSamples.Count >= _agent.CheckSamples)
                 {
-                    // its more probable, that the piece moved
-                    if (resultPieceMoved.IsAccepted(lowerThreshold))
+                    if (_movedSamples.Count(x => x) > _agent.CheckSamples / 2)
                     {
                         var timestamp = screenshot.Timestamp;
                         Success(resultPieceMoved.Result, timestamp);
                     }
                     else
                     {
-                        PositionUnclear(_tracedPiece.Tetromino);
-                    }
-                }
-                else
-                {
-                    if (resultPieceNotMoved.IsAccepted(lowerThreshold))
-                    {
-                        // its more probable, that the piece did not move
                         var timestamp = screenshot.Timestamp;
                         Fail(resultPieceNotMoved.Result, timestamp);
-                    }
-                    else
-                    {
-                        PositionUnclear(_tracedPiece.Tetromino);
                     }
                 }
             }
@@ -92,12 +89,7 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             _logger.Warn($"Piece not recognized ({tetromino})");
         }
-
-        private void PositionUnclear(Tetromino tetromino)
-        {
-            _logger.Warn($"Not clear, if piece moved or not ({tetromino})");
-        }
-
+        
         private void Success(Piece newPosition, TimeSpan now)
         {
             _logger.Info("Command executed");
@@ -141,7 +133,7 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             _tracedPiece = tracedPieceNew;
             _agent.TracedPiece = tracedPieceNew;
-            
+
             _agent.GameState.Piece = new Piece(_tracedPiece);
             _tracedPieceTimestamp = tracedPiecetTimestampNew;
         }
