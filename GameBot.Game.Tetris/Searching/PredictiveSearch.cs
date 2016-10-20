@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameBot.Game.Tetris.Searching.Heuristics;
 
 namespace GameBot.Game.Tetris.Searching

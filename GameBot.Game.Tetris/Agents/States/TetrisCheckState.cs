@@ -56,18 +56,37 @@ namespace GameBot.Game.Tetris.Agents.States
             var lowerThreshold = _agent.ExtractionLowerThreshold;
             if (resultPieceNotMoved.IsRejected(lowerThreshold) && resultPieceMoved.IsRejected(lowerThreshold))
             {
-                // piece not found on the screenshot
+                // both hypotheses rejected: piece not found on the screenshot
                 // no problem, we get a new screenshot and try it again ;)
-                // TODO: maybe the piece is not visble at all? handle pasue menu and rocket cutscenes
+                // TODO: maybe the piece is not visble at all? handle pause menu and rocket cutscenes
                 PieceNotFound(_tracedPiece.Tetrimino);
             }
             else
             {
+                var movedIsMoreProbableThanNotMoved = resultPieceMoved.Probability >= resultPieceNotMoved.Probability;
+                var timestamp = screenshot.Timestamp;
+
+                // directly accept?
+                if (movedIsMoreProbableThanNotMoved && resultPieceMoved.IsAccepted(_agent.ExtractionUpperThreshold))
+                {
+                    // accept immediately
+                    _logger.Info($"Accept successful move immediately ({_lastMove}, probability {resultPieceMoved.Probability:F})");
+
+                    Success(resultPieceMoved.Result, timestamp);
+                    return;
+                }
+                if (!movedIsMoreProbableThanNotMoved && resultPieceNotMoved.IsAccepted(_agent.ExtractionUpperThreshold))
+                {
+                    // accept immediately
+                    _logger.Info($"Accept failed move immediately ({_lastMove}, probability {resultPieceNotMoved.Probability:F})");
+
+                    Fail(resultPieceNotMoved.Result, timestamp);
+                    return;
+                }
+
                 // add sample
-                var sample = resultPieceMoved.Probability >= resultPieceNotMoved.Probability;
                 var samplePseudoProbability = Math.Abs(resultPieceMoved.Probability - resultPieceNotMoved.Probability);
-                
-                _moveConfirmationSampler.Sample(new ProbabilisticResult<bool>(sample, samplePseudoProbability));
+                _moveConfirmationSampler.Sample(new ProbabilisticResult<bool>(movedIsMoreProbableThanNotMoved, samplePseudoProbability));
                 _logger.Info($"Add sample to decide movement ({_lastMove})");
 
                 // enought samples?
@@ -75,12 +94,10 @@ namespace GameBot.Game.Tetris.Agents.States
                 {
                     if (_moveConfirmationSampler.Result)
                     {
-                        var timestamp = screenshot.Timestamp;
                         Success(resultPieceMoved.Result, timestamp);
                     }
                     else
                     {
-                        var timestamp = screenshot.Timestamp;
                         Fail(resultPieceNotMoved.Result, timestamp);
                     }
                 }
