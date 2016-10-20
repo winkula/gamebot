@@ -8,7 +8,7 @@ namespace GameBot.Game.Tetris.Data
     {
         public Board Board { get; }
         public Piece Piece { get; set; }
-        public Tetromino? NextPiece { get; set; }
+        public Tetrimino? NextPiece { get; set; }
 
         public int Lines { get; private set; }
         public int Score { get; private set; }
@@ -35,21 +35,21 @@ namespace GameBot.Game.Tetris.Data
             StartLevel = old.StartLevel;
         }
 
-        public GameState(Piece piece, Tetromino? nextPiece)
+        public GameState(Piece piece, Tetrimino? nextPiece)
         {
             Board = new Board();
             Piece = piece;
             NextPiece = nextPiece;
         }
 
-        public GameState(Board board = null, Piece piece = null, Tetromino? nextPiece = null)
+        public GameState(Board board = null, Piece piece = null, Tetrimino? nextPiece = null)
         {
             Board = board ?? new Board();
             Piece = piece ?? new Piece();
             NextPiece = nextPiece;
         }
 
-        public GameState(Tetromino tetromino, Tetromino? nextTetromino = null) : this(new Piece(tetromino), nextTetromino)
+        public GameState(Tetrimino tetrimino, Tetrimino? nextTetrimino = null) : this(new Piece(tetrimino), nextTetrimino)
         {
         }
 
@@ -57,10 +57,10 @@ namespace GameBot.Game.Tetris.Data
 
         public bool Fall()
         {
-            return Fall(Tetrominos.GetRandom());
+            return Fall(Tetriminos.GetRandom());
         }
 
-        public bool Fall(Tetromino next)
+        public bool Fall(Tetrimino next)
         {
             if (Board.DropDistance(Piece) < 0 && Board.Intersects(Piece)) throw new GameOverException();
 
@@ -90,11 +90,11 @@ namespace GameBot.Game.Tetris.Data
         // returns the fallen distance of the piece
         public int Drop()
         {
-            return Drop(Tetrominos.GetRandom());
+            return Drop(Tetriminos.GetRandom());
         }
 
         // returns the fallen distance of the piece
-        public int Drop(Tetromino next)
+        public int Drop(Tetrimino next)
         {
             int distance = Board.DropDistance(Piece);
             if (distance < 0 && Board.Intersects(Piece)) throw new GameOverException();
@@ -206,7 +206,7 @@ namespace GameBot.Game.Tetris.Data
                 if (y == Board.Height - 1) builder.AppendFormat(" Score: {0}", Score);
                 else if (y == Board.Height - 2) builder.AppendFormat(" Level: {0}", Level);
                 else if (y == Board.Height - 3) builder.AppendFormat(" Lines: {0}", Lines);
-                else if (y == Board.Height - 5) builder.AppendFormat(" Curr.: {0}", Piece?.Tetromino);
+                else if (y == Board.Height - 5) builder.AppendFormat(" Curr.: {0}", Piece?.Tetrimino);
                 else if (y == Board.Height - 6) builder.AppendFormat(" Next : {0}", NextPiece);
 
                 builder.AppendLine();

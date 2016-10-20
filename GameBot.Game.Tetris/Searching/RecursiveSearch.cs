@@ -9,12 +9,12 @@ namespace GameBot.Game.Tetris.Searching
     public class RecursiveSearch : BaseSearch
     {
         public int Depth;
-        private readonly ICollection<Tetromino> _tetrominos;
+        private readonly ICollection<Tetrimino> _tetrominos;
 
         public RecursiveSearch(IHeuristic heuristic) : base(heuristic)
         {
             Depth = 3;
-            _tetrominos = Enum.GetValues(typeof(Tetromino)).Cast<Tetromino>().ToList();
+            _tetrominos = Enum.GetValues(typeof(Tetrimino)).Cast<Tetrimino>().ToList();
         }
 
         public override SearchResult Search(GameState gameState)
@@ -87,10 +87,10 @@ namespace GameBot.Game.Tetris.Searching
                 double minimal = double.MaxValue;
                 bestNode = parent;
 
-                // test each tetromino with its chance to appear
+                // test each tetrimino with its chance to appear
                 foreach (var tetromino in _tetrominos)
                 {
-                    //double chance = tetromino.GetChance();
+                    //double chance = tetrimino.GetChance();
 
                     //Node bestNodeForThisTetromino = null;
                     double bestScoreForThisTetromino = double.NegativeInfinity;

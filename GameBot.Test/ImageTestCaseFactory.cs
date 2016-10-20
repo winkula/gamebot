@@ -22,11 +22,11 @@ namespace GameBot.Test
             private string ImagePath => $"Images/test{ImageKey}.jpg";
             private Point[] Keypoints { get; }
             public Piece Piece { get; }
-            public Tetromino? NextPiece { get; }
+            public Tetrimino? NextPiece { get; }
             public Move? Move { get; }
             public IScreenshot Screenshot { get; }
 
-            public TestData(string imageKey, Piece currentPiece, Tetromino? nextPiece, Move? move = null)
+            public TestData(string imageKey, Piece currentPiece, Tetrimino? nextPiece, Move? move = null)
             {
                 ImageKey = imageKey;
                 Keypoints = _keypoints[int.Parse(imageKey.Substring(0, 2))];
@@ -54,41 +54,41 @@ namespace GameBot.Test
 
         private static readonly IEnumerable<TestData> _data = new List<TestData>
         {
-            new TestData("0000", new Piece(Tetromino.T), Tetromino.J, Move.Right),
-            new TestData("0001", new Piece(Tetromino.J), Tetromino.S, Move.Left),
-            new TestData("0002", new Piece(Tetromino.S), Tetromino.S, Move.RotateCounterclockwise),
-            new TestData("0003", new Piece(Tetromino.S), Tetromino.O, Move.Rotate),
-            new TestData("0004", new Piece(Tetromino.O), Tetromino.J, Move.Left),
-            new TestData("0005", new Piece(Tetromino.J), Tetromino.T, Move.Right),
-            new TestData("0006", new Piece(Tetromino.L), Tetromino.J, Move.Left),
-            new TestData("0007", new Piece(Tetromino.J), Tetromino.L, Move.Rotate),
-            new TestData("0008", new Piece(Tetromino.L), Tetromino.L, Move.Right),
-            new TestData("0009", new Piece(Tetromino.L), Tetromino.T, Move.RotateCounterclockwise),
-            new TestData("0010", new Piece(Tetromino.T), Tetromino.T, Move.Rotate),
-            new TestData("0011", new Piece(Tetromino.Z), Tetromino.J, Move.Right),
+            new TestData("0000", new Piece(Tetrimino.T), Tetrimino.J, Move.Right),
+            new TestData("0001", new Piece(Tetrimino.J), Tetrimino.S, Move.Left),
+            new TestData("0002", new Piece(Tetrimino.S), Tetrimino.S, Move.RotateCounterclockwise),
+            new TestData("0003", new Piece(Tetrimino.S), Tetrimino.O, Move.Rotate),
+            new TestData("0004", new Piece(Tetrimino.O), Tetrimino.J, Move.Left),
+            new TestData("0005", new Piece(Tetrimino.J), Tetrimino.T, Move.Right),
+            new TestData("0006", new Piece(Tetrimino.L), Tetrimino.J, Move.Left),
+            new TestData("0007", new Piece(Tetrimino.J), Tetrimino.L, Move.Rotate),
+            new TestData("0008", new Piece(Tetrimino.L), Tetrimino.L, Move.Right),
+            new TestData("0009", new Piece(Tetrimino.L), Tetrimino.T, Move.RotateCounterclockwise),
+            new TestData("0010", new Piece(Tetrimino.T), Tetrimino.T, Move.Rotate),
+            new TestData("0011", new Piece(Tetrimino.Z), Tetrimino.J, Move.Right),
 
-            new TestData("0100", new Piece(Tetromino.O), Tetromino.I, Move.Right),
-            new TestData("0101", new Piece(Tetromino.I), Tetromino.T, Move.Left),
-            new TestData("0102", new Piece(Tetromino.T), Tetromino.O, Move.Left),
-            new TestData("0103", new Piece(Tetromino.T, 0, 3, -5), Tetromino.O, Move.Rotate),
-            new TestData("0104", new Piece(Tetromino.T, 0, 3, -10), Tetromino.O, Move.Right),
-            new TestData("0105", new Piece(Tetromino.O, 0, 4, -4), Tetromino.J, Move.Left),
-            new TestData("0106", new Piece(Tetromino.O, 0, 4, -7), Tetromino.J, Move.Left),
-            new TestData("0107", new Piece(Tetromino.J).Fall(2), null, Move.RotateCounterclockwise),
+            new TestData("0100", new Piece(Tetrimino.O), Tetrimino.I, Move.Right),
+            new TestData("0101", new Piece(Tetrimino.I), Tetrimino.T, Move.Left),
+            new TestData("0102", new Piece(Tetrimino.T), Tetrimino.O, Move.Left),
+            new TestData("0103", new Piece(Tetrimino.T, 0, 3, -5), Tetrimino.O, Move.Rotate),
+            new TestData("0104", new Piece(Tetrimino.T, 0, 3, -10), Tetrimino.O, Move.Right),
+            new TestData("0105", new Piece(Tetrimino.O, 0, 4, -4), Tetrimino.J, Move.Left),
+            new TestData("0106", new Piece(Tetrimino.O, 0, 4, -7), Tetrimino.J, Move.Left),
+            new TestData("0107", new Piece(Tetrimino.J).Fall(2), null, Move.RotateCounterclockwise),
 
-            new TestData("0200", new Piece(Tetromino.T).Fall(2), Tetromino.L, Move.Rotate),
-            new TestData("0201", new Piece(Tetromino.T, 0, -1, -9), Tetromino.L, Move.RotateCounterclockwise),
-            new TestData("0202", new Piece(Tetromino.L, 0, -3, -4), Tetromino.O, Move.Rotate),
-            new TestData("0203", new Piece(Tetromino.O).Fall(3), Tetromino.J, Move.Right),
-            new TestData("0204", new Piece(Tetromino.O, 0, -2, -10), Tetromino.J, Move.Left),
-            new TestData("0205", new Piece(Tetromino.J, 0, 4, -6), Tetromino.O, Move.Left),
-            new TestData("0206", new Piece(Tetromino.J, 0, 4, -8), Tetromino.O, Move.Rotate),
-            new TestData("0207", new Piece(Tetromino.O).Fall(2), Tetromino.T, Move.Right),
-            new TestData("0208", new Piece(Tetromino.O, 0, 2, -5), Tetromino.T, Move.Left),
-            new TestData("0209", new Piece(Tetromino.T, 0, 4, -4), Tetromino.L, Move.Left),
-            new TestData("0210", new Piece(Tetromino.L, 0, 4, -4), Tetromino.J, Move.RotateCounterclockwise),
-            new TestData("0211", new Piece(Tetromino.S).Fall(4), null, Move.Left),
-            new TestData("0212", new Piece(Tetromino.S).Fall(), null, Move.Right),
+            new TestData("0200", new Piece(Tetrimino.T).Fall(2), Tetrimino.L, Move.Rotate),
+            new TestData("0201", new Piece(Tetrimino.T, 0, -1, -9), Tetrimino.L, Move.RotateCounterclockwise),
+            new TestData("0202", new Piece(Tetrimino.L, 0, -3, -4), Tetrimino.O, Move.Rotate),
+            new TestData("0203", new Piece(Tetrimino.O).Fall(3), Tetrimino.J, Move.Right),
+            new TestData("0204", new Piece(Tetrimino.O, 0, -2, -10), Tetrimino.J, Move.Left),
+            new TestData("0205", new Piece(Tetrimino.J, 0, 4, -6), Tetrimino.O, Move.Left),
+            new TestData("0206", new Piece(Tetrimino.J, 0, 4, -8), Tetrimino.O, Move.Rotate),
+            new TestData("0207", new Piece(Tetrimino.O).Fall(2), Tetrimino.T, Move.Right),
+            new TestData("0208", new Piece(Tetrimino.O, 0, 2, -5), Tetrimino.T, Move.Left),
+            new TestData("0209", new Piece(Tetrimino.T, 0, 4, -4), Tetrimino.L, Move.Left),
+            new TestData("0210", new Piece(Tetrimino.L, 0, 4, -4), Tetrimino.J, Move.RotateCounterclockwise),
+            new TestData("0211", new Piece(Tetrimino.S).Fall(4), null, Move.Left),
+            new TestData("0212", new Piece(Tetrimino.S).Fall(), null, Move.Right),
 
             new TestData("0300", null, null) // pause menu
         };

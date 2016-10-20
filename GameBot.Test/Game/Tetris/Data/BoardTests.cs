@@ -170,7 +170,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 0,0,0,0,0,0,0,0,0,0
             });
             var board = new Board();
-            var piece = new Piece(Tetromino.I).Rotate().Fall();
+            var piece = new Piece(Tetrimino.I).Rotate().Fall();
 
             board.Place(piece);
 
@@ -329,7 +329,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 1,0,1,1,0,1,0,0,1,0,
                 0,0,1,1,0,1,1,1,0,1
             });            
-            var piece = new Piece(Tetromino.I).Rotate().Fall(12);
+            var piece = new Piece(Tetrimino.I).Rotate().Fall(12);
 
             board.Place(piece);            
             board.RemoveLines();
@@ -382,7 +382,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 0,0,0,0,1,0,0,0,0,0,
                 0,0,0,0,1,0,0,0,0,0
             });
-            var piece = new Piece(Tetromino.I).Rotate().Fall(15);
+            var piece = new Piece(Tetrimino.I).Rotate().Fall(15);
 
             board.Place(piece);
             board.RemoveLines();
@@ -417,7 +417,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 1,0,1,1,0,1,0,0,1,0,
                 0,0,1,1,0,1,1,1,0,1
             });
-            var piece = new Piece(Tetromino.O).Fall(6);
+            var piece = new Piece(Tetrimino.O).Fall(6);
 
             Assert.True(board.Intersects(piece));
         }
@@ -426,7 +426,7 @@ namespace GameBot.Test.Game.Tetris.Data
         public void NotIntersects()
         {
             var board = new Board();
-            var piece = new Piece(Tetromino.Z).Rotate();
+            var piece = new Piece(Tetrimino.Z).Rotate();
 
             Assert.False(board.Intersects(piece));
         }

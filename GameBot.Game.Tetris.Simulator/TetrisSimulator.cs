@@ -6,7 +6,7 @@ namespace GameBot.Game.Tetris.Simulator
     {
         public TetrisSimulator()
         {
-            GameState = new GameState(new Piece(), Tetrominos.GetRandom());
+            GameState = new GameState(new Piece(), Tetriminos.GetRandom());
         }
 
         public GameState GameState { get; }

@@ -20,7 +20,7 @@ namespace GameBot.Test.Game.Tetris.Data
             Assert.AreEqual(0, gameState.StartLevel);
         }
 
-        [TestCase(Tetromino.L, Tetromino.O, 0, 10, new[] {
+        [TestCase(Tetrimino.L, Tetrimino.O, 0, 10, new[] {
             0,0,0,0,0,0,0,0,0,0,
             0,0,0,2,2,2,0,0,0,0,
             0,0,0,2,0,0,0,0,0,0,
@@ -59,7 +59,7 @@ namespace GameBot.Test.Game.Tetris.Data
             0,1,1,1,0,0,1,0,1,0,
             1,1,0,1,0,0,1,0,1,0
         })]
-        [TestCase(Tetromino.S, Tetromino.I, -3, 13, new[] {
+        [TestCase(Tetrimino.S, Tetrimino.I, -3, 13, new[] {
             0,0,0,0,0,0,0,0,0,0,
             0,2,2,0,0,0,0,0,0,0,
             2,2,0,0,0,0,0,0,0,0,
@@ -98,7 +98,7 @@ namespace GameBot.Test.Game.Tetris.Data
             1,1,0,0,0,0,0,0,0,0,
             1,1,0,0,0,0,0,0,0,0
         })]
-        public void Drop(Tetromino piece, Tetromino next, int translation, int expectedFall, int[] before, int[] after)
+        public void Drop(Tetrimino piece, Tetrimino next, int translation, int expectedFall, int[] before, int[] after)
         {
             var gameState = new GameState(new Piece(piece, 0, translation), next);
             for (int x = 0; x < 10; x++)
@@ -109,7 +109,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 }
             }
 
-            Assert.AreEqual(piece, gameState.Piece.Tetromino);
+            Assert.AreEqual(piece, gameState.Piece.Tetrimino);
             Assert.AreEqual(0, gameState.Board.Pieces);
 
             int fall = gameState.Drop();
@@ -133,7 +133,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 }
             }
 
-            Assert.AreEqual(next, gameState.Piece.Tetromino);
+            Assert.AreEqual(next, gameState.Piece.Tetrimino);
             Assert.AreEqual(1, gameState.Board.Pieces);
         }
         

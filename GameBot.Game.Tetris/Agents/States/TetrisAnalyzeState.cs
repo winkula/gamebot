@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GameBot.Game.Tetris.Extraction;
+using GameBot.Game.Tetris.Extraction.Samplers;
 
 namespace GameBot.Game.Tetris.Agents.States
 {
@@ -14,31 +15,31 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private readonly TetrisAgent _agent;
 
-        private Tetromino? _currentTetromino;
+        private Tetrimino? _currentTetrimino;
 
-        private readonly IList<ProbabilisticResult<Piece>> _extractedPieceSamples;
-        private readonly IList<ProbabilisticResult<Tetromino>> _extractedNextPieceSamples;
-
+        private readonly ISampler<Piece> _currentPieceSampler;
+        private readonly ISampler<Tetrimino> _nextPieceSampler;
+        
         private Piece _extractedPiece;
         private TimeSpan _extractedPieceTimestamp;
-        private Tetromino? _extractedNextPiece;
+        private Tetrimino? _extractedNextPiece;
         private TimeSpan? _beginTime;
         
         // we can extract the next piece only then, when we already have found the current piece
-        private bool CanExtractNextPiece => _extractedPiece != null || _extractedPieceSamples.Any();
+        private bool CanExtractNextPiece => _extractedPiece != null || _currentPieceSampler.SampleCount > 0;
 
         // extraction is complete, when we have both pieces (current and next)
         private bool ExtractionComplete => _extractedPiece != null && _extractedNextPiece.HasValue;
 
-        public TetrisAnalyzeState(TetrisAgent agent, Tetromino? currentTetromino = null)
+        public TetrisAnalyzeState(TetrisAgent agent, Tetrimino? currentTetrimino = null)
         {
             if (agent == null) throw new ArgumentNullException(nameof(agent));
 
             _agent = agent;
-            _currentTetromino = currentTetromino;
-            _extractedPieceSamples = new List<ProbabilisticResult<Piece>>(_agent.ExtractionSamples);
-            _extractedNextPieceSamples = new List<ProbabilisticResult<Tetromino>>(_agent.ExtractionSamples);
-
+            _currentTetrimino = currentTetrimino;
+            _currentPieceSampler = new CurrentTetriminoSampler(_agent.ExtractionSamples);
+            _nextPieceSampler = new NextTetriminoSampler(_agent.ExtractionSamples);
+            
             _agent.ExtractedPiece = null;
             _agent.ExtractedNextPiece = null;
             _agent.TracedPiece = null;
@@ -53,8 +54,8 @@ namespace GameBot.Game.Tetris.Agents.States
                 _beginTime = _agent.Screenshot.Timestamp;
             }
 
-            int searchHeight = CalulateSearchHeight(_currentTetromino);
-            _logger.Info($"Search height for extraction is {searchHeight}");
+            int searchHeight = CalulateSearchHeight(_currentTetrimino);
+            _logger.Info($"Analyze (search height {searchHeight})");
 
             ExtractGameState(searchHeight);
         }
@@ -65,15 +66,14 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 UpdateGlobalGameState();
 
-                _logger.Info($"Game state extraction successfully:\n{_agent.GameState}");
+                _logger.Info($"Game state extraction successful\n{_agent.GameState}");
 
                 // perform the search
-                // here we decide, where we want to place our tetromino on the board
+                // here we decide, where we want to place our tetrimino on the board
                 var results = Search();
                 if (results == null) throw new Exception("search was not successful");
 
-                _logger.Info("Agent found a solution");
-                _logger.Info($"Solution: {string.Join(", ", results.Moves.Select(x => x.ToString()))}");
+                _logger.Info($"Agent found a solution: {string.Join(", ", results.Moves.Select(x => x.ToString()))}");
 
                 // begin to execute the commands
                 SetStateExecute(results);
@@ -109,45 +109,28 @@ namespace GameBot.Game.Tetris.Agents.States
             if (!result.Result.IsUntouched)
             {
                 // reject (threshold not reached or piece is touched)
-                _logger.Warn($"Reject extracted current piece: not untouched ({result.Result}, probability {result.Probability:F})");
+                _logger.Warn($"Reject extracted current piece: not untouched ({result.Result.Tetrimino}, probability {result.Probability:F})");
                 return;
             }
             if (result.IsAccepted(_agent.ExtractionUpperThreshold))
             {
                 // accept immediately
-                _logger.Info($"Accept extracted current piece immediately ({result.Result}, probability {result.Probability:F})");
+                _logger.Info($"Accept extracted current piece immediately ({result.Result.Tetrimino}, probability {result.Probability:F})");
                 AcceptCurrentPiece(result.Result);
                 return;
             }
 
             // add sample
-            _logger.Info($"Added sample for extracted current piece ({result.Result}, probability {result.Probability:F})");
-            _extractedPieceSamples.Add(result);
-
-            // do we have enougt samples?
-            // TODO: outsource in separate class, break early, if we reach the majority (2 of 3 for example)
-            if (_extractedPieceSamples.Count >= _agent.ExtractionSamples)
+            _logger.Info($"Added sample for extracted current piece ({result.Result.Tetrimino}, probability {result.Probability:F})");
+            _currentPieceSampler.Sample(result);
+            
+            if (_currentPieceSampler.IsComplete)
             {
-                // evaluate samples
-                // group by tetromino, orientation and x coordinate to make evaluation Y invariant
-                // we then take the last matching sample and take its y coordinate
-                var samplesOrderedGrouped = _extractedPieceSamples
-                    .GroupBy(x => new { x.Result.Tetromino, x.Result.Orientation, x.Result.X }, y => y.Probability)
-                    .Select(x => new { Piece = x.Key, Number = x.Count(), ProbabilityAvg = x.Average(), ProbabilityMax = x.Max() })
-                    .OrderByDescending(x => x.Number)
-                    .ThenByDescending(x => x.ProbabilityAvg)
-                    .ToList();
-                var invariantPiece = samplesOrderedGrouped.First().Piece;
-                var yCoordinate = _extractedPieceSamples
-                    .Reverse()
-                    .First(x => 
-                        x.Result.Tetromino == invariantPiece.Tetromino && 
-                        x.Result.Orientation == invariantPiece.Orientation && 
-                        x.Result.X == invariantPiece.X)
-                    .Result.Y;
-                var piece = new Piece(invariantPiece.Tetromino, invariantPiece.Orientation, invariantPiece.X, yCoordinate);
+                // we have enought samples
+                // evaluate our "true" result
+                var piece = _currentPieceSampler.Result;
 
-                _logger.Info($"Accept extracted current piece by sampling ({result.Result}, {samplesOrderedGrouped.First().Number} samples)");
+                _logger.Info($"Accept extracted current piece by sampling ({result.Result.Tetrimino})");
                 AcceptCurrentPiece(piece);
             }
         }
@@ -183,27 +166,20 @@ namespace GameBot.Game.Tetris.Agents.States
 
             // add sample
             _logger.Info($"Added sample for extracted next piece ({result.Result}, probability {result.Probability:F})");
-            _extractedNextPieceSamples.Add(result);
-
-            // do we have enougt samples?
-            // TODO: outsource in separate class, break early, if we reach the majority (2 of 3 for example)
-            if (_extractedNextPieceSamples.Count >= _agent.ExtractionSamples)
+            _nextPieceSampler.Sample(result);
+            
+            if (_nextPieceSampler.IsComplete)
             {
-                // evaluate samples
-                var samplesOrderedGrouped = _extractedNextPieceSamples
-                    .GroupBy(x => x.Result, y => y.Probability)
-                    .Select(x => new { NextPiece = x.Key, Number = x.Count(), ProbabilityAvg = x.Average(), ProbabilityMax = x.Max() })
-                    .OrderByDescending(x => x.Number)
-                    .ThenByDescending(x => x.ProbabilityAvg)
-                    .ToList();
-                var nextPiece = samplesOrderedGrouped.First().NextPiece;
-
-                _logger.Info($"Accept extracted next piece by sampling ({result.Result}, {samplesOrderedGrouped.First().Number} samples)");
+                // we have enought samples
+                // evaluate our "true" result
+                var nextPiece = _nextPieceSampler.Result;
+                
+                _logger.Info($"Accept extracted next piece by sampling ({result.Result})");
                 AcceptNextPiece(nextPiece);
             }
         }
         
-        private void AcceptNextPiece(Tetromino nextPiece)
+        private void AcceptNextPiece(Tetrimino nextPiece)
         {
             _extractedNextPiece = nextPiece;
             _agent.ExtractedNextPiece = _extractedNextPiece;
@@ -213,19 +189,19 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             var screenshot = _agent.Screenshot;
 
-            if (_currentTetromino.HasValue)
+            if (_currentTetrimino.HasValue)
             {
-                // we know which tetromino to look for
+                // we know which tetrimino to look for
                 // this gives us valuable information and we can validate our results
-                return _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(_currentTetromino.Value), searchHeight);
+                return _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(_currentTetrimino.Value), searchHeight);
             }
 
             // this case only happens once (in the beginning of a new game)
-            // we have to test every possible tetromino and take the most probable
+            // we have to test every possible tetrimino and take the most probable
             return _agent.PieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, searchHeight);
         }
 
-        private ProbabilisticResult<Tetromino> ExtractNextPiece()
+        private ProbabilisticResult<Tetrimino> ExtractNextPiece()
         {
             var screenshot = _agent.Screenshot;
 
@@ -243,7 +219,7 @@ namespace GameBot.Game.Tetris.Agents.States
             return _agent.Search.Search(_agent.GameState);
         }
 
-        private int CalulateSearchHeight(Tetromino? tetromino)
+        private int CalulateSearchHeight(Tetrimino? tetrimino)
         {
             if (!_beginTime.HasValue) throw new Exception("_beginTime is not initialized");
 
@@ -255,16 +231,16 @@ namespace GameBot.Game.Tetris.Agents.States
 
             int searchHeightTime = TetrisLevel.GetMaxFallDistance(_agent.GameState.Level, passedTime);
 
-            if (tetromino.HasValue)
+            if (tetrimino.HasValue)
             {
-                // we know which tetromino we are looking for
-                // we maximally search to the distance that this tetromino could possibly fall (drop distance)
-                int dropDistance = _agent.GameState.Board.DropDistance(new Piece(tetromino.Value));
+                // we know which tetrimino we are looking for
+                // we maximally search to the distance that this tetrimino could possibly fall (drop distance)
+                int dropDistance = _agent.GameState.Board.DropDistance(new Piece(tetrimino.Value));
                 return Math.Min(searchHeightTime, dropDistance);
             }
 
             // this case only happens once (in the beginning of a new game)
-            // we don't know which tetromino we are looking for, so we take the maximum drop distance of every possible tetromino
+            // we don't know which tetrimino we are looking for, so we take the maximum drop distance of every possible tetrimino
             int maxDropDistance = _agent.GameState.Board.MaximumDropDistanceForSpawnedPiece();
             return Math.Min(searchHeightTime, maxDropDistance);
         }

@@ -117,8 +117,8 @@ namespace GameBot.Test.Game.Tetris.Searching
             for (int i = 0; i < number; i++)
             {
                 var board = new Board().Random(random);
-                var piece = new Piece(Tetrominos.GetRandom(random));
-                var nextPiece = Tetrominos.GetRandom(random);
+                var piece = new Piece(Tetriminos.GetRandom(random));
+                var nextPiece = Tetriminos.GetRandom(random);
                 
                 var gameState = new GameState(board, piece, nextPiece);
 

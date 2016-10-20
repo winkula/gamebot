@@ -36,7 +36,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         }
         
         [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPiecePositives))]
-        public void RecognizeNextPiece(string imageKey, IScreenshot screenshot, Tetromino nextPieceExpected)
+        public void RecognizeNextPiece(string imageKey, IScreenshot screenshot, Tetrimino nextPieceExpected)
         {
             _nextPiece++;
 
@@ -116,7 +116,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             _knownSpawnedPiece++;
 
-            var spawned = new Piece(currentPieceExpected.Tetromino);
+            var spawned = new Piece(currentPieceExpected.Tetrimino);
 
             // TODO: make tests with higher search distance!
             var maxFallingDistance = currentPieceExpected.FallHeight;
@@ -137,7 +137,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             // TODO: make tests with higher search distance!
             var maxFallingDistance = currentPieceExpected.FallHeight;
 
-            var pieceTrue = new Piece(currentPieceExpected.Tetromino, currentPieceExpected.Orientation, currentPieceExpected.X);
+            var pieceTrue = new Piece(currentPieceExpected.Tetrimino, currentPieceExpected.Orientation, currentPieceExpected.X);
             var pieceFalse = new Piece(pieceTrue).Apply(move);
 
             var resultTrue = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceTrue, maxFallingDistance);

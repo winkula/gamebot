@@ -153,6 +153,9 @@
     <Compile Include="Core\Data\Commands\PressCommandTests.cs" />
     <Compile Include="Core\Data\Commands\HitCommandTests.cs" />
     <Compile Include="Core\Executors\ExecutorTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\Samplers\MoveConfirmationSamplerTests - Kopieren.cs" />
+    <Compile Include="Game\Tetris\Extraction\Samplers\NextTetriminoSamplerTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\Samplers\CurrentTetriminoSamplerTests.cs" />
     <Compile Include="Game\Tetris\Extraction\StatisticalPieceMatcherTests.cs" />
     <Compile Include="Game\Tetris\Extraction\StatisticalPieceExtractorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\PieceMatcherTests.cs" />

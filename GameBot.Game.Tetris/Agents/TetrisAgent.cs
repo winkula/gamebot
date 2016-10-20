@@ -41,7 +41,7 @@ namespace GameBot.Game.Tetris.Agents
         public Piece ExtractedPiece { private get; set; }
         public Piece TracedPiece { private get; set; }
         public Piece ExpectedPiece { private get; set; }
-        public Tetromino? ExtractedNextPiece { private get; set; }
+        public Tetrimino? ExtractedNextPiece { private get; set; }
 
         public TetrisAgent(IConfig config, PieceExtractor pieceExtractor, ISearch search)
         {

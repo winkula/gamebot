@@ -20,7 +20,7 @@ namespace GameBot.Game.Tetris.Searching
         {
             if (GameState.Piece != null)
             {
-                foreach (var pose in GameState.Piece.Tetromino.GetPoses())
+                foreach (var pose in GameState.Piece.Tetrimino.GetPoses())
                 {
                     var newPiece = pose;
                     if (GameState.Board.CanDrop(newPiece))

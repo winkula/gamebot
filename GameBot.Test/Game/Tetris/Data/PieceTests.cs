@@ -9,14 +9,14 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void Constructor()
         {
-            var tetromino = Tetromino.S;
+            var tetromino = Tetrimino.S;
             var orientation = 1;
             var x = 1;
             var y = -4;
 
             var piece = new Piece(tetromino, orientation, x, y);
 
-            Assert.AreEqual(tetromino, piece.Tetromino);
+            Assert.AreEqual(tetromino, piece.Tetrimino);
             Assert.AreEqual(orientation, piece.Orientation);
             Assert.AreEqual(x, piece.X);
             Assert.AreEqual(y, piece.Y);
@@ -25,26 +25,26 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void ConstructorDefault()
         {
-            var tetromino = Tetromino.S;
+            var tetromino = Tetrimino.S;
 
             var piece = new Piece(tetromino);
 
-            Assert.AreEqual(tetromino, piece.Tetromino);
+            Assert.AreEqual(tetromino, piece.Tetrimino);
             Assert.AreEqual(0, piece.Orientation);
             Assert.AreEqual(0, piece.X);
             Assert.AreEqual(0, piece.Y);
         }
 
-        [TestCase(Tetromino.O)]
-        [TestCase(Tetromino.I)]
-        [TestCase(Tetromino.S)]
-        [TestCase(Tetromino.Z)]
-        [TestCase(Tetromino.L)]
-        [TestCase(Tetromino.J)]
-        [TestCase(Tetromino.T)]
-        public void Fall(Tetromino tetromino)
+        [TestCase(Tetrimino.O)]
+        [TestCase(Tetrimino.I)]
+        [TestCase(Tetrimino.S)]
+        [TestCase(Tetrimino.Z)]
+        [TestCase(Tetrimino.L)]
+        [TestCase(Tetrimino.J)]
+        [TestCase(Tetrimino.T)]
+        public void Fall(Tetrimino tetrimino)
         {
-            var piece = new Piece(tetromino);
+            var piece = new Piece(tetrimino);
 
             int yBefore = piece.Y;
             piece.Fall();
@@ -53,17 +53,17 @@ namespace GameBot.Test.Game.Tetris.Data
             Assert.AreEqual(yBefore, yAfter + 1);
         }
 
-        [TestCase(Tetromino.O, 8)]
-        [TestCase(Tetromino.I, 1)]
-        [TestCase(Tetromino.S, 0)]
-        [TestCase(Tetromino.Z, 1)]
-        [TestCase(Tetromino.L, 2)]
-        [TestCase(Tetromino.J, 6)]
-        [TestCase(Tetromino.T, 3)]
-        public void FallMultipleTimes(Tetromino tetromino, int times)
+        [TestCase(Tetrimino.O, 8)]
+        [TestCase(Tetrimino.I, 1)]
+        [TestCase(Tetrimino.S, 0)]
+        [TestCase(Tetrimino.Z, 1)]
+        [TestCase(Tetrimino.L, 2)]
+        [TestCase(Tetrimino.J, 6)]
+        [TestCase(Tetrimino.T, 3)]
+        public void FallMultipleTimes(Tetrimino tetrimino, int times)
         {
-            var piece1 = new Piece(tetromino);
-            var piece2 = new Piece(tetromino);
+            var piece1 = new Piece(tetrimino);
+            var piece2 = new Piece(tetrimino);
 
             int yBefore1 = piece1.Y;
             int yBefore2 = piece2.Y;
@@ -80,16 +80,16 @@ namespace GameBot.Test.Game.Tetris.Data
             Assert.AreEqual(yBefore2, yAfter2 + times);
         }
 
-        [TestCase(Tetromino.O, 8)]
-        [TestCase(Tetromino.I, 1)]
-        [TestCase(Tetromino.S, 0)]
-        [TestCase(Tetromino.Z, 1)]
-        [TestCase(Tetromino.L, 2)]
-        [TestCase(Tetromino.J, 6)]
-        [TestCase(Tetromino.T, 3)]
-        public void Rotate(Tetromino tetromino, int times)
+        [TestCase(Tetrimino.O, 8)]
+        [TestCase(Tetrimino.I, 1)]
+        [TestCase(Tetrimino.S, 0)]
+        [TestCase(Tetrimino.Z, 1)]
+        [TestCase(Tetrimino.L, 2)]
+        [TestCase(Tetrimino.J, 6)]
+        [TestCase(Tetrimino.T, 3)]
+        public void Rotate(Tetrimino tetrimino, int times)
         {
-            var piece = new Piece(tetromino);
+            var piece = new Piece(tetrimino);
 
             int orientationBefore = piece.Orientation;
             for (int i = 0; i < times; i++)
@@ -104,18 +104,18 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void Equals()
         {
-            var piece1 = new Piece(Tetromino.J);
-            var piece2 = new Piece(Tetromino.J);
+            var piece1 = new Piece(Tetrimino.J);
+            var piece2 = new Piece(Tetrimino.J);
 
             Assert.AreEqual(piece1, piece2);
 
-            piece1 = new Piece(Tetromino.O, 1);
-            piece2 = new Piece(Tetromino.O, 1);
+            piece1 = new Piece(Tetrimino.O, 1);
+            piece2 = new Piece(Tetrimino.O, 1);
 
             Assert.AreEqual(piece1, piece2);
 
-            piece1 = new Piece(Tetromino.Z, 3, 7, -2);
-            piece2 = new Piece(Tetromino.Z, 3, 7, -2);
+            piece1 = new Piece(Tetrimino.Z, 3, 7, -2);
+            piece2 = new Piece(Tetrimino.Z, 3, 7, -2);
 
             Assert.AreEqual(piece1, piece2);
         }
@@ -123,18 +123,18 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void NotEquals()
         {
-            var piece1 = new Piece(Tetromino.J);
-            var piece2 = new Piece(Tetromino.O);
+            var piece1 = new Piece(Tetrimino.J);
+            var piece2 = new Piece(Tetrimino.O);
 
             Assert.AreNotEqual(piece1, piece2);
 
-            piece1 = new Piece(Tetromino.O, 1);
-            piece2 = new Piece(Tetromino.O, 2);
+            piece1 = new Piece(Tetrimino.O, 1);
+            piece2 = new Piece(Tetrimino.O, 2);
 
             Assert.AreNotEqual(piece1, piece2);
 
-            piece1 = new Piece(Tetromino.Z, 3, 6, -2);
-            piece2 = new Piece(Tetromino.Z, 3, 7, -1);
+            piece1 = new Piece(Tetrimino.Z, 3, 6, -2);
+            piece2 = new Piece(Tetrimino.Z, 3, 7, -1);
 
             Assert.AreNotEqual(piece1, piece2);
         }

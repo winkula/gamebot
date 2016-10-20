@@ -121,15 +121,15 @@ namespace GameBot.Game.Tetris.Searching
 
         protected double ScoreProbabilisticExpected(Node parent)
         {
-            return Enum.GetValues(typeof(Tetromino))
-                .Cast<Tetromino>()
+            return Enum.GetValues(typeof(Tetrimino))
+                .Cast<Tetrimino>()
                 .AsParallel()
                 .Sum(x => ScoreByChance(parent, x));
         }
 
         protected double ScoreProbabilisticMinimum(Node parent)
         {
-            var tetrominos = Enum.GetValues(typeof(Tetromino)).Cast<Tetromino>();
+            var tetrominos = Enum.GetValues(typeof(Tetrimino)).Cast<Tetrimino>();
             double minimum = 0;
 
             foreach (var tetromino in tetrominos)
@@ -145,11 +145,11 @@ namespace GameBot.Game.Tetris.Searching
             return minimum;
         }
 
-        protected double ScoreByChance(Node parent, Tetromino tetromino)
+        protected double ScoreByChance(Node parent, Tetrimino tetrimino)
         {
-            double chance = tetromino.GetChance();
+            double chance = tetrimino.GetChance();
 
-            var newState = new GameState(parent.GameState, new Piece(tetromino));
+            var newState = new GameState(parent.GameState, new Piece(tetrimino));
             var child = new Node(newState);
             var successors = child.GetSuccessors();
             var score = GetBestScore(successors);

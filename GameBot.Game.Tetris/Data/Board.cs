@@ -264,7 +264,7 @@ namespace GameBot.Game.Tetris.Data
         {
             int distance = 0;
 
-            foreach (var tetromino in Tetrominos.All)
+            foreach (var tetromino in Tetriminos.All)
             {
                 var distanceTest = DropDistance(new Piece(tetromino));
                 distance = Math.Max(distance, distanceTest);

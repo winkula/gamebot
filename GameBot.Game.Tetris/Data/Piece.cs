@@ -4,21 +4,21 @@ namespace GameBot.Game.Tetris.Data
 {
     public class Piece
     {
-        public Tetromino Tetromino { get; }
+        public Tetrimino Tetrimino { get; }
         public Shape Shape { get; private set; }
 
         /// <summary>
-        /// Orientation is counted in clockwise direction from the start position of a Tetromino.
+        /// Orientation is counted in clockwise direction from the start position of a Tetrimino.
         /// </summary>
         public int Orientation { get; private set; }
 
         /// <summary>
-        /// X axis is from left to right. The origin is the spawning point of the Tetromino.
+        /// X axis is from left to right. The origin is the spawning point of the Tetrimino.
         /// </summary>
         public int X { get; private set; }
 
         /// <summary>
-        /// Y axis is from bottom to top. The origin is the spawning point of the Tetromino.
+        /// Y axis is from bottom to top. The origin is the spawning point of the Tetrimino.
         /// </summary>
         public int Y { get; private set; }
 
@@ -33,25 +33,25 @@ namespace GameBot.Game.Tetris.Data
 
         public bool IsOrigin => IsUntouched && !IsFallen;
 
-        public Piece(Tetromino tetromino, int orientation = 0, int x = 0, int y = 0)
+        public Piece(Tetrimino tetrimino, int orientation = 0, int x = 0, int y = 0)
         {
             if (orientation < 0 || orientation > 3)
                 throw new ArgumentException("orientation must be between 0 and 3");
             if (y > 0)
                 throw new ArgumentException("y must be 0 or negative");
 
-            Tetromino = tetromino;
-            Shape = Shape.Get(tetromino, orientation);
+            Tetrimino = tetrimino;
+            Shape = Shape.Get(tetrimino, orientation);
             Orientation = orientation;
             X = x;
             Y = y;
         }
 
-        public Piece(Piece piece) : this(piece.Tetromino, piece.Orientation, piece.X, piece.Y)
+        public Piece(Piece piece) : this(piece.Tetrimino, piece.Orientation, piece.X, piece.Y)
         {
         }
 
-        public Piece() : this(Tetrominos.GetRandom())
+        public Piece() : this(Tetriminos.GetRandom())
         {
         }
 
@@ -60,7 +60,7 @@ namespace GameBot.Game.Tetris.Data
             var shape = Shape.FromMask(mask);
             if (shape != null)
             {
-                return new Piece(shape.Tetromino, shape.Orientation);
+                return new Piece(shape.Tetrimino, shape.Orientation);
             }
             return null;
         }
@@ -134,7 +134,7 @@ namespace GameBot.Game.Tetris.Data
 
         public override int GetHashCode()
         {
-            return (int)Tetromino ^ (Orientation << 3) ^ (X << 5) ^ (Y << 10);
+            return (int)Tetrimino ^ (Orientation << 3) ^ (X << 5) ^ (Y << 10);
         }
 
         public override bool Equals(object obj)
@@ -144,14 +144,14 @@ namespace GameBot.Game.Tetris.Data
             Piece other = obj as Piece;
             if (other != null)
             {
-                return Tetromino == other.Tetromino && Orientation == other.Orientation && X == other.X && Y == other.Y;
+                return Tetrimino == other.Tetrimino && Orientation == other.Orientation && X == other.X && Y == other.Y;
             }
             return false;
         }
 
         public override string ToString()
         {
-            return $"Piece({Tetromino}, o:{Orientation}, x:{X}, y:{Y})";
+            return $"Piece({Tetrimino}, o:{Orientation}, x:{X}, y:{Y})";
         }
     }
 }

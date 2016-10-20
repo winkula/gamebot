@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GameBot.Game.Tetris.Data
 {
-    public enum Tetromino
+    public enum Tetrimino
     {
         O = 0,
         I = 1,
@@ -13,15 +13,15 @@ namespace GameBot.Game.Tetris.Data
         J = 5,
         T = 6
     }
-
-    public static class Tetrominos
+    
+    public static class Tetriminos
     {
         public const int AllPossibleOrientations = 19;
 
         /// <summary>
-        /// All possible Tetrominos.
+        /// All possible Tetriminos.
         /// </summary>
-        public static readonly Tetromino[] All = { Tetromino.O, Tetromino.I, Tetromino.S, Tetromino.Z, Tetromino.L, Tetromino.J, Tetromino.T };
+        public static readonly Tetrimino[] All = { Tetrimino.O, Tetrimino.I, Tetrimino.S, Tetrimino.Z, Tetrimino.L, Tetrimino.J, Tetrimino.T };
 
         private static readonly Random _random = new Random();
 
@@ -29,100 +29,100 @@ namespace GameBot.Game.Tetris.Data
         private static readonly double[] _chances = { 0.149, 0.130, 0.196, 0.100, 0.113, 0.145, 0.167 };
         private static readonly int[][] _orientations = { new[] { 0 }, new[] { 0, 1 }, new[] { 0, 1 }, new[] { 0, 1 }, new[] { 0, 1, 2, 3 }, new[] { 0, 1, 2, 3 }, new[] { 0, 1, 2, 3 } };
 
-        public static Tetromino GetRandom(Random random = null)
+        public static Tetrimino GetRandom(Random random = null)
         {
             var p = (random ?? _random).NextDouble();
-            if (p < 0.149) return Tetromino.O;
-            if (p < 0.279) return Tetromino.I;
-            if (p < 0.475) return Tetromino.S;
-            if (p < 0.575) return Tetromino.Z;
-            if (p < 0.688) return Tetromino.L;
-            if (p < 0.833) return Tetromino.J;
-            return Tetromino.T;
+            if (p < 0.149) return Tetrimino.O;
+            if (p < 0.279) return Tetrimino.I;
+            if (p < 0.475) return Tetrimino.S;
+            if (p < 0.575) return Tetrimino.Z;
+            if (p < 0.688) return Tetrimino.L;
+            if (p < 0.833) return Tetrimino.J;
+            return Tetrimino.T;
         }
 
-        public static double GetChance(Tetromino tetromino)
+        public static double GetChance(Tetrimino tetrimino)
         {
-            return _chances[(int)tetromino];
+            return _chances[(int)tetrimino];
         }
 
-        public static IEnumerable<int> GetPossibleOrientations(Tetromino tetromino)
+        public static IEnumerable<int> GetPossibleOrientations(Tetrimino tetrimino)
         {
-            return _orientations[(int)tetromino];
+            return _orientations[(int)tetrimino];
         }
     }
 
     public static class TetrominoExtensions
     {
-        public static double GetChance(this Tetromino tetromino)
+        public static double GetChance(this Tetrimino tetrimino)
         {
-            return Tetrominos.GetChance(tetromino);
+            return Tetriminos.GetChance(tetrimino);
         }
 
-        public static IEnumerable<int> GetPossibleOrientations(this Tetromino tetromino)
+        public static IEnumerable<int> GetPossibleOrientations(this Tetrimino tetrimino)
         {
-            return Tetrominos.GetPossibleOrientations(tetromino);
+            return Tetriminos.GetPossibleOrientations(tetrimino);
         }
         
-        // gets all start configurations that are possible for a specified tetromino
-        public static IEnumerable<Piece> GetPoses(this Tetromino tetromino)
+        // gets all start configurations that are possible for a specified tetrimino
+        public static IEnumerable<Piece> GetPoses(this Tetrimino tetrimino)
         {
             Shape shape;
 
             // TODO: make static lookup table
-            switch (tetromino)
+            switch (tetrimino)
             {
-                case Tetromino.O:
-                    shape = Shape.Get(tetromino);
+                case Tetrimino.O:
+                    shape = Shape.Get(tetrimino);
                     for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                        yield return new Piece(tetromino, 0, translation);
+                        yield return new Piece(tetrimino, 0, translation);
                     break;
-                case Tetromino.I:
+                case Tetrimino.I:
                     foreach (int rotation in new[] { 0, 1 })
                     {
-                        shape = Shape.Get(tetromino, rotation);
+                        shape = Shape.Get(tetrimino, rotation);
                         for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetromino, rotation, translation);
+                            yield return new Piece(tetrimino, rotation, translation);
                     }
                     break;
-                case Tetromino.S:
+                case Tetrimino.S:
                     foreach (int rotation in new[] { 0, 1 })
                     {
-                        shape = Shape.Get(tetromino, rotation);
+                        shape = Shape.Get(tetrimino, rotation);
                         for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetromino, rotation, translation);
+                            yield return new Piece(tetrimino, rotation, translation);
                     }
                     break;
-                case Tetromino.Z:
+                case Tetrimino.Z:
                     foreach (int rotation in new[] { 0, 1 })
                     {
-                        shape = Shape.Get(tetromino, rotation);
+                        shape = Shape.Get(tetrimino, rotation);
                         for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetromino, rotation, translation);
+                            yield return new Piece(tetrimino, rotation, translation);
                     }
                     break;
-                case Tetromino.L:
+                case Tetrimino.L:
                     for (int rotation = 0; rotation < 4; rotation++)
                     {
-                        shape = Shape.Get(tetromino, rotation);
+                        shape = Shape.Get(tetrimino, rotation);
                         for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetromino, rotation, translation);
+                            yield return new Piece(tetrimino, rotation, translation);
                     }
                     break;
-                case Tetromino.J:
+                case Tetrimino.J:
                     for (int rotation = 0; rotation < 4; rotation++)
                     {
-                        shape = Shape.Get(tetromino, rotation);
+                        shape = Shape.Get(tetrimino, rotation);
                         for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetromino, rotation, translation);
+                            yield return new Piece(tetrimino, rotation, translation);
                     }
                     break;
-                case Tetromino.T:
+                case Tetrimino.T:
                     for (int rotation = 0; rotation < 4; rotation++)
                     {
-                        shape = Shape.Get(tetromino, rotation);
+                        shape = Shape.Get(tetrimino, rotation);
                         for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetromino, rotation, translation);
+                            yield return new Piece(tetrimino, rotation, translation);
                     }
                     break;
             }

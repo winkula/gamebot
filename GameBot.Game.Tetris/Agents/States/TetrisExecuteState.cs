@@ -64,9 +64,7 @@ namespace GameBot.Game.Tetris.Agents.States
             var linesBefore = _agent.GameState.Lines;
             var dropDistance = _agent.GameState.Drop();
             var dropDuration = TetrisTiming.GetDropDuration(dropDistance);
-
-            _logger.Info("Execute Drop");
-            _logger.Info($"New score: {_agent.GameState.Score}");
+            int linesRemoved = 0;
 
             if (_agent.GameState.Lines > linesBefore)
             {
@@ -74,15 +72,15 @@ namespace GameBot.Game.Tetris.Agents.States
                 //var lineRemoveDuration = TetrisTiming.LineRemovingDuration();
                 dropDuration += TetrisTiming.LineRemovingDuration;
 
-                var linesRemoved = _agent.GameState.Lines - linesBefore;
-                _logger.Info($"{linesRemoved} lines removed");
+                linesRemoved = _agent.GameState.Lines - linesBefore;
             }
-
+            
             // we subtract a time padding, because we dont want to wait the
             // theoretical drop duration, but the real drop duration
             // (we don't want to miss an important frame in analyze state)  
             var waitDuration = dropDuration - Timing.DropDurationPaddingTime;
-            _logger.Info($"Wait {waitDuration.Milliseconds} ms before analyze");
+
+            _logger.Info($"Execute Drop (new score {_agent.GameState.Score}, {linesRemoved} lines removed, sleep {waitDuration.Milliseconds} ms)");
 
             // execute the drop blocking
             // we must wait until the drop is ended before we can continue
@@ -134,7 +132,7 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             if (_pendingMoves.Any()) throw new Exception("Not all moves were executed");
 
-            _agent.SetState(new TetrisAnalyzeState(_agent, _agent.GameState.Piece.Tetromino));
+            _agent.SetState(new TetrisAnalyzeState(_agent, _agent.GameState.Piece.Tetrimino));
         }
     }
 }

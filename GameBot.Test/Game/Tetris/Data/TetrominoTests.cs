@@ -11,7 +11,7 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void Size()
         {
-            var values = Enum.GetValues(typeof(Tetromino)).Cast<Tetromino>();
+            var values = Enum.GetValues(typeof(Tetrimino)).Cast<Tetrimino>();
             Assert.AreEqual(7, values.Count());
         }
     }

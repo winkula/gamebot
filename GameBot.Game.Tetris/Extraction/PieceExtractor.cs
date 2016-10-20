@@ -33,7 +33,7 @@ namespace GameBot.Game.Tetris.Extraction
 
             for (int yDelta = 0; yDelta <= maxFallingDistance; yDelta++)
             {
-                foreach (var tetromino in Tetrominos.All)
+                foreach (var tetromino in Tetriminos.All)
                 {
                     foreach (var pose in tetromino.GetPoses())
                     {
@@ -70,7 +70,7 @@ namespace GameBot.Game.Tetris.Extraction
 
             for (int yDelta = 0; yDelta <= maxFallingDistance; yDelta++)
             {
-                foreach (var tetromino in Tetrominos.All)
+                foreach (var tetromino in Tetriminos.All)
                 {
                     var piece = new Piece(tetromino, 0, 0, -yDelta);
                     var probability = _pieceMatcher.GetProbability(screenshot, piece);
@@ -128,8 +128,8 @@ namespace GameBot.Game.Tetris.Extraction
         /// Throws an exception, if the next piece is not visible on the screenshot.
         /// </summary>
         /// <param name="screenshot">The screenshot to extract the piece from.</param>
-        /// <returns>The next Tetromino.</returns>
-        public Tetromino ExtractNextPiece(IScreenshot screenshot)
+        /// <returns>The next Tetrimino.</returns>
+        public Tetrimino ExtractNextPiece(IScreenshot screenshot)
         {
             // relevant tiles on the screen: x : 14 - 17, y : 13 - 16 
 
@@ -148,37 +148,37 @@ namespace GameBot.Game.Tetris.Extraction
             }
 
             var nextPiece = Piece.FromMask(mask);
-            if (nextPiece?.Tetromino == null)
+            if (nextPiece?.Tetrimino == null)
                 throw new ApplicationException("Next piece not visible on the screenshot");
 
-            return nextPiece.Tetromino;
+            return nextPiece.Tetrimino;
         }
 
         /// <summary>
         /// Extracts the next piece visible on the screenshot.
         /// </summary>
         /// <param name="screenshot">The screenshot to extract the piece from.</param>
-        /// <returns>The next Tetromino.</returns>
-        public ProbabilisticResult<Tetromino> ExtractNextPieceFuzzy(IScreenshot screenshot)
+        /// <returns>The next Tetrimino.</returns>
+        public ProbabilisticResult<Tetrimino> ExtractNextPieceFuzzy(IScreenshot screenshot)
         {
             // relevant tiles on the screen: x : 14 - 17, y : 13 - 16 
 
             double bestProbability = 0;
-            Tetromino? bestTetromino = null;
+            Tetrimino? bestTetrimino = null;
 
-            foreach (var tetromino in Tetrominos.All)
+            foreach (var tetromino in Tetriminos.All)
             {
                 var piece = new Piece(tetromino, 0, TetrisConstants.NextPieceTemplateTileCoordinates.X, TetrisConstants.NextPieceTemplateTileCoordinates.Y);
                 var probability = _pieceMatcher.GetProbability(screenshot, piece);
                 if (probability > bestProbability)
                 {
                     bestProbability = probability;
-                    bestTetromino = tetromino;
+                    bestTetrimino = tetromino;
                 }
             }
 
-            if (!bestTetromino.HasValue) throw new Exception("No possible value for tetromino found!");
-            return new ProbabilisticResult<Tetromino>(bestTetromino.Value, bestProbability);
+            if (!bestTetrimino.HasValue) throw new Exception("No possible value for tetrimino found!");
+            return new ProbabilisticResult<Tetrimino>(bestTetrimino.Value, bestProbability);
         }
 
         #endregion

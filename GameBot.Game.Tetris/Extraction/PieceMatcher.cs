@@ -16,15 +16,15 @@ namespace GameBot.Game.Tetris.Extraction
         // template data
         private const int _templateSize = 4 * GameBoyConstants.TileSize;
         private static readonly int[,] _templateIndexTable = { { 0, 0, 0, 0 }, { 1, 2, 1, 2 }, { 3, 4, 3, 4 }, { 5, 6, 5, 6 }, { 7, 8, 9, 10 }, { 11, 12, 13, 14 }, { 15, 16, 17, 18 } };
-        private readonly Image<Gray, byte>[] _templates = new Image<Gray, byte>[Tetrominos.AllPossibleOrientations];
-        private readonly Image<Gray, byte>[] _templateMasks = new Image<Gray, byte>[Tetrominos.AllPossibleOrientations];
+        private readonly Image<Gray, byte>[] _templates = new Image<Gray, byte>[Tetriminos.AllPossibleOrientations];
+        private readonly Image<Gray, byte>[] _templateMasks = new Image<Gray, byte>[Tetriminos.AllPossibleOrientations];
 
         public PieceMatcher()
         {
             // init template tiles
             //var templateTiles = new Image<Gray, byte>(Resources.TemplatesGrayscale);
             var templateTiles = new Image<Gray, byte>(Resources.TemplatesBinary);
-            for (int i = 0; i < Tetrominos.AllPossibleOrientations; i++)
+            for (int i = 0; i < Tetriminos.AllPossibleOrientations; i++)
             {
                 var template = new Image<Gray, byte>(_templateSize, _templateSize);
                 var templateMask = new Image<Gray, byte>(_templateSize, _templateSize);
@@ -124,7 +124,7 @@ namespace GameBot.Game.Tetris.Extraction
 
         private int GetTemplateIndex(Piece piece)
         {
-            return _templateIndexTable[(int)piece.Tetromino, piece.Orientation];
+            return _templateIndexTable[(int)piece.Tetrimino, piece.Orientation];
         }
         
         private IEnumerable<Point> GetShifts()

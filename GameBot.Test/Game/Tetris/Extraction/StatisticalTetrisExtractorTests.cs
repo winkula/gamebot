@@ -33,7 +33,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         }
 
         [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPiecePositives))]
-        public void RecognizeNextPiece(string imageKey, IScreenshot screenshot, Tetromino nextPieceExpected)
+        public void RecognizeNextPiece(string imageKey, IScreenshot screenshot, Tetrimino nextPieceExpected)
         {
             _nextPiece++;
 

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using GameBot.Game.Tetris.Data;
+using GameBot.Game.Tetris.Extraction;
+using GameBot.Game.Tetris.Extraction.Samplers;
 using NLog;
 
 namespace GameBot.Game.Tetris.Agents.States
@@ -12,12 +13,13 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private readonly TetrisAgent _agent;
 
+        private readonly ISampler<bool> _moveConfirmationSampler;
+
         private readonly Move _lastMove;
         private readonly Queue<Move> _pendingMoves;
 
         private Piece _tracedPiece;
         private TimeSpan _tracedPieceTimestamp;
-        private IList<bool> _movedSamples;
 
         public TetrisCheckState(TetrisAgent agent, Move lastMove, Queue<Move> pendingMoves, Piece tracedPiece, TimeSpan tracedPieceTimestamp)
         {
@@ -26,11 +28,11 @@ namespace GameBot.Game.Tetris.Agents.States
             if (tracedPiece == null) throw new ArgumentNullException(nameof(tracedPiece));
 
             _agent = agent;
+            _moveConfirmationSampler = new MoveConfirmationSampler(_agent.CheckSamples);
             _lastMove = lastMove;
             _pendingMoves = pendingMoves;
             _tracedPiece = tracedPiece;
             _tracedPieceTimestamp = tracedPieceTimestamp;
-            _movedSamples = new List<bool>();
         }
 
         public void Extract()
@@ -40,10 +42,8 @@ namespace GameBot.Game.Tetris.Agents.States
 
         public void Play()
         {
-            _logger.Info($"Check command {_lastMove}");
-
             var searchHeight = CalulateSearchHeight();
-            _logger.Info($"Search height for check is {searchHeight}");
+            _logger.Info($"Check {_lastMove} (search height {searchHeight})");
 
             var pieceNotMoved = _tracedPiece;
             var pieceMoved = new Piece(_tracedPiece).Apply(_lastMove);
@@ -59,19 +59,21 @@ namespace GameBot.Game.Tetris.Agents.States
                 // piece not found on the screenshot
                 // no problem, we get a new screenshot and try it again ;)
                 // TODO: maybe the piece is not visble at all? handle pasue menu and rocket cutscenes
-                PieceNotFound(_tracedPiece.Tetromino);
+                PieceNotFound(_tracedPiece.Tetrimino);
             }
             else
             {
                 // add sample
-                _movedSamples.Add(resultPieceMoved.Probability >= resultPieceNotMoved.Probability);
+                var sample = resultPieceMoved.Probability >= resultPieceNotMoved.Probability;
+                var samplePseudoProbability = Math.Abs(resultPieceMoved.Probability - resultPieceNotMoved.Probability);
+                
+                _moveConfirmationSampler.Sample(new ProbabilisticResult<bool>(sample, samplePseudoProbability));
                 _logger.Info($"Add sample to decide movement ({_lastMove})");
 
                 // enought samples?
-                // TODO: outsource in separate class, break early, if we reach the majority (2 of 3 for example)
-                if (_movedSamples.Count >= _agent.CheckSamples)
+                if (_moveConfirmationSampler.IsComplete)
                 {
-                    if (_movedSamples.Count(x => x) > _agent.CheckSamples / 2)
+                    if (_moveConfirmationSampler.Result)
                     {
                         var timestamp = screenshot.Timestamp;
                         Success(resultPieceMoved.Result, timestamp);
@@ -85,14 +87,14 @@ namespace GameBot.Game.Tetris.Agents.States
             }
         }
 
-        private void PieceNotFound(Tetromino tetromino)
+        private void PieceNotFound(Tetrimino tetrimino)
         {
-            _logger.Warn($"Piece not recognized ({tetromino})");
+            _logger.Warn($"Piece not recognized ({tetrimino})");
         }
         
         private void Success(Piece newPosition, TimeSpan now)
         {
-            _logger.Info("Command executed");
+            _logger.Info($"Execution successful ({_lastMove})");
 
             // move was successfully executed
             // we remove it from the queue
@@ -105,7 +107,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void Fail(Piece newPosition, TimeSpan now)
         {
-            _logger.Warn("Command failed");
+            _logger.Warn($"Execution failed ({_lastMove})");
 
             // the command was not executed and the tile is in the old position
             UpdateCurrentPiece(newPosition, now);

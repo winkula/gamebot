@@ -145,6 +145,10 @@
     <Compile Include="Agents\TetrisAgent.cs" />
     <Compile Include="Data\BoardLookups.cs" />
     <Compile Include="Data\Coordinates.cs" />
+    <Compile Include="Extraction\Samplers\ISampler.cs" />
+    <Compile Include="Extraction\Samplers\MoveConfirmationSampler.cs" />
+    <Compile Include="Extraction\Samplers\NextTetriminoSampler.cs" />
+    <Compile Include="Extraction\Samplers\CurrentTetriminoSampler.cs" />
     <Compile Include="Extraction\PieceMatcher.cs" />
     <Compile Include="Extraction\ProbabilisticResult.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -179,7 +183,7 @@
     <Compile Include="Searching\RecursiveSearch.cs" />
     <Compile Include="Data\GameState.cs" />
     <Compile Include="Searching\Node.cs" />
-    <Compile Include="Data\Tetromino.cs" />
+    <Compile Include="Data\Tetrimino.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extraction\TetrisExtractor.cs" />
     <Compile Include="Searching\Heuristics\MaxBergmarkHeuristic.cs" />

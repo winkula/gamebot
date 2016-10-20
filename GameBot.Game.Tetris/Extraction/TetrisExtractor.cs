@@ -281,7 +281,7 @@ namespace GameBot.Game.Tetris.Extraction
                 }
             }
 
-            if (errors > 0 && expected.Tetromino == Tetromino.I && expected.Y == 0 && expected.Orientation == 1)
+            if (errors > 0 && expected.Tetrimino == Tetrimino.I && expected.Y == 0 && expected.Orientation == 1)
             {
                 // TODO: remove this ugly hack
                 // subtract one because the I piece is not completly visible in upright position
@@ -304,7 +304,7 @@ namespace GameBot.Game.Tetris.Extraction
                 }
             }
 
-            if (errors > 0 && expected.Tetromino == Tetromino.I && expected.Y == 0 && expected.Orientation == 1)
+            if (errors > 0 && expected.Tetrimino == Tetrimino.I && expected.Y == 0 && expected.Orientation == 1)
             {
                 // TODO: remove this ugly hack
                 // subtract one because the I piece is not completly visible in upright position
@@ -315,7 +315,7 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         // Tiles: x : 14 - 17, y : 13 - 16 
-        public Tetromino? ExtractNextPiece(IScreenshot screenshot)
+        public Tetrimino? ExtractNextPiece(IScreenshot screenshot)
         {
             ushort mask = 0;
             for (int x = 0; x < 4; x++)
@@ -331,7 +331,7 @@ namespace GameBot.Game.Tetris.Extraction
                     }
                 }
             }
-            return Piece.FromMask(mask)?.Tetromino;
+            return Piece.FromMask(mask)?.Tetrimino;
         }
     }
 }

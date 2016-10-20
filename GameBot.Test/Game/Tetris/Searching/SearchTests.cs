@@ -29,14 +29,14 @@ namespace GameBot.Test.Game.Tetris.Searching
             _recursiveSearch.Depth = 2;
         }
 
-        [TestCase(Tetromino.O, Tetromino.S)]
-        [TestCase(Tetromino.I, Tetromino.L)]
-        [TestCase(Tetromino.S, Tetromino.Z)]
-        [TestCase(Tetromino.Z, Tetromino.I)]
-        [TestCase(Tetromino.L, Tetromino.O)]
-        [TestCase(Tetromino.J, Tetromino.T)]
-        [TestCase(Tetromino.T, Tetromino.J)]
-        public void SimpleSearch(Tetromino current, Tetromino next)
+        [TestCase(Tetrimino.O, Tetrimino.S)]
+        [TestCase(Tetrimino.I, Tetrimino.L)]
+        [TestCase(Tetrimino.S, Tetrimino.Z)]
+        [TestCase(Tetrimino.Z, Tetrimino.I)]
+        [TestCase(Tetrimino.L, Tetrimino.O)]
+        [TestCase(Tetrimino.J, Tetrimino.T)]
+        [TestCase(Tetrimino.T, Tetrimino.J)]
+        public void SimpleSearch(Tetrimino current, Tetrimino next)
         {
             var gameState = new GameState(current, next);
             
@@ -44,8 +44,8 @@ namespace GameBot.Test.Game.Tetris.Searching
             _logger.Info(result.GoalGameState);
         }
 
-        [TestCase(Tetromino.T, Tetromino.J)]
-        public void SimpleSearchFull(Tetromino current, Tetromino next)
+        [TestCase(Tetrimino.T, Tetrimino.J)]
+        public void SimpleSearchFull(Tetrimino current, Tetrimino next)
         {
             var simpleSearchLocal = new SimpleSearch(new YiyuanLeeHeuristic());
 
@@ -61,14 +61,14 @@ namespace GameBot.Test.Game.Tetris.Searching
             Assert.AreEqual(Move.Drop, result.Moves.ToList()[2]);
         }
 
-        [TestCase(Tetromino.O, Tetromino.S)]
-        [TestCase(Tetromino.I, Tetromino.L)]
-        [TestCase(Tetromino.S, Tetromino.Z)]
-        [TestCase(Tetromino.Z, Tetromino.I)]
-        [TestCase(Tetromino.L, Tetromino.O)]
-        [TestCase(Tetromino.J, Tetromino.T)]
-        [TestCase(Tetromino.T, Tetromino.J)]
-        public void PredictiveSearch(Tetromino current, Tetromino next)
+        [TestCase(Tetrimino.O, Tetrimino.S)]
+        [TestCase(Tetrimino.I, Tetrimino.L)]
+        [TestCase(Tetrimino.S, Tetrimino.Z)]
+        [TestCase(Tetrimino.Z, Tetrimino.I)]
+        [TestCase(Tetrimino.L, Tetrimino.O)]
+        [TestCase(Tetrimino.J, Tetrimino.T)]
+        [TestCase(Tetrimino.T, Tetrimino.J)]
+        public void PredictiveSearch(Tetrimino current, Tetrimino next)
         {
             var gameState = new GameState(current, next);
 
@@ -76,14 +76,14 @@ namespace GameBot.Test.Game.Tetris.Searching
             _logger.Info(result.GoalGameState);
         }
 
-        [TestCase(Tetromino.O, Tetromino.S)]
-        [TestCase(Tetromino.I, Tetromino.L)]
-        [TestCase(Tetromino.S, Tetromino.Z)]
-        [TestCase(Tetromino.Z, Tetromino.I)]
-        [TestCase(Tetromino.L, Tetromino.O)]
-        [TestCase(Tetromino.J, Tetromino.T)]
-        [TestCase(Tetromino.T, Tetromino.J)]
-        public void RecursiveSearch(Tetromino current, Tetromino next)
+        [TestCase(Tetrimino.O, Tetrimino.S)]
+        [TestCase(Tetrimino.I, Tetrimino.L)]
+        [TestCase(Tetrimino.S, Tetrimino.Z)]
+        [TestCase(Tetrimino.Z, Tetrimino.I)]
+        [TestCase(Tetrimino.L, Tetrimino.O)]
+        [TestCase(Tetrimino.J, Tetrimino.T)]
+        [TestCase(Tetrimino.T, Tetrimino.J)]
+        public void RecursiveSearch(Tetrimino current, Tetrimino next)
         {
             var gameState = new GameState(current, next);
 
