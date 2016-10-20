@@ -11,12 +11,13 @@ using System.Linq;
 
 namespace GameBot.Test.Game.Tetris.Searching
 {
+    [Ignore]
     [TestFixture]
     public class GameStateHashTests
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private const int _numberOfGameState = 1000000;
+        private const int _numberOfGameState = 100;
 
         private IHeuristic _heuristic;
         

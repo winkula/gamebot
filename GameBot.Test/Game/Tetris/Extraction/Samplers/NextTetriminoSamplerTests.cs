@@ -34,6 +34,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Samplers
             });
         }
 
+        [TestCase(1)]
         [TestCase(3)]
         [TestCase(5)]
         public void Sample(int numSamples)
@@ -47,6 +48,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Samplers
             }
         }
 
+        [TestCase(1)]
         [TestCase(3)]
         [TestCase(5)]
         public void SampleFails(int numSamples)
