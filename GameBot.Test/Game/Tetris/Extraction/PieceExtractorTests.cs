@@ -2,6 +2,7 @@
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction;
+using NLog;
 using NUnit.Framework;
 
 namespace GameBot.Test.Game.Tetris.Extraction
@@ -103,16 +104,15 @@ namespace GameBot.Test.Game.Tetris.Extraction
             Assert.False(result.IsRejected(0.5));
             Assert.AreEqual(Tetrimino.L, result.Result);
         }
-
-        [Ignore]
-        [Test]
-        public void ExtractNextPieceFuzzyFailCandidate()
+        
+        [TestCase("Screenshots/fail00.png", Tetrimino.J)]
+        public void ExtractNextPieceFuzzyFailCandidates(string path, Tetrimino expected)
         {
-            var screenshot = new EmguScreenshot(@"C:\Users\Winkler\Desktop\test.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot(path, TimeSpan.Zero);
 
             var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot);
             
-            Assert.AreEqual(Tetrimino.J, result.Result);
+            Assert.AreEqual(expected, result.Result);
         }
     }
 }

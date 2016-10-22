@@ -166,14 +166,15 @@ namespace GameBot.Game.Tetris.Extraction
             double bestProbability = 0;
             Tetrimino? bestTetrimino = null;
 
-            foreach (var tetromino in Tetriminos.All)
+            foreach (var tetrimino in Tetriminos.All)
             {
-                var piece = new Piece(tetromino, 0, TetrisConstants.NextPieceTemplateTileCoordinates.X, TetrisConstants.NextPieceTemplateTileCoordinates.Y);
-                var probability = _pieceMatcher.GetProbability(screenshot, piece);
+                //var piece = new Piece(tetromino, 0, TetrisConstants.NextPieceTemplateTileCoordinates.X, TetrisConstants.NextPieceTemplateTileCoordinates.Y);
+                //var probability = _pieceMatcher.GetProbability(screenshot, piece);
+                var probability = _pieceMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
                 if (probability > bestProbability)
                 {
                     bestProbability = probability;
-                    bestTetrimino = tetromino;
+                    bestTetrimino = tetrimino;
                 }
             }
 
