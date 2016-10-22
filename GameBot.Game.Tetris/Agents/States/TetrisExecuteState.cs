@@ -54,7 +54,8 @@ namespace GameBot.Game.Tetris.Agents.States
             else
             {
                 Execute(move);
-                SetStateCheck(move);
+                SetStatePseudoCheck(move);
+                //SetStateCheck(move);
             }
         }
 
@@ -126,6 +127,13 @@ namespace GameBot.Game.Tetris.Agents.States
             if (lastMove == Move.Drop) throw new Exception("Can't check drop");
 
             _agent.SetState(new TetrisCheckState(_agent, lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
+        }
+
+        private void SetStatePseudoCheck(Move lastMove)
+        {
+            if (lastMove == Move.Drop) throw new Exception("Can't check drop");
+
+            _agent.SetState(new TetrisPseudoCheckState(_agent, lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
         }
 
         private void SetStateAnalyze()

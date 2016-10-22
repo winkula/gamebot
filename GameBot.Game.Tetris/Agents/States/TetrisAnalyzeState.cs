@@ -142,6 +142,11 @@ namespace GameBot.Game.Tetris.Agents.States
                 var piece = _currentPieceSampler.Result;
 
                 _logger.Info($"Accept extracted current piece by sampling ({result.Result.Tetrimino})");
+
+                string outputFilename = $"{DateTime.Now.ToString("HH_mm_ss_ffff")}_analyze.png";
+                string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "debug", outputFilename);
+                _agent.Screenshot.Image.Save(outputPath);
+
                 AcceptCurrentPiece(piece);
             }
         }

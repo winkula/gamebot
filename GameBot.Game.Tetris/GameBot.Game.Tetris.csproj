@@ -140,6 +140,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Agents\States\TetrisPseudoCheckState.cs" />
     <Compile Include="Agents\States\TetrisRepeatState.cs" />
     <Compile Include="Agents\States\TetrisCheckState.cs" />
     <Compile Include="Agents\TetrisAgent.cs" />
