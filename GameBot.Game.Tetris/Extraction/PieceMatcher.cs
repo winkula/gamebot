@@ -16,6 +16,8 @@ namespace GameBot.Game.Tetris.Extraction
         
         // template data
         private const int _templateSize = 4 * GameBoyConstants.TileSize;
+
+        // current piece
         private static readonly int[,] _templateIndexTable = { { 0, 0, 0, 0 }, { 1, 2, 1, 2 }, { 3, 4, 3, 4 }, { 5, 6, 5, 6 }, { 7, 8, 9, 10 }, { 11, 12, 13, 14 }, { 15, 16, 17, 18 } };
         private readonly Image<Gray, byte>[] _templates = new Image<Gray, byte>[Tetriminos.AllPossibleOrientations];
         private readonly Image<Gray, byte>[] _templateMasks = new Image<Gray, byte>[Tetriminos.AllPossibleOrientations];
@@ -30,9 +32,25 @@ namespace GameBot.Game.Tetris.Extraction
             255.0 * 160, // J
             255.0 * 160 // T
         };
+        
+        private static readonly double[] _maxErrorsNextPiece =
+        {
+            255.0 * 334, // O
+            255.0 * 440, // I
+            255.0 * 336, // S
+            255.0 * 304, // Z
+            255.0 * 296, // L
+            255.0 * 336, // J
+            255.0 * 336 // T
+        };
 
+        // next piece
+        private readonly Image<Gray, byte>[] _templatesNextPiece = new Image<Gray, byte>[Tetriminos.All.Length];
+        private readonly Image<Gray, byte>[] _templateMasksNextPiece = new Image<Gray, byte>[Tetriminos.All.Length];
+        
         public PieceMatcher()
         {
+            // current piece
             // init template tiles
             //var templateTiles = new Image<Gray, byte>(Resources.TemplatesGrayscale);
             //var templateTiles = new Image<Gray, byte>(Resources.TemplatesBinary);
@@ -49,6 +67,21 @@ namespace GameBot.Game.Tetris.Extraction
                 _templates[i] = template;
                 _templateMasks[i] = templateMask;
             }
+
+            // next piece
+            var templateTilesNextPiece = new Image<Gray, byte>(Resources.TemplatesNextEdges);
+            for (int i = 0; i < Tetriminos.All.Length; i++)
+            {
+                var template = new Image<Gray, byte>(_templateSize, _templateSize);
+                var templateMask = new Image<Gray, byte>(_templateSize, _templateSize);
+                templateTilesNextPiece.ROI = new Rectangle(0, i * _templateSize, _templateSize, _templateSize);
+                templateTilesNextPiece.CopyTo(template);
+                templateTilesNextPiece.ROI = new Rectangle(_templateSize, i * _templateSize, _templateSize, _templateSize);
+                templateTilesNextPiece.CopyTo(templateMask);
+
+                _templatesNextPiece[i] = template;
+                _templateMasksNextPiece[i] = templateMask;
+            }
         }
 
         /// <summary>
@@ -62,6 +95,8 @@ namespace GameBot.Game.Tetris.Extraction
         /// <returns>The probability.</returns>
         public double GetProbability(IScreenshot screenshot, Piece piece)
         {
+            // TODO: add argument check for coordinates
+
             // we need some extra space over the screenshot, so that the template is not off the image
             // we add an extra one that we can make 1 pixel shifts to compensate errors in the camera calibration
             const int yTopPadding = GameBoyConstants.TileSize + _maxShiftDistance;
@@ -135,6 +170,78 @@ namespace GameBot.Game.Tetris.Extraction
             return bestProbability;
         }
 
+        /// <summary>
+        /// TODO: comment
+        /// </summary>
+        /// <param name="screenshot"></param>
+        /// <param name="tetrimino"></param>
+        /// <returns></returns>
+        public double GetProbabilityNextPiece(IScreenshot screenshot, Tetrimino tetrimino)
+        {
+            // TODO: add argument check for coordinates
+            
+            var tileCoordinates = TetrisConstants.NextPieceTileOrigin;
+
+            // load screenshot
+            // we handle to cases (one with more performance for the physical engine, the other for the emulator)
+            Mat originalMat = screenshot.Image as Mat;
+            Image<Gray, byte> originalImage = null;
+            if (originalMat == null)
+            {
+                originalImage = screenshot.Image as Image<Gray, byte>;
+                if (originalImage == null)
+                {
+                    originalImage = new Image<Gray, byte>(screenshot.Image.Bitmap);
+                }
+            }
+
+            // get template and it's mask
+            var templateIndex = (int) tetrimino;
+            var template = _templatesNextPiece[templateIndex];
+            var templateMask = _templateMasksNextPiece[templateIndex];
+
+            double bestProbability = 0;
+
+            foreach (var shift in GetShifts())
+            {
+                // TODO: use CvInvoke instead of generic Image objects
+
+                // create combined and reference image (that we can compare them later)
+                var combined = new Image<Gray, byte>(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight);
+                var mainRoi = new Rectangle(0, 0, GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight);
+                combined.ROI = mainRoi;
+                if (originalMat != null)
+                {
+                    originalMat.CopyTo(combined);
+                }
+                else
+                {
+                    originalImage.CopyTo(combined);
+                }
+                combined.ROI = Rectangle.Empty;
+                var reference = combined.Clone();
+                combined.ROI = mainRoi;
+
+                // combine image with template
+                var roiX = tileCoordinates.X * GameBoyConstants.TileSize + shift.X;
+                var roiY = tileCoordinates.Y * GameBoyConstants.TileSize + shift.Y;
+                combined.ROI = new Rectangle(roiX, roiY, _templateSize, _templateSize);
+                template.Copy(combined, templateMask);
+                reference.ROI = combined.ROI;
+
+                // calculate error
+                var difference = new Mat();
+                CvInvoke.AbsDiff(reference, combined, difference);
+                var sum = CvInvoke.Sum(difference);
+
+                // calculate probability
+                var newProbability = GetProbabilityNextPiece(sum.V0, tetrimino);
+                bestProbability = Math.Max(bestProbability, newProbability);
+            }
+
+            return bestProbability;
+        }
+
         private int GetTemplateIndex(Piece piece)
         {
             return _templateIndexTable[(int)piece.Tetrimino, piece.Orientation];
@@ -150,17 +257,21 @@ namespace GameBot.Game.Tetris.Extraction
                 }
             }
         }
-
-        private double GetError(double sum, Tetrimino tetromino)
-        {
-            double maxError = _maxErrors[(int) tetromino];
-            double error = sum / maxError;
-            return error.Clamp(0.0, 1.0);
-        }
-
+        
         private double GetProbability(double sum, Tetrimino tetromino)
         {
-            return 1 - GetError(sum, tetromino);
+            double maxError = _maxErrors[(int)tetromino];
+            double error = sum / maxError;
+            error = error.Clamp(0.0, 1.0);
+            return 1 - error;
+        }
+
+        private double GetProbabilityNextPiece(double sum, Tetrimino tetromino)
+        {
+            double maxError = _maxErrorsNextPiece[(int)tetromino];
+            double error = sum / maxError;
+            error = error.Clamp(0.0, 1.0);
+            return 1 - error;
         }
     }
 }
