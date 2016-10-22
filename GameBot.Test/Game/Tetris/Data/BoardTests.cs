@@ -7,7 +7,7 @@ namespace GameBot.Test.Game.Tetris.Data
     [TestFixture]
     public class BoardTests
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Test]
         public void Constructor()
@@ -40,7 +40,7 @@ namespace GameBot.Test.Game.Tetris.Data
             Assert.AreEqual(19, board.Height);
             Assert.AreEqual(0, board.Pieces);
 
-            logger.Info(board.ToString());
+            _logger.Info(board.ToString());
 
             for (int x = 0; x < board.Width; x++)
             {
@@ -136,7 +136,7 @@ namespace GameBot.Test.Game.Tetris.Data
             {
                 for (int _y = 0; _y < board.Height; _y++)
                 {
-                    logger.Info(_x + "," + _y);
+                    _logger.Info(_x + "," + _y);
                     if (_x != x || _y != y)
                     {
                         Assert.True(board.IsOccupied(_x, _y));
@@ -170,7 +170,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 0,0,0,0,0,0,0,0,0,0
             });
             var board = new Board();
-            var piece = new Piece(Tetromino.I).Rotate().Fall();
+            var piece = new Piece(Tetrimino.I).Rotate().Fall();
 
             board.Place(piece);
 
@@ -242,9 +242,11 @@ namespace GameBot.Test.Game.Tetris.Data
             Assert.AreEqual(5, board.ColumnHeight(6));
             Assert.AreEqual(0, board.ColumnHeight(7));
             Assert.AreEqual(4, board.ColumnHeight(8));
-            Assert.AreEqual(0, board.ColumnHeight(9));            
+            Assert.AreEqual(0, board.ColumnHeight(9));     
+            
+            Assert.AreEqual(7, board.MaximumHeight);  
         }
-
+        
         [Test]
         public void ColumnHoles()
         {
@@ -327,7 +329,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 1,0,1,1,0,1,0,0,1,0,
                 0,0,1,1,0,1,1,1,0,1
             });            
-            var piece = new Piece(Tetromino.I).Rotate().Fall(12);
+            var piece = new Piece(Tetrimino.I).Rotate().Fall(12);
 
             board.Place(piece);            
             board.RemoveLines();
@@ -380,13 +382,13 @@ namespace GameBot.Test.Game.Tetris.Data
                 0,0,0,0,1,0,0,0,0,0,
                 0,0,0,0,1,0,0,0,0,0
             });
-            var piece = new Piece(Tetromino.I).Rotate().Fall(15);
+            var piece = new Piece(Tetrimino.I).Rotate().Fall(15);
 
             board.Place(piece);
             board.RemoveLines();
 
-            logger.Info(board.ToString());
-            logger.Info(expected.ToString());
+            _logger.Info(board.ToString());
+            _logger.Info(expected.ToString());
 
             Assert.True(SquaresEqual(expected, board));
         }
@@ -415,7 +417,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 1,0,1,1,0,1,0,0,1,0,
                 0,0,1,1,0,1,1,1,0,1
             });
-            var piece = new Piece(Tetromino.O).Fall(6);
+            var piece = new Piece(Tetrimino.O).Fall(6);
 
             Assert.True(board.Intersects(piece));
         }
@@ -424,7 +426,7 @@ namespace GameBot.Test.Game.Tetris.Data
         public void NotIntersects()
         {
             var board = new Board();
-            var piece = new Piece(Tetromino.Z).Rotate();
+            var piece = new Piece(Tetrimino.Z).Rotate();
 
             Assert.False(board.Intersects(piece));
         }
@@ -465,7 +467,7 @@ namespace GameBot.Test.Game.Tetris.Data
             var board = new Board();
 
             var str = board.ToString();
-            logger.Info(str);
+            _logger.Info(str);
 
             Assert.NotNull(str);
         }

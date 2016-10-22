@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace GameBot.Game.Tetris.Data
@@ -9,83 +10,12 @@ namespace GameBot.Game.Tetris.Data
     /// </summary>
     public class Board
     {
-        #region Static part
+        public int Width { get; }
+        public int Height { get; }
 
-        private static int[] columnHeights;
-        private static int[] columnHoles;
-        private static int[] linePosition;
-
-        private static void CalculateLookupTables()
-        {
-            columnHeights = new int[0x7FFFF + 1];
-            columnHoles = new int[0x7FFFF + 1];
-            linePosition = new int[0x7FFFF + 1];
-            for (int i = 1; i < 0x7FFFF + 1; i++)
-            {
-                // calculate heights
-                columnHeights[i] = 1 + (int)Math.Log(i, 2);
-
-                // calculate holes
-                int holes = 0;
-                int tempCount = 0;
-                for (int y = 0; y < 32; y++)
-                {
-                    if ((i & (1 << y)) > 0)
-                    {
-                        holes += tempCount;
-                        tempCount = 0;
-                    }
-                    else
-                    {
-                        tempCount++;
-                    }
-                }
-                columnHoles[i] = holes;
-
-                // calculate line position
-                linePosition[i] = -1;
-                for (int y = 0; y < 32; y++)
-                {
-                    if ((i & (1 << y)) > 0)
-                    {
-                        linePosition[i] = y;
-                        break;
-                    }
-                }
-            }
-        }
-
-        private static int GetColumnHeight(int column)
-        {
-            if (columnHeights == null)
-            {
-                CalculateLookupTables();
-            }
-            return columnHeights[column];
-        }
-
-        private static int GetColumnHoles(int column)
-        {
-            if (columnHoles == null)
-            {
-                CalculateLookupTables();
-            }
-            return columnHoles[column];
-        }
-
-        private static int GetLinePosition(int columns)
-        {
-            if (linePosition == null)
-            {
-                CalculateLookupTables();
-            }
-            return linePosition[columns];
-        }
-
-        #endregion
-
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        /// <summary>
+        /// Number of placed pieces on the board.
+        /// </summary>
         public int Pieces { get; private set; }
 
         /// <summary>
@@ -95,16 +25,16 @@ namespace GameBot.Game.Tetris.Data
         /// </summary>
         private int[] Columns { get; }
 
-        protected bool this[int x, int y]
+        private bool this[int x, int y]
         {
             get
             {
-                if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
+                if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
                 return (Columns[x] & (1 << y)) > 0;
             }
             set
             {
-                if (!SquareExists(x, y)) throw new ArgumentException(string.Format("square with coordinates {0}, {1} not in board", x, y));
+                if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
                 if (value)
                 {
                     // set one bit
@@ -145,13 +75,13 @@ namespace GameBot.Game.Tetris.Data
         {
             get
             {
-                // AND every column
-                int mask = ~0;
+                // OR every column
+                int mask = 0;
                 for (int x = 0; x < Width; x++)
                 {
-                    mask &= Columns[x];
+                    mask |= Columns[x];
                 }
-                return columnHeights[mask];
+                return BoardLookups.Instance.GetColumnHeight(mask);
             }
         }
 
@@ -165,7 +95,7 @@ namespace GameBot.Game.Tetris.Data
             Columns = new int[width];
         }
 
-        public Board() : this(10, 19)
+        public Board() : this(TetrisConstants.DefaultBoardWidth, TetrisConstants.DefaultBoardHeight)
         {
         }
 
@@ -176,6 +106,30 @@ namespace GameBot.Game.Tetris.Data
             Pieces = board.Pieces;
             Columns = new int[board.Width];
             Array.Copy(board.Columns, Columns, board.Columns.Length);
+        }
+
+        public Board Random(Random random = null)
+        {
+            const double chanceForBlock = 0.8;
+            const double chanceToBreak = 0.3;
+            random = random ?? new Random();
+
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    if (random.NextDouble() < chanceForBlock)
+                    {
+                        Occupy(x, y);
+                    }
+                    if (random.NextDouble() < (chanceToBreak + 0.05 * y))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return this;
         }
 
         public bool IsOccupied(int x, int y)
@@ -202,14 +156,14 @@ namespace GameBot.Game.Tetris.Data
         {
             if (x >= Width) throw new ArgumentException("x must be lower than the width of the board");
 
-            return GetColumnHeight(Columns[x]);
+            return BoardLookups.Instance.GetColumnHeight(Columns[x]);
         }
 
         public int ColumnHoles(int x)
         {
             if (x >= Width) throw new ArgumentException("x must be lower than the width of the board");
 
-            return GetColumnHoles(Columns[x]);
+            return BoardLookups.Instance.GetColumnHoles(Columns[x]);
         }
 
         public bool SquareExists(int x, int y)
@@ -217,7 +171,8 @@ namespace GameBot.Game.Tetris.Data
             return x >= 0 && x < Width && y >= 0 && y < Height;
         }
 
-        // TODO: make private?
+        // this should be private to guarantee consistent game state
+        // is public for testing purposes
         public void Place(Piece piece)
         {
             foreach (var block in piece.Shape.Body)
@@ -231,7 +186,8 @@ namespace GameBot.Game.Tetris.Data
             Pieces++;
         }
 
-        // TODO: make private?
+        // this should be private to guarantee consistent game state
+        // is public for testing purposes
         public int RemoveLines()
         {
             int removed = 0;
@@ -245,13 +201,13 @@ namespace GameBot.Game.Tetris.Data
                     if (mask == 0) return removed; // no lines
                 }
 
-                int y = GetLinePosition(mask);
+                int y = BoardLookups.Instance.GetLinePosition(mask);
                 removed++;
                 CopySquaresDown(y);
             }
             return removed;
         }
-        
+
         private void CopySquaresDown(int yCompleteLine)
         {
             for (int x = 0; x < Width; x++)
@@ -290,11 +246,11 @@ namespace GameBot.Game.Tetris.Data
             }
             return false;
         }
-        
+
         public int DropDistance(Piece piece)
         {
             int distance = int.MaxValue;
-            
+
             foreach (var block in piece.Shape.Head)
             {
                 var distanceTest = (Coordinates.PieceOrigin.Y + block.Y + piece.Y) - ColumnHeight(Coordinates.PieceOrigin.X + block.X + piece.X);
@@ -304,17 +260,30 @@ namespace GameBot.Game.Tetris.Data
             return distance;
         }
 
+        public int MaximumDropDistanceForSpawnedPiece()
+        {
+            int distance = 0;
+
+            foreach (var tetromino in Tetriminos.All)
+            {
+                var distanceTest = DropDistance(new Piece(tetromino));
+                distance = Math.Max(distance, distanceTest);
+            }
+
+            return distance;
+        }
+
         public bool CanDrop(Piece piece)
         {
             return DropDistance(piece) >= 0;
         }
-        
+
         public override int GetHashCode()
         {
             int hashCode = 0;
             for (int x = 0; x < Width; x++)
             {
-                hashCode ^= Columns[x];
+                hashCode ^= Columns[x] << (3 * x);
             }
             return hashCode;
         }
@@ -326,11 +295,9 @@ namespace GameBot.Game.Tetris.Data
             Board other = obj as Board;
             if (other != null)
             {
-                // TODO: implement faster!
                 return
                     Width == other.Width &&
                     Height == other.Height &&
-                    Pieces == other.Pieces &&
                     Columns.SequenceEqual(other.Columns);
             }
             return false;
@@ -347,8 +314,7 @@ namespace GameBot.Game.Tetris.Data
                 builder.Append("|");
                 for (int x = 0; x < Width; x++)
                 {
-                    if (IsOccupied(x, y)) builder.Append('#');
-                    else builder.Append(' ');
+                    builder.Append(IsOccupied(x, y) ? '#' : ' ');
                 }
                 builder.AppendLine("|");
             }

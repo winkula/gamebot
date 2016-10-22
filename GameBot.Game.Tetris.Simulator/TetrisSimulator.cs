@@ -1,15 +1,12 @@
-﻿using System;
-using GameBot.Game.Tetris.Data;
+﻿using GameBot.Game.Tetris.Data;
 
-namespace GameBot.Game.Tetris
+namespace GameBot.Game.Tetris.Simulator
 {
     public class TetrisSimulator
     {
-        private readonly Random random = new Random();
-
         public TetrisSimulator()
         {
-            GameState = new GameState();
+            GameState = new GameState(new Piece(), Tetriminos.GetRandom());
         }
 
         public GameState GameState { get; }
@@ -24,7 +21,6 @@ namespace GameBot.Game.Tetris
                 case Move.RotateCounterclockwise: GameState.RotateCounterclockwise(); break;
                 case Move.Fall: GameState.Fall(); break;
                 case Move.Drop: GameState.Drop(); break;
-                default: break;
             }
         }
 

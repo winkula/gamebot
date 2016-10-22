@@ -1,14 +1,16 @@
-﻿namespace GameBot.Game.Tetris
+﻿using System;
+
+namespace GameBot.Game.Tetris
 {
+    // TODO: finetune!
     public class Timing
     {
-        public const int Fps = 20;
+        // this should be in sync with the duration after a butten was pressed/released
+        // important is the blocking time until the control goes back in the code
+        public static TimeSpan SleepAfterButtonTime = TimeSpan.FromMilliseconds(0); // 500
 
-        public const int RoundtripTime = 1000 / Fps; // ms
-
-        // we can miss 3 frames
-        public const int ExpectedFallDurationPadding = 3 * RoundtripTime; // three cycles at 20 fps
-
-        public const int NegativeDropDurationPadding = 1 * RoundtripTime; // one cycle at 20 fps
+        public static TimeSpan AnalyzeFallDurationPaddingTime = TimeSpan.FromMilliseconds(1) + SleepAfterButtonTime; // 30?
+        public static TimeSpan CheckFallDurationPaddingTime = TimeSpan.FromMilliseconds(1) + SleepAfterButtonTime; // 30?
+        public static TimeSpan DropDurationPaddingTime = TimeSpan.FromMilliseconds(1); // 30?
     }
 }

@@ -6,42 +6,67 @@ using System;
 
 namespace GameBot.Game.Tetris.Agents.States
 {
-    public class TetrisStartState : ITetrisState
+    public class TetrisStartState : ITetrisAgentState
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private TetrisAgent agent;
+        private readonly TetrisAgent _agent;
 
-        private readonly int startLevel;
+        private readonly bool _startFromGameover;
+        private readonly int _startLevel;
 
-        public TetrisStartState(TetrisAgent agent, int startLevel)
+        public TetrisStartState(TetrisAgent agent, int startLevel, bool startFromGameOver)
         {
-            this.agent = agent;
+            if (agent == null) throw new ArgumentNullException(nameof(agent));
 
-            this.startLevel = startLevel;
+            _agent = agent;
+            _startFromGameover = startFromGameOver;
+            _startLevel = startLevel;
         }
 
-        public void Act()
+        public void Extract()
         {
-            // wait before start
-            var random = new Random();
-            var randomTime = 2.1 + 0.5 * random.NextDouble();
-            if (agent.Clock.Time >= TimeSpan.FromSeconds(randomTime))
+            // do nothing
+        }
+        
+        public void Play()
+        {
+            if (IsStartScreenVisble())
             {
-                // handle start menu
-                //StartFromMenu(agent.Actuator);
-                StartFromGameOver(agent.Actuator);
+                if (_startFromGameover)
+                {
+                    _logger.Info("Game started from game over screen");
 
+                    // handle start menu
+                    StartFromGameOver(_agent.Executor);
+                }
+                else
+                {
+                    _logger.Info("Game started from start menu");
+
+                    // restart from game over screen (good for testing multiple games)
+                    StartFromMenu(_agent.Executor);
+                }
+                
                 // init game state
-                agent.GameState = new GameState();
-                agent.GameState.StartLevel = startLevel;
-
-                logger.Info("> Game started. Initialization sequence executed.");
-                agent.SetState(new TetrisAnalyzeState(agent, null));
+                _agent.GameState = new GameState { StartLevel = _startLevel };
+                SetStateAnalyze();
             }
         }
         
-        private void StartFromMenu(IActuator actuator)
+        private bool IsStartScreenVisble()
+        {
+            var random = new Random();
+            var randomTime = 2.5 + random.NextDouble();
+            return _agent.Screenshot.Timestamp >= TimeSpan.FromSeconds(randomTime);
+        }
+
+        private void SetStateAnalyze()
+        {
+            _agent.SetState(new TetrisAnalyzeState(_agent));
+        }
+
+        private void StartFromMenu(IExecutor actuator)
         {
             // start 1 player mode
             actuator.Hit(Button.Start);
@@ -55,16 +80,19 @@ namespace GameBot.Game.Tetris.Agents.States
             actuator.Hit(Button.A);
 
             // select level
-            SelectLevel(actuator, startLevel);
+            SelectLevel(actuator, _startLevel);
         }
 
-        private void StartFromGameOver(IActuator actuator)
+        private void StartFromGameOver(IExecutor actuator)
         {
+            // sequence handles both cases (with and without entry in high score table)
             actuator.Hit(Button.Start);
+            actuator.Hit(Button.Start);
+            actuator.Hit(Button.B);
             actuator.Hit(Button.Start);
         }
 
-        private void SelectLevel(IActuator actuator, int startLevel)
+        private void SelectLevel(IExecutor actuator, int startLevel)
         {
             if (startLevel < 0 || startLevel > 9)
                 throw new ArgumentException("startLevel must be between 0 and 9 (inclusive)");

@@ -13,21 +13,21 @@
     /// </summary>
     public class TetrisScore
     {
-        public static int ScoreSoftDrop = 1;
-        public static int ScoreSingle = 40;
-        public static int ScoreDouble = 100;
-        public static int ScoreTriple = 300;
-        public static int ScoreTeris = 1200;
-        public static int[] LinesScores = new int[] { 0, ScoreSingle, ScoreDouble, ScoreTriple, ScoreTeris };
-
+        private const int _scoreSoftDrop = 1;
+        private const int _scoreSingle = 40;
+        private const int _scoreDouble = 100;
+        private const int _scoreTriple = 300;
+        private const int _scoreTeris = 1200;
+        private static readonly int[] _linesScores = { 0, _scoreSingle, _scoreDouble, _scoreTriple, _scoreTeris };
+        
         public static int GetSoftdropScore(int fallHeight)
         {
-            return fallHeight * ScoreSoftDrop;
+            return fallHeight * _scoreSoftDrop;
         }
 
         public static int GetLineScore(int clearedLines, int level)
         {
-            return GetMultiplier(level) * LinesScores[clearedLines];
+            return GetMultiplier(level) * _linesScores[clearedLines];
         }
 
         private static int GetMultiplier(int level)

@@ -4,8 +4,8 @@ namespace GameBot.Core.Data.Commands
 {
     public class ReleaseCommand : ICommand
     {
-        public Button Button { get; private set; }
-        public TimeSpan Timestamp { get; private set; }
+        public Button Button { get; }
+        public TimeSpan Timestamp { get; }
 
         public ReleaseCommand(Button button, TimeSpan timestamp)
         {

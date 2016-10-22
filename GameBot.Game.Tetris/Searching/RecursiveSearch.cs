@@ -9,12 +9,12 @@ namespace GameBot.Game.Tetris.Searching
     public class RecursiveSearch : BaseSearch
     {
         public int Depth;
-        private readonly ICollection<Tetromino> tetrominos;
+        private readonly ICollection<Tetrimino> _tetrominos;
 
         public RecursiveSearch(IHeuristic heuristic) : base(heuristic)
         {
             Depth = 3;
-            this.tetrominos = Enum.GetValues(typeof(Tetromino)).Cast<Tetromino>().ToList();
+            _tetrominos = Enum.GetValues(typeof(Tetrimino)).Cast<Tetrimino>().ToList();
         }
 
         public override SearchResult Search(GameState gameState)
@@ -22,14 +22,15 @@ namespace GameBot.Game.Tetris.Searching
             if (gameState == null)
                 throw new ArgumentNullException(nameof(gameState));
 
-            var root = new Node(gameState);
+            var gameStateBegin = new GameState(gameState).ResetLinesAndScore();
+
+            var root = new Node(gameStateBegin);
             var goal = SearchRecursive(root, 0);
-            
-            var result = new SearchResult();
-            result.CurrentGameState = gameState;
+
+            var result = new SearchResult { CurrentGameState = root.GameState };
             if (goal != null)
             {
-                result.GoalGameState = goal?.GameState;
+                result.GoalGameState = goal.GameState;
                 result.Way = GetWayToNextSuccessor(goal);
                 result.Moves = GetMoves(result.Way);
             }
@@ -56,7 +57,7 @@ namespace GameBot.Game.Tetris.Searching
             if (depth >= Depth)
             {
                 // depth limit is reached -> score the game state
-                parent.Score = heuristic.Score(parent.GameState);
+                parent.Score = Heuristic.Score(parent.GameState);
                 return parent;
             }
 
@@ -86,10 +87,10 @@ namespace GameBot.Game.Tetris.Searching
                 double minimal = double.MaxValue;
                 bestNode = parent;
 
-                // test each tetromino with its chance to appear
-                foreach (var tetromino in tetrominos)
+                // test each tetrimino with its chance to appear
+                foreach (var tetromino in _tetrominos)
                 {
-                    //double chance = tetromino.GetChance();
+                    //double chance = tetrimino.GetChance();
 
                     //Node bestNodeForThisTetromino = null;
                     double bestScoreForThisTetromino = double.NegativeInfinity;

@@ -7,211 +7,132 @@ using System.Linq;
 
 namespace GameBot.Game.Tetris.Agents.States
 {
-    public class TetrisExecuteState : ITetrisState
+    public class TetrisExecuteState : ITetrisAgentState
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        private static Logger loggerCamera = LogManager.GetLogger("Stats.Camera");
-        private static Logger loggerActuator = LogManager.GetLogger("Stats.Actuator");
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private TetrisAgent agent;
+        private readonly TetrisAgent _agent;
 
-        private Queue<Move> moves;
+        private readonly Queue<Move> _pendingMoves;
+        private readonly Piece _tracedPiece;
+        private readonly TimeSpan _tracedPieceTimestamp;
 
-        private Move? lastMove;
-        private Piece lastPosition;
-        private TimeSpan lastPositionTimeStamp;
-
-        public TetrisExecuteState(TetrisAgent agent, Queue<Move> moves, TimeSpan analyzeTimestamp)
+        public TetrisExecuteState(TetrisAgent agent, Queue<Move> pendingMoves, Piece tracedPiece, TimeSpan tracedPieceTimestamp)
         {
             if (agent == null) throw new ArgumentNullException(nameof(agent));
-            if (moves == null) throw new ArgumentNullException(nameof(moves));
-            if (analyzeTimestamp == null) throw new ArgumentNullException(nameof(analyzeTimestamp));
-
-            this.agent = agent;
-
-            this.moves = moves;
-            this.lastPositionTimeStamp = analyzeTimestamp;
+            if (pendingMoves == null) throw new ArgumentNullException(nameof(pendingMoves));
+            if (!pendingMoves.Any()) throw new ArgumentException("pendingMoves contains no elements");
+            if (tracedPiece == null) throw new ArgumentNullException(nameof(tracedPiece));
 
             if (agent.GameState == null) throw new ArgumentNullException(nameof(agent.GameState));
             if (agent.GameState.Piece == null) throw new ArgumentNullException(nameof(agent.GameState.Piece));
             if (agent.GameState.NextPiece == null) throw new ArgumentNullException(nameof(agent.GameState.NextPiece));
 
-            this.lastPosition = new Piece(agent.GameState.Piece);
+            _agent = agent;
+            _pendingMoves = pendingMoves;
+            _tracedPiece = tracedPiece;
+            _tracedPieceTimestamp = tracedPieceTimestamp;
         }
 
-        public void Act()
+        public void Extract()
         {
-            // first we have to check if the last command was successful
-            if (lastMove.HasValue)
+            // do nothing
+        }
+
+        public void Play()
+        {
+            // next move to execute
+            var move = _pendingMoves.Dequeue();
+
+            if (move == Move.Drop)
             {
-                var now = agent.Clock.Time;
-                var expectedFallDistance = GetExpectedFallDistance(now);
-                logger.Info("> Check command. Maximal expected fall distance is " + expectedFallDistance);
-                                
-                var piece = agent.Extractor.ExtractMovedPieceWithErrorTolerance(agent.Screenshot, lastPosition, lastMove.Value, expectedFallDistance);
-                if (piece == null)
-                {
-                    loggerCamera.Info("Piece not recognized");
-                    logger.Info("> PIECE NOT FOUND! Looking for " + lastPosition.Tetromino + ". Try again.");
-                    return;
-                }
-
-                // check if last command was executed
-                // if not, repeat      
-                var delta = piece.Delta(new Piece(lastPosition).Apply(lastMove.Value));
-
-                UpdateLastPosition(piece, now);
-                if (delta.IsTargetPosition)
-                {
-                    loggerActuator.Info("Command executed");
-
-                    // move was successfully executed
-                    // we remove it from the queue
-                    ProceedToNextCommand();
-                }
-                else
-                {
-                    loggerActuator.Info("Command failed");
-
-                    // the command was not executed and the tile is in the old position
-                    logger.Info("> Failed to execute the command.");
-                    RepeatCommand();
-                    return; // we return here because we need a new screenshot
-                }
+                if (_pendingMoves.Any()) throw new Exception("Drop must be the last move to execute");
+                
+                ExecuteDrop();
+                SetStateAnalyze();
             }
-
-            // are there commands to execute?
-            if (moves.Any())
+            else
             {
-                var move = moves.Peek();
-
-                // first execution
-                if (move != Move.Drop)
-                {
-                    ExecuteAndCheck(move);
-                }
-                else
-                {
-                    if (moves.Count != 1)
-                        throw new Exception("Drop must be the last move to execute.");
-
-                    ExecuteWithoutCheck(move);
-                }
-
-                if (!moves.Any() && !lastMove.HasValue)
-                {
-                    // we executed all moves and have no comannd to check
-                    // back to the analyze state
-                    Analyze();
-                }
+                Execute(move);
+                SetStateCheck(move);
             }
         }
 
-        private int GetExpectedFallDistance(TimeSpan now)
+        private void ExecuteDrop()
         {
-            // we add some time to the theoretical duration between now and the
-            // timestamp of the last analyzed screenshot
-            // so we are sure, that we don't miss the piece
-            var duration = 
-                (now - lastPositionTimeStamp) + 
-                TimeSpan.FromMilliseconds(Timing.ExpectedFallDurationPadding);
+            // calculates drop distance, score and new level
+            var linesBefore = _agent.GameState.Lines;
+            var dropDistance = _agent.GameState.Drop();
+            var dropDuration = TetrisTiming.GetDropDuration(dropDistance);
+            int linesRemoved = 0;
 
-            return TetrisLevel.GetMaxFallDistance(agent.GameState.Level, duration);
+            if (_agent.GameState.Lines > linesBefore)
+            {
+                // lines were removed, add extra time
+                //var lineRemoveDuration = TetrisTiming.LineRemovingDuration();
+                dropDuration += TetrisTiming.LineRemovingDuration;
+
+                linesRemoved = _agent.GameState.Lines - linesBefore;
+            }
+            
+            // we subtract a time padding, because we dont want to wait the
+            // theoretical drop duration, but the real drop duration
+            // (we don't want to miss an important frame in analyze state)  
+            var waitDuration = dropDuration - Timing.DropDurationPaddingTime;
+
+            _logger.Info($"Execute Drop (new score {_agent.GameState.Score}, {linesRemoved} lines removed, sleep {waitDuration.Milliseconds} ms)");
+
+            // execute the drop blocking
+            // we must wait until the drop is ended before we can continue
+            // TODO: here we could do some precalculations for the next search (and execute the drop asynchronous)???
+            _agent.Executor.Hit(Button.Down, waitDuration);
         }
-
-        private void UpdateLastPosition(Piece newLastPosition, TimeSpan newLastPositionTimestamp)
-        {
-            lastPosition = newLastPosition;
-            agent.GameState.Piece = new Piece(lastPosition);
-            lastPositionTimeStamp = newLastPositionTimestamp;
-        }
-
-        private void ProceedToNextCommand()
-        {
-            moves.Dequeue();
-        }
-
-        private void RepeatCommand()
-        {
-            if (!lastMove.HasValue)
-                throw new ArgumentNullException(nameof(lastMove));
-
-            // repeated execution
-            ExecuteAndCheck(lastMove.Value);
-        }
-
-        private void ExecuteAndCheck(Move move)
-        {
-            lastMove = move;
-
-            Execute(move);
-        }
-
-        private void ExecuteWithoutCheck(Move move)
-        {
-            lastMove = null;
-            ProceedToNextCommand();
-
-            Execute(move);
-        }
-
+        
         private void Execute(Move move)
         {
-            logger.Info("> Execute " + move);
-            loggerActuator.Info("Command: " + move);
+            _logger.Info($"Execute {move}");
+            _agent.ExpectedPiece = new Piece(_tracedPiece).Apply(move);
+
+            var gameStateSimulation = new GameState(_agent.GameState);
             switch (move)
             {
                 case Move.Left:
-                    agent.Actuator.Hit(Button.Left);
+                    _agent.Executor.Hit(Button.Left);
+                    gameStateSimulation.Left();
                     break;
 
                 case Move.Right:
-                    agent.Actuator.Hit(Button.Right);
+                    _agent.Executor.Hit(Button.Right);
+                    gameStateSimulation.Right();
                     break;
 
                 case Move.Rotate:
-                    agent.Actuator.Hit(Button.A); // clockwise rotation
+                    _agent.Executor.Hit(Button.A); // clockwise rotation
+                    gameStateSimulation.Rotate();
                     break;
 
                 case Move.RotateCounterclockwise:
-                    agent.Actuator.Hit(Button.B); // counterclockwise rotation
+                    _agent.Executor.Hit(Button.B); // counterclockwise rotation
+                    gameStateSimulation.RotateCounterclockwise();
                     break;
 
                 case Move.Drop:
-                    agent.Actuator.Press(Button.Down); // drop
-
-                    // calculates the score and the level
-                    var dropDistance = agent.GameState.Drop();
-
-                    // let time lapse away
-                    // (the tetromino falls and we must pause
-                    // TODO: here we could to some precalculations for the next search???
-                    AwaitDrop(dropDistance);
-                    break;
-
-                default:
-                    break;
+                    throw new ApplicationException("no drop allowed here!");
             }
         }
 
-        private void AwaitDrop(int fallDistanceRows)
+        private void SetStateCheck(Move lastMove)
         {
-            // we subtract a time padding, because we dont want to wait the
-            // theoretical drop duration, but the real drop duration
-            // (we lose some overhead time)  
-            var dropDuration = TetrisLevel
-                .GetFreeFallDuration(fallDistanceRows)
-                .Subtract(TimeSpan.FromMilliseconds(Timing.NegativeDropDurationPadding));
+            if (lastMove == Move.Drop) throw new Exception("Can't check drop");
 
-            if (dropDuration > TimeSpan.Zero)
-            {
-                agent.Clock.Sleep((int)dropDuration.TotalMilliseconds);
-            }
+            _agent.SetState(new TetrisCheckState(_agent, lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
         }
 
-        private void Analyze()
+        private void SetStateAnalyze()
         {
-            agent.SetState(new TetrisAnalyzeState(agent, agent.GameState.Piece.Tetromino));
+            if (_pendingMoves.Any()) throw new Exception("Not all moves were executed");
+
+            _agent.SetState(new TetrisAnalyzeState(_agent, _agent.GameState.Piece.Tetrimino));
         }
     }
 }

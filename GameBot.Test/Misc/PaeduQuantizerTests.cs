@@ -12,7 +12,7 @@ namespace GameBot.Test.Misc
     [TestFixture]
     public class PaeduQuantizerTests
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Test]
         public void TestMe()
@@ -48,7 +48,7 @@ namespace GameBot.Test.Misc
 
 
             stopwatch.Stop();
-            logger.Info($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
+            _logger.Info($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
 
             // show/save image
             //destImage.Save(@"C:\...");

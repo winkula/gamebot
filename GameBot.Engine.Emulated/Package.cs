@@ -1,4 +1,5 @@
 ﻿using GameBot.Core;
+using GameBot.Core.Executors;
 using GameBot.Engine.Emulated.Actuators;
 using GameBot.Engine.Emulated.Cameras;
 using GameBot.Engine.Emulated.Clocks;
@@ -17,6 +18,7 @@ namespace GameBot.Engine.Emulated
             container.RegisterSingleton<IActuator, EmulatedActuator>();
             container.RegisterSingleton<ICamera, EmulatedCamera>();
             container.RegisterSingleton<IClock, EmulatedClock>();
+            container.RegisterSingleton<IExecutor, Executor>();
             container.RegisterSingleton<IQuantizer, PassthroughQuantizer>();
         }        
     }

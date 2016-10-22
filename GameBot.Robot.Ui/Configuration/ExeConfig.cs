@@ -8,12 +8,12 @@ namespace GameBot.Robot.Ui.Configuration
 {
     public class ExeConfig : IConfig
     {
-        private const char Delimiter = ',';
-        private readonly System.Configuration.Configuration configuration;
+        private const char _delimiter = ',';
+        private readonly System.Configuration.Configuration _configuration;
 
         public ExeConfig()
         {
-            this.configuration = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+            _configuration = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
         }
 
         public T Read<T>(string key)
@@ -37,7 +37,7 @@ namespace GameBot.Robot.Ui.Configuration
 
         public void Write<T>(string key, T value)
         {
-            configuration.AppSettings.Settings[key].Value = value.ToString();
+            _configuration.AppSettings.Settings[key].Value = value.ToString();
         }
 
         public IEnumerable<T> ReadCollection<T>(string key)
@@ -45,7 +45,7 @@ namespace GameBot.Robot.Ui.Configuration
             string values = ConfigurationManager.AppSettings[key];
             if (values == null) throw new ArgumentException($"config value with key {key} not found.");
 
-            foreach (var value in values.Split(Delimiter))
+            foreach (var value in values.Split(_delimiter))
             {
                 yield return Get<T>(value);
             }
@@ -63,7 +63,7 @@ namespace GameBot.Robot.Ui.Configuration
                 yield break;
             }
 
-            foreach (var value in values.Split(Delimiter))
+            foreach (var value in values.Split(_delimiter))
             {
                 yield return Get<T>(value);
             }
@@ -71,7 +71,7 @@ namespace GameBot.Robot.Ui.Configuration
 
         public void WriteCollection<T>(string key, IEnumerable<T> values)
         {
-            configuration.AppSettings.Settings[key].Value = string.Join(",", values);
+            _configuration.AppSettings.Settings[key].Value = string.Join(",", values);
         }
         
         private T Get<T>(string value)
@@ -86,7 +86,7 @@ namespace GameBot.Robot.Ui.Configuration
 
         public void Save()
         {
-            configuration.Save(ConfigurationSaveMode.Modified);
+            _configuration.Save(ConfigurationSaveMode.Modified);
         }
     }
 }

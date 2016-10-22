@@ -12,12 +12,13 @@ namespace GameBot.Game.Tetris.Data
     ///     The origin is top left on the game boy screen)
     ///     Every tile is a 8 by 8 pixel block
     /// </summary>
-    public class Coordinates
+    public static class Coordinates
     {
         // origin of spawning pieces (center of the piece)
         // in absolute game coordinates (origin in bottom left of the board)
         public static Point PieceOrigin = new Point(4, 16);
-
+        public static Point NextPieceTileOrigin = new Point(15, 13);
+        
         #region To board coordinate system
 
 
@@ -62,14 +63,24 @@ namespace GameBot.Game.Tetris.Data
         
         // converts game coordinates (X and Y of Piece) to the origin (top left) of the search window (4 by 4)
         // this is used for creating bitmasks for piece matching        
-        public static Point PieceToSearchWindow(int x, int y)
+        public static Point PieceToTileSearchWindowOrigin(int x, int y)
         {
             return new Point(x + 5, -y - 1);
         }
 
-        public static Point PieceToSearchWindow(Point coordinates)
+        public static Point PieceToTileSearchWindowOrigin(Point coordinates)
         {
-            return PieceToSearchWindow(coordinates.X, coordinates.Y);
+            return PieceToTileSearchWindowOrigin(coordinates.X, coordinates.Y);
+        }
+        
+        public static Point PieceToTilePreview(int x, int y)
+        {
+            return new Point(x + 5 + 11, -y - 1 + 15);
+        }
+
+        public static Point PieceToTilePreview(Point coordinates)
+        {
+            return PieceToTilePreview(coordinates.X, coordinates.Y);
         }
 
         #endregion

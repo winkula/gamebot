@@ -9,77 +9,84 @@ namespace GameBot.Engine.Emulated
 {
     public class EmulatorEngine : IEngine
     {
-        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IConfig config;
+        private readonly IConfig _config;
+        
+        private readonly ICamera _camera;
+        private readonly IClock _clock;
+        private readonly IExecutor _executor;
+        private readonly IQuantizer _quantizer;
 
-        private readonly IActuator actuator;
-        private readonly ICamera camera;
-        private readonly IClock clock;
-        private readonly IQuantizer quantizer;
+        private readonly IAgent _agent;
 
-        private readonly IAgent agent;
-
-        private readonly Emulator emulator;
+        private readonly Emulator _emulator;
 
         public bool Play { get; set; }
 
-        public EmulatorEngine(IConfig config, IActuator actuator, ICamera camera, IClock clock, IQuantizer quantizer, IAgent agent, Emulator emulator)
+        public EmulatorEngine(IConfig config, ICamera camera, IClock clock, IExecutor executor, IQuantizer quantizer, IAgent agent, Emulator emulator)
         {
-            this.config = config;
+            _config = config;
+            
+            _camera = camera;
+            _clock = clock;
+            _executor = executor;
+            _quantizer = quantizer;
 
-            this.actuator = actuator;
-            this.camera = camera;
-            this.clock = clock;
-            this.quantizer = quantizer;
+            _agent = agent;
 
-            this.agent = agent;
-
-            this.emulator = emulator;
+            _emulator = emulator;
             LoadRom();
         }
 
         private void LoadRom()
         {
             var loader = new RomLoader();
-            var game = loader.Load(config.Read("Emulator.Rom.Path", "Roms/tetris.gb"));
-            emulator.Load(game);
+            var game = loader.Load(_config.Read("Emulator.Rom.Path", "Roms/tetris.gb"));
+            _emulator.Load(game);
         }
 
         public void Initialize()
         {
-            clock.Start();
+            _clock.Start();
         }
 
-        public void Step(Action<IImage,IImage> callback = null)
+        public void Step(Action<IImage> showImage = null, Action<IImage> showProcessedImage = null)
         {
             // get image as photo of the gameboy screen (input)
-            IImage image = camera.Capture();
+            IImage image = _camera.Capture();
+            TimeSpan time = _clock.Time;
 
-            // process image and get display data
-            TimeSpan time = clock.Time;
-            IImage processed = quantizer.Quantize(image);
+            // process image
+            IImage processed = _quantizer.Quantize(image);
             
+            showImage?.Invoke(image);
+
             if (Play)
             {
                 IScreenshot screenshot = new EmguScreenshot(processed, time);
 
-                // handle input to the agent which
-                //  - extracts the game state
-                //  - decides which commands to press
-                //  - presses the commands
-                agent.Act(screenshot, actuator);
-                processed = agent.Visualize(processed);
+                // extracts the game state
+                _agent.Extract(screenshot);
+
+                processed = _agent.Visualize(processed);
+                showProcessedImage?.Invoke(processed);
+
+                // presses the buttons
+                _agent.Play(_executor);
+            }
+            else
+            {
+                showProcessedImage?.Invoke(processed);
             }
 
-            callback?.Invoke(image, processed);
-
-            emulator.Execute();
+            _emulator.Execute();
         }
 
         public void Reset()
         {
-            throw new NotImplementedException();
+            Play = false;
+            _agent.Reset();
         }
     }
 }

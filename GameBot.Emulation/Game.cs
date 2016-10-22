@@ -26,148 +26,148 @@ namespace GameBot.Emulation
 {
     public class Game
     {
-        public string title;
-        public bool gameBoyColorGame;
-        public int licenseCode;
-        public bool gameBoy;
-        public RomType romType;
-        public int romSize;
-        public int romBanks;
-        public int ramSize;
-        public int ramBanks;
-        public bool japanese;
-        public int oldLicenseCode;
-        public int maskRomVersion;
-        public int checksum;
-        public int actualChecksum;
-        public int headerChecksum;
-        public int actualHeaderChecksum;
-        public bool noVerticalBlankInterruptHandler;
-        public bool noLCDCStatusInterruptHandler;
-        public bool noTimerOverflowInterruptHandler;
-        public bool noSerialTransferCompletionInterruptHandler;
-        public bool noHighToLowOfP10ToP13InterruptHandler;
-        public ICartridge cartridge;
+        public string Title;
+        public bool GameBoyColorGame;
+        public int LicenseCode;
+        public bool GameBoy;
+        public RomType RomType;
+        public int RomSize;
+        public int RomBanks;
+        public int RamSize;
+        public int RamBanks;
+        public bool Japanese;
+        public int OldLicenseCode;
+        public int MaskRomVersion;
+        public int Checksum;
+        public int ActualChecksum;
+        public int HeaderChecksum;
+        public int ActualHeaderChecksum;
+        public bool NoVerticalBlankInterruptHandler;
+        public bool NoLcdcStatusInterruptHandler;
+        public bool NoTimerOverflowInterruptHandler;
+        public bool NoSerialTransferCompletionInterruptHandler;
+        public bool NoHighToLowOfP10ToP13InterruptHandler;
+        public ICartridge Cartridge;
 
         public Game(byte[] fileData)
         {
-            title = ExtractGameTitle(fileData);
-            gameBoyColorGame = fileData[0x0143] == 0x80;
-            licenseCode = (((int)fileData[0x0144]) << 4) | fileData[0x0145];
-            gameBoy = fileData[0x0146] == 0x00;
-            romType = (RomType)fileData[0x0147];
+            Title = ExtractGameTitle(fileData);
+            GameBoyColorGame = fileData[0x0143] == 0x80;
+            LicenseCode = (((int)fileData[0x0144]) << 4) | fileData[0x0145];
+            GameBoy = fileData[0x0146] == 0x00;
+            RomType = (RomType)fileData[0x0147];
 
             switch (fileData[0x0148])
             {
                 case 0x00:
-                    romSize = 32 * 1024;
-                    romBanks = 2;
+                    RomSize = 32 * 1024;
+                    RomBanks = 2;
                     break;
                 case 0x01:
-                    romSize = 64 * 1024;
-                    romBanks = 4;
+                    RomSize = 64 * 1024;
+                    RomBanks = 4;
                     break;
                 case 0x02:
-                    romSize = 128 * 1024;
-                    romBanks = 8;
+                    RomSize = 128 * 1024;
+                    RomBanks = 8;
                     break;
                 case 0x03:
-                    romSize = 256 * 1024;
-                    romBanks = 16;
+                    RomSize = 256 * 1024;
+                    RomBanks = 16;
                     break;
                 case 0x04:
-                    romSize = 512 * 1024;
-                    romBanks = 32;
+                    RomSize = 512 * 1024;
+                    RomBanks = 32;
                     break;
                 case 0x05:
-                    romSize = 1024 * 1024;
-                    romBanks = 64;
+                    RomSize = 1024 * 1024;
+                    RomBanks = 64;
                     break;
                 case 0x06:
-                    romSize = 2 * 1024 * 1024;
-                    romBanks = 128;
+                    RomSize = 2 * 1024 * 1024;
+                    RomBanks = 128;
                     break;
                 case 0x52:
-                    romSize = 1179648;
-                    romBanks = 72;
+                    RomSize = 1179648;
+                    RomBanks = 72;
                     break;
                 case 0x53:
-                    romSize = 1310720;
-                    romBanks = 80;
+                    RomSize = 1310720;
+                    RomBanks = 80;
                     break;
                 case 0x54:
-                    romSize = 1572864;
-                    romBanks = 96;
+                    RomSize = 1572864;
+                    RomBanks = 96;
                     break;
             }
 
             switch (fileData[0x0149])
             {
                 case 0x00:
-                    ramSize = 0;
-                    ramBanks = 0;
+                    RamSize = 0;
+                    RamBanks = 0;
                     break;
                 case 0x01:
-                    ramSize = 2 * 1024;
-                    ramBanks = 1;
+                    RamSize = 2 * 1024;
+                    RamBanks = 1;
                     break;
                 case 0x02:
-                    ramSize = 8 * 1024;
-                    ramBanks = 1;
+                    RamSize = 8 * 1024;
+                    RamBanks = 1;
                     break;
                 case 0x03:
-                    ramSize = 32 * 1024;
-                    ramBanks = 4;
+                    RamSize = 32 * 1024;
+                    RamBanks = 4;
                     break;
                 case 0x04:
-                    ramSize = 128 * 1024;
-                    ramBanks = 16;
+                    RamSize = 128 * 1024;
+                    RamBanks = 16;
                     break;
             }
 
-            japanese = fileData[0x014A] == 0x00;
-            oldLicenseCode = fileData[0x014B];
-            maskRomVersion = fileData[0x014C];
+            Japanese = fileData[0x014A] == 0x00;
+            OldLicenseCode = fileData[0x014B];
+            MaskRomVersion = fileData[0x014C];
 
-            headerChecksum = fileData[0x014D];
+            HeaderChecksum = fileData[0x014D];
             for (int i = 0x0134; i <= 0x014C; i++)
             {
-                actualHeaderChecksum = actualHeaderChecksum - fileData[i] - 1;
+                ActualHeaderChecksum = ActualHeaderChecksum - fileData[i] - 1;
             }
-            actualHeaderChecksum &= 0xFF;
+            ActualHeaderChecksum &= 0xFF;
 
-            checksum = (((int)fileData[0x014E]) << 8) | fileData[0x014F];
+            Checksum = (((int)fileData[0x014E]) << 8) | fileData[0x014F];
             for (int i = 0; i < fileData.Length; i++)
             {
                 if (i != 0x014E && i != 0x014F)
                 {
-                    actualChecksum += fileData[i];
+                    ActualChecksum += fileData[i];
                 }
             }
-            actualChecksum &= 0xFFFF;
+            ActualChecksum &= 0xFFFF;
 
-            noVerticalBlankInterruptHandler = fileData[0x0040] == 0xD9;
-            noLCDCStatusInterruptHandler = fileData[0x0048] == 0xD9;
-            noTimerOverflowInterruptHandler = fileData[0x0050] == 0xD9;
-            noSerialTransferCompletionInterruptHandler = fileData[0x0058] == 0xD9;
-            noHighToLowOfP10ToP13InterruptHandler = fileData[0x0060] == 0xD9;
+            NoVerticalBlankInterruptHandler = fileData[0x0040] == 0xD9;
+            NoLcdcStatusInterruptHandler = fileData[0x0048] == 0xD9;
+            NoTimerOverflowInterruptHandler = fileData[0x0050] == 0xD9;
+            NoSerialTransferCompletionInterruptHandler = fileData[0x0058] == 0xD9;
+            NoHighToLowOfP10ToP13InterruptHandler = fileData[0x0060] == 0xD9;
 
-            switch (romType)
+            switch (RomType)
             {
-                case RomType.ROM:
-                    cartridge = new Rom(fileData);
+                case RomType.Rom:
+                    Cartridge = new Rom(fileData);
                     break;
-                case RomType.ROM_MBC1:
-                case RomType.ROM_MBC1_RAM:
-                case RomType.ROM_MBC1_RAM_BATT:
-                    cartridge = new Mbc1(fileData, romType, romSize, romBanks);
+                case RomType.RomMbc1:
+                case RomType.RomMbc1Ram:
+                case RomType.RomMbc1RamBatt:
+                    Cartridge = new Mbc1(fileData, RomType, RomSize, RomBanks);
                     break;
-                case RomType.ROM_MBC2:
-                case RomType.ROM_MBC2_BATTERY:
-                    cartridge = new Mbc2(fileData, romType, romSize, romBanks);
+                case RomType.RomMbc2:
+                case RomType.RomMbc2Battery:
+                    Cartridge = new Mbc2(fileData, RomType, RomSize, RomBanks);
                     break;
                 default:
-                    throw new Exception(string.Format("Cannot emulate cartridge type {0}.", romType));
+                    throw new Exception($"Cannot emulate cartridge type {RomType}.");
             }
         }
 
@@ -187,27 +187,27 @@ namespace GameBot.Emulation
 
         public override string ToString()
         {
-            return "title = " + title + "\n"
-                + "game boy color game = " + gameBoyColorGame + "\n"
-                + "license code = " + licenseCode + "\n"
-                + "game boy = " + gameBoy + "\n"
-                + "rom type = " + romType + "\n"
-                + "rom size = " + romSize + "\n"
-                + "rom banks = " + romBanks + "\n"
-                + "ram size = " + ramSize + "\n"
-                + "ram banks = " + ramBanks + "\n"
-                + "japanese = " + japanese + "\n"
-                + "old license code = " + oldLicenseCode + "\n"
-                + "mask rom version = " + maskRomVersion + "\n"
-                + "header checksum = " + headerChecksum + "\n"
-                + "actual header checksum = " + actualHeaderChecksum + "\n"
-                + "checksum = " + checksum + "\n"
-                + "actual checksum = " + actualChecksum + "\n"
-                + "no vertical blank interrupt handler = " + noVerticalBlankInterruptHandler + "\n"
-                + "no lcd status interrupt handler = " + noLCDCStatusInterruptHandler + "\n"
-                + "no timer overflow interrupt handler = " + noTimerOverflowInterruptHandler + "\n"
-                + "no serial transfer completion interrupt handler = " + noSerialTransferCompletionInterruptHandler + "\n"
-                + "no high to lower of P10-P13 interrupt handler = " + noHighToLowOfP10ToP13InterruptHandler + "\n";
+            return "title = " + Title + "\n"
+                + "game boy color game = " + GameBoyColorGame + "\n"
+                + "license code = " + LicenseCode + "\n"
+                + "game boy = " + GameBoy + "\n"
+                + "rom type = " + RomType + "\n"
+                + "rom size = " + RomSize + "\n"
+                + "rom banks = " + RomBanks + "\n"
+                + "ram size = " + RamSize + "\n"
+                + "ram banks = " + RamBanks + "\n"
+                + "japanese = " + Japanese + "\n"
+                + "old license code = " + OldLicenseCode + "\n"
+                + "mask rom version = " + MaskRomVersion + "\n"
+                + "header checksum = " + HeaderChecksum + "\n"
+                + "actual header checksum = " + ActualHeaderChecksum + "\n"
+                + "checksum = " + Checksum + "\n"
+                + "actual checksum = " + ActualChecksum + "\n"
+                + "no vertical blank interrupt handler = " + NoVerticalBlankInterruptHandler + "\n"
+                + "no lcd status interrupt handler = " + NoLcdcStatusInterruptHandler + "\n"
+                + "no timer overflow interrupt handler = " + NoTimerOverflowInterruptHandler + "\n"
+                + "no serial transfer completion interrupt handler = " + NoSerialTransferCompletionInterruptHandler + "\n"
+                + "no high to lower of P10-P13 interrupt handler = " + NoHighToLowOfP10ToP13InterruptHandler + "\n";
         }
     }    
 }

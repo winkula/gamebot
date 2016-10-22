@@ -140,43 +140,54 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Agents\States\TetrisRepeatState.cs" />
+    <Compile Include="Agents\States\TetrisCheckState.cs" />
     <Compile Include="Agents\TetrisAgent.cs" />
+    <Compile Include="Data\BoardLookups.cs" />
     <Compile Include="Data\Coordinates.cs" />
+    <Compile Include="Extraction\Samplers\ISampler.cs" />
+    <Compile Include="Extraction\Samplers\MoveConfirmationSampler.cs" />
+    <Compile Include="Extraction\Samplers\NextTetriminoSampler.cs" />
+    <Compile Include="Extraction\Samplers\CurrentTetriminoSampler.cs" />
     <Compile Include="Extraction\PieceMatcher.cs" />
+    <Compile Include="Extraction\ProbabilisticResult.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Searching\BaseSearch.cs" />
     <Compile Include="Searching\Heuristics\IHeuristic.cs" />
     <Compile Include="Searching\ISearch.cs" />
     <Compile Include="Searching\SearchResult.cs" />
+    <Compile Include="Searching\PredictiveSearch.cs" />
     <Compile Include="Searching\SimpleSearch.cs" />
     <Compile Include="Data\Move.cs" />
     <Compile Include="Data\Board.cs" />
     <Compile Include="Data\Way.cs" />
     <Compile Include="Data\Piece.cs" />
     <Compile Include="Data\PieceDelta.cs" />
-    <Compile Include="Data\Pose.cs" />
     <Compile Include="Data\Shape.cs" />
-    <Compile Include="Extraction\PieceExtractionResult.cs" />
     <Compile Include="Extraction\PieceExtractor.cs" />
     <Compile Include="Searching\Heuristics\BasicTetrisHeuristic.cs" />
     <Compile Include="Searching\Heuristics\ExperimentalHeuristic.cs" />
     <Compile Include="Searching\Heuristics\YiyuanLeeHeuristic.cs" />
     <Compile Include="Package.cs" />
-    <Compile Include="Agents\States\ITetrisState.cs" />
+    <Compile Include="Agents\States\ITetrisAgentState.cs" />
     <Compile Include="Agents\States\TetrisExecuteState.cs" />
     <Compile Include="Agents\States\TetrisAnalyzeState.cs" />
     <Compile Include="Agents\States\TetrisStartState.cs" />
+    <Compile Include="TetrisConstants.cs" />
     <Compile Include="TetrisLevel.cs" />
     <Compile Include="TetrisScore.cs" />
     <Compile Include="Searching\RecursiveSearch.cs" />
     <Compile Include="Data\GameState.cs" />
     <Compile Include="Searching\Node.cs" />
-    <Compile Include="Data\Tetromino.cs" />
-    <Compile Include="Agents\OptimisticTetrisAgent.cs" />
-    <Compile Include="TetrisAi.cs" />
+    <Compile Include="Data\Tetrimino.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extraction\TetrisExtractor.cs" />
     <Compile Include="Searching\Heuristics\MaxBergmarkHeuristic.cs" />
-    <Compile Include="Searching\ProbabilisticSearch.cs" />
+    <Compile Include="TetrisTiming.cs" />
     <Compile Include="Timing.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -187,6 +198,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TemplatesGrayscale.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TemplatesBinary.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

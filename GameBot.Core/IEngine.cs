@@ -24,10 +24,14 @@ namespace GameBot.Core
         /// Runs one step of the engine and returns the result.
         /// This method is intended to call in a loop.
         /// </summary>
-        /// <param name="callback">Callback with the extracted images.</param>
+        /// <param name="showImage">Callback with the original image.</param>
+        /// <param name="showProcessedImage">Callback with the processed image.</param>
         /// <returns>The engines result.</returns>
-        void Step(Action<IImage, IImage> callback = null);
+        void Step(Action<IImage> showImage = null, Action<IImage> showProcessedImage = null);
 
+        /// <summary>
+        /// Resets the underlying agent.
+        /// </summary>
         void Reset();
     }
 }

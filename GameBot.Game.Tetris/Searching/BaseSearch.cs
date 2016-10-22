@@ -9,11 +9,11 @@ namespace GameBot.Game.Tetris.Searching
     // Tetris breadth first search
     public abstract class BaseSearch : ISearch
     {
-        protected readonly IHeuristic heuristic;
+        protected readonly IHeuristic Heuristic;
 
-        public BaseSearch(IHeuristic heuristic)
+        protected BaseSearch(IHeuristic heuristic)
         {
-            this.heuristic = heuristic;
+            Heuristic = heuristic;
         }
 
         public virtual SearchResult Search(GameState gameState)
@@ -21,7 +21,9 @@ namespace GameBot.Game.Tetris.Searching
             if (gameState == null)
                 throw new ArgumentNullException(nameof(gameState));
 
-            Node root = new Node(gameState);            
+            var gameStateBegin = new GameState(gameState).ResetLinesAndScore();
+
+            Node root = new Node(gameStateBegin);            
             Node goal = null;
             var bestScore = double.NegativeInfinity;
 
@@ -50,10 +52,12 @@ namespace GameBot.Game.Tetris.Searching
             
             if (goal?.Parent != null)
             {
-                var result = new SearchResult();
-                result.CurrentGameState = root?.GameState;
-                result.GoalGameState = goal?.Parent.GameState;
-                result.Way = goal?.Parent.Way;
+                var result = new SearchResult
+                {
+                    CurrentGameState = root.GameState,
+                    GoalGameState = goal.Parent.GameState,
+                    Way = goal.Parent.Way
+                };
                 result.Moves = GetMoves(result.Way);
                 return result;
             }
@@ -110,22 +114,22 @@ namespace GameBot.Game.Tetris.Searching
             return ScoreSimple(node);
         }
 
-        protected double ScoreSimple(Node parent)
+        private double ScoreSimple(Node parent)
         {
-            return heuristic.Score(parent.GameState);
+            return Heuristic.Score(parent.GameState);
         }
 
         protected double ScoreProbabilisticExpected(Node parent)
         {
-            return Enum.GetValues(typeof(Tetromino))
-                .Cast<Tetromino>()
+            return Enum.GetValues(typeof(Tetrimino))
+                .Cast<Tetrimino>()
                 .AsParallel()
                 .Sum(x => ScoreByChance(parent, x));
         }
 
         protected double ScoreProbabilisticMinimum(Node parent)
         {
-            var tetrominos = Enum.GetValues(typeof(Tetromino)).Cast<Tetromino>();
+            var tetrominos = Enum.GetValues(typeof(Tetrimino)).Cast<Tetrimino>();
             double minimum = 0;
 
             foreach (var tetromino in tetrominos)
@@ -141,11 +145,11 @@ namespace GameBot.Game.Tetris.Searching
             return minimum;
         }
 
-        protected double ScoreByChance(Node parent, Tetromino tetromino)
+        protected double ScoreByChance(Node parent, Tetrimino tetrimino)
         {
-            double chance = tetromino.GetChance();
+            double chance = tetrimino.GetChance();
 
-            var newState = new GameState(parent.GameState, new Piece(tetromino));
+            var newState = new GameState(parent.GameState, new Piece(tetrimino));
             var child = new Node(newState);
             var successors = child.GetSuccessors();
             var score = GetBestScore(successors);
@@ -159,7 +163,7 @@ namespace GameBot.Game.Tetris.Searching
 
             foreach (var successor in successors)
             {
-                var score = heuristic.Score(successor.GameState);
+                var score = Heuristic.Score(successor.GameState);
                 bestScore = Math.Max(bestScore, score);
             }
 

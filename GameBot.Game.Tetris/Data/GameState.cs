@@ -1,27 +1,20 @@
-﻿using GameBot.Core.Data;
+﻿using System;
 using GameBot.Core.Exceptions;
 using System.Text;
 
 namespace GameBot.Game.Tetris.Data
 {
-    public class GameState : AbstractGameState
+    public class GameState
     {
-        public Board Board { get; private set; }
+        public Board Board { get; }
         public Piece Piece { get; set; }
-        public Tetromino? NextPiece { get; set; }
-        
-        public int Lines { get; set; }
-        public int Score { get; set; }
+        public Tetrimino? NextPiece { get; set; }
+
+        public int Lines { get; private set; }
+        public int Score { get; private set; }
         public int StartLevel { get; set; }
-        public int Level { get { return TetrisLevel.GetLevel(StartLevel, Lines); } }
-
-        public GameState()
-        {
-            Board = new Board();
-            Piece = new Piece();
-            NextPiece = Tetrominos.GetRandom(); // TODO: only generate if needed!
-        }
-
+        public int Level => TetrisLevel.GetLevel(StartLevel, Lines);
+        
         public GameState(GameState old)
         {
             Board = new Board(old.Board);
@@ -29,6 +22,7 @@ namespace GameBot.Game.Tetris.Data
             NextPiece = old.NextPiece;
             Lines += old.Lines;
             Score += old.Score;
+            StartLevel = old.StartLevel;
         }
 
         public GameState(GameState old, Piece piece)
@@ -38,41 +32,35 @@ namespace GameBot.Game.Tetris.Data
             NextPiece = old.NextPiece;
             Lines += old.Lines;
             Score += old.Score;
+            StartLevel = old.StartLevel;
         }
 
-        public GameState(Piece piece, Tetromino? nextPiece)
+        public GameState(Piece piece, Tetrimino? nextPiece)
         {
             Board = new Board();
             Piece = piece;
             NextPiece = nextPiece;
         }
 
-        public GameState(Board board, Piece piece, Tetromino? nextPiece = null)
+        public GameState(Board board = null, Piece piece = null, Tetrimino? nextPiece = null)
         {
-            Board = board;
-            Piece = piece;
+            Board = board ?? new Board();
+            Piece = piece ?? new Piece();
             NextPiece = nextPiece;
         }
 
-        public GameState(Tetromino tetromino, Tetromino? nextTetromino) : this(new Piece(tetromino), nextTetromino)
+        public GameState(Tetrimino tetrimino, Tetrimino? nextTetrimino = null) : this(new Piece(tetrimino), nextTetrimino)
         {
         }
 
-        public GameState(Tetromino tetromino) : this(new Piece(tetromino), null)
-        {
-        }
-
-        public bool IsPieceLanded
-        {
-            get { return Board.Intersects(new Piece(Piece).Fall()); }
-        }
+        private bool IsPieceLanded => Board.Intersects(new Piece(Piece).Fall());
 
         public bool Fall()
         {
-            return Fall(Tetrominos.GetRandom());
+            return Fall(Tetriminos.GetRandom());
         }
 
-        public bool Fall(Tetromino next)
+        public bool Fall(Tetrimino next)
         {
             if (Board.DropDistance(Piece) < 0 && Board.Intersects(Piece)) throw new GameOverException();
 
@@ -102,11 +90,11 @@ namespace GameBot.Game.Tetris.Data
         // returns the fallen distance of the piece
         public int Drop()
         {
-            return Drop(Tetrominos.GetRandom());
+            return Drop(Tetriminos.GetRandom());
         }
 
         // returns the fallen distance of the piece
-        public int Drop(Tetromino next)
+        public int Drop(Tetrimino next)
         {
             int distance = Board.DropDistance(Piece);
             if (distance < 0 && Board.Intersects(Piece)) throw new GameOverException();
@@ -147,7 +135,7 @@ namespace GameBot.Game.Tetris.Data
             if (Board.Intersects(new Piece(Piece).Right()))
                 throw new GameOverException("Right not possible");
 
-            Piece.Right();            
+            Piece.Right();
         }
 
         public void Rotate()
@@ -155,7 +143,7 @@ namespace GameBot.Game.Tetris.Data
             if (Board.Intersects(new Piece(Piece).Rotate()))
                 throw new GameOverException("Rotate not possible");
 
-            Piece.Rotate();            
+            Piece.Rotate();
         }
 
         public void RotateCounterclockwise()
@@ -166,9 +154,16 @@ namespace GameBot.Game.Tetris.Data
             Piece.RotateCounterclockwise();
         }
 
+        public GameState ResetLinesAndScore()
+        {
+            Lines = 0;
+            Score = 0;
+            return this;
+        }
+
         public override int GetHashCode()
         {
-            return Lines ^ (Piece.GetHashCode() << 5) ^ ((int) NextPiece << 20);
+            return Lines ^ (Piece.GetHashCode() << 5) ^ ((int)NextPiece.GetValueOrDefault() << 20);
         }
 
         public override bool Equals(object obj)
@@ -211,7 +206,7 @@ namespace GameBot.Game.Tetris.Data
                 if (y == Board.Height - 1) builder.AppendFormat(" Score: {0}", Score);
                 else if (y == Board.Height - 2) builder.AppendFormat(" Level: {0}", Level);
                 else if (y == Board.Height - 3) builder.AppendFormat(" Lines: {0}", Lines);
-                else if (y == Board.Height - 5) builder.AppendFormat(" Curr.: {0}", Piece?.Tetromino);
+                else if (y == Board.Height - 5) builder.AppendFormat(" Curr.: {0}", Piece?.Tetrimino);
                 else if (y == Board.Height - 6) builder.AppendFormat(" Next : {0}", NextPiece);
 
                 builder.AppendLine();

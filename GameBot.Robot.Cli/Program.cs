@@ -1,6 +1,4 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using GameBot.Core;
+﻿using GameBot.Core;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -10,8 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameBot.Robot.Cli
 {

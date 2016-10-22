@@ -11,104 +11,125 @@ namespace GameBot.Game.Tetris.Simulator
 {
     public class SimulatorEngine
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _loggerTime = LogManager.GetLogger("time");
 
-        private readonly ISearch search;
-        private readonly TetrisSimulator simulator;
+        private readonly Stopwatch _stopwatch;
+        private readonly Stopwatch _stopwatchRound;
+
+        private readonly ISearch _search;
+        private readonly TetrisSimulator _simulator;
 
         // in ms
         public int PauseTime { get; set; }
 
         public SimulatorEngine(ISearch search, TetrisSimulator simulator)
         {
-            this.search = search;
-            this.simulator = simulator;
+            _stopwatch = new Stopwatch();
+            _stopwatchRound = new Stopwatch();
+
+            _search = search;
+            _simulator = simulator;
         }
 
         public void Run()
         {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            _stopwatch.Start();
+            _stopwatchRound.Start();
             int round = 0;
             while (true)
             {
+                const int updateEvery = 60;
                 try
                 {
-                    if (round % 600 == 0)
+                    if (round % updateEvery == 0)
                     {
                         WriteStatus(round, ">..");
                     }
-                    else if (round % 600 == 100)
+                    else if (round % updateEvery == 1 * updateEvery / 6)
                     {
                         WriteStatus(round, ".>.");
                     }
-                    else if (round % 600 == 200)
+                    else if (round % updateEvery == 2 * updateEvery / 6)
                     {
                         WriteStatus(round, "..>");
                     }
-                    else if (round % 600 == 300)
+                    else if (round % updateEvery == 3 * updateEvery / 6)
                     {
                         WriteStatus(round, "..<");
                     }
-                    else if (round % 600 == 400)
+                    else if (round % updateEvery == 4 * updateEvery / 6)
                     {
                         WriteStatus(round, ".<.");
                     }
-                    else if (round % 600 == 500)
+                    else if (round % updateEvery == 5 * updateEvery / 6)
                     {
                         WriteStatus(round, "<..");
                     }
 
                     Update();
-                    logger.Info($"Round {round + 1}");
+                    _logger.Info($"Round {round + 1}");
                     Render();
 
                     round++;
                 }
                 catch (GameOverException)
                 {
-                    LogResults(round, stopwatch.ElapsedMilliseconds);
+                    LogResults(round, _stopwatch.ElapsedMilliseconds);
                     break;
                 }
             }
-            stopwatch.Stop();
+            _stopwatch.Stop();
         }
 
         private void WriteStatus(int round, string animation)
         {
             Console.Clear();
-            Console.WriteLine($"Running {animation}");
-            Console.WriteLine($"Round {round}");
-            Console.WriteLine($"---------------------");
-            Console.WriteLine($"Level {simulator.GameState.Level}");
-            Console.WriteLine($"Score {simulator.GameState.Score}");
-            Console.WriteLine($"Lines {simulator.GameState.Lines}");
+            Console.WriteLine($@"Running {animation}");
+            Console.WriteLine($@"Round {round}");
+            Console.WriteLine(@"---------------------");
+            Console.WriteLine($@"Level {_simulator.GameState.Level}");
+            Console.WriteLine($@"Score {_simulator.GameState.Score}");
+            Console.WriteLine($@"Lines {_simulator.GameState.Lines}");
+            
+            var predictiveSearch = _search as PredictiveSearch;
+            if (predictiveSearch != null)
+            {
+                Console.WriteLine($@" Elapsed: {_stopwatchRound.ElapsedMilliseconds} ms");
+                Console.WriteLine($@" Score calculated {predictiveSearch.ScoreCalculated,10} times");
+                Console.WriteLine($@" Score looked up  {predictiveSearch.ScoreLookedUp,10} times");
+            }
+
+            _loggerTime.Info(_stopwatchRound.ElapsedMilliseconds);
+            Console.WriteLine($"Game State:\n{_simulator.GameState}");
+
+            _stopwatchRound.Restart();
         }
 
-        protected void Update()
+        private void Update()
         {
-            var result = search.Search(simulator.GameState);
+            var result = _search.Search(_simulator.GameState);
             if (result != null && result.Moves.Any())
             {
                 foreach (var move in result.Moves)
                 {
-                    simulator.Simulate(move);
+                    _simulator.Simulate(move);
                 }
             }
         }
 
-        protected void Render()
+        private void Render()
         {
-            logger.Info(simulator.GameState);
+            _logger.Info(_simulator.GameState);
             if (PauseTime > 0)
             {
                 Thread.Sleep(PauseTime);
             }
         }
 
-        protected void LogResults(int rounds, long time)
+        private void LogResults(int rounds, long time)
         {
-            logger.Error("Game over");
+            _logger.Error("Game over");
             Console.WriteLine("Game over");
 
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Simulator_Results.csv");
@@ -121,7 +142,7 @@ namespace GameBot.Game.Tetris.Simulator
                 }
             }
 
-            string message = $"{rounds},{simulator.GameState.Lines},{simulator.GameState.Score},{simulator.GameState.Level},{time}\n";
+            string message = $"{rounds},{_simulator.GameState.Lines},{_simulator.GameState.Score},{_simulator.GameState.Level},{time}\n";
             File.AppendAllText(path, message);
         }
     }

@@ -8,14 +8,14 @@ namespace GameBot.Test.Misc
     [TestFixture]
     public class PerformanceTests
     {   
-        private readonly Stopwatch stopwatch = new Stopwatch();
-        private Capture capture;
-        private IImage image;
+        private readonly Stopwatch _stopwatch = new Stopwatch();
+        private Capture _capture;
+        private IImage _image;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            capture = new Capture(0);
+            _capture = new Capture(0);
         }
 
         [Test]
@@ -24,11 +24,11 @@ namespace GameBot.Test.Misc
             int num = 30;
             bool show = false;
 
-            capture.Start();
+            _capture.Start();
             
-            stopwatch.Restart();
+            _stopwatch.Restart();
 
-            image = new Mat();
+            _image = new Mat();
             for (int i = 0; i < num; i++)
             {
                 Grab();
@@ -36,15 +36,15 @@ namespace GameBot.Test.Misc
 
                 if (show)
                 {
-                    CvInvoke.Imshow("Test", image);
+                    CvInvoke.Imshow("Test", _image);
                     CvInvoke.WaitKey();
                 }
             }
 
-            stopwatch.Stop();
-            Debug.Write($"Time for {num} loops: {stopwatch.ElapsedMilliseconds} ms");
+            _stopwatch.Stop();
+            Debug.Write($"Time for {num} loops: {_stopwatch.ElapsedMilliseconds} ms");
 
-            capture.Stop();
+            _capture.Stop();
         }
 
         [Test]
@@ -53,9 +53,9 @@ namespace GameBot.Test.Misc
             int num = 30;
             bool show = false;
             
-            stopwatch.Restart();
+            _stopwatch.Restart();
 
-            image = new Mat();
+            _image = new Mat();
             for (int i = 0; i < num; i++)
             {
                 //Grab();
@@ -63,26 +63,26 @@ namespace GameBot.Test.Misc
 
                 if (show)
                 {
-                    CvInvoke.Imshow("Test", image);
+                    CvInvoke.Imshow("Test", _image);
                     CvInvoke.WaitKey();
                 }
             }
 
-            stopwatch.Stop();
-            Debug.Write($"Time for {num} loops: {stopwatch.ElapsedMilliseconds} ms");
+            _stopwatch.Stop();
+            Debug.Write($"Time for {num} loops: {_stopwatch.ElapsedMilliseconds} ms");
 
-            capture.Stop();
+            _capture.Stop();
         }
 
         private void Grab()
         {
-            capture.Grab();
-            capture.Retrieve(image, 0);
+            _capture.Grab();
+            _capture.Retrieve(_image, 0);
         }
 
         private void QueryFrame()
         {
-            image = capture.QueryFrame();
+            _image = _capture.QueryFrame();
         }
     }
 }

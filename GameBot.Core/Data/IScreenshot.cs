@@ -1,4 +1,5 @@
 ﻿using System;
+using Emgu.CV;
 
 namespace GameBot.Core.Data
 {
@@ -9,6 +10,11 @@ namespace GameBot.Core.Data
     /// </summary>
     public interface IScreenshot
     {
+        /// <summary>
+        /// Gets the underlying EmguCV image.
+        /// </summary>
+        IImage Image { get; }
+
         /// <summary>
         /// Gets the pixels of the screenshot row by row.
         /// </summary>

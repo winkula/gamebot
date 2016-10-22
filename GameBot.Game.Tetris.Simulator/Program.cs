@@ -5,6 +5,7 @@ using NLog.Config;
 using NLog.Targets;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace GameBot.Game.Tetris.Simulator
 {
@@ -12,15 +13,16 @@ namespace GameBot.Game.Tetris.Simulator
     {
         static void Main(string[] args)
         {
+            ConfigureLogging();
             Simulate();
         }
 
         static void Simulate()
         {
-            ConfigureLogging();
-
             var heuristic = new YiyuanLeeHeuristic();
-            var tetrisSearch = new SimpleSearch(heuristic);
+            //var tetrisSearch = new SimpleSearch(heuristic);
+            var tetrisSearch = new PredictiveSearch(heuristic);
+            tetrisSearch.Cache = true;
             //var tetrisSearch = new RecursiveSearch(heuristic);
             //tetrisSearch.Depth = 3;
 
@@ -46,6 +48,13 @@ namespace GameBot.Game.Tetris.Simulator
             fileTarget.FileName = path;
             config.AddTarget("file", fileTarget);
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, fileTarget));
+
+            string path2 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Time.txt");
+            var fileTarget2 = new FileTarget();
+            fileTarget2.Layout = @"${message}";
+            fileTarget2.FileName = path2;
+            config.AddTarget("file2", fileTarget2);
+            config.LoggingRules.Add(new LoggingRule("time", LogLevel.Debug, fileTarget2));
 
             LogManager.Configuration = config;
         }

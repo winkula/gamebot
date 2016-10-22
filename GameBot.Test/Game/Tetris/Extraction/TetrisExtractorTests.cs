@@ -12,8 +12,8 @@ namespace GameBot.Test.Game.Tetris.Extraction
     [TestFixture]
     public class TetrisExtractorTests
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        
         [Test]
         public void Constructor()
         {
@@ -43,11 +43,11 @@ namespace GameBot.Test.Game.Tetris.Extraction
             Assert.NotNull(gameState.Piece);
             Assert.NotNull(gameState.NextPiece);
 
-            logger.Info(gameState.Piece);
-            logger.Info(gameState.NextPiece);
+            _logger.Info(gameState.Piece);
+            _logger.Info(gameState.NextPiece);
 
-            logger.Info(gameState);
-            logger.Info(gameState.Board);
+            _logger.Info(gameState);
+            _logger.Info(gameState.Board);
         }
 
         [Test]
@@ -60,12 +60,12 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var piece = extractor.ExtractSpawnedPieceOrigin(screenshot);
 
             Assert.NotNull(piece);
-            Assert.AreEqual(Tetromino.S, piece.Tetromino);
+            Assert.AreEqual(Tetrimino.S, piece.Tetrimino);
             Assert.AreEqual(0, piece.Orientation);
             Assert.AreEqual(0, piece.X);
             Assert.AreEqual(0, piece.Y);
         }
-
+        
         [Test]
         public void ExtractPieceSpawnedFalled()
         {
@@ -80,7 +80,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             piece = extractor.ExtractSpawnedPiece(screenshot, 6);
 
             Assert.NotNull(piece);
-            Assert.AreEqual(Tetromino.Z, piece.Tetromino);
+            Assert.AreEqual(Tetrimino.Z, piece.Tetrimino);
             Assert.AreEqual(0, piece.Orientation);
             Assert.AreEqual(0, piece.X);
             Assert.AreEqual(-6, piece.Y);
@@ -96,7 +96,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var piece = extractor.ExtractSpawnedPiece(screenshot, 10);
 
             Assert.NotNull(piece);
-            Assert.AreEqual(Tetromino.S, piece.Tetromino);
+            Assert.AreEqual(Tetrimino.S, piece.Tetrimino);
             Assert.AreEqual(0, piece.Orientation);
             Assert.AreEqual(0, piece.X);
             Assert.AreEqual(0, piece.Y);
@@ -126,13 +126,13 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
 
-            var lastPosition = new Piece(Tetromino.Z, 0, 1, -6);
+            var lastPosition = new Piece(Tetrimino.Z, 0, 1, -6);
             
             var newPosition = extractor.ExtractMovedPieceWithoutErrorTolerance(screenshot, lastPosition, Move.Left, 0);
 
             Assert.NotNull(newPosition);
 
-            Assert.AreEqual(Tetromino.Z, newPosition.Tetromino);
+            Assert.AreEqual(Tetrimino.Z, newPosition.Tetrimino);
             Assert.AreEqual(0, newPosition.Orientation);
             Assert.AreEqual(0, newPosition.X);
             Assert.AreEqual(-6, newPosition.Y);
@@ -146,7 +146,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
 
-            var lastPosition = new Piece(Tetromino.Z, 0, 1, 0);
+            var lastPosition = new Piece(Tetrimino.Z, 0, 1, 0);
 
             var newPosition = extractor.ExtractMovedPieceWithoutErrorTolerance(screenshot, lastPosition, Move.Left, 5);
             Assert.Null(newPosition);
@@ -154,24 +154,24 @@ namespace GameBot.Test.Game.Tetris.Extraction
             newPosition = extractor.ExtractMovedPieceWithoutErrorTolerance(screenshot, lastPosition, Move.Left, 6);
             Assert.NotNull(newPosition);
 
-            Assert.AreEqual(Tetromino.Z, newPosition.Tetromino);
+            Assert.AreEqual(Tetrimino.Z, newPosition.Tetrimino);
             Assert.AreEqual(0, newPosition.Orientation);
             Assert.AreEqual(0, newPosition.X);
             Assert.AreEqual(-6, newPosition.Y);
         }
 
-        [TestCase(Tetromino.Z, 0, -6, 1.0)]
-        [TestCase(Tetromino.Z, 0, -5, 1.0 - (4 / 16.0))]
-        [TestCase(Tetromino.Z, 0, -4, 1.0 - (4 / 16.0))]
-        [TestCase(Tetromino.Z, -1, -6, 1.0 - (4 / 16.0))]
-        public void GetProbability(Tetromino tetromino, int x, int y, double expectedProbability)
+        [TestCase(Tetrimino.Z, 0, -6, 1.0)]
+        [TestCase(Tetrimino.Z, 0, -5, 1.0 - (4 / 16.0))]
+        [TestCase(Tetrimino.Z, 0, -4, 1.0 - (4 / 16.0))]
+        [TestCase(Tetrimino.Z, -1, -6, 1.0 - (4 / 16.0))]
+        public void GetProbability(Tetrimino tetrimino, int x, int y, double expectedProbability)
         {
             var config = new AppSettingsConfig();
 
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
 
-            var piece = new Piece(tetromino, 0, x, y);
+            var piece = new Piece(tetrimino, 0, x, y);
 
             var probability = extractor.GetProbability(screenshot, piece);
 

@@ -7,26 +7,19 @@ using System.Collections.Generic;
 
 namespace GameBot.Game.Tetris.Extraction
 {
-    public class TetrisExtractor : IExtractor<GameState>
+    // TODO: remove this class?
+    public class TetrisExtractor
     {
-        // this coordinates are in the coordinate system of the tile system of the game boy screen (origin is top left)
-        private static Point BoardTileOrigin = new Point(2, 0);
-        private static Point CurrentTileOrigin = new Point(5, 0);
-        private static Point PreviewTileOrigin = new Point(15, 13);
-
-        private readonly IConfig config;
-
-        public int MeanThreshold { get; private set; }
-        public double MinimalProbability { get; private set;}
+        private int MeanThreshold { get; }
+        private double MinimalProbability { get; }
 
         // debugging/visualization only
-        public IList<Point> Rectangles { get; private set; } = new List<Point>();
+        public IList<Point> Rectangles { get; } = new List<Point>();
 
         public TetrisExtractor(IConfig config)
         {
-            this.config = config;
-            this.MeanThreshold = config.Read<int>("Game.Tetris.Extractor.MeanThreshold");
-            this.MinimalProbability = config.Read<double>("Game.Tetris.Extractor.MinimalProbability");
+            MeanThreshold = config.Read<int>("Game.Tetris.Extractor.MeanThreshold");
+            MinimalProbability = config.Read<double>("Game.Tetris.Extractor.MinimalProbability");
         }
 
         public GameState Extract(IScreenshot screenshot, GameState currentGameState)
@@ -52,7 +45,7 @@ namespace GameBot.Game.Tetris.Extraction
         //
         public ushort GetPieceMask(IScreenshot screenshot, int pieceX, int pieceY)
         {
-            var tileCoordinates = Coordinates.PieceToSearchWindow(pieceX, pieceY);
+            var tileCoordinates = Coordinates.PieceToTileSearchWindowOrigin(pieceX, pieceY);
             ushort mask = 0;
             for (int x = 0; x < 4; x++)
             {
@@ -115,11 +108,11 @@ namespace GameBot.Game.Tetris.Extraction
                 // TODO: extract whole board but subtract current piece
                 for (int y = 3; y < 18; y++)
                 {
-                    byte mean = screenshot.GetTileMean(BoardTileOrigin.X + x, BoardTileOrigin.Y + y);
+                    byte mean = screenshot.GetTileMean(TetrisConstants.BoardTileOrigin.X + x, TetrisConstants.BoardTileOrigin.Y + y);
                     if (IsBlock(mean))
                     {
                         board.Occupy(x, 17 - y);
-                        Rectangles.Add(new Point(BoardTileOrigin.X + x, BoardTileOrigin.Y + y));
+                        Rectangles.Add(new Point(TetrisConstants.BoardTileOrigin.X + x, TetrisConstants.BoardTileOrigin.Y + y));
                     }
                 }
             }
@@ -137,11 +130,11 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 for (int y = 0; y < 3; y++)
                 {
-                    if (IsTileBlock(screenshot, CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y))
+                    if (IsTileBlock(screenshot, TetrisConstants.CurrentTileOrigin.X + x, TetrisConstants.CurrentTileOrigin.Y + y))
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);
-                        Rectangles.Add(new Point(CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y));
+                        Rectangles.Add(new Point(TetrisConstants.CurrentTileOrigin.X + x, TetrisConstants.CurrentTileOrigin.Y + y));
                     }
                 }
             }
@@ -163,7 +156,7 @@ namespace GameBot.Game.Tetris.Extraction
                 {
                     for (int y = 0; y < 3; y++)
                     {
-                        if (IsTileBlock(screenshot, CurrentTileOrigin.X + x, CurrentTileOrigin.Y + y + yDelta))
+                        if (IsTileBlock(screenshot, TetrisConstants.CurrentTileOrigin.X + x, TetrisConstants.CurrentTileOrigin.Y + y + yDelta))
                         {
                             int index = 4 * (2 - y) + (x);
                             mask |= (ushort)(1 << index);
@@ -195,9 +188,7 @@ namespace GameBot.Game.Tetris.Extraction
                 throw new ArgumentException("searchHeight must be positive.");
 
             // TODO: upper bound for maxFallDistance
-
-            if (move == Move.None) return lastPosition;
-
+            
             var lastPositionTemp = new Piece(lastPosition);
             var expectedPosition = new Piece(lastPosition).Apply(move);
 
@@ -237,9 +228,7 @@ namespace GameBot.Game.Tetris.Extraction
                 throw new ArgumentException("searchHeight must be positive.");
 
             // TODO: upper bound for maxFallDistance
-
-            if (move == Move.None) return lastPosition;
-
+            
             var lastPositionTemp = new Piece(lastPosition);
             var expectedPosition = new Piece(lastPosition).Apply(move);
 
@@ -254,6 +243,7 @@ namespace GameBot.Game.Tetris.Extraction
                     highestProbability = probabilityExpected;
                     mostProbablePiece = new Piece(expectedPosition);
                 }
+
 
                 var probabilityLast = GetProbability(screenshot, lastPositionTemp);
                 if (probabilityLast > MinimalProbability && probabilityLast > highestProbability)
@@ -291,7 +281,7 @@ namespace GameBot.Game.Tetris.Extraction
                 }
             }
 
-            if (errors > 0 && expected.Tetromino == Tetromino.I && expected.Y == 0 && expected.Orientation == 1)
+            if (errors > 0 && expected.Tetrimino == Tetrimino.I && expected.Y == 0 && expected.Orientation == 1)
             {
                 // TODO: remove this ugly hack
                 // subtract one because the I piece is not completly visible in upright position
@@ -314,7 +304,7 @@ namespace GameBot.Game.Tetris.Extraction
                 }
             }
 
-            if (errors > 0 && expected.Tetromino == Tetromino.I && expected.Y == 0 && expected.Orientation == 1)
+            if (errors > 0 && expected.Tetrimino == Tetrimino.I && expected.Y == 0 && expected.Orientation == 1)
             {
                 // TODO: remove this ugly hack
                 // subtract one because the I piece is not completly visible in upright position
@@ -325,23 +315,23 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         // Tiles: x : 14 - 17, y : 13 - 16 
-        public Tetromino? ExtractNextPiece(IScreenshot screenshot)
+        public Tetrimino? ExtractNextPiece(IScreenshot screenshot)
         {
             ushort mask = 0;
             for (int x = 0; x < 4; x++)
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    byte mean = screenshot.GetTileMean(PreviewTileOrigin.X + x, PreviewTileOrigin.Y + y);
+                    byte mean = screenshot.GetTileMean(TetrisConstants.NextPieceTileOrigin.X + x, TetrisConstants.NextPieceTileOrigin.Y + y);
                     if (IsBlock(mean))
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);
-                        Rectangles.Add(new Point(PreviewTileOrigin.X + x, PreviewTileOrigin.Y + y));
+                        Rectangles.Add(new Point(TetrisConstants.NextPieceTileOrigin.X + x, TetrisConstants.NextPieceTileOrigin.Y + y));
                     }
                 }
             }
-            return Piece.FromMask(mask)?.Tetromino;
+            return Piece.FromMask(mask)?.Tetrimino;
         }
     }
 }

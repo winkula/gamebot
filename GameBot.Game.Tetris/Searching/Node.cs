@@ -5,48 +5,58 @@ namespace GameBot.Game.Tetris.Searching
 {
     public class Node
     {
-        public Node Parent { get; set; }
-        public GameState GameState { get; set; }
-        public Way Way { get; set; }
+        public Node Parent { get; }
+        public GameState GameState { get; }
+        public Way Way { get; private set; }
         public double Score { get; set; }
 
-        public Node(GameState gameState, Node parent)
+        public Node(GameState gameState, Node parent = null)
         {
             GameState = gameState;
             Parent = parent;
-        }
-
-        public Node(GameState gameState) : this(gameState, null)
-        {
         }
 
         public IEnumerable<Node> GetSuccessors()
         {
             if (GameState.Piece != null)
             {
-                foreach (var setting in Way.GetAllSettings(GameState.Piece.Tetromino))
+                foreach (var pose in GameState.Piece.Tetrimino.GetPoses())
                 {
-                    var orientation = setting.Rotation;
-                    var translation = setting.Translation;
-
-                    var newPiece = new Piece(GameState.Piece.Tetromino, orientation, translation);
+                    var newPiece = pose;
                     if (GameState.Board.CanDrop(newPiece))
                     {
                         var successor = new GameState(GameState, newPiece);
                         var fall = successor.Drop();
 
-                        var node = new Node(successor, this);
-                        node.Way = new Way(orientation, translation, fall);
-
-                        yield return node;
+                        yield return new Node(successor, this) { Way = new Way(pose.Orientation, pose.X, fall) };
                     }
                 }
             }
         }
 
+        public override int GetHashCode()
+        {
+            int hashCode = GameState.Board.GetHashCode();
+            hashCode ^= (GameState.Lines << 29);
+            return hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (obj == this) return true;
+            Node other = obj as Node;
+            if (other != null)
+            {
+                return GameState.Board.Equals(other.GameState.Board) 
+                    && GameState.Lines == other.GameState.Lines;
+            }
+            return false;
+        }
+
         public override string ToString()
         {
-            return string.Format("Node {{ State: \n{0} }}", GameState);
+            return $"Node {{ State: \n{GameState} }}";
         }
     }
 }

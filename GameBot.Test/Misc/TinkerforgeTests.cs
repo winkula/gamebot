@@ -9,23 +9,23 @@ namespace GameBot.Test.Misc
     [TestFixture]
     public class TinkerforgeTests
     {
-        private string HOST = "localhost";
-        private int PORT = 4223;
-        private string UID_MASTER = "6JKbWn";
-        private string UID_RELAY1 = "r5F";
-        private string UID_RELAY2 = "mTC";
-        private string UID_TEMP = "qBx";
+        private readonly string _host = "localhost";
+        private readonly int _port = 4223;
+        private readonly string _uidMaster = "6JKbWn";
+        private readonly string _uidRelay1 = "r5F";
+        private readonly string _uidRelay2 = "mTC";
+        private readonly string _uidTemp = "qBx";
 
         [Test]
         public void TestConnection()
         {
             IPConnection ipcon = new IPConnection(); // Create IP connection
-            BrickMaster master = new BrickMaster(UID_MASTER, ipcon); // Create device object
-            BrickletIndustrialQuadRelay or1 = new BrickletIndustrialQuadRelay(UID_RELAY1, ipcon);
-            BrickletIndustrialQuadRelay or2 = new BrickletIndustrialQuadRelay(UID_RELAY2, ipcon);
-            BrickletTemperatureIR tir = new BrickletTemperatureIR(UID_TEMP, ipcon);
+            BrickMaster master = new BrickMaster(_uidMaster, ipcon); // Create device object
+            BrickletIndustrialQuadRelay or1 = new BrickletIndustrialQuadRelay(_uidRelay1, ipcon);
+            BrickletIndustrialQuadRelay or2 = new BrickletIndustrialQuadRelay(_uidRelay2, ipcon);
+            BrickletTemperatureIR tir = new BrickletTemperatureIR(_uidTemp, ipcon);
 
-            ipcon.Connect(HOST, PORT); // Connect to brickd
+            ipcon.Connect(_host, _port); // Connect to brickd
                                        // Don't use device before ipcon is connected
 
             // Get current stack voltage (unit is mV)
@@ -36,8 +36,8 @@ namespace GameBot.Test.Misc
             int stackCurrent = master.GetStackCurrent();
             Console.WriteLine("Stack Current: " + stackCurrent / 1000.0 + " A");
 
-            short ChipTemp = tir.GetAmbientTemperature();
-            Console.WriteLine("Chibi master address: " + ChipTemp / 10 + "°/C");
+            short chipTemp = tir.GetAmbientTemperature();
+            Console.WriteLine("Chibi master address: " + chipTemp / 10 + "°/C");
 
             int delay = 50;
 

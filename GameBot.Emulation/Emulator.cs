@@ -31,54 +31,54 @@ namespace GameBot.Emulation
 {
     public class Emulator
     {
-        private const int FramesPerSecond = 60;
-        private const int MaxFramesSkipped = 10;
+        private const int _framesPerSecond = 60;
+        private const int _maxFramesSkipped = 10;
 
-        private const int DisplayWidth = GameBoyConstants.ScreenWidth;
-        private const int DisplayHeight = GameBoyConstants.ScreenHeight;
+        private const int _displayWidth = GameBoyConstants.ScreenWidth;
+        private const int _displayHeight = GameBoyConstants.ScreenHeight;
 
-        private const int FramesAfterButton = 2;
+        private const int _framesAfterButton = 2;
 
-        private readonly Random random = new Random();
-        private readonly X80 cpu;
-        private double scanLineTicks;
-        private uint[] pixels = new uint[DisplayWidth * DisplayHeight];
+        private readonly Random _random = new Random();
+        private readonly X80 _cpu;
+        private double _scanLineTicks;
+        private readonly uint[] _pixels = new uint[_displayWidth * _displayHeight];
 
-        private Graphics graphics;
-        private Bitmap bitmap;
+        private readonly Graphics _graphics;
+        private readonly Bitmap _bitmap;
 
         public bool Running { get; private set; }
         public int Frames { get; private set; }
-        public TimeSpan Time { get { return TimeSpan.FromSeconds((double)Frames / FramesPerSecond); } }
-        public Bitmap Display { get { return bitmap; } }
+        public TimeSpan Time => TimeSpan.FromSeconds((double)Frames / _framesPerSecond);
+        public Bitmap Display => _bitmap;
         public Game Game { get; private set; }
-        private Size DisplaySize { get { return new Size(DisplayWidth, DisplayHeight); } }
-        
-        private bool anyButtonsPressed = false;
-        private double errorProbability;
+        private Size DisplaySize => new Size(_displayWidth, _displayHeight);
+
+        private bool _anyButtonsPressed = false;
+        private readonly double _errorProbability;
 
         public Emulator(double errorProbability = 0)
         {
-            cpu = new X80();
-            this.errorProbability = errorProbability;
+            _cpu = new X80();
+            _errorProbability = errorProbability;
 
-            graphics = Graphics.FromImage(new Bitmap(DisplayWidth, DisplayHeight));
-            graphics.CompositingQuality = CompositingQuality.HighSpeed;
-            graphics.CompositingMode = CompositingMode.SourceCopy;
-            graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+            _graphics = Graphics.FromImage(new Bitmap(_displayWidth, _displayHeight));
+            _graphics.CompositingQuality = CompositingQuality.HighSpeed;
+            _graphics.CompositingMode = CompositingMode.SourceCopy;
+            _graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 
             // init image
-            for (int i = 0; i < pixels.Length; i++) { pixels[i] = 0xFF000000; }
-            GCHandle handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
-            IntPtr pointer = Marshal.UnsafeAddrOfPinnedArrayElement(pixels, 0);
-            bitmap = new Bitmap(DisplayWidth, DisplayHeight, DisplayWidth * 4, PixelFormat.Format32bppPArgb, pointer);
+            for (int i = 0; i < _pixels.Length; i++) { _pixels[i] = 0xFF000000; }
+            GCHandle handle = GCHandle.Alloc(_pixels, GCHandleType.Pinned);
+            IntPtr pointer = Marshal.UnsafeAddrOfPinnedArrayElement(_pixels, 0);
+            _bitmap = new Bitmap(_displayWidth, _displayHeight, _displayWidth * 4, PixelFormat.Format32bppPArgb, pointer);
         }
 
         public void Load(Game game)
         {
             Game = game;
-            cpu.cartridge = Game.cartridge;
-            cpu.PowerUp();
+            _cpu.Cartridge = Game.Cartridge;
+            _cpu.PowerUp();
 
             Running = true;
 
@@ -91,38 +91,38 @@ namespace GameBot.Emulation
             Frames++;
             if (updateBitmap)
             {
-                uint[] backgroundPalette = cpu.backgroundPalette;
-                uint[] objectPalette0 = cpu.objectPalette0;
-                uint[] objectPalette1 = cpu.objectPalette1;
-                uint[,] backgroundBuffer = cpu.backgroundBuffer;
-                uint[,] windowBuffer = cpu.windowBuffer;
-                byte[] oam = cpu.oam;
+                uint[] backgroundPalette = _cpu.BackgroundPalette;
+                uint[] objectPalette0 = _cpu.ObjectPalette0;
+                uint[] objectPalette1 = _cpu.ObjectPalette1;
+                uint[,] backgroundBuffer = _cpu.BackgroundBuffer;
+                uint[,] windowBuffer = _cpu.WindowBuffer;
+                byte[] oam = _cpu.Oam;
 
                 for (int y = 0, pixelIndex = 0; y < 144; y++)
                 {
-                    cpu.ly = y;
-                    cpu.lcdcMode = LcdcModeType.SearchingOamRam;
-                    if (cpu.lcdcInterruptEnabled && (cpu.lcdcOamInterruptEnabled || (cpu.lcdcLycLyCoincidenceInterruptEnabled && cpu.lyCompare == y)))
+                    _cpu.Ly = y;
+                    _cpu.LcdcMode = LcdcModeType.SearchingOamRam;
+                    if (_cpu.LcdcInterruptEnabled && (_cpu.LcdcOamInterruptEnabled || (_cpu.LcdcLycLyCoincidenceInterruptEnabled && _cpu.LyCompare == y)))
                     {
-                        cpu.lcdcInterruptRequested = true;
+                        _cpu.LcdcInterruptRequested = true;
                     }
                     ExecuteProcessor(800);
-                    cpu.lcdcMode = LcdcModeType.TransferingData;
+                    _cpu.LcdcMode = LcdcModeType.TransferingData;
                     ExecuteProcessor(1720);
 
-                    cpu.UpdateWindow();
-                    cpu.UpdateBackground();
-                    cpu.UpdateSpriteTiles();
+                    _cpu.UpdateWindow();
+                    _cpu.UpdateBackground();
+                    _cpu.UpdateSpriteTiles();
 
-                    bool backgroundDisplayed = cpu.backgroundDisplayed;
-                    bool backgroundAndWindowTileDataSelect = cpu.backgroundAndWindowTileDataSelect;
-                    bool backgroundTileMapDisplaySelect = cpu.backgroundTileMapDisplaySelect;
-                    int scrollX = cpu.scrollX;
-                    int scrollY = cpu.scrollY;
-                    bool windowDisplayed = cpu.windowDisplayed;
-                    bool windowTileMapDisplaySelect = cpu.windowTileMapDisplaySelect;
-                    int windowX = cpu.windowX - 7;
-                    int windowY = cpu.windowY;
+                    bool backgroundDisplayed = _cpu.BackgroundDisplayed;
+                    bool backgroundAndWindowTileDataSelect = _cpu.BackgroundAndWindowTileDataSelect;
+                    bool backgroundTileMapDisplaySelect = _cpu.BackgroundTileMapDisplaySelect;
+                    int scrollX = _cpu.ScrollX;
+                    int scrollY = _cpu.ScrollY;
+                    bool windowDisplayed = _cpu.WindowDisplayed;
+                    bool windowTileMapDisplaySelect = _cpu.WindowTileMapDisplaySelect;
+                    int windowX = _cpu.WindowX - 7;
+                    int windowY = _cpu.WindowY;
 
                     int windowPointY = windowY + y;
 
@@ -140,13 +140,13 @@ namespace GameBot.Emulation
                             intensity = windowBuffer[y - windowY, x - windowX];
                         }
 
-                        pixels[pixelIndex] = intensity;
+                        _pixels[pixelIndex] = intensity;
                     }
 
-                    if (cpu.spritesDisplayed)
+                    if (_cpu.SpritesDisplayed)
                     {
-                        uint[,,,] spriteTile = cpu.spriteTile;
-                        if (cpu.largeSprites)
+                        uint[,,,] spriteTile = _cpu.SpriteTile;
+                        if (_cpu.LargeSprites)
                         {
                             for (int address = 0; address < 160; address += 4)
                             {
@@ -194,14 +194,14 @@ namespace GameBot.Emulation
                                             {
                                                 if (spritePriority)
                                                 {
-                                                    if (pixels[screenAddress] == 0xFFFFFFFF)
+                                                    if (_pixels[screenAddress] == 0xFFFFFFFF)
                                                     {
-                                                        pixels[screenAddress] = color;
+                                                        _pixels[screenAddress] = color;
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    pixels[screenAddress] = color;
+                                                    _pixels[screenAddress] = color;
                                                 }
                                             }
                                         }
@@ -225,14 +225,14 @@ namespace GameBot.Emulation
                                             {
                                                 if (spritePriority)
                                                 {
-                                                    if (pixels[screenAddress] == 0xFFFFFFFF)
+                                                    if (_pixels[screenAddress] == 0xFFFFFFFF)
                                                     {
-                                                        pixels[screenAddress] = color;
+                                                        _pixels[screenAddress] = color;
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    pixels[screenAddress] = color;
+                                                    _pixels[screenAddress] = color;
                                                 }
                                             }
                                         }
@@ -276,14 +276,14 @@ namespace GameBot.Emulation
                                         {
                                             if (spritePriority)
                                             {
-                                                if (pixels[screenAddress] == 0xFFFFFFFF)
+                                                if (_pixels[screenAddress] == 0xFFFFFFFF)
                                                 {
-                                                    pixels[screenAddress] = color;
+                                                    _pixels[screenAddress] = color;
                                                 }
                                             }
                                             else
                                             {
-                                                pixels[screenAddress] = color;
+                                                _pixels[screenAddress] = color;
                                             }
                                         }
                                     }
@@ -292,10 +292,10 @@ namespace GameBot.Emulation
                         }
                     }
 
-                    cpu.lcdcMode = LcdcModeType.HBlank;
-                    if (cpu.lcdcInterruptEnabled && cpu.lcdcHBlankInterruptEnabled)
+                    _cpu.LcdcMode = LcdcModeType.HBlank;
+                    if (_cpu.LcdcInterruptEnabled && _cpu.LcdcHBlankInterruptEnabled)
                     {
-                        cpu.lcdcInterruptRequested = true;
+                        _cpu.LcdcInterruptRequested = true;
                     }
                     ExecuteProcessor(2040);
                     AddTicksPerScanLine();
@@ -305,41 +305,41 @@ namespace GameBot.Emulation
             {
                 for (int y = 0; y < 144; y++)
                 {
-                    cpu.ly = y;
-                    cpu.lcdcMode = LcdcModeType.SearchingOamRam;
-                    if (cpu.lcdcInterruptEnabled && (cpu.lcdcOamInterruptEnabled || (cpu.lcdcLycLyCoincidenceInterruptEnabled && cpu.lyCompare == y)))
+                    _cpu.Ly = y;
+                    _cpu.LcdcMode = LcdcModeType.SearchingOamRam;
+                    if (_cpu.LcdcInterruptEnabled && (_cpu.LcdcOamInterruptEnabled || (_cpu.LcdcLycLyCoincidenceInterruptEnabled && _cpu.LyCompare == y)))
                     {
-                        cpu.lcdcInterruptRequested = true;
+                        _cpu.LcdcInterruptRequested = true;
                     }
                     ExecuteProcessor(800);
-                    cpu.lcdcMode = LcdcModeType.TransferingData;
+                    _cpu.LcdcMode = LcdcModeType.TransferingData;
                     ExecuteProcessor(1720);
-                    cpu.lcdcMode = LcdcModeType.HBlank;
-                    if (cpu.lcdcInterruptEnabled && cpu.lcdcHBlankInterruptEnabled)
+                    _cpu.LcdcMode = LcdcModeType.HBlank;
+                    if (_cpu.LcdcInterruptEnabled && _cpu.LcdcHBlankInterruptEnabled)
                     {
-                        cpu.lcdcInterruptRequested = true;
+                        _cpu.LcdcInterruptRequested = true;
                     }
                     ExecuteProcessor(2040);
                     AddTicksPerScanLine();
                 }
             }
 
-            cpu.lcdcMode = LcdcModeType.VBlank;
-            if (cpu.vBlankInterruptEnabled)
+            _cpu.LcdcMode = LcdcModeType.VBlank;
+            if (_cpu.VBlankInterruptEnabled)
             {
-                cpu.vBlankInterruptRequested = true;
+                _cpu.VBlankInterruptRequested = true;
             }
-            if (cpu.lcdcInterruptEnabled && cpu.lcdcVBlankInterruptEnabled)
+            if (_cpu.LcdcInterruptEnabled && _cpu.LcdcVBlankInterruptEnabled)
             {
-                cpu.lcdcInterruptRequested = true;
+                _cpu.LcdcInterruptRequested = true;
             }
             for (int y = 144; y <= 153; y++)
             {
-                cpu.ly = y;
-                if (cpu.lcdcInterruptEnabled && cpu.lcdcLycLyCoincidenceInterruptEnabled
-                    && cpu.lyCompare == y)
+                _cpu.Ly = y;
+                if (_cpu.LcdcInterruptEnabled && _cpu.LcdcLycLyCoincidenceInterruptEnabled
+                    && _cpu.LyCompare == y)
                 {
-                    cpu.lcdcInterruptRequested = true;
+                    _cpu.LcdcInterruptRequested = true;
                 }
                 ExecuteProcessor(4560);
                 AddTicksPerScanLine();
@@ -348,35 +348,35 @@ namespace GameBot.Emulation
 
         private void AddTicksPerScanLine()
         {
-            switch (cpu.timerFrequency)
+            switch (_cpu.TimerFrequency)
             {
-                case TimerFrequencyType.hz4096:
-                    scanLineTicks += 0.44329004329004329004329004329004;
+                case TimerFrequencyType.Hz4096:
+                    _scanLineTicks += 0.44329004329004329004329004329004;
                     break;
-                case TimerFrequencyType.hz16384:
-                    scanLineTicks += 1.7731601731601731601731601731602;
+                case TimerFrequencyType.Hz16384:
+                    _scanLineTicks += 1.7731601731601731601731601731602;
                     break;
-                case TimerFrequencyType.hz65536:
-                    scanLineTicks += 7.0926406926406926406926406926407;
+                case TimerFrequencyType.Hz65536:
+                    _scanLineTicks += 7.0926406926406926406926406926407;
                     break;
-                case TimerFrequencyType.hz262144:
-                    scanLineTicks += 28.370562770562770562770562770563;
+                case TimerFrequencyType.Hz262144:
+                    _scanLineTicks += 28.370562770562770562770562770563;
                     break;
             }
-            while (scanLineTicks >= 1.0)
+            while (_scanLineTicks >= 1.0)
             {
-                scanLineTicks -= 1.0;
-                if (cpu.timerCounter == 0xFF)
+                _scanLineTicks -= 1.0;
+                if (_cpu.TimerCounter == 0xFF)
                 {
-                    cpu.timerCounter = cpu.timerModulo;
-                    if (cpu.lcdcInterruptEnabled && cpu.timerOverflowInterruptEnabled)
+                    _cpu.TimerCounter = _cpu.TimerModulo;
+                    if (_cpu.LcdcInterruptEnabled && _cpu.TimerOverflowInterruptEnabled)
                     {
-                        cpu.timerOverflowInterruptRequested = true;
+                        _cpu.TimerOverflowInterruptRequested = true;
                     }
                 }
                 else
                 {
-                    cpu.timerCounter++;
+                    _cpu.TimerCounter++;
                 }
             }
         }
@@ -385,19 +385,19 @@ namespace GameBot.Emulation
         {
             do
             {
-                cpu.Step();
-                if (cpu.halted)
+                _cpu.Step();
+                if (_cpu.Halted)
                 {
-                    cpu.ticks = ((maxTicks - cpu.ticks) & 0x03);
+                    _cpu.Ticks = ((maxTicks - _cpu.Ticks) & 0x03);
                     return;
                 }
-            } while (cpu.ticks < maxTicks);
-            cpu.ticks -= maxTicks;
+            } while (_cpu.Ticks < maxTicks);
+            _cpu.Ticks -= maxTicks;
         }
 
         private void RenderFrame()
         {
-            graphics.DrawImage(Display, 0, 0, DisplayWidth, DisplayHeight);
+            _graphics.DrawImage(Display, 0, 0, _displayWidth, _displayHeight);
         }
 
         public void ExecuteFrame()
@@ -412,16 +412,16 @@ namespace GameBot.Emulation
 
         public void Execute()
         {
-            if (!anyButtonsPressed)
+            if (!_anyButtonsPressed)
             {
                 ExecuteFrames(2);
             }
-            anyButtonsPressed = false;
+            _anyButtonsPressed = false;
         }
 
         public void Execute(TimeSpan time)
         {
-            int frames = (int)(time.TotalSeconds * FramesPerSecond);
+            int frames = (int)(time.TotalSeconds * _framesPerSecond);
             Execute(frames);
         }
 
@@ -451,30 +451,30 @@ namespace GameBot.Emulation
 
         private void PressButtonInternal(Button button)
         {
-            cpu.KeyChanged(button, true);
+            _cpu.KeyChanged(button, true);
         }
 
         private void ReleaseButtonInternal(Button button)
         {
-            cpu.KeyChanged(button, false);
+            _cpu.KeyChanged(button, false);
         }
 
         private bool IsError()
         {
-            var value = random.NextDouble();
-            return value < errorProbability;
+            var value = _random.NextDouble();
+            return value < _errorProbability;
         }
 
         public void Hit(Button button)
         {
             if (Running && !IsError())
             {
-                anyButtonsPressed = true;
+                _anyButtonsPressed = true;
 
                 PressButtonInternal(button);
-                Execute(FramesAfterButton);
+                Execute(_framesAfterButton);
                 ReleaseButtonInternal(button);
-                Execute(FramesAfterButton);
+                Execute(_framesAfterButton);
             }
         }
 
@@ -482,10 +482,10 @@ namespace GameBot.Emulation
         {
             if (Running && !IsError())
             {
-                anyButtonsPressed = true;
+                _anyButtonsPressed = true;
 
                 PressButtonInternal(button);
-                Execute(FramesAfterButton);
+                Execute(_framesAfterButton);
             }
         }
 
@@ -493,10 +493,10 @@ namespace GameBot.Emulation
         {
             if (Running && !IsError())
             {
-                anyButtonsPressed = true;
+                _anyButtonsPressed = true;
 
                 ReleaseButtonInternal(button);
-                Execute(FramesAfterButton);
+                Execute(_framesAfterButton);
             }
         }
     }
