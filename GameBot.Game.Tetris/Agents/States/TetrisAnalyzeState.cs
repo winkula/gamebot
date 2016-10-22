@@ -168,7 +168,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 _agent.Screenshot.Save($"rejected_np_p{result.Probability}");
                 return;
             }
-            if (result.IsAccepted(_agent.ExtractionUpperThreshold))
+            if (result.IsAccepted(_agent.ExtractionUpperThreshold)) // TODO: make different threshold here
             {
                 // accept immediately
                 _logger.Info($"Accept extracted next piece immediately ({result.Result}, probability {result.Probability:F})");
