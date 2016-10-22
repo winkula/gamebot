@@ -5,6 +5,7 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using GameBot.Core;
 using GameBot.Core.Data;
+using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Data;
 
 namespace GameBot.Game.Tetris.Extraction
@@ -19,11 +20,23 @@ namespace GameBot.Game.Tetris.Extraction
         private readonly Image<Gray, byte>[] _templates = new Image<Gray, byte>[Tetriminos.AllPossibleOrientations];
         private readonly Image<Gray, byte>[] _templateMasks = new Image<Gray, byte>[Tetriminos.AllPossibleOrientations];
 
+        private static readonly double[] _maxErrors = 
+        {
+            255.0 * 176, // O
+            255.0 * 76, // I
+            255.0 * 160, // S
+            255.0 * 128, // Z
+            255.0 * 112, // L
+            255.0 * 160, // J
+            255.0 * 160 // T
+        };
+
         public PieceMatcher()
         {
             // init template tiles
             //var templateTiles = new Image<Gray, byte>(Resources.TemplatesGrayscale);
-            var templateTiles = new Image<Gray, byte>(Resources.TemplatesBinary);
+            //var templateTiles = new Image<Gray, byte>(Resources.TemplatesBinary);
+            var templateTiles = new Image<Gray, byte>(Resources.TemplatesEdges);
             for (int i = 0; i < Tetriminos.AllPossibleOrientations; i++)
             {
                 var template = new Image<Gray, byte>(_templateSize, _templateSize);
@@ -110,7 +123,7 @@ namespace GameBot.Game.Tetris.Extraction
                 var sum = CvInvoke.Sum(difference);
 
                 // calculate probability
-                var newProbability = GetProbability(sum.V0);
+                var newProbability = GetProbability(sum.V0, piece.Tetrimino);
                 bestProbability = Math.Max(bestProbability, newProbability);
 
                 //CvInvoke.Imshow("Combined", combined);
@@ -138,15 +151,16 @@ namespace GameBot.Game.Tetris.Extraction
             }
         }
 
-        private double GetError(double sum)
+        private double GetError(double sum, Tetrimino tetromino)
         {
-            const double maxError = 4 * 8 * 8 * 255; // 4 blocks fully white
-            return sum / maxError;
+            double maxError = _maxErrors[(int) tetromino];
+            double error = sum / maxError;
+            return error.Clamp(0.0, 1.0);
         }
 
-        private double GetProbability(double sum)
+        private double GetProbability(double sum, Tetrimino tetromino)
         {
-            return 1 - GetError(sum);
+            return 1 - GetError(sum, tetromino);
         }
     }
 }

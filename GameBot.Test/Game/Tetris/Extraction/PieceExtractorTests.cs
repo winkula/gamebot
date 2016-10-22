@@ -103,5 +103,16 @@ namespace GameBot.Test.Game.Tetris.Extraction
             Assert.False(result.IsRejected(0.5));
             Assert.AreEqual(Tetrimino.L, result.Result);
         }
+
+        [Ignore]
+        [Test]
+        public void ExtractNextPieceFuzzyFailCandidate()
+        {
+            var screenshot = new EmguScreenshot(@"C:\Users\Winkler\Desktop\test.png", TimeSpan.Zero);
+
+            var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot);
+            
+            Assert.AreEqual(Tetrimino.J, result.Result);
+        }
     }
 }

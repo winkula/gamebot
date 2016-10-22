@@ -139,7 +139,8 @@
     <Compile Include="Data\ICommand.cs" />
     <Compile Include="Exceptions\GameOverException.cs" />
     <Compile Include="Executors\Executor.cs" />
-    <Compile Include="Extensions\Extensions.cs" />
+    <Compile Include="Extensions\DoubleExtensions.cs" />
+    <Compile Include="Extensions\TimeSpanExtensions.cs" />
     <Compile Include="GameBoyConstants.cs" />
     <Compile Include="IActuator.cs" />
     <Compile Include="ICamera.cs" />

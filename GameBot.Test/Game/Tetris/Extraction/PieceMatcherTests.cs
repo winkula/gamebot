@@ -16,7 +16,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             _pieceMatcher = new PieceMatcher();
         }
-        
+
         //[TestCase("Screenshots/tetris_play_1.png", Tetrimino.O, 0, 1, -2, 0.31)]
         //[TestCase("Screenshots/tetris_play_1.png", Tetrimino.S, 0, 0, 0, 0.99)]
         //[TestCase("Screenshots/tetris_play_2.png", Tetrimino.Z, 0, 0, -6, 0.99)]
@@ -25,7 +25,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         //{
         //    var screenshot = new EmguScreenshot(file, TimeSpan.Zero);
         //    var piece = new Piece(tetrimino, orientation, x, y);
-            
+
         //    var probability = _pieceMatcher.GetProbability(screenshot, piece);
 
         //    Assert.GreaterOrEqual(probability, expectedProbability);

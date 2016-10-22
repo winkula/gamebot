@@ -14,7 +14,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         
         // 0.65 seems to be a pretty accurate value. if we go deeper (0.6 for example), we get false positives (without binarization)
         // 0.7 seems to be good, when we use binarized templates
-        private const double _probabilityThreshold = 0.7;
+        private const double _probabilityThreshold = 0.85;
 
         private int _nextPiece;
         private int _nextPieceRecognized;

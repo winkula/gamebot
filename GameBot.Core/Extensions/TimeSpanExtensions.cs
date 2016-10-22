@@ -2,7 +2,7 @@
 
 namespace GameBot.Core.Extensions
 {
-    public static class Extensions
+    public static class TimeSpanExtensions
     {
         public static TimeSpan ToTimestamp(this double seconds)
         {
