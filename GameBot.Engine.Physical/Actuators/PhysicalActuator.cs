@@ -9,10 +9,10 @@ namespace GameBot.Engine.Physical.Actuators
 {
     public class PhysicalActuator : IActuator, IDisposable
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private const int DelayHit = 60; // was 40
-        private const int DelayCommand = 300; // was 50
+        private const int _delayHit = 60; // was 40
+        private const int _delayCommand = 300; // was 50
 
         private readonly IConfig _config;
 

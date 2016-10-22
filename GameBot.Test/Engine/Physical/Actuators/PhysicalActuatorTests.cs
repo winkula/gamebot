@@ -67,7 +67,7 @@ namespace GameBot.Test.Engine.Physical.Actuators
         {
             Thread.Sleep(500);
 
-            using (var actuator = new PhysicalActuator(new AppSettingsConfig()))
+            using (var actuator = new PhysicalActuator(_config))
             {
                 for (int i = 0; i < 10; i++)
                 {
