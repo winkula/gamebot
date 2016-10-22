@@ -11,8 +11,8 @@ namespace GameBot.Engine.Physical.Actuators
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        private const int DelayHit = 100; // was 40
-        private const int DelayCommand = 500; // was 50
+        private const int DelayHit = 60; // was 40
+        private const int DelayCommand = 300; // was 50
 
         private readonly IConfig config;
 
@@ -94,16 +94,16 @@ namespace GameBot.Engine.Physical.Actuators
             switch (button)
             {
                 case Button.Up:
-                    HandleState1Bit(1 << 0, pressOrRelease);
+                    HandleState1Bit(1 << 2, pressOrRelease);
                     break;
                 case Button.Down:
-                    HandleState1Bit(1 << 3, pressOrRelease);
-                    break;
-                case Button.Left:
                     HandleState1Bit(1 << 1, pressOrRelease);
                     break;
+                case Button.Left:
+                    HandleState1Bit(1 << 0, pressOrRelease);
+                    break;
                 case Button.Right:
-                    HandleState1Bit(1 << 2, pressOrRelease);
+                    HandleState1Bit(1 << 3, pressOrRelease);
                     break;
 
                 case Button.Start:

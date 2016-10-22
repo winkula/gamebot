@@ -51,6 +51,8 @@ namespace GameBot.Test.Engine.Physical.Actuators
         [Test]
         public void MenuTestRoutine()
         {
+            Thread.Sleep(500);
+
             using (var actuator = new PhysicalActuator(new AppSettingsConfig()))
             {
                 for (int i = 0; i < 10; i++)
