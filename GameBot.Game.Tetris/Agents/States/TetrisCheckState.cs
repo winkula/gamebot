@@ -57,9 +57,9 @@ namespace GameBot.Game.Tetris.Agents.States
             var lowerThreshold = _agent.ExtractionLowerThreshold;
             if (resultPieceNotMoved.IsRejected(lowerThreshold) && resultPieceMoved.IsRejected(lowerThreshold))
             {
-                string outputFilename = $"{DateTime.Now.Date}_rejected_move_p{resultPieceMoved.Probability}_p{resultPieceNotMoved.Probability}.png";
-                string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "fail", outputFilename);
-                _agent.Screenshot.Image.Save(outputPath);
+                //string outputFilename = $"{DateTime.Now.Ticks}_rejected_move_p{resultPieceMoved.Probability}_p{resultPieceNotMoved.Probability}.png";
+                //string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "fail", outputFilename);
+                //_agent.Screenshot.Image.Save(outputPath);
                 
                 // both hypotheses rejected: piece not found on the screenshot
                 // no problem, we get a new screenshot and try it again ;)

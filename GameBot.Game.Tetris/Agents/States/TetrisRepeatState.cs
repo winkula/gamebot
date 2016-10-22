@@ -46,7 +46,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void SetStateCheck()
         {
-            _agent.SetStateAndContinue(new TetrisCheckState(_agent, _lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
+            _agent.SetState(new TetrisCheckState(_agent, _lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
         }
         
         private void Repeat(Move move)
