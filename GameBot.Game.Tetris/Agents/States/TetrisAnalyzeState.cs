@@ -3,6 +3,7 @@ using GameBot.Game.Tetris.Searching;
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Samplers;
@@ -104,12 +105,22 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 // reject (threshold not reached or piece is touched)
                 _logger.Warn($"Reject extracted current piece (probability {result.Probability:F})");
+
+                string outputFilename = $"{DateTime.Now.Date}_rejected_cp_p{result.Probability}.png";
+                string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "fail", outputFilename);
+                _agent.Screenshot.Image.Save(outputPath);
+
                 return;
             }
             if (!result.Result.IsUntouched)
             {
                 // reject (threshold not reached or piece is touched)
                 _logger.Warn($"Reject extracted current piece: not untouched ({result.Result.Tetrimino}, probability {result.Probability:F})");
+                
+                string outputFilename = $"{DateTime.Now.Date}_rejected_touched_cp_p{result.Probability}.png";
+                string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "fail", outputFilename);
+                _agent.Screenshot.Image.Save(outputPath);
+
                 return;
             }
             if (result.IsAccepted(_agent.ExtractionUpperThreshold))
@@ -154,6 +165,11 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 // reject (threshold not reached or piece is touched)
                 _logger.Warn($"Reject extracted next piece (probability {result.Probability:F}, threshold {_agent.ExtractionLowerThreshold})");
+
+                string outputFilename = $"{DateTime.Now.Date}_rejected_np_p{result.Probability}.png";
+                string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "fail", outputFilename);
+                _agent.Screenshot.Image.Save(outputPath);
+
                 return;
             }
             if (result.IsAccepted(_agent.ExtractionUpperThreshold))

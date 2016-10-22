@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Samplers;
@@ -56,6 +57,10 @@ namespace GameBot.Game.Tetris.Agents.States
             var lowerThreshold = _agent.ExtractionLowerThreshold;
             if (resultPieceNotMoved.IsRejected(lowerThreshold) && resultPieceMoved.IsRejected(lowerThreshold))
             {
+                string outputFilename = $"{DateTime.Now.Date}_rejected_move_p{resultPieceMoved.Probability}_p{resultPieceNotMoved.Probability}.png";
+                string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "fail", outputFilename);
+                _agent.Screenshot.Image.Save(outputPath);
+                
                 // both hypotheses rejected: piece not found on the screenshot
                 // no problem, we get a new screenshot and try it again ;)
                 // TODO: maybe the piece is not visble at all? handle pause menu and rocket cutscenes

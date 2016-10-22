@@ -1,11 +1,11 @@
-﻿using Emgu.CV;
+﻿using System.Diagnostics;
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core;
 using GameBot.Engine.Physical.Quantizers;
 using NUnit.Framework;
-using System.Diagnostics;
 
-namespace GameBot.Test.Engine.Quantizers
+namespace GameBot.Test.Engine.Physical.Quantizers
 {
     [TestFixture]
     public class QuantizerTests
