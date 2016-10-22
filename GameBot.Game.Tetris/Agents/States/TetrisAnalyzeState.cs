@@ -143,7 +143,7 @@ namespace GameBot.Game.Tetris.Agents.States
 
                 _logger.Info($"Accept extracted current piece by sampling ({result.Result.Tetrimino})");
 
-                string outputFilename = $"{DateTime.Now.ToString("HH_mm_ss_ffff")}_analyze.png";
+                string outputFilename = $"{DateTime.Now.ToString("HH_mm_ss_ffff")}_analyze_cp.png";
                 string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "debug", outputFilename);
                 _agent.Screenshot.Image.Save(outputPath);
 
@@ -196,6 +196,11 @@ namespace GameBot.Game.Tetris.Agents.States
                 var nextPiece = _nextPieceSampler.Result;
                 
                 _logger.Info($"Accept extracted next piece by sampling ({result.Result})");
+                
+                string outputFilename = $"{DateTime.Now.ToString("HH_mm_ss_ffff")}_analyze_np.png";
+                string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "debug", outputFilename);
+                _agent.Screenshot.Image.Save(outputPath);
+
                 AcceptNextPiece(nextPiece);
             }
         }

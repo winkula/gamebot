@@ -63,6 +63,72 @@ namespace GameBot.Test.Engine.Physical.Actuators
         }
 
         [Test]
+        public void PokemonSequence()
+        {
+            using (var actuator = new PhysicalActuator(_config))
+            {
+                int Time = 500;
+                for (int i = 0; i < 4; i++)
+                {
+                    actuator.Hit(Button.Right);
+                    Thread.Sleep(Time);
+
+                    actuator.Hit(Button.Down);
+                    Thread.Sleep(Time);
+
+                    actuator.Hit(Button.Left);
+                    Thread.Sleep(Time);
+
+                    actuator.Hit(Button.Down);
+                    Thread.Sleep(Time);
+                }
+
+                for (int i = 0; i < 9; i++)
+                {
+                    actuator.Hit(Button.Right);
+                    Thread.Sleep(Time);
+                }
+
+                actuator.Hit(Button.Up);
+                Thread.Sleep(Time);
+
+                for (int i = 0; i < 10; i++)
+                {
+                    actuator.Hit(Button.Right);
+                    Thread.Sleep(Time);
+                }
+
+                for (int i = 0; i < 3; i++)
+                {
+                    actuator.Hit(Button.Up);
+                    Thread.Sleep(Time);
+
+                    actuator.Hit(Button.Left);
+                    Thread.Sleep(Time);
+
+                    actuator.Hit(Button.Up);
+                    Thread.Sleep(Time);
+
+                    actuator.Hit(Button.Right);
+                    Thread.Sleep(Time);
+                }
+
+                actuator.Hit(Button.Up);
+                Thread.Sleep(Time);
+
+                actuator.Hit(Button.Left);
+                Thread.Sleep(Time);
+
+                for (int i = 0; i < 18; i++)
+                {
+                    actuator.Hit(Button.Left);
+                    Thread.Sleep(Time);
+                }
+                
+            }
+        }
+
+        [Test]
         public void MenuTestRoutine()
         {
             Thread.Sleep(500);
