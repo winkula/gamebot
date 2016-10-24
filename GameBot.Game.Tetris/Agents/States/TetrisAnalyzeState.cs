@@ -3,7 +3,6 @@ using GameBot.Game.Tetris.Searching;
 using NLog;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Extraction;
@@ -106,21 +105,21 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 // reject (threshold not reached or piece is touched)
                 _logger.Warn($"Reject extracted current piece (probability {result.Probability:F})");
-                _agent.Screenshot.Save($"rejected_cp_p{result.Probability}");
+                _agent.Screenshot.Save(_agent.Quantizer, $"reject_cp_{result.Probability:F}");
                 return;
             }
             if (!result.Result.IsUntouched)
             {
                 // reject (threshold not reached or piece is touched)
                 _logger.Warn($"Reject extracted current piece: not untouched ({result.Result.Tetrimino}, probability {result.Probability:F})");
-                _agent.Screenshot.Save($"rejected_cp_touched_p{result.Probability}");
+                _agent.Screenshot.Save(_agent.Quantizer, $"reject_cp_{result.Probability:F}");
                 return;
             }
             if (result.IsAccepted(_agent.ExtractionUpperThreshold))
             {
                 // accept immediately
                 _logger.Info($"Accept extracted current piece immediately ({result.Result.Tetrimino}, probability {result.Probability:F})");
-                _agent.Screenshot.Save($"accepted_cp_p{result.Probability}");
+                _agent.Screenshot.Save(_agent.Quantizer, $"accept_cp_{result.Probability:F}");
                 AcceptCurrentPiece(result.Result);
                 return;
             }
@@ -128,7 +127,7 @@ namespace GameBot.Game.Tetris.Agents.States
             // add sample
             _logger.Info($"Added sample for extracted current piece ({result.Result.Tetrimino}, probability {result.Probability:F})");
             _currentPieceSampler.Sample(result);
-            _agent.Screenshot.Save($"sample_cp_p{result.Probability}");
+            _agent.Screenshot.Save(_agent.Quantizer, $"sample_cp_{result.Probability:F}");
             
             if (_currentPieceSampler.IsComplete)
             {
@@ -137,11 +136,6 @@ namespace GameBot.Game.Tetris.Agents.States
                 var piece = _currentPieceSampler.Result;
 
                 _logger.Info($"Accept extracted current piece by sampling ({result.Result.Tetrimino})");
-
-                string outputFilename = $"{DateTime.Now.ToString("HH_mm_ss_ffff")}_analyze.png";
-                string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "debug", outputFilename);
-                _agent.Screenshot.Image.Save(outputPath);
-
                 AcceptCurrentPiece(piece);
             }
         }
@@ -164,15 +158,15 @@ namespace GameBot.Game.Tetris.Agents.States
             if (result.IsRejected(_agent.ExtractionLowerThreshold))
             {
                 // reject (threshold not reached or piece is touched)
-                _logger.Warn($"Reject extracted next piece (probability {result.Probability:F}, threshold {_agent.ExtractionLowerThreshold})");
-                _agent.Screenshot.Save($"rejected_np_p{result.Probability}");
+                _logger.Warn($"Reject extracted next piece (probability {result.Probability:F}, threshold {_agent.ExtractionLowerThreshold:F})");
+                _agent.Screenshot.Save(_agent.Quantizer, $"reject_np_{result.Probability:F}");
                 return;
             }
             if (result.IsAccepted(_agent.ExtractionUpperThreshold)) // TODO: make different threshold here
             {
                 // accept immediately
                 _logger.Info($"Accept extracted next piece immediately ({result.Result}, probability {result.Probability:F})");
-                _agent.Screenshot.Save($"accepted_np_p{result.Probability}");
+                _agent.Screenshot.Save(_agent.Quantizer, $"accept_np_{result.Probability:F}");
                 AcceptNextPiece(result.Result);
                 return;
             }
@@ -180,7 +174,7 @@ namespace GameBot.Game.Tetris.Agents.States
             // add sample
             _logger.Info($"Added sample for extracted next piece ({result.Result}, probability {result.Probability:F})");
             _nextPieceSampler.Sample(result);
-            _agent.Screenshot.Save($"sample_np_p{result.Probability}");
+            _agent.Screenshot.Save(_agent.Quantizer, $"sample_np_{result.Probability:F}");
 
             if (_nextPieceSampler.IsComplete)
             {
@@ -189,11 +183,6 @@ namespace GameBot.Game.Tetris.Agents.States
                 var nextPiece = _nextPieceSampler.Result;
                 
                 _logger.Info($"Accept extracted next piece by sampling ({result.Result})");
-                
-                string outputFilename = $"{DateTime.Now.ToString("HH_mm_ss_ffff")}_analyze_np.png";
-                string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "debug", outputFilename);
-                _agent.Screenshot.Image.Save(outputPath);
-
                 AcceptNextPiece(nextPiece);
             }
         }

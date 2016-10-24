@@ -16,6 +16,7 @@ namespace GameBot.Core.Data
         private static readonly Mat _black;
 
         public IImage Image { get; }
+        public IImage OriginalImage { get; set; }
         public byte[] Pixels { get; }
         public int Width { get; }
         public int Height { get; }

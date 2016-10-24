@@ -17,6 +17,13 @@ namespace GameBot.Robot.Ui
         [STAThread]
         static void Main()
         {
+            // create folders on desktop
+            // TODO: remove this (only for debugging)
+            string pathDebug = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "debug");
+            string pathTest = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "test");
+            Directory.CreateDirectory(pathDebug);
+            Directory.CreateDirectory(pathTest);
+
             using (var container = new Container())
             {
                 Application.EnableVisualStyles();
@@ -74,7 +81,7 @@ namespace GameBot.Robot.Ui
             fileTarget.FileName = path;
             config.AddTarget("file", fileTarget);
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, fileTarget));
-            
+
             LogManager.Configuration = config;
         }
     }

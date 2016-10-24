@@ -21,8 +21,9 @@ namespace GameBot.Game.Tetris.Agents
         // state informations
         private ITetrisAgentState _state;
         private bool _continue;
-        
+
         // services and data used by states
+        public IQuantizer Quantizer { get; private set; }
         public IExecutor Executor { get; private set; }
         public IScreenshot Screenshot { get; private set; }
         public PieceExtractor PieceExtractor { get; private set; }
@@ -43,11 +44,12 @@ namespace GameBot.Game.Tetris.Agents
         public Piece ExpectedPiece { private get; set; }
         public Tetrimino? ExtractedNextPiece { private get; set; }
 
-        public TetrisAgent(IConfig config, PieceExtractor pieceExtractor, ISearch search)
+        public TetrisAgent(IConfig config, IQuantizer quantizer, PieceExtractor pieceExtractor, ISearch search)
         {
             _config = config;
             _visualize = config.Read("Game.Tetris.Visualize", false);
 
+            Quantizer = quantizer;
             PieceExtractor = pieceExtractor;
             Search = search;
 

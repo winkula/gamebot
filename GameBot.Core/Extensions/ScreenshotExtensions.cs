@@ -1,16 +1,29 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using GameBot.Core.Data;
 
 namespace GameBot.Core.Extensions
 {
     public static class ScreenshotExtensions
     {
-        public static void Save(this IScreenshot screenshot, string message)
+        public static void Save(this IScreenshot screenshot, IQuantizer quantizer, string message)
         {
-            string outputFilename = $"{DateTime.Now:HH_mm_ss_ffff}_{message}.png";
-            string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "debug", outputFilename);
-            screenshot.Image.Save(outputPath);
+            string pathDebug = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                "debug",
+                $"{DateTime.Now:HH_mm_ss_ffff}_{message}.png");
+            screenshot.Image.Save(pathDebug);
+
+            var calibrateableQuantizer = quantizer as ICalibrateableQuantizer;
+            if (calibrateableQuantizer != null)
+            {
+                string keypoints = string.Join("_", calibrateableQuantizer.Keypoints.Select(p => $"{p.X}_{p.Y}"));
+                string filename = $"{DateTime.Now:HH_mm_ss_ffff}_{message}_{keypoints}.png";
+                string pathTest = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    "test",
+                    filename);
+                screenshot.OriginalImage.Save(pathTest);
+            }
         }
     }
 }

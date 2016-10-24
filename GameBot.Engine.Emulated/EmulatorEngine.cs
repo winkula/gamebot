@@ -65,6 +65,7 @@ namespace GameBot.Engine.Emulated
             if (Play)
             {
                 IScreenshot screenshot = new EmguScreenshot(processed, time);
+                screenshot.OriginalImage = image;
 
                 // extracts the game state
                 _agent.Extract(screenshot);

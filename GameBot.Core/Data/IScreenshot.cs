@@ -11,7 +11,12 @@ namespace GameBot.Core.Data
     public interface IScreenshot
     {
         /// <summary>
-        /// Gets the underlying EmguCV image.
+        /// Gets or sets the original underlying EmguCV image.
+        /// </summary>
+        IImage OriginalImage { get; set; }
+        
+        /// <summary>
+        /// Gets the processed underlying EmguCV image.
         /// </summary>
         IImage Image { get; }
 
