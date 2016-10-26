@@ -8,14 +8,73 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Text;
+using GameBot.Core.Data;
+using GameBot.Game.Tetris.Data;
+using GameBot.Game.Tetris.Extraction;
 
 namespace GameBot.Test.Misc
 {
-    [Ignore]
+    //[Ignore]
     [TestFixture]
     public class MaethuQuantizerTests
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        [Test]
+        public void PieceMatcher()
+        {
+            // source image
+            string path = "Screenshots/white.png";
+            var sourceImage = new Mat(path, LoadImageType.Grayscale);
+            var screenshot = new EmguScreenshot(sourceImage, TimeSpan.Zero);
+
+            var pieceMatcher = new PieceMatcher();
+            pieceMatcher.GetProbabilityNextPiece(screenshot, Tetrimino.I);
+        }
+
+        [Test]
+        public void RenameTestData()
+        {
+            foreach (var record in ImageTestCaseFactory.Data)
+            {
+                var sb = new StringBuilder();
+
+                if (record.Piece != null)
+                {
+                    sb.Append($"{record.Piece.Tetrimino}{record.Piece.Orientation:D1}{record.Piece.X:D3}{-record.Piece.Y:D3}");
+                }
+                else
+                {
+                    sb.Append(new string('_', 6));
+                }
+
+                sb.Append("_");
+
+                if (record.NextPiece.HasValue)
+                {
+                    sb.Append($"{record.NextPiece.Value}");
+                }
+                else
+                {
+                    sb.Append("_");
+                }
+
+                sb.Append("_");
+                
+                sb.Append(new string('_', 2 * 10));
+
+                sb.Append("_");
+
+                sb.Append(string.Join("", record.Keypoints.Select(p => $"{p.X:D3}{p.Y:D3}")));
+
+                // TOXXYY_T_00112233445566778899_000111222333444555666777
+
+                string name = sb.ToString();
+                File.Copy($"Images/test{record.ImageKey}.jpg", $"Images/{name}.jpg");
+            }
+        }
 
         [Test]
         public void TestMe()

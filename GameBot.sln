@@ -35,6 +35,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Screenshots", "Screenshots"
 		Screenshots\tetris_play_1.png = Screenshots\tetris_play_1.png
 		Screenshots\tetris_play_2.png = Screenshots\tetris_play_2.png
 		Screenshots\tetris_start.png = Screenshots\tetris_start.png
+		Screenshots\white.png = Screenshots\white.png
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{CA14972B-6D28-420A-81A2-AC24B3D70F78}"

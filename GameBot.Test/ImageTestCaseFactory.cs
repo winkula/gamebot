@@ -14,13 +14,30 @@ using System.Linq;
 
 namespace GameBot.Test
 {
+    // File name patern for test cases
+    //     0 Current Tetrimino
+    //     1 Current orientation
+    //  2- 3 Current x coordinate
+    //  4- 5 Current fall distance (negative y coordinate) 
+    //     6 Underscore (space)
+    //     7 Next Tetromino
+    //     8 Underscore (space)
+    //  9-28 Column heights of the board
+    //    29 Underscore (space)
+    // 30-53 Keypoints for calibration (3 chars for one coordinate)
+    //
+    // Pattern:
+    // TOXXYY_T_00112233445566778899_000111222333444555666777
+    // Example:
+    // T20310_J_00100804060100010200_010010600010010300600300
     public class ImageTestCaseFactory
     {
-        private class TestData
+        public class TestData
         {
             public string ImageKey { get; }
+            public IImage Image { get; }
             private string ImagePath => $"Images/test{ImageKey}.jpg";
-            private Point[] Keypoints { get; }
+            public Point[] Keypoints { get; }
             public Piece Piece { get; }
             public Tetrimino? NextPiece { get; }
             public Move? Move { get; }
@@ -36,8 +53,8 @@ namespace GameBot.Test
 
                 _quantizer.Calibrate(Keypoints);
 
-                var image = new Mat(ImagePath, LoadImageType.AnyColor);
-                var quantizedImage = _quantizer.Quantize(image);
+                Image = new Mat(ImagePath, LoadImageType.AnyColor);
+                var quantizedImage = _quantizer.Quantize(Image);
                 Screenshot = new EmguScreenshot(quantizedImage, TimeSpan.Zero);
             }
         }
@@ -52,7 +69,7 @@ namespace GameBot.Test
             new [] { new Point(590,367), new Point(211,365), new Point(572,67), new Point(235,67) } // series 03
         };
 
-        private static readonly IEnumerable<TestData> _data = new List<TestData>
+        public static readonly IEnumerable<TestData> Data = new List<TestData>
         {
             new TestData("0000", new Piece(Tetrimino.T), Tetrimino.J, Move.Right),
             new TestData("0001", new Piece(Tetrimino.J), Tetrimino.S, Move.Left),
@@ -92,25 +109,25 @@ namespace GameBot.Test
 
             new TestData("0300", null, null) // pause menu
         };
-        
-        public static IEnumerable TestCasesCurrentPiecePositives => _data
+
+        public static IEnumerable TestCasesCurrentPiecePositives => Data
             .Where(x => x.Piece != null)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot, x.Piece));
 
-        public static IEnumerable TestCasesCurrentPieceNegativesNull => _data
+        public static IEnumerable TestCasesCurrentPieceNegativesNull => Data
             .Where(x => x.Piece == null)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot));
 
-        public static IEnumerable TestCasesSpawnedPiecePositives => _data
+        public static IEnumerable TestCasesSpawnedPiecePositives => Data
             .Where(x => x.Piece != null)
             .Where(x => x.Piece.IsUntouched)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot, x.Piece));
 
-        public static IEnumerable TestCasesSpawnedPieceNegativesNull => _data
+        public static IEnumerable TestCasesSpawnedPieceNegativesNull => Data
             .Where(x => x.Piece == null || !x.Piece.IsUntouched)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot));
 
-        public static IEnumerable TestCasesTouchedPieces => _data
+        public static IEnumerable TestCasesTouchedPieces => Data
             .Where(x => x.Piece != null)
             .Where(x => !x.Piece.IsUntouched)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot, x.Piece));
@@ -118,7 +135,7 @@ namespace GameBot.Test
         /// <summary>
         /// Should be correctly recognized.
         /// </summary>
-        public static IEnumerable TestCasesNextPiecePositives => _data
+        public static IEnumerable TestCasesNextPiecePositives => Data
             .Where(x => x.NextPiece.HasValue)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot, x.NextPiece));
 
@@ -126,11 +143,11 @@ namespace GameBot.Test
         /// Should be classified as false.
         /// Because no next piece is visible or the wrong piece is visible.
         /// </summary>
-        public static IEnumerable TestCasesNextPieceNegativesNull => _data
+        public static IEnumerable TestCasesNextPieceNegativesNull => Data
             .Where(x => !x.NextPiece.HasValue)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot));
-       
-        public static IEnumerable TestCasesMovedPiece => _data
+
+        public static IEnumerable TestCasesMovedPiece => Data
             .Where(x => x.Move.HasValue)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot, x.Piece, x.Move));
     }

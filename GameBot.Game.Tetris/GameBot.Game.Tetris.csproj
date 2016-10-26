@@ -146,6 +146,9 @@
     <Compile Include="Agents\TetrisAgent.cs" />
     <Compile Include="Data\BoardLookups.cs" />
     <Compile Include="Data\Coordinates.cs" />
+    <Compile Include="Extraction\Extractors\PieceBasedExtractor.cs" />
+    <Compile Include="Extraction\Extractors\BlockBasedExtractor.cs" />
+    <Compile Include="Extraction\Extractors\IExtractor.cs" />
     <Compile Include="Extraction\Samplers\ISampler.cs" />
     <Compile Include="Extraction\Samplers\MoveConfirmationSampler.cs" />
     <Compile Include="Extraction\Samplers\NextTetriminoSampler.cs" />

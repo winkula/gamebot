@@ -7,13 +7,16 @@ using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Data;
+using NLog;
 
 namespace GameBot.Game.Tetris.Extraction
 {
     public class PieceMatcher
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private const int _maxShiftDistance = 1; // must be 0 or greater
-        
+
         // template data
         private const int _templateSize = 4 * GameBoyConstants.TileSize;
 
@@ -22,7 +25,7 @@ namespace GameBot.Game.Tetris.Extraction
         private readonly Image<Gray, byte>[] _templates = new Image<Gray, byte>[Tetriminos.AllPossibleOrientations];
         private readonly Image<Gray, byte>[] _templateMasks = new Image<Gray, byte>[Tetriminos.AllPossibleOrientations];
 
-        private static readonly double[] _maxErrors = 
+        private static readonly double[] _maxErrors =
         {
             255.0 * 176, // O
             255.0 * 76, // I
@@ -32,22 +35,22 @@ namespace GameBot.Game.Tetris.Extraction
             255.0 * 160, // J
             255.0 * 160 // T
         };
-        
+
         private static readonly double[] _maxErrorsNextPiece =
         {
-            255.0 * 334, // O
-            255.0 * 440, // I
-            255.0 * 336, // S
-            255.0 * 304, // Z
-            255.0 * 296, // L
-            255.0 * 336, // J
-            255.0 * 336 // T
+            44880, // O
+            21165, // I
+            40800, // S
+            32640, // Z
+            28560, // L
+            40800, // J
+            34680 // T
         };
 
         // next piece
         private readonly Image<Gray, byte>[] _templatesNextPiece = new Image<Gray, byte>[Tetriminos.All.Length];
         private readonly Image<Gray, byte>[] _templateMasksNextPiece = new Image<Gray, byte>[Tetriminos.All.Length];
-        
+
         public PieceMatcher()
         {
             // current piece
@@ -85,17 +88,17 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         /// <summary>
-        /// Gets the probability that a specific piece is visible on the screenshot.
-        /// Test results:
-        /// - With adaptive binarization:     piece (68 - 91 %), empty (41 - 45 %)
-        /// - Without any filter (greyscale): piece (%), empty (%)        
+        /// Gets the probability that a specific piece is visible on the screenshot.     
         /// </summary>
         /// <param name="screenshot">The screenshot.</param>
         /// <param name="piece">The piece to match.</param>
         /// <returns>The probability.</returns>
         public double GetProbability(IScreenshot screenshot, Piece piece)
         {
-            // TODO: add argument check for coordinates
+            if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
+            if (piece == null) throw new ArgumentNullException(nameof(piece));
+            if (piece.X < -4 || piece.X > 5) throw new ArgumentException("piece has illegal x coordinate");
+            if (piece.Y < -16 || piece.Y > 0) throw new ArgumentException("piece has illegal y coordinate");
 
             // we need some extra space over the screenshot, so that the template is not off the image
             // we add an extra one that we can make 1 pixel shifts to compensate errors in the camera calibration
@@ -178,8 +181,8 @@ namespace GameBot.Game.Tetris.Extraction
         /// <returns></returns>
         public double GetProbabilityNextPiece(IScreenshot screenshot, Tetrimino tetrimino)
         {
-            // TODO: add argument check for coordinates
-            
+            if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
+
             var tileCoordinates = TetrisConstants.NextPieceTileOrigin;
 
             // load screenshot
@@ -196,7 +199,7 @@ namespace GameBot.Game.Tetris.Extraction
             }
 
             // get template and it's mask
-            var templateIndex = (int) tetrimino;
+            var templateIndex = (int)tetrimino;
             var template = _templatesNextPiece[templateIndex];
             var templateMask = _templateMasksNextPiece[templateIndex];
 
@@ -234,6 +237,8 @@ namespace GameBot.Game.Tetris.Extraction
                 CvInvoke.AbsDiff(reference, combined, difference);
                 var sum = CvInvoke.Sum(difference);
 
+                //_logger.Info($"Sum {sum.V0}");
+
                 // calculate probability
                 var newProbability = GetProbabilityNextPiece(sum.V0, tetrimino);
                 bestProbability = Math.Max(bestProbability, newProbability);
@@ -246,7 +251,7 @@ namespace GameBot.Game.Tetris.Extraction
         {
             return _templateIndexTable[(int)piece.Tetrimino, piece.Orientation];
         }
-        
+
         private IEnumerable<Point> GetShifts()
         {
             for (int x = -_maxShiftDistance; x <= _maxShiftDistance; x++)
@@ -257,7 +262,7 @@ namespace GameBot.Game.Tetris.Extraction
                 }
             }
         }
-        
+
         private double GetProbability(double sum, Tetrimino tetromino)
         {
             double maxError = _maxErrors[(int)tetromino];
@@ -268,6 +273,8 @@ namespace GameBot.Game.Tetris.Extraction
 
         private double GetProbabilityNextPiece(double sum, Tetrimino tetromino)
         {
+            //return (1.0 / (sum + 1)).Clamp(0.0, 1.0);
+
             double maxError = _maxErrorsNextPiece[(int)tetromino];
             double error = sum / maxError;
             error = error.Clamp(0.0, 1.0);
