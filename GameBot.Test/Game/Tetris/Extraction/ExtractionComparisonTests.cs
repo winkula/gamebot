@@ -203,14 +203,14 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 // TODO: implement this!
 
                 bool moved;
-                var pieceExpected = new Piece(test.Piece.Tetrimino, test.Piece.Orientation, test.Piece.X);
-                var pieceMoved = new Piece(pieceExpected).Apply(move.Value);
-                var recognizedPiece = input.Extractor.ExtractMovedPiece(screenshot, pieceExpected, move.Value, test.Piece.FallHeight, out moved);
+                var pieceOriginNotMoved = new Piece(test.Piece.Tetrimino, test.Piece.Orientation, test.Piece.X);
+                var pieceOriginMoved = new Piece(pieceOriginNotMoved).Apply(move.Value);
+                var recognizedPiece = input.Extractor.ExtractMovedPiece(screenshot, pieceOriginNotMoved, move.Value, test.Piece.FallHeight, out moved);
 
-                if (pieceMoved.Equals(pieceExpected)) throw new Exception("pieces must be different!");
+                if (pieceOriginMoved.Equals(pieceOriginNotMoved)) throw new Exception("pieces must be different!");
 
                 results.Total++;
-                if (recognizedPiece != null && recognizedPiece.Equals(pieceExpected) && !recognizedPiece.Equals(pieceMoved))
+                if (recognizedPiece != null && recognizedPiece.Equals(test.Piece) && !moved)
                 {
                     results.Recognized++;
                 }
