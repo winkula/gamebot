@@ -53,7 +53,26 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
 
         public Piece ExtractMovedPiece(IScreenshot screenshot, Piece piece, Move move, int maxFallDistance, out bool moved)
         {
-            throw new NotImplementedException();
+            const double threshold = 0.5;
+
+            var pieceMoved = new Piece(piece).Apply(move);
+
+            var resultNotMoved = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, piece, maxFallDistance);
+            var resultMoved = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceMoved, maxFallDistance);
+
+            if (resultMoved.IsAccepted(threshold) && resultMoved.Probability >= resultNotMoved.Probability)
+            {
+                moved = true;
+                return resultMoved.Result;
+            }
+            if (resultNotMoved.IsAccepted(threshold) && resultNotMoved.Probability > resultMoved.Probability)
+            {
+                moved = false;
+                return resultNotMoved.Result;
+            }
+
+            moved = false;
+            return null;
         }
     }
 }

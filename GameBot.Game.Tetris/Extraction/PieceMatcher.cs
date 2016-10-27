@@ -97,8 +97,8 @@ namespace GameBot.Game.Tetris.Extraction
         {
             if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
             if (piece == null) throw new ArgumentNullException(nameof(piece));
-            if (piece.X < -4 || piece.X > 5) throw new ArgumentException("piece has illegal x coordinate");
-            if (piece.Y < -16 || piece.Y > 0) throw new ArgumentException("piece has illegal y coordinate");
+            if (piece.X < -4 || piece.X > 5) throw new ArgumentException($"piece has illegal x coordinate {piece.X}");
+            if (piece.Y < -16 || piece.Y > 0) throw new ArgumentException($"piece has illegal y coordinate {piece.Y}");
 
             // we need some extra space over the screenshot, so that the template is not off the image
             // we add an extra one that we can make 1 pixel shifts to compensate errors in the camera calibration

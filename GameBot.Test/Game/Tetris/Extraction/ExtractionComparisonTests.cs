@@ -7,7 +7,9 @@ using Emgu.CV;
 using GameBot.Core;
 using GameBot.Core.Configuration;
 using GameBot.Core.Data;
+using GameBot.Core.Exceptions;
 using GameBot.Engine.Physical.Quantizers;
+using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Extractors;
 using NLog;
 using NUnit.Framework;
@@ -17,8 +19,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
     [TestFixture]
     public class ExtractionComparisonTests
     {
-        private static readonly Logger _logger = LogManager.GetLogger("Tests");
-
+        private static readonly Logger _loggerResults = LogManager.GetLogger("Tests");
+        private static readonly Logger _loggerFails = LogManager.GetLogger("Fails");
+        
         private Random _random;
         private ICalibrateableQuantizer _quantizer1;
         private ICalibrateableQuantizer _quantizer2;
@@ -59,13 +62,13 @@ namespace GameBot.Test.Game.Tetris.Extraction
                         var results3 = RecognizeCurrentPieceKnown(input, shift);
                         sb.AppendLine($"{quantizer.GetType().Name};{extractor.GetType().Name};RecognizeCurrentPieceKnown;{shift:F};{results3.Total};{results3.Recognized};{100.0 * results3.Recognized / results3.Total:F}");
 
-                        //var results4 = RecognizeMove(input, shift);
-                        //sb.AppendLine($"{quantizer.GetType().Name};{extractor.GetType().Name};RecognizeMove;{shift:F};{results4.Total};{results4.Recognized};{100.0 * results4.Recognized / results4.Total:F}");
+                        var results4 = RecognizeMove(input, shift);
+                        sb.AppendLine($"{quantizer.GetType().Name};{extractor.GetType().Name};RecognizeMove;{shift:F};{results4.Total};{results4.Recognized};{100.0 * results4.Recognized / results4.Total:F}");
                     }
                 }
             }
 
-            _logger.Info(sb.ToString());
+            _loggerResults.Info(sb.ToString());
         }
 
         private ExtractionComparisonResults RecognizeNextPiece(ExtractionComparisonInput input, double shift)
@@ -193,17 +196,69 @@ namespace GameBot.Test.Game.Tetris.Extraction
             foreach (var test in tests)
             {
                 var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, shift);
-                /*
-                var nextPiece = extractor.ExtractNextPiece(screenshot);
+
+                var move = GetValidMove(test);
+                if (!move.HasValue) continue;
+
+                // TODO: implement this!
+
+                bool moved;
+                var pieceExpected = new Piece(test.Piece.Tetrimino, test.Piece.Orientation, test.Piece.X);
+                var pieceMoved = new Piece(pieceExpected).Apply(move.Value);
+                var recognizedPiece = input.Extractor.ExtractMovedPiece(screenshot, pieceExpected, move.Value, test.Piece.FallHeight, out moved);
+
+                if (pieceMoved.Equals(pieceExpected)) throw new Exception("pieces must be different!");
 
                 results.Total++;
-                if (test.NextPiece == nextPiece)
+                if (recognizedPiece != null && recognizedPiece.Equals(pieceExpected) && !recognizedPiece.Equals(pieceMoved))
                 {
                     results.Recognized++;
-                }*/
+                }
+                else
+                {
+                    _loggerFails.Warn($"Recognized: {recognizedPiece}, Real: {test.Piece}");
+                }
             }
 
             return results;
+        }
+
+        private Move? GetValidMove(ImageTestCaseFactory.TestData test)
+        {
+            var validMoves = new[] { Move.Left, Move.Right, Move.Rotate, Move.RotateCounterclockwise }
+            .OrderBy(x => Guid.NewGuid())
+            .ToArray();
+
+            foreach (var move in validMoves)
+            {
+                var gamestate = new GameState(new Piece(test.Piece), test.NextPiece);
+
+                try
+                {
+                    switch (move)
+                    {
+                        case Move.Left:
+                            gamestate.Left();
+                            break;
+                        case Move.Right:
+                            gamestate.Right();
+                            break;
+                        case Move.Rotate:
+                            gamestate.Rotate();
+                            break;
+                        case Move.RotateCounterclockwise:
+                            gamestate.RotateCounterclockwise();
+                            break;
+                    }
+                    return move;
+                }
+                catch (GameOverException)
+                {
+                    // this move is not valid, ignore
+                }
+            }
+
+            return null;
         }
 
         private IScreenshot GetScreenshot(ICalibrateableQuantizer quantizer, IImage image, Point[] keypoints, double shift)

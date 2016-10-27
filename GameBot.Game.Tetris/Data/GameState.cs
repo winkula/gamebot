@@ -54,7 +54,7 @@ namespace GameBot.Game.Tetris.Data
         }
 
         private bool IsPieceLanded => Board.Intersects(new Piece(Piece).Fall());
-
+        
         public bool Fall()
         {
             return Fall(Tetriminos.GetRandom());

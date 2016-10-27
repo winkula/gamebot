@@ -26,6 +26,13 @@ namespace GameBot.Test
             fileTarget.FileName = path;
             config.AddTarget("file", fileTarget);
             config.LoggingRules.Add(new LoggingRule("Tests", LogLevel.Debug, fileTarget));
+            
+            path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Tests_Fails.txt");
+            fileTarget = new FileTarget();
+            fileTarget.Layout = @"${message}";
+            fileTarget.FileName = path;
+            config.AddTarget("file", fileTarget);
+            config.LoggingRules.Add(new LoggingRule("Fails", LogLevel.Debug, fileTarget));
 
             LogManager.Configuration = config;
         }

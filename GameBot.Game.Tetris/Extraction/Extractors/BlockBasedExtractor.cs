@@ -31,7 +31,9 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
 
         public Piece ExtractMovedPiece(IScreenshot screenshot, Piece piece, Move move, int maxFallDistance, out bool moved)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            moved = false;
+            return null;
         }
     }
 }

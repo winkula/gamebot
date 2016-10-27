@@ -163,7 +163,7 @@ namespace GameBot.Game.Tetris.Extraction
         {
             // relevant tiles on the screen: x : 14 - 17, y : 13 - 16 
 
-            double bestProbability = 0;
+            double bestProbability = double.NegativeInfinity;
             Tetrimino? bestTetrimino = null;
 
             foreach (var tetrimino in Tetriminos.All)
