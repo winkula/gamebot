@@ -111,6 +111,7 @@ namespace GameBot.Game.Tetris.Data
             // calculate score
             Score += TetrisScore.GetSoftdropScore(distance);
             Score += TetrisScore.GetLineScore(lines, Level);
+            if (Score > 999999) Score = 999999; // max score is 999'999
 
             if (NextPiece.HasValue)
             {

@@ -15,14 +15,14 @@ namespace GameBot.Game.Tetris.Agents
     // ReSharper disable once ClassNeverInstantiated.Global
     public class TetrisAgent : IAgent
     {
-        private readonly IConfig _config;
         private readonly bool _visualize;
 
         // state informations
         private ITetrisAgentState _state;
         private bool _continue;
-
+        
         // services and data used by states
+        public IConfig Config { get; private set; }
         public IQuantizer Quantizer { get; private set; }
         public IExecutor Executor { get; private set; }
         public IScreenshot Screenshot { get; private set; }
@@ -46,25 +46,25 @@ namespace GameBot.Game.Tetris.Agents
 
         public TetrisAgent(IConfig config, IQuantizer quantizer, PieceExtractor pieceExtractor, ISearch search)
         {
-            _config = config;
             _visualize = config.Read("Game.Tetris.Visualize", false);
 
+            Config = config;
             Quantizer = quantizer;
             PieceExtractor = pieceExtractor;
             Search = search;
 
-            CheckSamples = _config.Read("Game.Tetris.Check.Samples", 1);
-            ExtractionSamples = _config.Read("Game.Tetris.Extractor.Samples", 1);
-            ExtractionUpperThreshold = _config.Read<double>("Game.Tetris.Extractor.UpperThreshold");
-            ExtractionLowerThreshold = _config.Read<double>("Game.Tetris.Extractor.LowerThreshold");
+            CheckSamples = Config.Read("Game.Tetris.Check.Samples", 1);
+            ExtractionSamples = Config.Read("Game.Tetris.Extractor.Samples", 1);
+            ExtractionUpperThreshold = Config.Read<double>("Game.Tetris.Extractor.UpperThreshold");
+            ExtractionLowerThreshold = Config.Read<double>("Game.Tetris.Extractor.LowerThreshold");
 
             Init();
         }
 
         private void Init()
         {
-            var startLevel = _config.Read("Game.Tetris.StartLevel", 0);
-            var startFromGameOver = _config.Read("Game.Tetris.StartFromGameOver", false);
+            var startLevel = Config.Read("Game.Tetris.StartLevel", 0);
+            var startFromGameOver = Config.Read("Game.Tetris.StartFromGameOver", false);
 
             SetState(new TetrisStartState(this, startLevel, startFromGameOver));
         }

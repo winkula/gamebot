@@ -12,10 +12,12 @@ namespace GameBot.Game.Tetris.Agents.States
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly TetrisAgent _agent;
-
+        
         private readonly Queue<Move> _pendingMoves;
         private readonly Piece _tracedPiece;
         private readonly TimeSpan _tracedPieceTimestamp;
+
+        private readonly bool _checkCommands;
 
         public TetrisExecuteState(TetrisAgent agent, Queue<Move> pendingMoves, Piece tracedPiece, TimeSpan tracedPieceTimestamp)
         {
@@ -32,6 +34,8 @@ namespace GameBot.Game.Tetris.Agents.States
             _pendingMoves = pendingMoves;
             _tracedPiece = tracedPiece;
             _tracedPieceTimestamp = tracedPieceTimestamp;
+
+            _checkCommands = _agent.Config.Read("Game.Tetris.Check.Enabled", false);
         }
 
         public void Extract()
@@ -54,8 +58,15 @@ namespace GameBot.Game.Tetris.Agents.States
             else
             {
                 Execute(move);
-                SetStatePseudoCheck(move);
-                //SetStateCheck(move);
+
+                if (_checkCommands)
+                {
+                    SetStateCheck(move);
+                }
+                else
+                {
+                    SetStatePseudoCheck(move);
+                }
             }
         }
 
