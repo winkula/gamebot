@@ -1,4 +1,5 @@
-﻿using GameBot.Core.Data;
+﻿using System;
+using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 
 namespace GameBot.Game.Tetris.Extraction.Extractors
@@ -13,38 +14,46 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
             _pieceMatcher = new PieceMatcher();
             _pieceExtractor = new PieceExtractor(_pieceMatcher);
         }
-
-        public bool ConfirmPiece(IScreenshot screenshot, Piece piece)
-        {
-            const double threshold = 0.5;
-
-            var probability = _pieceMatcher.GetProbability(screenshot, piece);
-            return probability >= threshold;
-        }
-
-        public Tetrimino? ExtractCurrentPiece(IScreenshot screenshot)
-        {
-            const double threshold = 0.5;
-            const int searchHeight = 15;
-
-            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, searchHeight);
-            if (result.IsAccepted(threshold))
-            {
-                return result.Result?.Tetrimino;
-            }
-            return null;
-        }
-
+        
         public Tetrimino? ExtractNextPiece(IScreenshot screenshot)
         {
-            const double threshold = 0.5;
+            const double threshold = 0.2;
 
             var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot);
             if (result.IsAccepted(threshold))
             {
                 return result.Result;
             }
+
             return null;
+        }
+
+        public Piece ExtractCurrentPiece(IScreenshot screenshot, Tetrimino? tetrimino, int maxFallDistance)
+        {
+            const double threshold = 0.5;
+
+            if (tetrimino.HasValue)
+            {
+                var piece = new Piece(tetrimino.Value);
+                var resultKnown = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, piece, maxFallDistance);
+                if (resultKnown.IsAccepted(threshold))
+                {
+                    return resultKnown.Result;
+                }
+            }
+            
+            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, maxFallDistance);
+            if (result.IsAccepted(threshold))
+            {
+                return result.Result;
+            }
+
+            return null;
+        }
+
+        public Piece ExtractMovedPiece(IScreenshot screenshot, Piece piece, Move move, int maxFallDistance, out bool moved)
+        {
+            throw new NotImplementedException();
         }
     }
 }

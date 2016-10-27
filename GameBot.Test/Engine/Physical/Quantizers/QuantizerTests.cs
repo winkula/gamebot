@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core;
@@ -11,7 +12,23 @@ namespace GameBot.Test.Engine.Physical.Quantizers
     public class QuantizerTests
     {
         private const bool _adjust = false;
-        
+
+        [Test]
+        public void TestQuantizerFromTestData()
+        {
+            var test1 = ImageTestCaseFactory.Data.First(x => x.ImageKey == "0102");
+
+            string path = $"Images/test{test1.ImageKey}.jpg";
+            var keypoints = new float[,] {
+                { test1.Keypoints[0].X, test1.Keypoints[0].Y },
+                { test1.Keypoints[1].X, test1.Keypoints[1].Y },
+                { test1.Keypoints[2].X, test1.Keypoints[2].Y },
+                { test1.Keypoints[3].X, test1.Keypoints[3].Y }
+            };
+
+            TestQuantizer(path, new AdaptiveThresholdQuantizer(_adjust, keypoints, 17, 23));
+        }
+
         [Test]
         public void UnwarpAndAdaptiveThreshold1()
         {

@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GameBot.Core.Configuration;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
-using GameBot.Game.Tetris.Extraction.Extractors;
 
 namespace GameBot.Game.Tetris.Extraction.Extractors
 {
@@ -18,22 +13,25 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
         {
             _tetrisExtractor = new TetrisExtractor(new AppSettingsConfig());
         }
-
-        public bool ConfirmPiece(IScreenshot screenshot, Piece piece)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Tetrimino? ExtractCurrentPiece(IScreenshot screenshot)
-        {
-            const int searchHeight = 15;
-
-            return _tetrisExtractor.ExtractSpawnedPiece(screenshot, searchHeight)?.Tetrimino;
-        }
-
+        
         public Tetrimino? ExtractNextPiece(IScreenshot screenshot)
         {
             return _tetrisExtractor.ExtractNextPiece(screenshot);
+        }
+
+        public Piece ExtractCurrentPiece(IScreenshot screenshot, Tetrimino? tetrimino, int maxFallDistance)
+        {
+            var foundPiece = _tetrisExtractor.ExtractSpawnedPiece(screenshot, maxFallDistance);
+            if (foundPiece != null && tetrimino.HasValue && foundPiece.Tetrimino == tetrimino.Value)
+            {
+                return foundPiece;
+            }
+            return null;
+        }
+
+        public Piece ExtractMovedPiece(IScreenshot screenshot, Piece piece, Move move, int maxFallDistance, out bool moved)
+        {
+            throw new NotImplementedException();
         }
     }
 }

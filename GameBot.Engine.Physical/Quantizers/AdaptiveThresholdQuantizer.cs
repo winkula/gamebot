@@ -1,9 +1,11 @@
-﻿using Emgu.CV;
+﻿using System;
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core;
 using NLog;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 
 namespace GameBot.Engine.Physical.Quantizers
 {
@@ -46,6 +48,14 @@ namespace GameBot.Engine.Physical.Quantizers
             _logger.Info($"{stopwatch.ElapsedMilliseconds} ms, GetPerspectiveTransform");
             stopwatch.Restart();
 
+            /* Too resource-intensive!
+            // denoise
+            CvInvoke.FastNlMeansDenoising(sourceImage, sourceImage);
+
+            _logger.Info($"{stopwatch.ElapsedMilliseconds} ms, FastNlMeansDenoising");
+            stopwatch.Restart();
+            */
+
             // transform
             CvInvoke.WarpPerspective(sourceImage, destImage, transform, new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), Inter.Linear, Warp.Default);
 
@@ -64,6 +74,11 @@ namespace GameBot.Engine.Physical.Quantizers
 
                 CvInvoke.NamedWindow("Test");
                 CvInvoke.Imshow("Test", destImageBin);
+
+
+                string outputFilename = "quantizer_output.png";
+                string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), outputFilename);
+                destImageBin.Save(outputPath);
 
                 int key = CvInvoke.WaitKey();
                 Debug.Write(key);
