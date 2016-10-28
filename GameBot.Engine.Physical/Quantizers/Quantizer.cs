@@ -10,8 +10,9 @@ namespace GameBot.Engine.Physical.Quantizers
 {
     public class Quantizer : BaseCalibrateableQuantizer
     {
-        private readonly int _thresholdConstant;
-        private readonly int _thresholdBlockSize;
+        public int ThresholdConstant { get; set; }
+        public int ThresholdBlockSize { get; set; }
+
         private readonly int _thresholdMaxValue;
         private readonly AdaptiveThresholdType _thresholdAdaptiveThresholdType;
         private readonly ThresholdType _thresholdType;
@@ -21,11 +22,11 @@ namespace GameBot.Engine.Physical.Quantizers
             var keypoints = config.ReadCollection("Robot.Quantizer.Transformation.KeyPoints", new[] { 0 + 100, 0, 640 - 100, 0, 0, 480, 640, 480 }).ToList();
             if (keypoints.Count != 8) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Transformation.KeyPoints'.");
 
-            _thresholdConstant = config.Read("Robot.Quantizer.Threshold.Constant", 5);
-            if (_thresholdConstant < 0) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Threshold.Constant'.");
+            ThresholdConstant = config.Read("Robot.Quantizer.Threshold.Constant", 5);
+            if (ThresholdConstant < 0) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Threshold.Constant'.");
 
-            _thresholdBlockSize = config.Read("Robot.Quantizer.Threshold.BlockSize", 13);
-            if (_thresholdBlockSize < 0 || _thresholdBlockSize % 2 == 0) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Threshold.BlockSize'.");
+            ThresholdBlockSize = config.Read("Robot.Quantizer.Threshold.BlockSize", 13);
+            if (ThresholdBlockSize < 0 || ThresholdBlockSize % 2 == 0) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Threshold.BlockSize'.");
 
             _thresholdMaxValue = config.Read("Robot.Quantizer.Threshold.MaxValue", 13);
             if (_thresholdMaxValue < 0 || _thresholdMaxValue > 255) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Threshold.MaxValue'.");
@@ -53,7 +54,7 @@ namespace GameBot.Engine.Physical.Quantizers
 
             // threshold
             var imageBinarized = new Mat(new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), DepthType.Default, 1);
-            CvInvoke.AdaptiveThreshold(imageWarped, imageBinarized, _thresholdMaxValue, _thresholdAdaptiveThresholdType, _thresholdType, _thresholdBlockSize, _thresholdConstant);
+            CvInvoke.AdaptiveThreshold(imageWarped, imageBinarized, _thresholdMaxValue, _thresholdAdaptiveThresholdType, _thresholdType, ThresholdBlockSize, ThresholdConstant);
 
             return imageBinarized;
         }
