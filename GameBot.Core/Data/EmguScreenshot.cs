@@ -83,5 +83,22 @@ namespace GameBot.Core.Data
             var mean = CvInvoke.Mean(Image, mask);
             return (byte)mean.V0;
         }
+
+        public override int GetHashCode()
+        {
+            return Timestamp.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (obj == this) return true;
+            IScreenshot other = obj as IScreenshot;
+            if (other != null)
+            {
+                return Timestamp.Equals(other.Timestamp);
+            }
+            return false;
+        }
     }
 }

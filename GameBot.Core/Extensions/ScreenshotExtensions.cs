@@ -13,17 +13,13 @@ namespace GameBot.Core.Extensions
                 "debug",
                 $"{DateTime.Now:HH_mm_ss_ffff}_{message}.png");
             screenshot.Image.Save(pathDebug);
-
-            var calibrateableQuantizer = quantizer as ICalibrateableQuantizer;
-            if (calibrateableQuantizer != null)
-            {
-                string keypoints = string.Join("_", calibrateableQuantizer.Keypoints.Select(p => $"{p.X}_{p.Y}"));
-                string filename = $"{DateTime.Now:HH_mm_ss_ffff}_{message}_{keypoints}.png";
-                string pathTest = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                    "test",
-                    filename);
-                screenshot.OriginalImage.Save(pathTest);
-            }
+            
+            string keypoints = string.Join("_", quantizer.Keypoints.Select(p => $"{p.X}_{p.Y}"));
+            string filename = $"{DateTime.Now:HH_mm_ss_ffff}_{message}_{keypoints}.png";
+            string pathTest = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                "test",
+                filename);
+            screenshot.OriginalImage.Save(pathTest);
         }
     }
 }

@@ -51,15 +51,15 @@ namespace GameBot.Test
                 NextPiece = nextPiece;
                 Move = move;
 
-                _quantizer.Calibrate(Keypoints);
+                _quantizer.Keypoints = Keypoints;
 
                 Image = new Mat(ImagePath, LoadImageType.AnyColor);
                 var quantizedImage = _quantizer.Quantize(Image);
-                Screenshot = new EmguScreenshot(quantizedImage, TimeSpan.Zero);
+                Screenshot = new EmguScreenshot(quantizedImage, DateTime.Now.Subtract(DateTime.MinValue));
             }
         }
 
-        private static readonly ICalibrateableQuantizer _quantizer = new Quantizer(new AppSettingsConfig());
+        private static readonly IQuantizer _quantizer = new Quantizer(new AppSettingsConfig());
 
         private static readonly Point[][] _keypoints =
         {

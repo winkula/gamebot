@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core;
@@ -18,6 +19,8 @@ namespace GameBot.Engine.Physical.Quantizers
         private int _block = 13;
         private AdaptiveThresholdType _mode = AdaptiveThresholdType.MeanC; 
         private readonly float[,] _keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
+
+        public IEnumerable<Point> Keypoints { get; set; }
 
         public AdaptiveThresholdQuantizer()
         {

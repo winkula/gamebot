@@ -28,7 +28,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var config = new AppSettingsConfig();
 
             var extractor = new TetrisExtractor(config);
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -55,7 +55,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var config = new AppSettingsConfig();
             var extractor = new TetrisExtractor(config);
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var piece = extractor.ExtractSpawnedPieceOrigin(screenshot);
 
@@ -71,7 +71,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var config = new AppSettingsConfig();
             var extractor = new TetrisExtractor(config);
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var piece = extractor.ExtractSpawnedPiece(screenshot, 5);
 
@@ -91,7 +91,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var config = new AppSettingsConfig();
             var extractor = new TetrisExtractor(config);
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var piece = extractor.ExtractSpawnedPiece(screenshot, 10);
 
@@ -111,7 +111,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var config = new AppSettingsConfig();
 
             var extractor = new TetrisExtractor(config);
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var mask = extractor.GetPieceMask(screenshot, x, y);
 
@@ -124,7 +124,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var config = new AppSettingsConfig();
 
             var extractor = new TetrisExtractor(config);
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var lastPosition = new Piece(Tetrimino.Z, 0, 1, -6);
             
@@ -144,7 +144,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var config = new AppSettingsConfig();
 
             var extractor = new TetrisExtractor(config);
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var lastPosition = new Piece(Tetrimino.Z, 0, 1, 0);
 
@@ -169,7 +169,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var config = new AppSettingsConfig();
 
             var extractor = new TetrisExtractor(config);
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var piece = new Piece(tetrimino, 0, x, y);
 

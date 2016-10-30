@@ -20,13 +20,20 @@ namespace GameBot.Test
             config.AddTarget("debugger", target);
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, target));
 
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Tests_Results.csv");
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_ExtractionComparison.csv");
             var fileTarget = new FileTarget();
             fileTarget.Layout = @"${message}";
             fileTarget.FileName = path;
             config.AddTarget("file", fileTarget);
-            config.LoggingRules.Add(new LoggingRule("Tests", LogLevel.Debug, fileTarget));
-            
+            config.LoggingRules.Add(new LoggingRule("ExtractionComparison", LogLevel.Debug, fileTarget));
+
+            path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_ExtractionDetails.csv");
+            fileTarget = new FileTarget();
+            fileTarget.Layout = @"${message}";
+            fileTarget.FileName = path;
+            config.AddTarget("file", fileTarget);
+            config.LoggingRules.Add(new LoggingRule("ExtractionDetails", LogLevel.Debug, fileTarget));
+
             path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Tests_Fails.txt");
             fileTarget = new FileTarget();
             fileTarget.Layout = @"${message}";

@@ -5,10 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using GameBot.Core.Quantizers;
 
 namespace GameBot.Engine.Physical.Quantizers
 {
-    public class SimpleQuantizer : BaseCalibrateableQuantizer
+    public class SimpleQuantizer : CalibrateableQuantizer
     {
         public SimpleQuantizer(IConfig config)
         {
@@ -16,7 +17,7 @@ namespace GameBot.Engine.Physical.Quantizers
             if (keypoints.Count != 8) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Transformation.KeyPoints'.");
             
             // precalculate transformation matrix
-            Calibrate(new List<Point> { new Point(keypoints[0], keypoints[1]), new Point(keypoints[2], keypoints[3]), new Point(keypoints[4], keypoints[5]), new Point(keypoints[6], keypoints[7]) });
+            Keypoints = new List<Point> { new Point(keypoints[0], keypoints[1]), new Point(keypoints[2], keypoints[3]), new Point(keypoints[4], keypoints[5]), new Point(keypoints[6], keypoints[7]) };
         }
 
         public override IImage Quantize(IImage image)

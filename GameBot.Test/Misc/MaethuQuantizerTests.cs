@@ -34,7 +34,7 @@ namespace GameBot.Test.Misc
                 var quantizer = new Quantizer(new AppSettingsConfig());
                 quantizer.ThresholdConstant = 13;
                 quantizer.ThresholdBlockSize = 17; 
-                quantizer.Calibrate(testData.Keypoints);
+                quantizer.Keypoints = testData.Keypoints;
                 var src = quantizer.Quantize(testData.Image);
 
                 //Image<Gray, byte> src = new Image<Gray, byte>(@"C:\Users\Winkler\Desktop\quantizer_output.png");
@@ -79,7 +79,7 @@ namespace GameBot.Test.Misc
             // source image
             string path = "Screenshots/white.png";
             var sourceImage = new Mat(path, LoadImageType.Grayscale);
-            var screenshot = new EmguScreenshot(sourceImage, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot(sourceImage, DateTime.Now.Subtract(DateTime.MinValue));
 
             var pieceMatcher = new TemplateMatcher();
             pieceMatcher.GetProbabilityNextPiece(screenshot, Tetrimino.I);

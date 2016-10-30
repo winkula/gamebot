@@ -11,21 +11,21 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
     [TestFixture]
     public class TemplateMatcherTests
     {
-        private TemplateMatcher _templateMatcher;
+        private IMatcher _matcher;
 
         [SetUp]
         public void Init()
         {
-            _templateMatcher = new TemplateMatcher();
+            _matcher = new TemplateMatcher();
         }
         
         [Test]
         public void NextPieceProbabilityOne()
         {
             var tetrimino = Tetrimino.L;
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
-            var probability = _templateMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
+            var probability = _matcher.GetProbabilityNextPiece(screenshot, tetrimino);
 
             Assert.AreEqual(1.0, probability);
         }
@@ -34,9 +34,9 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         public void NextPieceProbabilityNotOne()
         {
             var tetrimino = Tetrimino.O;
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
             
-            var probability = _templateMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
+            var probability = _matcher.GetProbabilityNextPiece(screenshot, tetrimino);
 
             Assert.GreaterOrEqual(probability, 0.0);
             Assert.Less(probability, 1.0);
@@ -46,11 +46,11 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         public void NextPieceProbabilityZero()
         {
             var image = new Mat("Screenshots/white.png", LoadImageType.Grayscale);
-            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot(image, DateTime.Now.Subtract(DateTime.MinValue));
 
             foreach (var tetrimino in Tetriminos.All)
             {
-                var probability = _templateMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
+                var probability = _matcher.GetProbabilityNextPiece(screenshot, tetrimino);
                 Assert.AreEqual(0.0, probability);
             }
         }
@@ -58,7 +58,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         [Test]
         public void GetProbabilityPerformance()
         {
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             // 4 x 10 x 17
             for (int orientation = 0; orientation < 4; orientation++)
@@ -69,7 +69,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
                     {
                         var piece = new Piece(Tetrimino.T, orientation, x, y);
 
-                        var probability = _templateMatcher.GetProbability(screenshot, piece);
+                        var probability = _matcher.GetProbability(screenshot, piece);
 
                         Assert.GreaterOrEqual(probability, 0.0);
                         Assert.LessOrEqual(probability, 1.0);

@@ -45,21 +45,13 @@ namespace GameBot.Game.Tetris.Agents.States
             var searchHeight = CalulateSearchHeight();
             _logger.Info($"Check {_lastMove} (search height {searchHeight})");
 
-            var pieceNotMoved = _tracedPiece;
-            var pieceMoved = new Piece(_tracedPiece).Apply(_lastMove);
-
             // extract
+            bool pieceHasMoved;
             var screenshot = _agent.Screenshot;
-            var resultPieceNotMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceNotMoved, searchHeight);
-            var resultPieceMoved = _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceMoved, searchHeight);
-
-            var lowerThreshold = _agent.ExtractionLowerThreshold;
-            if (resultPieceNotMoved.IsRejected(lowerThreshold) && resultPieceMoved.IsRejected(lowerThreshold))
+            var extractedCurrentPiece = _agent.Extractor.ExtractMovedPiece(screenshot, new Piece(_tracedPiece), _lastMove, searchHeight, out pieceHasMoved);
+            
+            if (extractedCurrentPiece == null)
             {
-                //string outputFilename = $"{DateTime.Now.Ticks}_rejected_move_p{resultPieceMoved.Probability}_p{resultPieceNotMoved.Probability}.png";
-                //string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "fail", outputFilename);
-                //_agent.Screenshot.Image.Save(outputPath);
-                
                 // both hypotheses rejected: piece not found on the screenshot
                 // no problem, we get a new screenshot and try it again ;)
                 // TODO: maybe the piece is not visble at all? handle pause menu and rocket cutscenes
@@ -67,30 +59,11 @@ namespace GameBot.Game.Tetris.Agents.States
             }
             else
             {
-                var movedIsMoreProbableThanNotMoved = resultPieceMoved.Probability >= resultPieceNotMoved.Probability;
                 var timestamp = screenshot.Timestamp;
-
-                // directly accept?
-                if (movedIsMoreProbableThanNotMoved && resultPieceMoved.IsAccepted(_agent.ExtractionUpperThreshold))
-                {
-                    // accept immediately
-                    _logger.Info($"Accept successful move immediately ({_lastMove}, probability {resultPieceMoved.Probability:F})");
-
-                    Success(resultPieceMoved.Result, timestamp);
-                    return;
-                }
-                if (!movedIsMoreProbableThanNotMoved && resultPieceNotMoved.IsAccepted(_agent.ExtractionUpperThreshold))
-                {
-                    // accept immediately
-                    _logger.Info($"Accept failed move immediately ({_lastMove}, probability {resultPieceNotMoved.Probability:F})");
-
-                    Fail(resultPieceNotMoved.Result, timestamp);
-                    return;
-                }
-
+                
                 // add sample
-                var samplePseudoProbability = Math.Abs(resultPieceMoved.Probability - resultPieceNotMoved.Probability);
-                _moveConfirmationSampler.Sample(new ProbabilisticResult<bool>(movedIsMoreProbableThanNotMoved, samplePseudoProbability));
+                var samplePseudoProbability = 0.5; // TODO: remove dummy value?
+                _moveConfirmationSampler.Sample(new ProbabilisticResult<bool>(pieceHasMoved, samplePseudoProbability));
                 _logger.Info($"Add sample to decide movement ({_lastMove})");
 
                 // enought samples?
@@ -98,11 +71,11 @@ namespace GameBot.Game.Tetris.Agents.States
                 {
                     if (_moveConfirmationSampler.Result)
                     {
-                        Success(resultPieceMoved.Result, timestamp);
+                        Success(extractedCurrentPiece, timestamp);
                     }
                     else
                     {
-                        Fail(resultPieceNotMoved.Result, timestamp);
+                        Fail(extractedCurrentPiece, timestamp);
                     }
                 }
             }
@@ -112,7 +85,7 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             _logger.Warn($"Piece not recognized ({tetrimino})");
         }
-        
+
         private void Success(Piece newPosition, TimeSpan now)
         {
             _logger.Info($"Execution successful ({_lastMove})");

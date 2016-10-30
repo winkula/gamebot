@@ -21,7 +21,7 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
         public Piece ExtractCurrentPiece(IScreenshot screenshot, Tetrimino? tetrimino, int maxFallDistance)
         {
             var foundPiece = _tetrisExtractor.ExtractSpawnedPiece(screenshot, maxFallDistance);
-            if (foundPiece != null && tetrimino.HasValue && foundPiece.Tetrimino == tetrimino.Value)
+            if (foundPiece != null && tetrimino.HasValue && foundPiece.Tetrimino == tetrimino.Value && foundPiece.IsUntouched)
             {
                 return foundPiece;
             }

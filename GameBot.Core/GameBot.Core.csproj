@@ -150,11 +150,11 @@
     <Compile Include="IEngine.cs" />
     <Compile Include="IAgent.cs" />
     <Compile Include="IExecutor.cs" />
-    <Compile Include="ICalibrateableQuantizer.cs" />
     <Compile Include="IQuantizer.cs" />
     <Compile Include="Data\IScreenshot.cs" />
     <Compile Include="IClock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Quantizers\CalibrateableQuantizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

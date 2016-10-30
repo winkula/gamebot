@@ -146,6 +146,7 @@
     <Compile Include="Agents\TetrisAgent.cs" />
     <Compile Include="Data\BoardLookups.cs" />
     <Compile Include="Data\Coordinates.cs" />
+    <Compile Include="Extraction\Extractors\BaseExtractor.cs" />
     <Compile Include="Extraction\Extractors\MorphologyExtractor.cs" />
     <Compile Include="Extraction\Extractors\PieceBasedExtractor.cs" />
     <Compile Include="Extraction\Extractors\BlockBasedExtractor.cs" />

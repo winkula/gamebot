@@ -47,8 +47,7 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
 
             return probabilitySum / numBlocks;
         }
-
-
+        
         public double GetProbabilityNextPiece(IScreenshot screenshot, Tetrimino tetrimino)
         {
             if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
@@ -76,6 +75,32 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
             }
 
             return probabilitySum / numBlocks;
+
+            /*
+            if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
+
+            var dest = MorphologyEx(screenshot);
+
+            int blocks = 0;
+
+            var shape = Shape.Get(tetrimino);
+            foreach (var point in new[] { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0), new Point(-1, -1), new Point(0, -1), new Point(1, -1) })
+            {
+                var coordinates = Coordinates.PieceToTilePreview(point);
+                var isBlock = IsBlock(dest, coordinates);
+                var shouldBeBlock = shape.Body.Contains(point);
+
+                if (!(isBlock ^ shouldBeBlock))
+                {
+                    blocks++;
+                }
+            }
+
+            // 3 blocks out of 7 corresponds to probability 0
+            // 7 out of 7 blocks corresponds to probability 1
+            var normedProbability = (blocks - 3) / 4.0;
+            return normedProbability.Clamp(0.0, 1.0);
+            */
         }
 
         private Image<Gray, byte> MorphologyEx(IScreenshot screenshot)
@@ -105,6 +130,12 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
             image.ROI = new Rectangle(GameBoyConstants.TileSize * tileCoordinates.X, GameBoyConstants.TileSize * tileCoordinates.Y, GameBoyConstants.TileSize, GameBoyConstants.TileSize);
             var mean = CvInvoke.Mean(image);
             return ((255.0 - mean.V0) / 255.0).Clamp(0.0, 1.0);
+        }
+
+        private bool IsBlock(Image<Gray, byte> image, Point tileCoordinates)
+        {
+            var probability = GetBlockProbability(image, tileCoordinates);
+            return probability >= 0.5;
         }
     }
 }

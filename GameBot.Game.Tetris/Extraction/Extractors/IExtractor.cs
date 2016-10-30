@@ -17,6 +17,7 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
 
         /// <summary>
         /// Extracts the current piece from the board. The tetrimino can be provided, if known.
+        /// Only untouched (origin orientation an x coordinate) pieces are accepted.
         /// </summary>
         /// <param name="screenshot">The screenshot.</param>
         /// <param name="tetrimino">The known tetrimino.</param>

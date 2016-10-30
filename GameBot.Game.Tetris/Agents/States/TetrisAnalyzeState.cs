@@ -99,44 +99,37 @@ namespace GameBot.Game.Tetris.Agents.States
             if (_extractedPiece != null) return;
 
             // extract the current piece
-            var result = ExtractCurrentPiece(searchHeight);
+            var screenshot = _agent.Screenshot;
+            var currentPiece = _agent.Extractor.ExtractCurrentPiece(screenshot, _currentTetrimino, searchHeight);
 
-            if (result.IsRejected(_agent.ExtractionLowerThreshold))
+            if (currentPiece == null)
             {
                 // reject (threshold not reached or piece is touched)
-                _logger.Warn($"Reject extracted current piece (probability {result.Probability:F})");
-                _agent.Screenshot.Save(_agent.Quantizer, $"reject_cp_{result.Probability:F}");
+                _logger.Warn("Reject extracted current piece");
+                _agent.Screenshot.Save(_agent.Quantizer, "reject_cp");
                 return;
             }
-            if (!result.Result.IsUntouched)
+            if (!currentPiece.IsUntouched)
             {
                 // reject (threshold not reached or piece is touched)
-                _logger.Warn($"Reject extracted current piece: not untouched ({result.Result.Tetrimino}, probability {result.Probability:F})");
-                _agent.Screenshot.Save(_agent.Quantizer, $"reject_cp_{result.Probability:F}");
-                return;
-            }
-            if (result.IsAccepted(_agent.ExtractionUpperThreshold))
-            {
-                // accept immediately
-                _logger.Info($"Accept extracted current piece immediately ({result.Result.Tetrimino}, probability {result.Probability:F})");
-                _agent.Screenshot.Save(_agent.Quantizer, $"accept_cp_{result.Probability:F}");
-                AcceptCurrentPiece(result.Result);
+                _logger.Warn($"Reject extracted current piece: not untouched ({currentPiece.Tetrimino})");
+                _agent.Screenshot.Save(_agent.Quantizer, "reject_cp");
                 return;
             }
 
             // add sample
-            _logger.Info($"Added sample for extracted current piece ({result.Result.Tetrimino}, probability {result.Probability:F})");
-            _currentPieceSampler.Sample(result);
-            _agent.Screenshot.Save(_agent.Quantizer, $"sample_cp_{result.Probability:F}");
+            _logger.Info($"Added sample for extracted current piece ({currentPiece.Tetrimino})");
+            _currentPieceSampler.Sample(new ProbabilisticResult<Piece>(currentPiece));
+            _agent.Screenshot.Save(_agent.Quantizer, "sample_cp");
             
             if (_currentPieceSampler.IsComplete)
             {
                 // we have enought samples
                 // evaluate our "true" result
-                var piece = _currentPieceSampler.Result;
+                var acceptedCurrentPiece = _currentPieceSampler.Result;
 
-                _logger.Info($"Accept extracted current piece by sampling ({result.Result.Tetrimino})");
-                AcceptCurrentPiece(piece);
+                _logger.Info($"Accept extracted current piece by sampling ({currentPiece.Tetrimino})");
+                AcceptCurrentPiece(acceptedCurrentPiece);
             }
         }
 
@@ -153,37 +146,30 @@ namespace GameBot.Game.Tetris.Agents.States
             if (_extractedNextPiece != null) return;
 
             // extract the next piece
-            var result = ExtractNextPiece();
+            var screenshot = _agent.Screenshot;
+            var nextPiece = _agent.Extractor.ExtractNextPiece(screenshot);
 
-            if (result.IsRejected(_agent.ExtractionLowerThreshold))
+            if (!nextPiece.HasValue)
             {
                 // reject (threshold not reached or piece is touched)
-                _logger.Warn($"Reject extracted next piece (probability {result.Probability:F}, threshold {_agent.ExtractionLowerThreshold:F})");
-                _agent.Screenshot.Save(_agent.Quantizer, $"reject_np_{result.Probability:F}");
-                return;
-            }
-            if (result.IsAccepted(_agent.ExtractionUpperThreshold)) // TODO: make different threshold here
-            {
-                // accept immediately
-                _logger.Info($"Accept extracted next piece immediately ({result.Result}, probability {result.Probability:F})");
-                _agent.Screenshot.Save(_agent.Quantizer, $"accept_np_{result.Probability:F}");
-                AcceptNextPiece(result.Result);
+                _logger.Warn("Reject extracted next piece");
+                _agent.Screenshot.Save(_agent.Quantizer, "reject_np");
                 return;
             }
 
             // add sample
-            _logger.Info($"Added sample for extracted next piece ({result.Result}, probability {result.Probability:F})");
-            _nextPieceSampler.Sample(result);
-            _agent.Screenshot.Save(_agent.Quantizer, $"sample_np_{result.Probability:F}");
+            _logger.Info($"Added sample for extracted next piece ({nextPiece})");
+            _nextPieceSampler.Sample(new ProbabilisticResult<Tetrimino>(nextPiece.Value));
+            _agent.Screenshot.Save(_agent.Quantizer, "sample_np");
 
             if (_nextPieceSampler.IsComplete)
             {
                 // we have enought samples
                 // evaluate our "true" result
-                var nextPiece = _nextPieceSampler.Result;
+                var acceptedNextPiece = _nextPieceSampler.Result;
                 
-                _logger.Info($"Accept extracted next piece by sampling ({result.Result})");
-                AcceptNextPiece(nextPiece);
+                _logger.Info($"Accept extracted next piece by sampling ({acceptedNextPiece})");
+                AcceptNextPiece(acceptedNextPiece);
             }
         }
         
@@ -192,30 +178,7 @@ namespace GameBot.Game.Tetris.Agents.States
             _extractedNextPiece = nextPiece;
             _agent.ExtractedNextPiece = _extractedNextPiece;
         }
-
-        private ProbabilisticResult<Piece> ExtractCurrentPiece(int searchHeight)
-        {
-            var screenshot = _agent.Screenshot;
-
-            if (_currentTetrimino.HasValue)
-            {
-                // we know which tetrimino to look for
-                // this gives us valuable information and we can validate our results
-                return _agent.PieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(_currentTetrimino.Value), searchHeight);
-            }
-
-            // this case only happens once (in the beginning of a new game)
-            // we have to test every possible tetrimino and take the most probable
-            return _agent.PieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, searchHeight);
-        }
-
-        private ProbabilisticResult<Tetrimino> ExtractNextPiece()
-        {
-            var screenshot = _agent.Screenshot;
-
-            return _agent.PieceExtractor.ExtractNextPieceFuzzy(screenshot);
-        }
-
+        
         private void UpdateGlobalGameState()
         {
             _agent.GameState.Piece = _extractedPiece;

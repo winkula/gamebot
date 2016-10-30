@@ -25,7 +25,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ExtractPieceSpawnedFuzzy1()
         {
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, 3);
 
@@ -36,7 +36,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ExtractPieceSpawnedFuzzy2()
         {
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, 5);
 
@@ -52,7 +52,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ExtractPieceFuzzy()
         {
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var result = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, new Piece(Tetrimino.Z, 0, 0, -6), 0);
 
@@ -75,7 +75,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ExtractNextPiece()
         {
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var nextPiece = _pieceExtractor.ExtractNextPiece(screenshot);
 
@@ -85,7 +85,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ExtractNextPieceInvalid()
         {
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             Assert.Throws<ApplicationException>(() =>
             {
@@ -96,7 +96,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ExtractNextPieceFuzzy()
         {
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot);
 
@@ -108,7 +108,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [TestCase("Screenshots/fail00.png", Tetrimino.J)]
         public void ExtractNextPieceFuzzyFailCandidates(string path, Tetrimino expected)
         {
-            var screenshot = new EmguScreenshot(path, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot(path, DateTime.Now.Subtract(DateTime.MinValue));
 
             var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot);
             

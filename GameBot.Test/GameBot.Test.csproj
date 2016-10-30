@@ -158,7 +158,7 @@
     <Compile Include="Game\Tetris\Extraction\Samplers\MoveConfirmationSamplerTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Samplers\NextTetriminoSamplerTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Samplers\CurrentTetriminoSamplerTests.cs" />
-    <Compile Include="Game\Tetris\Extraction\StatisticalPieceMatcherTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\StatisticalMatcherTests.cs" />
     <Compile Include="Game\Tetris\Extraction\StatisticalPieceExtractorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Matchers\TemplateMatcherTests.cs" />
     <Compile Include="Game\Tetris\Extraction\StatisticalTetrisExtractorTests.cs" />

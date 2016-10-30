@@ -1,6 +1,7 @@
 ﻿using GameBot.Core;
 using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Extraction;
+using GameBot.Game.Tetris.Extraction.Extractors;
 using GameBot.Game.Tetris.Extraction.Matchers;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Searching.Heuristics;
@@ -15,6 +16,7 @@ namespace GameBot.Game.Tetris
         {
             container.RegisterSingleton<IAgent, TetrisAgent>();
 
+            container.RegisterSingleton<IExtractor, MorphologyExtractor>();
             //container.RegisterSingleton<ISearch, SimpleSearch>();
             container.RegisterSingleton<ISearch, PredictiveSearch>();
             container.RegisterSingleton<IHeuristic, YiyuanLeeHeuristic>();

@@ -1,4 +1,6 @@
-﻿using Emgu.CV;
+﻿using System.Collections.Generic;
+using System.Drawing;
+using Emgu.CV;
 
 namespace GameBot.Core
 {
@@ -7,6 +9,11 @@ namespace GameBot.Core
     /// </summary>
     public interface IQuantizer
     {
+        /// <summary>
+        /// Gets or sets the four keypoints of the the perspective transform.
+        /// </summary>
+        IEnumerable<Point> Keypoints { get; set; }
+
         /// <summary>
         /// Quantizes a noisy image or photo of the device's display.
         /// </summary>

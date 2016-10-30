@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using Emgu.CV;
 using GameBot.Core;
 using GameBot.Core.Configuration;
@@ -19,103 +18,133 @@ namespace GameBot.Test.Game.Tetris.Extraction
     [TestFixture]
     public class ExtractionComparisonTests
     {
-        private static readonly Logger _loggerResults = LogManager.GetLogger("Tests");
+        private static readonly Logger _loggerComparison = LogManager.GetLogger("ExtractionComparison");
+        private static readonly Logger _loggerDetails = LogManager.GetLogger("ExtractionDetails");
         private static readonly Logger _loggerFails = LogManager.GetLogger("Fails");
 
+        private const int _multiplySamplesBy = 10;
+
+        private IConfig _config;
         private Random _random;
         private Quantizer _quantizer1;
 
         [TestFixtureSetUp]
         public void Init()
         {
+            _config = new AppSettingsConfig();
             _random = new Random(123);
-            _quantizer1 = new Quantizer(new AppSettingsConfig());
+            _quantizer1 = new Quantizer(_config);
         }
 
         [Test]
         public void Compare()
         {
-            var extractors = new IExtractor[] { new BlockBasedExtractor(), new PieceBasedExtractor(), new MorphologyExtractor() };
-            var quantizers = new ICalibrateableQuantizer[] { _quantizer1 };
-            var shifts = new[] { 0.0, 1.0, 2.0, 3.0, 4.0, 8.0, 16.0 };
-
-            var sb = new StringBuilder();
-            sb.AppendLine("Quantizer;Extractor;Method;Shift;Total;Positive;Accuracy");
-
+            var extractors = new IExtractor[] {/* new BlockBasedExtractor(),*//* new PieceBasedExtractor(),*/ new MorphologyExtractor(_config) };
+            var quantizers = new IQuantizer[] { _quantizer1 };
+            var shifts = new[] { 0, 1, 2, 3, 4, 8, 16 };
+            
+            var results = new List<ExtractionComparisonResult>();
             foreach (var quantizer in quantizers)
             {
                 foreach (var extractor in extractors)
                 {
                     foreach (var shift in shifts)
                     {
-                        var input = new ExtractionComparisonInput(extractor, quantizer);
+                        var input = new ExtractionComparisonInput(extractor, quantizer, shift);
 
                         // run tests...
-                        var results1 = RecognizeNextPiece(input, shift);
-                        sb.AppendLine($"{quantizer.GetType().Name};{extractor.GetType().Name};RecognizeNextPiece;{shift:F};{results1.Total};{results1.Recognized};{100.0 * results1.Recognized / results1.Total:F}");
-
-                        var results2 = RecognizeCurrentPieceUnknown(input, shift);
-                        sb.AppendLine($"{quantizer.GetType().Name};{extractor.GetType().Name};RecognizeCurrentPieceUnknown;{shift:F};{results2.Total};{results2.Recognized};{100.0 * results2.Recognized / results2.Total:F}");
-
-                        var results3 = RecognizeCurrentPieceKnown(input, shift);
-                        sb.AppendLine($"{quantizer.GetType().Name};{extractor.GetType().Name};RecognizeCurrentPieceKnown;{shift:F};{results3.Total};{results3.Recognized};{100.0 * results3.Recognized / results3.Total:F}");
-
-                        var results4 = RecognizeMove(input, shift);
-                        sb.AppendLine($"{quantizer.GetType().Name};{extractor.GetType().Name};RecognizeMove;{shift:F};{results4.Total};{results4.Recognized};{100.0 * results4.Recognized / results4.Total:F}");
+                        AddResults(results, RecognizeNextPiece(input));
+                        AddResults(results, RecognizeCurrentPieceUnknown(input));
+                        AddResults(results, RecognizeCurrentPieceKnown(input));
+                        AddResults(results, RecognizeMove(input));
                     }
                 }
             }
 
-            _loggerResults.Info(sb.ToString());
+            if (extractors.Length > 1)
+            {
+                _loggerComparison.Info("Shift;BlockBasedExtractor;PieceBasedExtractor;MorphologyExtractor");
+                foreach (var grouping in results.GroupBy(x => x.Shift).ToList())
+                {
+                    _loggerComparison.Info($"{grouping.Key};" +
+                                           $"{grouping.Where(x => x.ExtractorName == "BlockBasedExtractor").Select(x => x.Accuracy).Average():F};" +
+                                           $"{grouping.Where(x => x.ExtractorName == "PieceBasedExtractor").Select(x => x.Accuracy).Average():F};" +
+                                           $"{grouping.Where(x => x.ExtractorName == "MorphologyExtractor").Select(x => x.Accuracy).Average():F}");
+                }
+            }
+            if (extractors.Length == 1)
+            {
+                _loggerDetails.Info("Shift;RecognizeNextPiece;RecognizeCurrentPieceUnknown;RecognizeCurrentPieceKnown;RecognizeMove");
+                foreach (var grouping in results.GroupBy(x => x.Shift).ToList())
+                {
+                    _loggerDetails.Info($"{grouping.Key};" +
+                                        $"{grouping.Where(x => x.MethodName == "RecognizeNextPiece").Select(x => x.Accuracy).Average():F};" +
+                                        $"{grouping.Where(x => x.MethodName == "RecognizeCurrentPieceUnknown").Select(x => x.Accuracy).Average():F};" +
+                                        $"{grouping.Where(x => x.MethodName == "RecognizeCurrentPieceKnown").Select(x => x.Accuracy).Average():F};" +
+                                        $"{grouping.Where(x => x.MethodName == "RecognizeMove").Select(x => x.Accuracy).Average():F}");
+                }
+            }
         }
 
-        private ExtractionComparisonResults RecognizeNextPiece(ExtractionComparisonInput input, double shift)
+        private void AddResults(IList<ExtractionComparisonResult> results, ExtractionComparisonResult result)
         {
-            var results = new ExtractionComparisonResults();
+            result.Calculate();
+            results.Add(result);
+        }
+
+        private ExtractionComparisonResult RecognizeNextPiece(ExtractionComparisonInput input)
+        {
+            var results = new ExtractionComparisonResult(input, nameof(RecognizeNextPiece));
 
             var tests = ImageTestCaseFactory.Data
                 .Where(x => x.NextPiece.HasValue)
                 .ToList();
 
-            foreach (var test in tests)
+            for (int i = 0; i < _multiplySamplesBy; i++)
             {
-                var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, shift);
-
-                var nextPiece = input.Extractor.ExtractNextPiece(screenshot);
-
-                results.Total++;
-                if (test.NextPiece == nextPiece)
+                foreach (var test in tests)
                 {
-                    results.Recognized++;
-                }
-                else
-                {
-                    _loggerFails.Warn($"RecognizeNextPiece. Recognized: {nextPiece}, Real: {test.NextPiece}. Testcase {test.ImageKey}. Shift {shift:F}");
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+
+                    var nextPiece = input.Extractor.ExtractNextPiece(screenshot);
+
+                    results.Total++;
+                    if (test.NextPiece == nextPiece)
+                    {
+                        results.Recognized++;
+                    }
+                    else
+                    {
+                        _loggerFails.Warn($"RecognizeNextPiece. Recognized: {nextPiece}, Real: {test.NextPiece}. Testcase {test.ImageKey}. Input {input}");
+                    }
                 }
             }
 
             return results;
         }
 
-        private ExtractionComparisonResults RecognizeCurrentPieceUnknown(ExtractionComparisonInput input, double shift)
+        private ExtractionComparisonResult RecognizeCurrentPieceUnknown(ExtractionComparisonInput input)
         {
-            var results = new ExtractionComparisonResults();
+            var results = new ExtractionComparisonResult(input, nameof(RecognizeCurrentPieceUnknown));
 
             var positiveTests = ImageTestCaseFactory.Data
                 .Where(x => x.Piece != null)
                 .Where(x => x.Piece.IsUntouched)
                 .ToList();
 
-            foreach (var test in positiveTests)
+            for (int i = 0; i < _multiplySamplesBy; i++)
             {
-                var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, shift);
-
-                var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, test.Piece.FallHeight);
-
-                results.Total++;
-                if (currentPiece != null && currentPiece.Tetrimino == test.Piece.Tetrimino)
+                foreach (var test in positiveTests)
                 {
-                    results.Recognized++;
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+
+                    var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, test.Piece.FallHeight);
+
+                    results.Total++;
+                    if (currentPiece != null && currentPiece.Tetrimino == test.Piece.Tetrimino)
+                    {
+                        results.Recognized++;
+                    }
                 }
             }
 
@@ -126,49 +155,56 @@ namespace GameBot.Test.Game.Tetris.Extraction
                     (!x.Piece.IsUntouched && x.Piece.FallHeight >= 3))
                 .ToList();
 
-            foreach (var test in negativeTests)
+            for (int i = 0; i < _multiplySamplesBy; i++)
             {
-                var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, shift);
-
-                var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, 0);
-
-                results.Total++;
-                if (currentPiece == null)
+                foreach (var test in negativeTests)
                 {
-                    results.Recognized++;
-                }
-                else
-                {
-                    _loggerFails.Warn($"RecognizeCurrentPieceUnknown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Shift {shift:F}");
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+
+                    var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, 0);
+
+                    results.Total++;
+                    if (currentPiece == null)
+                    {
+                        results.Recognized++;
+                    }
+                    else
+                    {
+                        _loggerFails.Warn($"RecognizeCurrentPieceUnknown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Input {input}");
+                    }
                 }
             }
 
             return results;
         }
 
-        private ExtractionComparisonResults RecognizeCurrentPieceKnown(ExtractionComparisonInput input, double shift)
+        private ExtractionComparisonResult RecognizeCurrentPieceKnown(ExtractionComparisonInput input)
         {
-            var results = new ExtractionComparisonResults();
+            var results = new ExtractionComparisonResult(input, nameof(RecognizeCurrentPieceKnown));
 
             var tests = ImageTestCaseFactory.Data
                 .Where(x => x.Piece != null)
                 .Where(x => x.Piece.IsUntouched)
                 .ToList();
 
-            foreach (var test in tests)
+            for (int i = 0; i < _multiplySamplesBy; i++)
             {
-                var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, shift);
-
-                var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, test.Piece.Tetrimino, test.Piece.FallHeight);
-
-                results.Total++;
-                if (currentPiece != null && currentPiece.Tetrimino == test.Piece.Tetrimino)
+                foreach (var test in tests)
                 {
-                    results.Recognized++;
-                }
-                else
-                {
-                    _loggerFails.Warn($"RecognizeCurrentPieceKnown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Shift {shift:F}");
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+
+                    var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, test.Piece.Tetrimino,
+                        test.Piece.FallHeight);
+
+                    results.Total++;
+                    if (currentPiece != null && currentPiece.Tetrimino == test.Piece.Tetrimino)
+                    {
+                        results.Recognized++;
+                    }
+                    else
+                    {
+                        _loggerFails.Warn($"RecognizeCurrentPieceKnown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Input {input}");
+                    }
                 }
             }
 
@@ -179,56 +215,63 @@ namespace GameBot.Test.Game.Tetris.Extraction
                     (!x.Piece.IsUntouched && x.Piece.FallHeight >= 3))
                 .ToList();
 
-            foreach (var test in negativeTests)
+            for (int i = 0; i < _multiplySamplesBy; i++)
             {
-                var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, shift);
-
-                var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, 0);
-
-                results.Total++;
-                if (currentPiece == null)
+                foreach (var test in negativeTests)
                 {
-                    results.Recognized++;
-                }
-                else
-                {
-                    _loggerFails.Warn($"RecognizeCurrentPieceKnown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Shift {shift:F}");
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+
+                    var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, 0);
+
+                    results.Total++;
+                    if (currentPiece == null)
+                    {
+                        results.Recognized++;
+                    }
+                    else
+                    {
+                        _loggerFails.Warn($"RecognizeCurrentPieceKnown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Input {input}");
+                    }
                 }
             }
 
             return results;
         }
 
-        private ExtractionComparisonResults RecognizeMove(ExtractionComparisonInput input, double shift)
+        private ExtractionComparisonResult RecognizeMove(ExtractionComparisonInput input)
         {
-            var results = new ExtractionComparisonResults();
+            var results = new ExtractionComparisonResult(input, nameof(RecognizeMove));
 
             var tests = ImageTestCaseFactory.Data
                 .Where(x => x.Piece != null)
                 .ToList();
 
-            foreach (var test in tests)
+            for (int i = 0; i < _multiplySamplesBy; i++)
             {
-                var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, shift);
-
-                var move = GetValidMove(test);
-                if (!move.HasValue) continue;
-
-                bool moved;
-                var pieceOriginNotMoved = new Piece(test.Piece.Tetrimino, test.Piece.Orientation, test.Piece.X);
-                var pieceOriginMoved = new Piece(pieceOriginNotMoved).Apply(move.Value);
-                var recognizedPiece = input.Extractor.ExtractMovedPiece(screenshot, pieceOriginNotMoved, move.Value, test.Piece.FallHeight, out moved);
-
-                if (pieceOriginMoved.Equals(pieceOriginNotMoved)) throw new Exception("pieces must be different!");
-
-                results.Total++;
-                if (recognizedPiece != null && recognizedPiece.Equals(test.Piece) && !moved)
+                foreach (var test in tests)
                 {
-                    results.Recognized++;
-                }
-                else
-                {
-                    _loggerFails.Warn($"RecognizeMove. Recognized: {recognizedPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Shift {shift:F}");
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+
+                    var move = GetValidMove(test);
+                    if (!move.HasValue) continue;
+
+                    bool moved;
+                    var pieceOriginNotMoved = new Piece(test.Piece.Tetrimino, test.Piece.Orientation, test.Piece.X);
+                    var pieceOriginMoved = new Piece(pieceOriginNotMoved).Apply(move.Value);
+                    var recognizedPiece = input.Extractor.ExtractMovedPiece(screenshot, pieceOriginNotMoved, move.Value,
+                        test.Piece.FallHeight, out moved);
+
+                    if (pieceOriginMoved.Equals(pieceOriginNotMoved)) throw new Exception("pieces must be different!");
+
+                    results.Total++;
+                    if (recognizedPiece != null && recognizedPiece.Equals(test.Piece) && !moved)
+                    {
+                        results.Recognized++;
+                    }
+                    else
+                    {
+                        _loggerFails.Warn($"RecognizeMove. Recognized: {recognizedPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Input {input}");
+                    }
                 }
             }
 
@@ -237,8 +280,8 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
         private Move? GetValidMove(ImageTestCaseFactory.TestData test)
         {
-            var validMoves = (test.Piece.Tetrimino == Tetrimino.O ? 
-                new[] { Move.Left, Move.Right } : 
+            var validMoves = (test.Piece.Tetrimino == Tetrimino.O ?
+                new[] { Move.Left, Move.Right } :
                 new[] { Move.Left, Move.Right, Move.Rotate, Move.RotateCounterclockwise })
             .OrderBy(x => Guid.NewGuid())
             .ToArray();
@@ -275,13 +318,13 @@ namespace GameBot.Test.Game.Tetris.Extraction
             return null;
         }
 
-        private IScreenshot GetScreenshot(ICalibrateableQuantizer quantizer, IImage image, Point[] keypoints, double shift)
+        private IScreenshot GetScreenshot(IQuantizer quantizer, IImage image, Point[] keypoints, double shift)
         {
             var shiftedKeypoints = ShiftKeypoints(keypoints, shift);
-            quantizer.Calibrate(shiftedKeypoints);
+            quantizer.Keypoints = shiftedKeypoints;
 
             var quantized = quantizer.Quantize(image);
-            var screenshot = new EmguScreenshot(quantized, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot(quantized, DateTime.Now.Subtract(DateTime.MinValue));
 
             return screenshot;
         }
@@ -305,18 +348,44 @@ namespace GameBot.Test.Game.Tetris.Extraction
     public class ExtractionComparisonInput
     {
         public IExtractor Extractor { get; }
-        public ICalibrateableQuantizer Quantizer { get; }
+        public IQuantizer Quantizer { get; }
+        public int Shift { get; }
 
-        public ExtractionComparisonInput(IExtractor extractor, ICalibrateableQuantizer quantizer)
+        public ExtractionComparisonInput(IExtractor extractor, IQuantizer quantizer, int shift)
         {
             Extractor = extractor;
             Quantizer = quantizer;
+            Shift = shift;
+        }
+
+        public override string ToString()
+        {
+            return $"{{ Shift: {Shift} }}";
         }
     }
 
-    public class ExtractionComparisonResults
+    public class ExtractionComparisonResult
     {
+        public string MethodName { get; }
+        public string ExtractorName { get; }
+        public string QuantizerName { get; }
+        public int Shift { get; }
+
         public int Total { get; set; }
         public int Recognized { get; set; }
+        public double Accuracy { get; private set; }
+
+        public ExtractionComparisonResult(ExtractionComparisonInput input, string methodName)
+        {
+            MethodName = methodName;
+            ExtractorName = input.Extractor.GetType().Name;
+            QuantizerName = input.Quantizer.GetType().Name;
+            Shift = input.Shift;
+        }
+
+        public void Calculate()
+        {
+            Accuracy = (double)Recognized / Total;
+        }
     }
 }

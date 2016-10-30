@@ -1,4 +1,5 @@
-﻿using Emgu.CV;
+﻿using System.Collections.Generic;
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core;
 using NLog;
@@ -15,6 +16,8 @@ namespace GameBot.Engine.Physical.Quantizers
         private int _threshold = 50;
         private readonly float[,] _keypoints = new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } };
 
+        public IEnumerable<Point> Keypoints { get; set; }
+
         public ThresholdQuantizer()
         {
         }
@@ -25,7 +28,7 @@ namespace GameBot.Engine.Physical.Quantizers
             _keypoints = keypoints;
             _threshold = threshold;
         }
-        
+
         public IImage Quantize(IImage image)
         {
             var stopwatch = new Stopwatch();

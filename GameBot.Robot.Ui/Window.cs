@@ -26,7 +26,7 @@ namespace GameBot.Robot.Ui
         private readonly IEngine _engine;
         private readonly ICamera _camera;
         private readonly IActuator _actuator;
-        private readonly ICalibrateableQuantizer _quantizer;
+        private readonly IQuantizer _quantizer;
 
         private const int _maxKeypointCount = 4;
         private readonly List<Point> _keypoints = new List<Point>();
@@ -38,7 +38,7 @@ namespace GameBot.Robot.Ui
             _engine = engine;
             _camera = camera;
             _actuator = actuator;
-            _quantizer = quantizer as ICalibrateableQuantizer;
+            _quantizer = quantizer;
             if (quantizer == null)
             {
                 _logger.Warn("Quantizer is not calibrateable");
@@ -176,9 +176,9 @@ namespace GameBot.Robot.Ui
             {
                 _keypointsApplied = _keypoints.Take(_maxKeypointCount).ToList();
 
-                var keypointsList = new int[] { _keypointsApplied[0].X, _keypointsApplied[0].Y, _keypointsApplied[1].X, _keypointsApplied[1].Y, _keypointsApplied[2].X, _keypointsApplied[2].Y, _keypointsApplied[3].X, _keypointsApplied[3].Y };
+                var keypointsList = new [] { _keypointsApplied[0].X, _keypointsApplied[0].Y, _keypointsApplied[1].X, _keypointsApplied[1].Y, _keypointsApplied[2].X, _keypointsApplied[2].Y, _keypointsApplied[3].X, _keypointsApplied[3].Y };
 
-                _quantizer.Calibrate(_keypointsApplied);
+                _quantizer.Keypoints = _keypointsApplied;
                 _keypoints.Clear();
                 _logger.Info($"Applied keypoints {string.Join(",", keypointsList)}");
             }

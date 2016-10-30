@@ -9,6 +9,7 @@ using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Agents.States;
+using GameBot.Game.Tetris.Extraction.Extractors;
 
 namespace GameBot.Game.Tetris.Agents
 {
@@ -26,7 +27,7 @@ namespace GameBot.Game.Tetris.Agents
         public IQuantizer Quantizer { get; private set; }
         public IExecutor Executor { get; private set; }
         public IScreenshot Screenshot { get; private set; }
-        public PieceExtractor PieceExtractor { get; private set; }
+        public IExtractor Extractor { get; private set; }
         public ISearch Search { get; private set; }
 
         // data used by states
@@ -44,13 +45,13 @@ namespace GameBot.Game.Tetris.Agents
         public Piece ExpectedPiece { private get; set; }
         public Tetrimino? ExtractedNextPiece { private get; set; }
 
-        public TetrisAgent(IConfig config, IQuantizer quantizer, PieceExtractor pieceExtractor, ISearch search)
+        public TetrisAgent(IConfig config, IQuantizer quantizer, IExtractor extractor, ISearch search)
         {
             _visualize = config.Read("Game.Tetris.Visualize", false);
 
             Config = config;
             Quantizer = quantizer;
-            PieceExtractor = pieceExtractor;
+            Extractor = extractor;
             Search = search;
 
             CheckSamples = Config.Read("Game.Tetris.Check.Samples", 1);

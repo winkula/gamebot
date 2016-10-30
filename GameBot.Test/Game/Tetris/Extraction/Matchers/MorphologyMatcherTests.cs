@@ -23,7 +23,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         public void NextPieceProbabilityOne()
         {
             var tetrimino = Tetrimino.L;
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
             var probability = _matcher.GetProbabilityNextPiece(screenshot, tetrimino);
 
@@ -34,7 +34,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         public void NextPieceProbabilityNotOne()
         {
             var tetrimino = Tetrimino.O;
-            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
+            var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
             
             var probability = _matcher.GetProbabilityNextPiece(screenshot, tetrimino);
 
@@ -46,7 +46,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         public void NextPieceProbabilityZero()
         {
             var image = new Mat("Screenshots/white.png", LoadImageType.Grayscale);
-            var screenshot = new EmguScreenshot(image, TimeSpan.Zero);
+            var screenshot = new EmguScreenshot(image, DateTime.Now.Subtract(DateTime.MinValue));
 
             foreach (var tetrimino in Tetriminos.All)
             {

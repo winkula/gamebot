@@ -5,10 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using GameBot.Core.Quantizers;
 
 namespace GameBot.Engine.Physical.Quantizers
 {
-    public class Quantizer : BaseCalibrateableQuantizer
+    public class Quantizer : CalibrateableQuantizer
     {
         public int ThresholdConstant { get; set; }
         public int ThresholdBlockSize { get; set; }
@@ -36,7 +37,7 @@ namespace GameBot.Engine.Physical.Quantizers
             _thresholdType = config.Read("Robot.Quantizer.Threshold.ThresholdType", ThresholdType.Binary);
 
             // precalculate transformation matrix
-            Calibrate(new List<Point> { new Point(keypoints[0], keypoints[1]), new Point(keypoints[2], keypoints[3]), new Point(keypoints[4], keypoints[5]), new Point(keypoints[6], keypoints[7]) });
+            Keypoints = new List<Point> { new Point(keypoints[0], keypoints[1]), new Point(keypoints[2], keypoints[3]), new Point(keypoints[4], keypoints[5]), new Point(keypoints[6], keypoints[7]) };
         }
 
         public override IImage Quantize(IImage image)

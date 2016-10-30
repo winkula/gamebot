@@ -1,75 +1,42 @@
-﻿using GameBot.Core.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using GameBot.Core;
+using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
 
 namespace GameBot.Game.Tetris.Extraction.Extractors
 {
-    public class MorphologyExtractor : IExtractor
+    public class MorphologyExtractor : BaseExtractor
     {
-        private const double _thresholdNextPiece = 0.2;
-        private const double _thresholdCurrentPiece = 0.5;
-        private const double _thresholdMovedPiece = 0.5;
-
-        private readonly PieceExtractorBase _pieceExtractor;
-
-        public MorphologyExtractor()
+        public MorphologyExtractor(IConfig config) : base(config, new MorphologyMatcher())
         {
-            var matcher = new MorphologyMatcher();
-            _pieceExtractor = new PieceExtractorBase(matcher);
-        }
-        
-        public Tetrimino? ExtractNextPiece(IScreenshot screenshot)
-        {
-            var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot);
-            if (result.IsAccepted(_thresholdNextPiece))
-            {
-                return result.Result;
-            }
-
-            return null;
         }
 
-        public Piece ExtractCurrentPiece(IScreenshot screenshot, Tetrimino? tetrimino, int maxFallDistance)
+        /*
+        public override Tetrimino? ExtractNextPiece(IScreenshot screenshot)
         {
-            if (tetrimino.HasValue)
+            Tetrimino? candidate = null;
+            int candidates = 0;
+
+            foreach (var tetrimino in Tetriminos.All)
             {
-                var piece = new Piece(tetrimino.Value);
-                var resultKnown = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, piece, maxFallDistance);
-                if (resultKnown.IsAccepted(_thresholdCurrentPiece))
+                var probability = Matcher.GetProbabilityNextPiece(screenshot, tetrimino);
+                if (probability > ThresholdNextPiece)
                 {
-                    return resultKnown.Result;
+                    candidate = tetrimino;
+                    candidates++;
                 }
             }
-            
-            var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, maxFallDistance);
-            if (result.IsAccepted(_thresholdCurrentPiece))
+
+            if (candidates == 1)
             {
-                return result.Result;
+                // we only allow one candidate
+                return candidate;
             }
 
             return null;
         }
-
-        public Piece ExtractMovedPiece(IScreenshot screenshot, Piece piece, Move move, int maxFallDistance, out bool moved)
-        {
-            var pieceMoved = new Piece(piece).Apply(move);
-
-            var resultNotMoved = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, piece, maxFallDistance);
-            var resultMoved = _pieceExtractor.ExtractKnownPieceFuzzy(screenshot, pieceMoved, maxFallDistance);
-
-            if (resultMoved.IsAccepted(_thresholdMovedPiece) && resultMoved.Probability >= resultNotMoved.Probability)
-            {
-                moved = true;
-                return resultMoved.Result;
-            }
-            if (resultNotMoved.IsAccepted(_thresholdMovedPiece) && resultNotMoved.Probability > resultMoved.Probability)
-            {
-                moved = false;
-                return resultNotMoved.Result;
-            }
-
-            moved = false;
-            return null;
-        }
+        */
     }
 }
