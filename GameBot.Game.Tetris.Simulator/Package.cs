@@ -1,6 +1,5 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Configuration;
-using GameBot.Game.Tetris;
 using GameBot.Game.Tetris.Simulator;
 using SimpleInjector;
 using SimpleInjector.Packaging;

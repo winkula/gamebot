@@ -146,14 +146,18 @@
     <Compile Include="Agents\TetrisAgent.cs" />
     <Compile Include="Data\BoardLookups.cs" />
     <Compile Include="Data\Coordinates.cs" />
+    <Compile Include="Extraction\Extractors\MorphologyExtractor.cs" />
     <Compile Include="Extraction\Extractors\PieceBasedExtractor.cs" />
     <Compile Include="Extraction\Extractors\BlockBasedExtractor.cs" />
     <Compile Include="Extraction\Extractors\IExtractor.cs" />
+    <Compile Include="Extraction\Matchers\IMatcher.cs" />
+    <Compile Include="Extraction\Matchers\MorphologyMatcher.cs" />
+    <Compile Include="Extraction\PieceExtractorBase.cs" />
     <Compile Include="Extraction\Samplers\ISampler.cs" />
     <Compile Include="Extraction\Samplers\MoveConfirmationSampler.cs" />
     <Compile Include="Extraction\Samplers\NextTetriminoSampler.cs" />
     <Compile Include="Extraction\Samplers\CurrentTetriminoSampler.cs" />
-    <Compile Include="Extraction\PieceMatcher.cs" />
+    <Compile Include="Extraction\Matchers\TemplateMatcher.cs" />
     <Compile Include="Extraction\ProbabilisticResult.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

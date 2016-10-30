@@ -1,7 +1,7 @@
 ﻿using GameBot.Core.Data;
 using GameBot.Game.Tetris;
 using GameBot.Game.Tetris.Data;
-using GameBot.Game.Tetris.Extraction;
+using GameBot.Game.Tetris.Extraction.Matchers;
 using NLog;
 using NUnit.Framework;
 
@@ -22,19 +22,19 @@ namespace GameBot.Test.Game.Tetris.Extraction
         // 0.7 seems to be good, when we use binarized templates
         private const double _probabilityThreshold = 0.7;
 
-        private PieceMatcher _pieceMatcher;
+        private TemplateMatcher _templateMatcher;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            _pieceMatcher = new PieceMatcher();
+            _templateMatcher = new TemplateMatcher();
         }
 
         [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesCurrentPiecePositives))]
         public void PieceMatchingCurrentPiece(string imageKey, IScreenshot screenshot, Piece currentPieceExpected)
         {
             _currentPiecesTotal++;
-            var probabilityCurrentPiece = _pieceMatcher.GetProbability(screenshot, currentPieceExpected);
+            var probabilityCurrentPiece = _templateMatcher.GetProbability(screenshot, currentPieceExpected);
             _logger.Info($"Probability: {probabilityCurrentPiece * 100.0:F}");
 
             var currentPieceFound = probabilityCurrentPiece >= _probabilityThreshold;
@@ -47,7 +47,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         public void PieceMatchingNextPiecePositives(string imageKey, IScreenshot screenshot, Tetrimino nextPieceExpected)
         {
             _nextPiecesTotal++;
-            var probabilityNextPiece = _pieceMatcher.GetProbability(screenshot, new Piece(nextPieceExpected, 0, TetrisConstants.NextPieceTemplateTileCoordinates.X, TetrisConstants.NextPieceTemplateTileCoordinates.Y));
+            var probabilityNextPiece = _templateMatcher.GetProbability(screenshot, new Piece(nextPieceExpected, 0, TetrisConstants.NextPieceTemplateTileCoordinates.X, TetrisConstants.NextPieceTemplateTileCoordinates.Y));
             _logger.Info($"Probability: {probabilityNextPiece * 100.0:F}");
 
             var nextPieceFound = probabilityNextPiece >= _probabilityThreshold;

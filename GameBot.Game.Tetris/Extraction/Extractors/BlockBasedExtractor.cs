@@ -1,5 +1,4 @@
-﻿using System;
-using GameBot.Core.Configuration;
+﻿using GameBot.Core.Configuration;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 
@@ -31,9 +30,7 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
 
         public Piece ExtractMovedPiece(IScreenshot screenshot, Piece piece, Move move, int maxFallDistance, out bool moved)
         {
-            //throw new NotImplementedException();
-            moved = false;
-            return null;
+            return _tetrisExtractor.ExtractMovedPieceWithErrorTolerance(screenshot, piece, move, maxFallDistance, out moved);
         }
     }
 }

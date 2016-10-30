@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Emgu.CV;
 using GameBot.Core.Configuration;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;

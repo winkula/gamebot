@@ -21,25 +21,23 @@ namespace GameBot.Test.Game.Tetris.Extraction
     {
         private static readonly Logger _loggerResults = LogManager.GetLogger("Tests");
         private static readonly Logger _loggerFails = LogManager.GetLogger("Fails");
-        
+
         private Random _random;
-        private ICalibrateableQuantizer _quantizer1;
-        private ICalibrateableQuantizer _quantizer2;
+        private Quantizer _quantizer1;
 
         [TestFixtureSetUp]
         public void Init()
         {
             _random = new Random(123);
             _quantizer1 = new Quantizer(new AppSettingsConfig());
-            _quantizer2 = new Quantizer(new AppSettingsConfig());
         }
 
         [Test]
         public void Compare()
         {
-            var extractors = new IExtractor[] { /*new BlockBasedExtractor(),*/ new PieceBasedExtractor() };
-            var quantizers = new ICalibrateableQuantizer[] { _quantizer1, _quantizer2 };
-            var shifts = new[] { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 10.0 };
+            var extractors = new IExtractor[] { new BlockBasedExtractor(), new PieceBasedExtractor(), new MorphologyExtractor() };
+            var quantizers = new ICalibrateableQuantizer[] { _quantizer1 };
+            var shifts = new[] { 0.0, 1.0, 2.0, 3.0, 4.0, 8.0, 16.0 };
 
             var sb = new StringBuilder();
             sb.AppendLine("Quantizer;Extractor;Method;Shift;Total;Positive;Accuracy");
@@ -90,6 +88,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 {
                     results.Recognized++;
                 }
+                else
+                {
+                    _loggerFails.Warn($"RecognizeNextPiece. Recognized: {nextPiece}, Real: {test.NextPiece}. Testcase {test.ImageKey}. Shift {shift:F}");
+                }
             }
 
             return results;
@@ -135,6 +137,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 {
                     results.Recognized++;
                 }
+                else
+                {
+                    _loggerFails.Warn($"RecognizeCurrentPieceUnknown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Shift {shift:F}");
+                }
             }
 
             return results;
@@ -160,6 +166,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 {
                     results.Recognized++;
                 }
+                else
+                {
+                    _loggerFails.Warn($"RecognizeCurrentPieceKnown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Shift {shift:F}");
+                }
             }
 
             var negativeTests = ImageTestCaseFactory.Data
@@ -179,6 +189,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 if (currentPiece == null)
                 {
                     results.Recognized++;
+                }
+                else
+                {
+                    _loggerFails.Warn($"RecognizeCurrentPieceKnown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Shift {shift:F}");
                 }
             }
 
@@ -200,8 +214,6 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 var move = GetValidMove(test);
                 if (!move.HasValue) continue;
 
-                // TODO: implement this!
-
                 bool moved;
                 var pieceOriginNotMoved = new Piece(test.Piece.Tetrimino, test.Piece.Orientation, test.Piece.X);
                 var pieceOriginMoved = new Piece(pieceOriginNotMoved).Apply(move.Value);
@@ -216,7 +228,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 }
                 else
                 {
-                    _loggerFails.Warn($"Recognized: {recognizedPiece}, Real: {test.Piece}");
+                    _loggerFails.Warn($"RecognizeMove. Recognized: {recognizedPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Shift {shift:F}");
                 }
             }
 
@@ -225,7 +237,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
         private Move? GetValidMove(ImageTestCaseFactory.TestData test)
         {
-            var validMoves = new[] { Move.Left, Move.Right, Move.Rotate, Move.RotateCounterclockwise }
+            var validMoves = (test.Piece.Tetrimino == Tetrimino.O ? 
+                new[] { Move.Left, Move.Right } : 
+                new[] { Move.Left, Move.Right, Move.Rotate, Move.RotateCounterclockwise })
             .OrderBy(x => Guid.NewGuid())
             .ToArray();
 

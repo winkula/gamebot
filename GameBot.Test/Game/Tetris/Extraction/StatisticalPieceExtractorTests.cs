@@ -2,6 +2,7 @@
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction;
+using GameBot.Game.Tetris.Extraction.Matchers;
 using NLog;
 using NUnit.Framework;
 
@@ -25,14 +26,14 @@ namespace GameBot.Test.Game.Tetris.Extraction
         private int _movedPiece;
         private int _movedPieceRecognized;
 
-        private PieceMatcher _pieceMatcher;
+        private TemplateMatcher _templateMatcher;
         private PieceExtractor _pieceExtractor;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            _pieceMatcher = new PieceMatcher();
-            _pieceExtractor = new PieceExtractor(_pieceMatcher);
+            _templateMatcher = new TemplateMatcher();
+            _pieceExtractor = new PieceExtractor(_templateMatcher);
         }
         
         [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPiecePositives))]

@@ -12,9 +12,10 @@ using System.Linq;
 using System.Text;
 using GameBot.Core.Configuration;
 using GameBot.Core.Data;
+using GameBot.Core.Extensions;
 using GameBot.Engine.Physical.Quantizers;
 using GameBot.Game.Tetris.Data;
-using GameBot.Game.Tetris.Extraction;
+using GameBot.Game.Tetris.Extraction.Matchers;
 
 namespace GameBot.Test.Misc
 {
@@ -52,15 +53,24 @@ namespace GameBot.Test.Misc
                 var sw = new Stopwatch();
                 sw.Start();
 
-                CvInvoke.MorphologyEx(src, dst, MorphOp.Open, kernel, new Point(2, 2), 1, BorderType.Replicate, new MCvScalar(1));
+                CvInvoke.MorphologyEx(src, dst, MorphOp.Open, kernel, new Point(-1, -1), 1, BorderType.Replicate, new MCvScalar(-1));
 
                 sw.Stop();
                 _logger.Info($"Time for MorphologyEx: {sw.ElapsedMilliseconds}");
 
+                dst.SaveToDesktop("morpho");
                 CvInvoke.Imshow("test", dst);
                 CvInvoke.WaitKey();
             }
 
+        }
+
+        [Test]
+        public void Roi()
+        {
+            var mat = new Image<Gray, byte>(160, 144);
+
+            CvInvoke.cvSetImageROI(mat.Ptr, new Rectangle(10, 10, 10, 10));
         }
 
         [Test]
@@ -71,7 +81,7 @@ namespace GameBot.Test.Misc
             var sourceImage = new Mat(path, LoadImageType.Grayscale);
             var screenshot = new EmguScreenshot(sourceImage, TimeSpan.Zero);
 
-            var pieceMatcher = new PieceMatcher();
+            var pieceMatcher = new TemplateMatcher();
             pieceMatcher.GetProbabilityNextPiece(screenshot, Tetrimino.I);
         }
 

@@ -4,23 +4,22 @@ using GameBot.Game.Tetris.Extraction.Matchers;
 
 namespace GameBot.Game.Tetris.Extraction.Extractors
 {
-    public class PieceBasedExtractor : IExtractor
+    public class MorphologyExtractor : IExtractor
     {
         private const double _thresholdNextPiece = 0.2;
         private const double _thresholdCurrentPiece = 0.5;
         private const double _thresholdMovedPiece = 0.5;
 
-        private readonly PieceExtractor _pieceExtractor;
+        private readonly PieceExtractorBase _pieceExtractor;
 
-        public PieceBasedExtractor()
+        public MorphologyExtractor()
         {
-            var matcher = new TemplateMatcher();
-            _pieceExtractor = new PieceExtractor(matcher);
+            var matcher = new MorphologyMatcher();
+            _pieceExtractor = new PieceExtractorBase(matcher);
         }
         
         public Tetrimino? ExtractNextPiece(IScreenshot screenshot)
         {
-
             var result = _pieceExtractor.ExtractNextPieceFuzzy(screenshot);
             if (result.IsAccepted(_thresholdNextPiece))
             {

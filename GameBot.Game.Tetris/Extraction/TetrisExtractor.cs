@@ -12,10 +12,7 @@ namespace GameBot.Game.Tetris.Extraction
     {
         private int MeanThreshold { get; }
         private double MinimalProbability { get; }
-
-        // debugging/visualization only
-        public IList<Point> Rectangles { get; } = new List<Point>();
-
+        
         public TetrisExtractor(IConfig config)
         {
             MeanThreshold = config.Read<int>("Game.Tetris.Extractor.MeanThreshold");
@@ -24,8 +21,6 @@ namespace GameBot.Game.Tetris.Extraction
 
         public GameState Extract(IScreenshot screenshot, GameState currentGameState)
         {
-            Rectangles.Clear();
-
             //var board = ExtractBoard();
             var board = new Board();
             var currentPiece = ExtractSpawnedPieceOrigin(screenshot);
@@ -82,7 +77,6 @@ namespace GameBot.Game.Tetris.Extraction
             var mean = screenshot.GetTileMean(x, y);
             if (IsBlock(mean))
             {
-                Rectangles.Add(new Point(x, y));
                 return true;
             }
             return false;
@@ -112,7 +106,6 @@ namespace GameBot.Game.Tetris.Extraction
                     if (IsBlock(mean))
                     {
                         board.Occupy(x, 17 - y);
-                        Rectangles.Add(new Point(TetrisConstants.BoardTileOrigin.X + x, TetrisConstants.BoardTileOrigin.Y + y));
                     }
                 }
             }
@@ -134,7 +127,6 @@ namespace GameBot.Game.Tetris.Extraction
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);
-                        Rectangles.Add(new Point(TetrisConstants.CurrentTileOrigin.X + x, TetrisConstants.CurrentTileOrigin.Y + y));
                     }
                 }
             }
@@ -222,7 +214,7 @@ namespace GameBot.Game.Tetris.Extraction
         }
 
         // Confirms that the piece has moved or roteted according to the command
-        public Piece ExtractMovedPieceWithErrorTolerance(IScreenshot screenshot, Piece lastPosition, Move move, int maxFallDistance)
+        public Piece ExtractMovedPieceWithErrorTolerance(IScreenshot screenshot, Piece lastPosition, Move move, int maxFallDistance, out bool moved)
         {
             if (maxFallDistance < 0)
                 throw new ArgumentException("searchHeight must be positive.");
@@ -234,6 +226,7 @@ namespace GameBot.Game.Tetris.Extraction
 
             double highestProbability = double.NegativeInfinity;
             Piece mostProbablePiece = null;
+            moved = false;
             
             for (int i = 0; i <= maxFallDistance; i++)
             {
@@ -242,6 +235,7 @@ namespace GameBot.Game.Tetris.Extraction
                 {
                     highestProbability = probabilityExpected;
                     mostProbablePiece = new Piece(expectedPosition);
+                    moved = true;
                 }
 
 
@@ -250,6 +244,7 @@ namespace GameBot.Game.Tetris.Extraction
                 {
                     highestProbability = probabilityLast;
                     mostProbablePiece = new Piece(lastPositionTemp);
+                    moved = false;
                 }
 
                 expectedPosition.Fall();
@@ -327,7 +322,6 @@ namespace GameBot.Game.Tetris.Extraction
                     {
                         int index = 4 * (2 - y) + (x);
                         mask |= (ushort)(1 << index);
-                        Rectangles.Add(new Point(TetrisConstants.NextPieceTileOrigin.X + x, TetrisConstants.NextPieceTileOrigin.Y + y));
                     }
                 }
             }

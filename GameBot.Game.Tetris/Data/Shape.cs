@@ -39,6 +39,7 @@ namespace GameBot.Game.Tetris.Data
             0x0072, 0x0232, 0x0270, 0x0262  // T
         };
 
+        // TODO: make this a extension method of tetrimino?
         public static Shape Get(Tetrimino tetrimino, int orientation = 0)
         {
             // TODO: remove this hack

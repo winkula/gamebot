@@ -1,12 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-using GameBot.Core;
-using NLog;
 using NUnit.Framework;
 using System;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 
 namespace GameBot.Test.Misc

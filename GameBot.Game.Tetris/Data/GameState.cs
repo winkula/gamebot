@@ -1,5 +1,4 @@
-﻿using System;
-using GameBot.Core.Exceptions;
+﻿using GameBot.Core.Exceptions;
 using System.Text;
 
 namespace GameBot.Game.Tetris.Data

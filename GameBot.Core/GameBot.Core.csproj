@@ -139,6 +139,7 @@
     <Compile Include="Data\ICommand.cs" />
     <Compile Include="Exceptions\GameOverException.cs" />
     <Compile Include="Executors\Executor.cs" />
+    <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\ScreenshotExtensions.cs" />
     <Compile Include="Extensions\DoubleExtensions.cs" />
     <Compile Include="Extensions\TimeSpanExtensions.cs" />

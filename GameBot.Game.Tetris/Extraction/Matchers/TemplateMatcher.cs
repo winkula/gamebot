@@ -9,9 +9,9 @@ using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Data;
 using NLog;
 
-namespace GameBot.Game.Tetris.Extraction
+namespace GameBot.Game.Tetris.Extraction.Matchers
 {
-    public class PieceMatcher
+    public class TemplateMatcher : IMatcher
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -51,7 +51,7 @@ namespace GameBot.Game.Tetris.Extraction
         private readonly Image<Gray, byte>[] _templatesNextPiece = new Image<Gray, byte>[Tetriminos.All.Length];
         private readonly Image<Gray, byte>[] _templateMasksNextPiece = new Image<Gray, byte>[Tetriminos.All.Length];
 
-        public PieceMatcher()
+        public TemplateMatcher()
         {
             // current piece
             // init template tiles
@@ -87,12 +87,6 @@ namespace GameBot.Game.Tetris.Extraction
             }
         }
 
-        /// <summary>
-        /// Gets the probability that a specific piece is visible on the screenshot.     
-        /// </summary>
-        /// <param name="screenshot">The screenshot.</param>
-        /// <param name="piece">The piece to match.</param>
-        /// <returns>The probability.</returns>
         public double GetProbability(IScreenshot screenshot, Piece piece)
         {
             if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
@@ -173,12 +167,6 @@ namespace GameBot.Game.Tetris.Extraction
             return bestProbability;
         }
 
-        /// <summary>
-        /// TODO: comment
-        /// </summary>
-        /// <param name="screenshot"></param>
-        /// <param name="tetrimino"></param>
-        /// <returns></returns>
         public double GetProbabilityNextPiece(IScreenshot screenshot, Tetrimino tetrimino)
         {
             if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
@@ -273,8 +261,6 @@ namespace GameBot.Game.Tetris.Extraction
 
         private double GetProbabilityNextPiece(double sum, Tetrimino tetromino)
         {
-            //return (1.0 / (sum + 1)).Clamp(0.0, 1.0);
-
             double maxError = _maxErrorsNextPiece[(int)tetromino];
             double error = sum / maxError;
             error = error.Clamp(0.0, 1.0);

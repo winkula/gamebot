@@ -154,12 +154,13 @@
     <Compile Include="Core\Data\Commands\HitCommandTests.cs" />
     <Compile Include="Core\Executors\ExecutorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\ExtractionComparisonTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\Matchers\MorphologyMatcherTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Samplers\MoveConfirmationSamplerTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Samplers\NextTetriminoSamplerTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Samplers\CurrentTetriminoSamplerTests.cs" />
     <Compile Include="Game\Tetris\Extraction\StatisticalPieceMatcherTests.cs" />
     <Compile Include="Game\Tetris\Extraction\StatisticalPieceExtractorTests.cs" />
-    <Compile Include="Game\Tetris\Extraction\PieceMatcherTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\Matchers\TemplateMatcherTests.cs" />
     <Compile Include="Game\Tetris\Extraction\StatisticalTetrisExtractorTests.cs" />
     <Compile Include="Game\Tetris\Searching\GameStateHashTests.cs" />
     <Compile Include="Misc\Playground.cs" />

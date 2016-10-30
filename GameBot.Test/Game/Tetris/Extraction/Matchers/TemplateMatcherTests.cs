@@ -3,20 +3,20 @@ using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
-using GameBot.Game.Tetris.Extraction;
+using GameBot.Game.Tetris.Extraction.Matchers;
 using NUnit.Framework;
 
-namespace GameBot.Test.Game.Tetris.Extraction
+namespace GameBot.Test.Game.Tetris.Extraction.Matchers
 {
     [TestFixture]
-    public class PieceMatcherTests
+    public class TemplateMatcherTests
     {
-        private PieceMatcher _pieceMatcher;
+        private TemplateMatcher _templateMatcher;
 
         [SetUp]
         public void Init()
         {
-            _pieceMatcher = new PieceMatcher();
+            _templateMatcher = new TemplateMatcher();
         }
         
         [Test]
@@ -25,7 +25,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var tetrimino = Tetrimino.L;
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
 
-            var probability = _pieceMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
+            var probability = _templateMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
 
             Assert.AreEqual(1.0, probability);
         }
@@ -36,7 +36,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var tetrimino = Tetrimino.O;
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", TimeSpan.Zero);
             
-            var probability = _pieceMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
+            var probability = _templateMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
 
             Assert.GreaterOrEqual(probability, 0.0);
             Assert.Less(probability, 1.0);
@@ -50,7 +50,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
             foreach (var tetrimino in Tetriminos.All)
             {
-                var probability = _pieceMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
+                var probability = _templateMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
                 Assert.AreEqual(0.0, probability);
             }
         }
@@ -69,7 +69,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
                     {
                         var piece = new Piece(Tetrimino.T, orientation, x, y);
 
-                        var probability = _pieceMatcher.GetProbability(screenshot, piece);
+                        var probability = _templateMatcher.GetProbability(screenshot, piece);
 
                         Assert.GreaterOrEqual(probability, 0.0);
                         Assert.LessOrEqual(probability, 1.0);

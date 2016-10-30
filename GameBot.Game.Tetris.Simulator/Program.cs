@@ -5,7 +5,6 @@ using NLog.Config;
 using NLog.Targets;
 using System;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace GameBot.Game.Tetris.Simulator
 {
