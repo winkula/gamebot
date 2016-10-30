@@ -58,10 +58,14 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
             double probabilitySum = 0.0;
 
             var shape = Shape.Get(tetrimino);
-            foreach (var point in new[] { new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0), new Point(-1, -1), new Point(0, -1), new Point(1, -1) })
+            foreach (var point in shape.Body)
             {
                 var coordinates = Coordinates.PieceToTilePreview(point);
                 var probability = GetBlockProbability(dest, coordinates);
+
+                probabilitySum += probability;
+
+                /*
                 if (shape.Body.Contains(point))
                 {
                     // here must be a block
@@ -71,10 +75,10 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
                 {
                     // here must be free tile
                     probabilitySum += (1 - probability);
-                }
+                }*/
             }
 
-            return probabilitySum / numBlocks;
+            return probabilitySum / 4;
 
             /*
             if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
