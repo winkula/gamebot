@@ -15,8 +15,8 @@ namespace GameBot.Engine.Physical
         {
             container.RegisterSingleton<IEngine, PhysicalEngine>();
 
-            //container.RegisterSingleton<IActuator, PhysicalActuator>();
-            container.RegisterSingleton<IActuator, LazyActuator>();
+            container.RegisterSingleton<IActuator, PhysicalActuator>();
+            //container.RegisterSingleton<IActuator, LazyActuator>();
             container.RegisterSingleton<ICamera, PhysicalCamera>();
             container.RegisterSingleton<IClock, PhysicalClock>();
             container.RegisterSingleton<IExecutor, Executor>();
