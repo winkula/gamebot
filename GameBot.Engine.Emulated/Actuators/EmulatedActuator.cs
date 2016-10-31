@@ -15,17 +15,26 @@ namespace GameBot.Engine.Emulated.Actuators
 
         public void Hit(Button button)
         {
-            _emulator.Hit(button);
+            lock (_emulator)
+            {
+                _emulator.Hit(button);
+            }
         }
 
         public void Press(Button button)
         {
-            _emulator.Press(button);
+            lock (_emulator)
+            {
+                _emulator.Press(button);
+            }
         }
 
         public void Release(Button button)
         {
-            _emulator.Release(button);
+            lock (_emulator)
+            {
+                _emulator.Release(button);
+            }
         }        
     }
 }

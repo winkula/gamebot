@@ -24,7 +24,11 @@ namespace GameBot.Engine.Emulated.Cameras
             const double noiseLevel = 0.75;
             const int gaussSize = 13;
 
-            var image = new Image<Gray, byte>(_emulator.Display);
+            Image<Gray, byte> image;
+            lock (_emulator)
+            {
+                image = new Image<Gray, byte>(_emulator.Display);
+            }
 
             if (addNoise)
             {

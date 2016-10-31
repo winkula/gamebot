@@ -8,7 +8,16 @@ namespace GameBot.Engine.Emulated.Clocks
     {
         private readonly Emulator _emulator;
 
-        public TimeSpan Time => _emulator.Time;
+        public TimeSpan Time
+        {
+            get
+            {
+                lock (_emulator)
+                {
+                    return _emulator.Time;
+                }
+            }
+        }
 
         public EmulatedClock(Emulator emulator)
         {
@@ -22,7 +31,11 @@ namespace GameBot.Engine.Emulated.Clocks
 
         public void Sleep(int miliseconds)
         {
-            _emulator.Execute(TimeSpan.FromMilliseconds(miliseconds));
+            var time = TimeSpan.FromMilliseconds(miliseconds);
+            lock (_emulator)
+            {
+                _emulator.Execute(time);
+            }
         }
     }
 }

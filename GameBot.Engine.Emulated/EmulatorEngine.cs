@@ -43,7 +43,10 @@ namespace GameBot.Engine.Emulated
         {
             var loader = new RomLoader();
             var game = loader.Load(_config.Read("Emulator.Rom.Path", "Roms/tetris.gb"));
-            _emulator.Load(game);
+            lock (_emulator)
+            {
+                _emulator.Load(game);
+            }
         }
 
         public void Initialize()
@@ -81,7 +84,10 @@ namespace GameBot.Engine.Emulated
                 showProcessedImage?.Invoke(processed);
             }
 
-            _emulator.Execute();
+            lock (_emulator)
+            {
+                _emulator.Execute();
+            }
         }
 
         public void Reset()
