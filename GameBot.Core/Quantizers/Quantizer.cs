@@ -38,7 +38,7 @@ namespace GameBot.Core.Quantizers
         {
             // convert to gray values
             IImage imageGray = new Mat();
-            if (imageGray.NumberOfChannels > 1)
+            if (image.NumberOfChannels > 1)
             {
                 CvInvoke.CvtColor(image, imageGray, ColorConversion.Rgb2Gray);
             }
