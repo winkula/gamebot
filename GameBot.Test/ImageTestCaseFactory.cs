@@ -11,25 +11,10 @@ using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GameBot.Core.Quantizers;
 
 namespace GameBot.Test
 {
-    // File name patern for test cases
-    //     0 Current Tetrimino
-    //     1 Current orientation
-    //  2- 3 Current x coordinate
-    //  4- 5 Current fall distance (negative y coordinate) 
-    //     6 Underscore (space)
-    //     7 Next Tetromino
-    //     8 Underscore (space)
-    //  9-28 Column heights of the board
-    //    29 Underscore (space)
-    // 30-53 Keypoints for calibration (3 chars for one coordinate)
-    //
-    // Pattern:
-    // TOXXYY_T_00112233445566778899_000111222333444555666777
-    // Example:
-    // T20310_J_00100804060100010200_010010600010010300600300
     public class ImageTestCaseFactory
     {
         public class TestData
@@ -53,13 +38,14 @@ namespace GameBot.Test
 
                 _quantizer.Keypoints = Keypoints;
 
-                Image = new Mat(ImagePath, LoadImageType.AnyColor);
+                Image = new Mat(ImagePath, LoadImageType.Grayscale);
                 var quantizedImage = _quantizer.Quantize(Image);
                 Screenshot = new EmguScreenshot(quantizedImage, DateTime.Now.Subtract(DateTime.MinValue));
             }
         }
 
-        private static readonly IQuantizer _quantizer = new Quantizer(new AppSettingsConfig());
+        //private static readonly IQuantizer _quantizer = new Quantizer(new AppSettingsConfig());
+        private static readonly IQuantizer _quantizer = new MorphologyQuantizer(new AppSettingsConfig());
 
         private static readonly Point[][] _keypoints =
         {
@@ -116,6 +102,10 @@ namespace GameBot.Test
 
         public static IEnumerable TestCasesCurrentPieceNegativesNull => Data
             .Where(x => x.Piece == null)
+            .Select(x => new TestCaseData(x.ImageKey, x.Screenshot));
+        
+        public static IEnumerable TestCasesCurrentPieceOriginNegatives => Data
+            .Where(x => x.Piece == null || !x.Piece.IsOrigin)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot));
 
         public static IEnumerable TestCasesSpawnedPiecePositives => Data

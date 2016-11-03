@@ -1,22 +1,21 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using GameBot.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using GameBot.Core.Quantizers;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
 
-namespace GameBot.Engine.Physical.Quantizers
+namespace GameBot.Core.Quantizers
 {
     public class Quantizer : CalibrateableQuantizer
     {
         public int ThresholdConstant { get; set; }
         public int ThresholdBlockSize { get; set; }
 
-        private readonly int _thresholdMaxValue;
-        private readonly AdaptiveThresholdType _thresholdAdaptiveThresholdType;
-        private readonly ThresholdType _thresholdType;
+        private readonly int _thresholdMaxValue = 255;
+        private readonly AdaptiveThresholdType _thresholdAdaptiveThresholdType = AdaptiveThresholdType.MeanC;
+        private readonly ThresholdType _thresholdType = ThresholdType.Binary;
+        private readonly bool _blurEnabled;
 
         public Quantizer(IConfig config)
         {
@@ -28,13 +27,8 @@ namespace GameBot.Engine.Physical.Quantizers
 
             ThresholdBlockSize = config.Read("Robot.Quantizer.Threshold.BlockSize", 13);
             if (ThresholdBlockSize < 0 || ThresholdBlockSize % 2 == 0) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Threshold.BlockSize'.");
-
-            _thresholdMaxValue = config.Read("Robot.Quantizer.Threshold.MaxValue", 13);
-            if (_thresholdMaxValue < 0 || _thresholdMaxValue > 255) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Threshold.MaxValue'.");
-
-            _thresholdAdaptiveThresholdType = config.Read("Robot.Quantizer.Threshold.AdaptiveThresholdType", AdaptiveThresholdType.MeanC);
-
-            _thresholdType = config.Read("Robot.Quantizer.Threshold.ThresholdType", ThresholdType.Binary);
+            
+            _blurEnabled = config.Read("Robot.Quantizer.Blur", false);
 
             // precalculate transformation matrix
             Keypoints = new List<Point> { new Point(keypoints[0], keypoints[1]), new Point(keypoints[2], keypoints[3]), new Point(keypoints[4], keypoints[5]), new Point(keypoints[6], keypoints[7]) };
@@ -43,15 +37,25 @@ namespace GameBot.Engine.Physical.Quantizers
         public override IImage Quantize(IImage image)
         {
             // convert to gray values
-            var imageGray = new Mat();
-            CvInvoke.CvtColor(image, imageGray, ColorConversion.Rgb2Gray);
+            IImage imageGray = new Mat();
+            if (imageGray.NumberOfChannels > 1)
+            {
+                CvInvoke.CvtColor(image, imageGray, ColorConversion.Rgb2Gray);
+            }
+            else
+            {
+                imageGray = image;
+            }
 
             // transform
             var imageWarped = new Mat(new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), DepthType.Default, 1);
             CvInvoke.WarpPerspective(imageGray, imageWarped, Transform, new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight));
 
-            // gauss
-            CvInvoke.GaussianBlur(imageWarped, imageWarped, new Size(3, 3), 0.6, 0.6);
+            if (_blurEnabled)
+            {
+                // gauss
+                CvInvoke.GaussianBlur(imageWarped, imageWarped, new Size(3, 3), 0.6, 0.6);
+            }
 
             // threshold
             var imageBinarized = new Mat(new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), DepthType.Default, 1);

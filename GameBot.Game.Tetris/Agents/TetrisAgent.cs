@@ -36,8 +36,8 @@ namespace GameBot.Game.Tetris.Agents
         // config used by states
         public int CheckSamples { get; }
         public int ExtractionSamples { get; }
-        public double ExtractionLowerThreshold { get; }
-        public double ExtractionUpperThreshold { get; }
+        //public double ExtractionLowerThreshold { get; }
+        //public double ExtractionUpperThreshold { get; }
 
         // for visualization only
         public Piece ExtractedPiece { private get; set; }
@@ -56,8 +56,8 @@ namespace GameBot.Game.Tetris.Agents
 
             CheckSamples = Config.Read("Game.Tetris.Check.Samples", 1);
             ExtractionSamples = Config.Read("Game.Tetris.Extractor.Samples", 1);
-            ExtractionUpperThreshold = Config.Read<double>("Game.Tetris.Extractor.UpperThreshold");
-            ExtractionLowerThreshold = Config.Read<double>("Game.Tetris.Extractor.LowerThreshold");
+            //ExtractionUpperThreshold = Config.Read<double>("Game.Tetris.Extractor.UpperThreshold");
+            //ExtractionLowerThreshold = Config.Read<double>("Game.Tetris.Extractor.LowerThreshold");
 
             Init();
         }
@@ -162,7 +162,7 @@ namespace GameBot.Game.Tetris.Agents
         {
             const int frameSize = 0;
             var rectangle = new Rectangle(GameBoyConstants.TileSize * tileCoordinates.X + frameSize, GameBoyConstants.TileSize * tileCoordinates.Y + frameSize, GameBoyConstants.TileSize - 2 * frameSize - 1, GameBoyConstants.TileSize - 2 * frameSize - 1);
-            CvInvoke.Rectangle(image, rectangle, new Bgr(color).MCvScalar, 2, LineType.FourConnected);
+            CvInvoke.Rectangle(image, rectangle, new Bgr(color).MCvScalar, 1, LineType.FourConnected);
         }
 
         public void Play(IExecutor executor)

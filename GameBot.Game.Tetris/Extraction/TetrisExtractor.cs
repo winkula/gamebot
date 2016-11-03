@@ -15,8 +15,8 @@ namespace GameBot.Game.Tetris.Extraction
         
         public TetrisExtractor(IConfig config)
         {
-            MeanThreshold = config.Read<int>("Game.Tetris.Extractor.MeanThreshold");
-            MinimalProbability = config.Read<double>("Game.Tetris.Extractor.MinimalProbability");
+            MeanThreshold = 150;
+            MinimalProbability = 0.9375;
         }
 
         public GameState Extract(IScreenshot screenshot, GameState currentGameState)

@@ -1,9 +1,9 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Executors;
+using GameBot.Core.Quantizers;
 using GameBot.Engine.Emulated.Actuators;
 using GameBot.Engine.Emulated.Cameras;
 using GameBot.Engine.Emulated.Clocks;
-using GameBot.Engine.Emulated.Quantizers;
 using SimpleInjector;
 using SimpleInjector.Packaging;
 
@@ -19,7 +19,9 @@ namespace GameBot.Engine.Emulated
             container.RegisterSingleton<ICamera, EmulatedCamera>();
             container.RegisterSingleton<IClock, EmulatedClock>();
             container.RegisterSingleton<IExecutor, Executor>();
-            container.RegisterSingleton<IQuantizer, PassthroughQuantizer>();
+
+            //container.RegisterSingleton<IQuantizer, PassthroughQuantizer>();
+            container.RegisterSingleton<IQuantizer, MorphologyQuantizer>();
         }        
     }
 }

@@ -419,6 +419,11 @@ namespace GameBot.Emulation
             _anyButtonsPressed = false;
         }
 
+        public int GetExecutionDurationInFrames(TimeSpan time)
+        {
+            return (int)(time.TotalSeconds * _framesPerSecond);
+        }
+
         public void Execute(TimeSpan time)
         {
             int frames = (int)(time.TotalSeconds * _framesPerSecond);

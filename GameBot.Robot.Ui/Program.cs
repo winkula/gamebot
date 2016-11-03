@@ -77,7 +77,7 @@ namespace GameBot.Robot.Ui
 
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Log.txt");
             var fileTarget = new FileTarget();
-            fileTarget.Layout = @"${longdate} | ${level:uppercase=true} | ${pad:padding=-55:inner=${logger}} | ${message}";
+            fileTarget.Layout = @"${longdate} | ${level:uppercase=true} | ${pad:padding=-58:inner=${logger}} | ${message}";
             fileTarget.FileName = path;
             config.AddTarget("file", fileTarget);
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, fileTarget));

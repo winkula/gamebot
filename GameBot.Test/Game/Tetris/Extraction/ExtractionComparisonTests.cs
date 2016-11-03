@@ -7,6 +7,7 @@ using GameBot.Core;
 using GameBot.Core.Configuration;
 using GameBot.Core.Data;
 using GameBot.Core.Exceptions;
+using GameBot.Core.Quantizers;
 using GameBot.Engine.Physical.Quantizers;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Extractors;

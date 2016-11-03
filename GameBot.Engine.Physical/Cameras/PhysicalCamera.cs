@@ -34,6 +34,7 @@ namespace GameBot.Engine.Physical.Cameras
                 CvInvoke.Flip(src, src, FlipType.Horizontal | FlipType.Vertical);
             }
 
+            /*
             // save every 30th image
             var tick = DateTime.Now.Ticks;
             if (tick % 30 == 0)
@@ -42,6 +43,7 @@ namespace GameBot.Engine.Physical.Cameras
                 string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Images", $"image{tick}.png");
                 src.Save(path);
             }
+            */
 
             return src;
         }

@@ -128,7 +128,6 @@
     <Compile Include="EmulatorEngine.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Quantizers\PassthroughQuantizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

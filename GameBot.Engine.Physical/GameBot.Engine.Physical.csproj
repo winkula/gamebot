@@ -133,7 +133,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Quantizers\AdaptiveThresholdQuantizer.cs" />
     <Compile Include="Quantizers\SimpleQuantizer.cs" />
-    <Compile Include="Quantizers\Quantizer.cs" />
     <Compile Include="Quantizers\ThresholdQuantizer.cs" />
     <Compile Include="Clocks\PhysicalClock.cs" />
     <Compile Include="PhysicalEngine.cs" />

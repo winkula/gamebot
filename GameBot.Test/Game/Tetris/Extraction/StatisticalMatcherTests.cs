@@ -1,4 +1,5 @@
-﻿using GameBot.Core.Data;
+﻿using Emgu.CV;
+using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
 using NLog;
@@ -43,8 +44,26 @@ namespace GameBot.Test.Game.Tetris.Extraction
             if (currentPieceFound) { _currentPiecesRecognized++; }
             Assert.True(currentPieceFound);
         }
-        
-        //[Ignore]
+
+        [Ignore]
+        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesCurrentPieceOriginNegatives))]
+        public void PieceMatchingCurrentPieceNegatives(string imageKey, IScreenshot screenshot)
+        {
+            foreach (var tetrimino in Tetriminos.All)
+            {
+                _currentPiecesTotal++;
+                
+                var probabilityCurrentPiece = _matcher.GetProbability(screenshot, new Piece(tetrimino));
+                _logger.Info($"PieceMatchingCurrentPieceNegatives: {probabilityCurrentPiece * 100.0:F}");
+
+                var currentPieceFound = probabilityCurrentPiece >= _probabilityThreshold;
+
+                if (!currentPieceFound) { _currentPiecesRecognized++; }
+                Assert.False(currentPieceFound);
+            }
+        }
+
+        [Ignore]
         [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPiecePositives))]
         public void PieceMatchingNextPiecePositives(string imageKey, IScreenshot screenshot, Tetrimino nextPieceExpected)
         {
@@ -58,7 +77,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             Assert.True(nextPieceFound);
         }
 
-        //[Ignore]
+        [Ignore]
         [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPieceNegativesNull))]
         public void PieceMatchingNextPieceNegatives(string imageKey, IScreenshot screenshot)
         {

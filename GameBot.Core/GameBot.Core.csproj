@@ -155,6 +155,9 @@
     <Compile Include="IClock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Quantizers\CalibrateableQuantizer.cs" />
+    <Compile Include="Quantizers\MorphologyQuantizer.cs" />
+    <Compile Include="Quantizers\PassthroughQuantizer.cs" />
+    <Compile Include="Quantizers\Quantizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

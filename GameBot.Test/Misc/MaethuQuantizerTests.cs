@@ -13,6 +13,7 @@ using System.Text;
 using GameBot.Core.Configuration;
 using GameBot.Core.Data;
 using GameBot.Core.Extensions;
+using GameBot.Core.Quantizers;
 using GameBot.Engine.Physical.Quantizers;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;

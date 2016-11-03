@@ -1,5 +1,6 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Executors;
+using GameBot.Core.Quantizers;
 using GameBot.Engine.Physical.Actuators;
 using GameBot.Engine.Physical.Cameras;
 using GameBot.Engine.Physical.Clocks;
@@ -20,7 +21,9 @@ namespace GameBot.Engine.Physical
             container.RegisterSingleton<ICamera, PhysicalCamera>();
             container.RegisterSingleton<IClock, PhysicalClock>();
             container.RegisterSingleton<IExecutor, Executor>();
-            container.RegisterSingleton<IQuantizer, Quantizer>();            
+
+            //container.RegisterSingleton<IQuantizer, Quantizer>();
+            container.RegisterSingleton<IQuantizer, MorphologyQuantizer>();
         }
     }
 }
