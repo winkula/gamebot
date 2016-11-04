@@ -23,7 +23,7 @@ namespace GameBot.Game.Tetris.Searching
 
             var gameStateBegin = new GameState(gameState).ResetLinesAndScore();
 
-            Node root = new Node(gameStateBegin);            
+            Node root = new Node(gameStateBegin);
             Node goal = null;
             var bestScore = double.NegativeInfinity;
 
@@ -42,14 +42,14 @@ namespace GameBot.Game.Tetris.Searching
                         bestScore2 = score;
                     }
                 }
-                
+
                 if (best?.Score > bestScore)
                 {
                     goal = best;
                     bestScore = best.Score;
                 }
             }
-            
+
             if (goal?.Parent != null)
             {
                 var result = new SearchResult
@@ -72,18 +72,22 @@ namespace GameBot.Game.Tetris.Searching
             if (way != null)
             {
                 // rotation
-                if (way.Rotation % 4 == 3)
+                var rotation = way.Rotation % 4;
+                if (rotation == 1)
+                {
+                    // clockwise rotation
+                    yield return Move.Rotate;
+                }
+                else if (rotation == 2)
                 {
                     // counterclockwise rotation
                     yield return Move.RotateCounterclockwise;
+                    yield return Move.RotateCounterclockwise;
                 }
-                else
+                else if (rotation == 3)
                 {
-                    // clockwise rotation
-                    for (int i = 0; i < way.Rotation % 4; i++)
-                    {
-                        yield return Move.Rotate;
-                    }
+                    // counterclockwise rotation
+                    yield return Move.RotateCounterclockwise;
                 }
 
                 // translation
