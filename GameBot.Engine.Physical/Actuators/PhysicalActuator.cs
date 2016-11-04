@@ -78,7 +78,7 @@ namespace GameBot.Engine.Physical.Actuators
             _logger.Info($"Press button {button}");
 
             HandleState(button, true);
-            Thread.Sleep(_delayCommand);
+            //Thread.Sleep(_delayCommand);
         }
 
         public void Release(Button button)
@@ -86,7 +86,7 @@ namespace GameBot.Engine.Physical.Actuators
             _logger.Info($"Release button {button}");
 
             HandleState(button, false);
-            Thread.Sleep(_delayCommand);
+            //Thread.Sleep(_delayCommand);
         }
 
         private void HandleState(Button button, bool pressOrRelease)

@@ -11,6 +11,6 @@ namespace GameBot.Game.Tetris
 
         public static TimeSpan AnalyzeFallDurationPaddingTime = TimeSpan.FromMilliseconds(500) + _sleepAfterButtonTime; // 30?
         public static TimeSpan CheckFallDurationPaddingTime = TimeSpan.FromMilliseconds(30) + _sleepAfterButtonTime; // 30?
-        public static TimeSpan DropDurationPaddingTime = TimeSpan.FromMilliseconds(30); // 30?
+        public static TimeSpan DropDurationPaddingTime = TimeSpan.FromMilliseconds(60); // 30?
     }
 }

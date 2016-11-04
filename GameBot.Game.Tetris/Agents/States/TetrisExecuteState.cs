@@ -91,6 +91,10 @@ namespace GameBot.Game.Tetris.Agents.States
             // theoretical drop duration, but the real drop duration
             // (we don't want to miss an important frame in analyze state)  
             var waitDuration = dropDuration - Timing.DropDurationPaddingTime;
+            if (waitDuration < TimeSpan.Zero)
+            {
+                waitDuration = TimeSpan.Zero;
+            }
 
             _logger.Info($"Execute Drop (new score {_agent.GameState.Score}, {linesRemoved} lines removed, sleep {waitDuration.Milliseconds} ms)");
 

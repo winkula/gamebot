@@ -27,6 +27,14 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
             _kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(7, 7), new Point(-1, -1));
         }
 
+        public double GetProbability(IScreenshot screenshot, int x, int y)
+        {
+            var dest = MorphologyEx(screenshot);
+            var coordinates = Coordinates.BoardToTile(x, y);
+
+            return GetBlockProbability(dest, coordinates);
+        }
+
         public double GetProbability(IScreenshot screenshot, Piece piece)
         {
             if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));

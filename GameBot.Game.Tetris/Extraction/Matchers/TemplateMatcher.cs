@@ -87,6 +87,11 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
             }
         }
 
+        public double GetProbability(IScreenshot screenshot, int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
         public double GetProbability(IScreenshot screenshot, Piece piece)
         {
             if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
