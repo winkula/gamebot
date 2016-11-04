@@ -87,8 +87,8 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             // sequence handles both cases (with and without entry in high score table)
             actuator.Hit(Button.Start);
-            actuator.Hit(Button.Start);
             actuator.Hit(Button.B);
+            actuator.Hit(Button.Start);
             actuator.Hit(Button.Start);
         }
 

@@ -29,13 +29,13 @@ namespace GameBot.Test.Misc
             
             for (int i = 0; i < num; i++)
             {
-                Thread.Sleep(100);
+                //Thread.Sleep(100);
 
                 watch.Start();
                 _image = new Mat();
 
                 //QueryFrame(2);
-                Grab(1);
+                Grab(2);
 
                 watch.Stop();
 

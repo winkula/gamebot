@@ -144,7 +144,7 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             if (lastMove == Move.Drop) throw new Exception("Can't check drop");
 
-            _agent.SetState(new TetrisPseudoCheckState(_agent, lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
+            _agent.SetStateAndContinue(new TetrisPseudoCheckState(_agent, lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
         }
 
         private void SetStateAnalyze()
