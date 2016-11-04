@@ -5,7 +5,7 @@ namespace GameBot.Game.Tetris
     // TODO: finetune!
     public class Timing
     {
-        // this should be in sync with the duration after a butten was pressed/released
+        // this should be in sync with the duration after a button was pressed/released
         // important is the blocking time until the control goes back in the code
         public static TimeSpan SleepAfterButtonTime = TimeSpan.FromMilliseconds(0); // 500
 
