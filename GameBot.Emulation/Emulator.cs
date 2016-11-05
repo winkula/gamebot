@@ -28,6 +28,11 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using GameBot.Core.Extensions;
 
 namespace GameBot.Emulation
 {
@@ -53,6 +58,17 @@ namespace GameBot.Emulation
         public int Frames { get; private set; }
         public TimeSpan Time => TimeSpan.FromSeconds((double)Frames / _framesPerSecond);
         public Bitmap Display => _bitmap;
+
+        //public Mat DisplayMat
+        //{
+        //    get
+        //    {
+        //        byte[] buffer = _bitmap.ToByteArray(ImageFormat.Bmp);
+        //        var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
+        //        return new Mat(new Size(_displayWidth, _displayHeight), DepthType.Cv8U, 3, ptr, 3);
+        //    }
+        //}
+
         public Game Game { get; private set; }
         private Size DisplaySize => new Size(_displayWidth, _displayHeight);
 

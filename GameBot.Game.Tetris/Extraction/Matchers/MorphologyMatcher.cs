@@ -122,7 +122,6 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
                 // we have already used this screenshot, take image from cache
                 return _chachedImage;
             }
-
             var dst = new Image<Gray, byte>(screenshot.Image.Bitmap);
             //var dst = new Image<Gray, byte>(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight);
             //CvInvoke.MorphologyEx(screenshot.Image, dst, MorphOp.Open, _kernel, new Point(-1, -1), 1, BorderType.Replicate, new MCvScalar(-1));

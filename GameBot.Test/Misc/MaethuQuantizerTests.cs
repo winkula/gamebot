@@ -27,6 +27,70 @@ namespace GameBot.Test.Misc
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Test]
+        public void TestMatRoi()
+        {
+            const int count = 100;
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var src = new Mat("Screenshots/tetris_play_1.png", LoadImageType.Grayscale);
+            var bin = new Mat();
+            var mor = new Mat();
+
+            sw.Stop();
+            _logger.Info($"Load: {sw.ElapsedMilliseconds}");
+            sw.Restart();
+
+            for (int i = 0; i < count; i++)
+            {
+                CvInvoke.AdaptiveThreshold(src, bin, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 17, 13);
+            }
+
+            sw.Stop();
+            _logger.Info($"Threshold: {sw.ElapsedMilliseconds}");
+            sw.Restart();
+
+            var kernel = new ConvolutionKernelF(new float[,]
+            {
+                    { 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1 },
+            });
+
+            for (int i = 0; i < count; i++)
+            {
+                CvInvoke.MorphologyEx(bin, mor, MorphOp.Open, kernel, new Point(-1, -1), 1, BorderType.Replicate, new MCvScalar(-1));
+            }
+
+            sw.Stop();
+            _logger.Info($"MorphologyEx: {sw.ElapsedMilliseconds}");
+            sw.Restart();
+
+            for (int i = 0; i < count; i++)
+            {
+                for (int x = 0; x < 10; x++)
+                {
+                    for (int y = 0; y < 10; y++)
+                    {
+                        var roi = new Mat(mor, new Rectangle(8 * x, 8 * y, 8, 8));
+                        var mean = CvInvoke.Mean(roi);
+                    }
+                }
+            }
+
+            sw.Stop();
+            _logger.Info($"Mean: {sw.ElapsedMilliseconds}");
+            sw.Restart();
+
+            sw.Stop();
+        }
+
+        [Test]
         public void OpenMorphological()
         {
             var data = ImageTestCaseFactory.Data;
@@ -34,7 +98,7 @@ namespace GameBot.Test.Misc
             {
                 var quantizer = new Quantizer(new AppSettingsConfig());
                 quantizer.ThresholdConstant = 13;
-                quantizer.ThresholdBlockSize = 17; 
+                quantizer.ThresholdBlockSize = 17;
                 quantizer.Keypoints = testData.Keypoints;
                 var src = quantizer.Quantize(testData.Image);
 
@@ -114,7 +178,7 @@ namespace GameBot.Test.Misc
                 }
 
                 sb.Append("_");
-                
+
                 sb.Append(new string('_', 2 * 10));
 
                 sb.Append("_");
