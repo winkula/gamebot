@@ -15,8 +15,9 @@ namespace GameBot.Game.Tetris
         // For A Type
         public static int GetLevel(int startLevel, int clearedLines)
         {
-            if (clearedLines < 10) return startLevel;
-            return Math.Min(20, startLevel + clearedLines / 10);
+            var limit = (startLevel + 1) * 10;
+            if (clearedLines < limit) return startLevel;
+            return Math.Min(20, clearedLines / 10);
         }
 
         // Frames per row
@@ -35,7 +36,7 @@ namespace GameBot.Game.Tetris
             if (level > 20) level = 20;
             return TimeSpan.FromSeconds(rows * _levelSpeeds[level] / TetrisTiming.Framerate);
         }
-        
+
         // how many rows will a tile maximal fall in a specific time span?
         public static int GetMaxFallDistance(int level, TimeSpan duration)
         {

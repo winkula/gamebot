@@ -81,7 +81,6 @@ namespace GameBot.Game.Tetris.Agents.States
             if (_agent.GameState.Lines > linesBefore)
             {
                 // lines were removed, add extra time
-                //var lineRemoveDuration = TetrisTiming.LineRemovingDuration();
                 dropDuration += TetrisTiming.LineRemovingDuration;
 
                 linesRemoved = _agent.GameState.Lines - linesBefore;

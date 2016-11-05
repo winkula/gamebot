@@ -39,13 +39,16 @@ namespace GameBot.Test.Game.Tetris
         [TestCase(0, 15, 1)]
         [TestCase(0, 19, 1)]
         [TestCase(0, 20, 2)]
-        [TestCase(3, 0, 3)]
-        [TestCase(3, 5, 3)]
-        [TestCase(3, 9, 3)]
-        [TestCase(3, 10, 4)]
-        [TestCase(3, 15, 4)]
-        [TestCase(3, 19, 4)]
-        [TestCase(3, 20, 5)]
+        [TestCase(5, 0, 5)]
+        [TestCase(5, 59, 5)]
+        [TestCase(5, 60, 6)]
+        [TestCase(5, 74, 7)]
+        [TestCase(5, 666, 20)]
+        [TestCase(9, 0, 9)]
+        [TestCase(9, 22, 9)]
+        [TestCase(9, 22, 9)]
+        [TestCase(9, 160, 16)]
+        [TestCase(9, 378, 20)]
         public void GetLevelAType(int startLevel, int clearedLines, int expectedLevel)
         {
             int level = TetrisLevel.GetLevel(startLevel, clearedLines);

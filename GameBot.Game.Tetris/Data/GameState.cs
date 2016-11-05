@@ -1,4 +1,5 @@
-﻿using GameBot.Core.Exceptions;
+﻿using System;
+using GameBot.Core.Exceptions;
 using System.Text;
 
 namespace GameBot.Game.Tetris.Data
@@ -10,10 +11,37 @@ namespace GameBot.Game.Tetris.Data
         public Tetrimino? NextPiece { get; set; }
 
         public int Lines { get; private set; }
-        public int Score { get; private set; }
-        public int StartLevel { get; set; }
+
+        // max score is 999'999
+        private int _score;
+        public int Score
+        {
+            get
+            {
+                return _score;
+            }
+            private set
+            {
+                _score = Math.Min(999999, value);
+            }
+        }
+
+        private int _startLevel;
+        public int StartLevel
+        {
+            get
+            {
+                return _startLevel;
+            }
+            set
+            {
+                if (value < 0 || value > 9) throw new ArgumentException("StartLevel must be between 0 and 9.");
+                _startLevel = value;
+            }
+        }
+
         public int Level => TetrisLevel.GetLevel(StartLevel, Lines);
-        
+
         public GameState(GameState old)
         {
             Board = new Board(old.Board);
@@ -53,7 +81,7 @@ namespace GameBot.Game.Tetris.Data
         }
 
         private bool IsPieceLanded => Board.Intersects(new Piece(Piece).Fall());
-        
+
         public bool Fall()
         {
             return Fall(Tetriminos.GetRandom());
@@ -110,7 +138,6 @@ namespace GameBot.Game.Tetris.Data
             // calculate score
             Score += TetrisScore.GetSoftdropScore(distance);
             Score += TetrisScore.GetLineScore(lines, Level);
-            if (Score > 999999) Score = 999999; // max score is 999'999
 
             if (NextPiece.HasValue)
             {
