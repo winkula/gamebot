@@ -1,5 +1,7 @@
 ﻿using GameBot.Core;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using GameBot.Core.Data;
 using Tinkerforge;
 using System.Threading;
@@ -9,58 +11,45 @@ namespace GameBot.Engine.Physical.Actuators
 {
     public class PhysicalActuator : IActuator, IDisposable
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private const int _delayHit = 40;
         private const int _delayCommand = 80;
 
-        private readonly IConfig _config;
-
-        private readonly string _host;
-        private readonly int _port;
-        private readonly string _uidMaster;
-        private readonly string _uidRelay1;
-        private readonly string _uidRelay2;
-        private readonly string _uidTemp;
+        private readonly IPConnection _ipcon;
+        private readonly BrickletIndustrialQuadRelay _or1;
+        private readonly BrickletIndustrialQuadRelay _or2;
 
         private int _state1;
         private int _state2;
 
-        private readonly IPConnection _ipcon;
-        private readonly BrickMaster _master;
-        private readonly BrickletIndustrialQuadRelay _or1;
-        private readonly BrickletIndustrialQuadRelay _or2;
-        private BrickletTemperatureIR _tir;
+        private bool _isDirtyOr1;
+        private bool _isDirtyOr2;
 
         public PhysicalActuator(IConfig config)
         {
-            _config = config;
+            if (config == null) throw new ArgumentNullException(nameof(config));
 
-            _host = config.Read<string>("Robot.Actuator.Host");
-            _port = config.Read<int>("Robot.Actuator.Port");
-            _uidMaster = config.Read<string>("Robot.Actuator.UidMaster");
-            _uidRelay1 = config.Read<string>("Robot.Actuator.UidRelay1");
-            _uidRelay2 = config.Read<string>("Robot.Actuator.UidRelay2");
-            _uidTemp = config.Read<string>("Robot.Actuator.UidTemp");
-            
+            var host = config.Read<string>("Robot.Actuator.Host");
+            var port = config.Read<int>("Robot.Actuator.Port");
+            var uidMaster = config.Read<string>("Robot.Actuator.UidMaster");
+            var uidRelay1 = config.Read<string>("Robot.Actuator.UidRelay1");
+            var uidRelay2 = config.Read<string>("Robot.Actuator.UidRelay2");
+
             _ipcon = new IPConnection(); // Create IP connection
-            _ipcon.Connect(_host, _port); // Connect to brickd. Don't use device before ipcon is connected
-            
-            _master = new BrickMaster(_uidMaster, _ipcon); // Create device object
-            _or1 = new BrickletIndustrialQuadRelay(_uidRelay1, _ipcon);
-            _or2 = new BrickletIndustrialQuadRelay(_uidRelay2, _ipcon);
-            _tir = new BrickletTemperatureIR(_uidTemp, _ipcon);
-            
+            _ipcon.Connect(host, port); // Connect to brickd. Don't use device before ipcon is connected
+
+            var master = new BrickMaster(uidMaster, _ipcon);
+            _or1 = new BrickletIndustrialQuadRelay(uidRelay1, _ipcon);
+            _or2 = new BrickletIndustrialQuadRelay(uidRelay2, _ipcon);
+
             // Get current stack voltage (unit is mV)
-            int stackVoltage = _master.GetStackVoltage();
-            _logger.Info("Stack Voltage: " + stackVoltage / 1000.0 + " V");
+            int stackVoltage = master.GetStackVoltage();
+            _logger.Info($"Stack Voltage: {stackVoltage / 1000.0:F} V");
 
             // Get current stack current (unit is mA)
-            int stackCurrent = _master.GetStackCurrent();
-            _logger.Info("Stack Current: " + stackCurrent / 1000.0 + " A");
-
-            //short ChipTemp = tir.GetAmbientTemperature();
-            //logger.Info("Chibi master address: " + ChipTemp / 10 + "°/C");
+            int stackCurrent = master.GetStackCurrent();
+            _logger.Info($"Stack Current: {stackCurrent / 1000.0:F} A");
         }
 
         public void Hit(Button button)
@@ -68,8 +57,29 @@ namespace GameBot.Engine.Physical.Actuators
             _logger.Info($"Hit button {button}");
 
             HandleState(button, true);
+            Update();
             Thread.Sleep(_delayHit);
             HandleState(button, false);
+            Update();
+            Thread.Sleep(_delayCommand);
+        }
+
+        public void Hit(IEnumerable<Button> buttons)
+        {
+            var buttonsList = buttons.ToList();
+            _logger.Info($"Hit buttons {string.Join(", ", buttonsList)}");
+
+            foreach (var button in buttonsList)
+            {
+                HandleState(button, true);
+            }
+            Update();
+            Thread.Sleep(_delayHit);
+            foreach (var button in buttonsList)
+            {
+                HandleState(button, false);
+            }
+            Update();
             Thread.Sleep(_delayCommand);
         }
 
@@ -78,7 +88,7 @@ namespace GameBot.Engine.Physical.Actuators
             _logger.Info($"Press button {button}");
 
             HandleState(button, true);
-            //Thread.Sleep(_delayCommand);
+            Update();
         }
 
         public void Release(Button button)
@@ -86,7 +96,7 @@ namespace GameBot.Engine.Physical.Actuators
             _logger.Info($"Release button {button}");
 
             HandleState(button, false);
-            //Thread.Sleep(_delayCommand);
+            Update();
         }
 
         private void HandleState(Button button, bool pressOrRelease)
@@ -134,7 +144,7 @@ namespace GameBot.Engine.Physical.Actuators
             {
                 _state1 &= ~bitmask;
             }
-            _or1.SetValue(_state1);
+            _isDirtyOr1 = true;
         }
 
         private void HandleState2Bit(int bitmask, bool pressOrRelease)
@@ -147,7 +157,21 @@ namespace GameBot.Engine.Physical.Actuators
             {
                 _state2 &= ~bitmask;
             }
-            _or2.SetValue(_state2);
+            _isDirtyOr2 = true;
+        }
+
+        private void Update()
+        {
+            if (_isDirtyOr1)
+            {
+                _or1.SetValue(_state1);
+                _isDirtyOr1 = false;
+            }
+            if (_isDirtyOr2)
+            {
+                _or2.SetValue(_state2);
+                _isDirtyOr2 = false;
+            }
         }
 
         public void Dispose()

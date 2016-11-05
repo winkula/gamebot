@@ -4,7 +4,6 @@ using GameBot.Core.Quantizers;
 using GameBot.Engine.Physical.Actuators;
 using GameBot.Engine.Physical.Cameras;
 using GameBot.Engine.Physical.Clocks;
-using GameBot.Engine.Physical.Quantizers;
 using SimpleInjector;
 using SimpleInjector.Packaging;
 

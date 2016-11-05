@@ -1,4 +1,5 @@
-﻿using GameBot.Core;
+﻿using System.Collections.Generic;
+using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Emulation;
 
@@ -18,6 +19,14 @@ namespace GameBot.Engine.Emulated.Actuators
             lock (_emulator)
             {
                 _emulator.Hit(button);
+            }
+        }
+
+        public void Hit(IEnumerable<Button> buttons)
+        {
+            lock (_emulator)
+            {
+                _emulator.Hit(buttons);
             }
         }
 

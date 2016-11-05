@@ -22,9 +22,11 @@
 using GameBot.Core;
 using GameBot.Core.Data;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace GameBot.Emulation
@@ -479,6 +481,29 @@ namespace GameBot.Emulation
                 PressButtonInternal(button);
                 Execute(_framesAfterButton);
                 ReleaseButtonInternal(button);
+                Execute(_framesAfterButton);
+            }
+        }
+
+        public void Hit(IEnumerable<Button> buttons)
+        {
+            if (buttons == null) throw new ArgumentNullException(nameof(buttons));
+            var buttonsList = buttons.ToList();
+
+            if (Running && !IsError())
+            {
+                _anyButtonsPressed = true;
+
+                foreach (var button in buttonsList)
+                {
+                    PressButtonInternal(button);
+                }
+                Execute(_framesAfterButton);
+
+                foreach (var button in buttonsList)
+                {
+                    ReleaseButtonInternal(button);
+                }
                 Execute(_framesAfterButton);
             }
         }

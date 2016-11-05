@@ -217,10 +217,10 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void SetStateExecute(SearchResult results)
         {
-            var moves = new Queue<Move>(results.Moves);
+            var moves = results.Moves.ToList();
             var tracedPiece = new Piece(_agent.GameState.Piece);
 
-            _agent.SetStateAndContinue(new TetrisExecuteState(_agent, moves, tracedPiece, _extractedPieceTimestamp));
+            _agent.SetStateAndContinue(new TetrisExecuteAllState(_agent, moves, tracedPiece));
         }
     }
 }

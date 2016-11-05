@@ -1,4 +1,5 @@
-﻿using GameBot.Core.Data;
+﻿using System.Collections.Generic;
+using GameBot.Core.Data;
 
 namespace GameBot.Core
 {
@@ -12,6 +13,12 @@ namespace GameBot.Core
         /// </summary>
         /// <param name="button">The button to hit.</param>
         void Hit(Button button);
+
+        /// <summary>
+        /// Hits multiple buttons for a minimal amount of time.
+        /// </summary>
+        /// <param name="buttons">The buttons to hit.</param>
+        void Hit(IEnumerable<Button> buttons);
 
         /// <summary>
         /// Presses a button down.

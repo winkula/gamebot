@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GameBot.Core.Data;
 
@@ -18,6 +19,11 @@ namespace GameBot.Core.Executors
         public void Hit(Button button)
         {
             _actuator.Hit(button);
+        }
+
+        public void Hit(IEnumerable<Button> buttons)
+        {
+            _actuator.Hit(buttons);
         }
 
         public void Hit(Button button, TimeSpan duration)
