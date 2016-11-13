@@ -13,8 +13,8 @@ namespace GameBot.Engine.Physical.Actuators
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private const int _delayHit = 40;
-        private const int _delayCommand = 80;
+        private const int _delayHit = 35;
+        private const int _delayCommand = 40;
 
         private readonly IPConnection _ipcon;
         private readonly BrickletIndustrialQuadRelay _or1;

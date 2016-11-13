@@ -3,6 +3,7 @@ using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using NLog;
 using System;
+using System.Threading;
 
 namespace GameBot.Game.Tetris.Agents.States
 {
@@ -87,8 +88,11 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             // sequence handles both cases (with and without entry in high score table)
             actuator.Hit(Button.Start);
+            Thread.Sleep(100);
             actuator.Hit(Button.B);
+            Thread.Sleep(100);
             actuator.Hit(Button.Start);
+            Thread.Sleep(100);
             actuator.Hit(Button.Start);
         }
 
@@ -100,12 +104,15 @@ namespace GameBot.Game.Tetris.Agents.States
             if (startLevel >= 5)
             {
                 actuator.Hit(Button.Down);
+                Thread.Sleep(100);
             }
             for (int i = 0; i < (startLevel % 5); i++)
             {
                 actuator.Hit(Button.Right);
+                Thread.Sleep(100);
             }
             actuator.Hit(Button.A);
+            Thread.Sleep(100);
         }
     }
 }
