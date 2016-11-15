@@ -13,7 +13,7 @@ namespace GameBot.Test.Core.Data
         [Test]
         public void ConstructorImage()
         {
-            var image = Image.FromFile("Screenshots/tetris_start.png");
+            var image = new Mat("Screenshots/tetris_start.png", LoadImageType.Grayscale);
             Assert.NotNull(image);
 
             var width = image.Width;
@@ -31,7 +31,7 @@ namespace GameBot.Test.Core.Data
         [Test]
         public void ConstructorBitmap()
         {
-            var image = new Bitmap("Screenshots/tetris_start.png");
+            var image = new Mat("Screenshots/tetris_start.png", LoadImageType.Grayscale);
             Assert.NotNull(image);
 
             var width = image.Width;
@@ -79,7 +79,7 @@ namespace GameBot.Test.Core.Data
         [Test]
         public void GetPixel()
         {
-            var image = Image.FromFile("Screenshots/tetris_start.png");
+            var image = new Mat("Screenshots/tetris_start.png", LoadImageType.Grayscale);
             Assert.NotNull(image);
 
             var timestamp = TimeSpan.FromSeconds(6);

@@ -138,7 +138,6 @@ namespace GameBot.Game.Tetris.Agents.States
         private void UpdateCurrentPiece(Piece newPiece)
         {
             _agent.TracedPiece = newPiece;
-            _agent.ExpectedPiece = newPiece;
             _agent.GameState.Piece = new Piece(newPiece);
         }
 

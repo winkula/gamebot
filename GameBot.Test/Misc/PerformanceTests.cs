@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace GameBot.Test.Misc
 {
-    //[Ignore]
+    [Ignore]
     [TestFixture]
     public class PerformanceTests
     {   

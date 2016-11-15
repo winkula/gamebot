@@ -5,7 +5,6 @@ using System.Drawing;
 using GameBot.Core.Data;
 using System;
 using Emgu.CV.CvEnum;
-using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Agents.States;
@@ -21,7 +20,7 @@ namespace GameBot.Game.Tetris.Agents
         // state informations
         private ITetrisAgentState _state;
         private bool _continue;
-        
+
         // services and data used by states
         public IConfig Config { get; private set; }
         public IQuantizer Quantizer { get; private set; }
@@ -32,17 +31,14 @@ namespace GameBot.Game.Tetris.Agents
 
         // data used by states
         public GameState GameState { get; set; }
-        
+
         // config used by states
         public int CheckSamples { get; }
         public int ExtractionSamples { get; }
-        //public double ExtractionLowerThreshold { get; }
-        //public double ExtractionUpperThreshold { get; }
 
         // for visualization only
         public Piece ExtractedPiece { private get; set; }
         public Piece TracedPiece { private get; set; }
-        public Piece ExpectedPiece { private get; set; }
         public Tetrimino? ExtractedNextPiece { private get; set; }
 
         public TetrisAgent(IConfig config, IQuantizer quantizer, IExtractor extractor, ISearch search)
@@ -97,9 +93,15 @@ namespace GameBot.Game.Tetris.Agents
 
         public IImage Visualize(IImage image)
         {
-            if (!_visualize) return image;
-            var visualization = new Image<Bgr, byte>(image.Bitmap);
+            if (!_visualize)
+            {
+                // no visualization
+                return image;
+            }
 
+            var visualization = new Mat();
+            CvInvoke.CvtColor(image, visualization, ColorConversion.Gray2Bgr);
+            
             if (GameState?.Board != null)
             {
                 var board = GameState.Board;
@@ -119,16 +121,6 @@ namespace GameBot.Game.Tetris.Agents
             {
                 // current piece
                 var piece = TracedPiece;
-                foreach (var block in piece.Shape.Body)
-                {
-                    var tileCoordinates = Coordinates.PieceToTile(piece.X + block.X, piece.Y + block.Y);
-                    Draw(visualization, tileCoordinates, Color.Khaki);
-                }
-            }
-            if (ExpectedPiece != null)
-            {
-                // current piece
-                var piece = ExpectedPiece;
                 foreach (var block in piece.Shape.Body)
                 {
                     var tileCoordinates = Coordinates.PieceToTile(piece.X + block.X, piece.Y + block.Y);
@@ -154,7 +146,7 @@ namespace GameBot.Game.Tetris.Agents
                     Draw(visualization, tileCoordinates, Color.LimeGreen);
                 }
             }
-            
+
             return visualization;
         }
 

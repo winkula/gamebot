@@ -189,6 +189,7 @@
     <Compile Include="Game\Tetris\Data\BoardTests.cs" />
     <Compile Include="Game\Tetris\Data\TetrominoTests.cs" />
     <Compile Include="ImageTestCaseFactory.cs" />
+    <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

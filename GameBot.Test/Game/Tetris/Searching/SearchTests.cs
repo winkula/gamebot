@@ -56,8 +56,8 @@ namespace GameBot.Test.Game.Tetris.Searching
             _logger.Info(result.GoalGameState);
 
             Assert.AreEqual(3, result.Moves.Count());
-            Assert.AreEqual(Move.Rotate, result.Moves.ToList()[0]);
-            Assert.AreEqual(Move.Rotate, result.Moves.ToList()[1]);
+            Assert.AreEqual(Move.RotateCounterclockwise, result.Moves.ToList()[0]);
+            Assert.AreEqual(Move.RotateCounterclockwise, result.Moves.ToList()[1]);
             Assert.AreEqual(Move.Drop, result.Moves.ToList()[2]);
         }
 

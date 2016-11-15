@@ -7,6 +7,7 @@ using System.Threading;
 using GameBot.Core;
 using GameBot.Core.Configuration;
 using NLog;
+using TimeoutException = Tinkerforge.TimeoutException;
 
 namespace GameBot.Test.Engine.Physical.Actuators
 {
@@ -20,7 +21,25 @@ namespace GameBot.Test.Engine.Physical.Actuators
         [TestFixtureSetUp]
         public void Init()
         {
+            if (!IsBrickdRunning())
+            {
+                Assert.Ignore("Brickd is not running.");
+            }
+
             _config = new AppSettingsConfig();
+        }
+        
+        private bool IsBrickdRunning()
+        {
+            try
+            {
+                var actuator = new PhysicalActuator(new AppSettingsConfig());
+                return true;
+            }
+            catch (TimeoutException)
+            {
+                return false;
+            }
         }
 
         [Test]
@@ -124,7 +143,7 @@ namespace GameBot.Test.Engine.Physical.Actuators
                     actuator.Hit(Button.Left);
                     Thread.Sleep(Time);
                 }
-                
+
             }
         }
 
@@ -156,7 +175,7 @@ namespace GameBot.Test.Engine.Physical.Actuators
         public void HighscoreRoutine()
         {
             var simulator = new HighscoreSimulator();
-            var sequence = new []
+            var sequence = new[]
             {
                 Button.Up, Button.A,
                 Button.Up, Button.A,
@@ -164,7 +183,7 @@ namespace GameBot.Test.Engine.Physical.Actuators
                 Button.Up, Button.A,
                 Button.Up, Button.A,
                 Button.Up,
-               
+
                 Button.Up, Button.B,
                 Button.Up, Button.B,
                 Button.Up, Button.B,

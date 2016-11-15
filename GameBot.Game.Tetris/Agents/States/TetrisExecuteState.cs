@@ -106,7 +106,7 @@ namespace GameBot.Game.Tetris.Agents.States
         private void Execute(Move move)
         {
             _logger.Info($"Execute {move}");
-            _agent.ExpectedPiece = new Piece(_tracedPiece).Apply(move);
+            _agent.TracedPiece = new Piece(_tracedPiece).Apply(move);
 
             var gameStateSimulation = new GameState(_agent.GameState);
             switch (move)

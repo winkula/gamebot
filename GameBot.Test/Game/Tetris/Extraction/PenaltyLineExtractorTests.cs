@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 namespace GameBot.Test.Game.Tetris.Extraction
 {
+    [Ignore]
     [TestFixture]
     public class PenaltyLineExtractorTests
     {

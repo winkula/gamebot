@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Drawing;
 using GameBot.Core;
 using GameBot.Emulation;
 using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 
 namespace GameBot.Engine.Emulated.Cameras
@@ -26,26 +28,40 @@ namespace GameBot.Engine.Emulated.Cameras
 
         public IImage Capture()
         {
-            Image<Gray, byte> image;
+            Mat image = new Mat();
+
             lock (_emulator)
             {
-                image = new Image<Gray, byte>(_emulator.Display);
+                new Image<Gray, byte>(_emulator.Display).Mat.CopyTo(image);
             }
 
             if (_addNoise)
             {
-                const double noiseLevel = 0.75;
-                const int gaussSize = 13;
-
-                var noise = new Image<Gray, byte>(image.Size);
-                noise.SetRandNormal(new MCvScalar(0), new MCvScalar(255));
-                noise = noise.SmoothGaussian(gaussSize);
-                
-                image = image.AddWeighted(noise, 1 - noiseLevel, noiseLevel, 0);
-                image = image.Mul(0.5).Add(new Gray(100));
+                AddNoise(image);
             }
 
             return image;
+        }
+
+        private void AddNoise(Mat image)
+        {
+            const double noiseLevel = 0.75;
+            var mean = new MCvScalar(0);
+            var std = new MCvScalar(255);
+            const int gaussSize = 13;
+            const double scale = 0.5;
+            const double shift = 100;
+
+            var noise = new Mat(image.Size, DepthType.Cv8U, 1);
+
+            using (ScalarArray scalarArray1 = new ScalarArray(mean))
+            using (ScalarArray scalarArray2 = new ScalarArray(std))
+            {
+                CvInvoke.Randn(noise, scalarArray1, scalarArray2);
+            }
+            CvInvoke.GaussianBlur(noise, noise, new Size(gaussSize, gaussSize), 0.0);
+            CvInvoke.AddWeighted(image, 1 - noiseLevel, noise, noiseLevel, 0, image, image.Depth);
+            CvInvoke.ConvertScaleAbs(image, image, scale, shift);
         }
     }
 }

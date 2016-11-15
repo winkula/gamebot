@@ -44,7 +44,6 @@ namespace GameBot.Game.Tetris.Agents.States
             _agent.ExtractedPiece = null;
             _agent.ExtractedNextPiece = null;
             _agent.TracedPiece = null;
-            _agent.ExpectedPiece = null;
         }
 
         public void Extract()

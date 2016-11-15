@@ -40,14 +40,6 @@ namespace GameBot.Core.Data
             Timestamp = timestamp;
         }
 
-        public EmguScreenshot(Image image, TimeSpan timestamp) : this(new Image<Gray, byte>(new Bitmap(image)), timestamp)
-        {
-        }
-
-        public EmguScreenshot(Bitmap bitmap, TimeSpan timestamp) : this(new Image<Gray, byte>(bitmap), timestamp)
-        {
-        }
-
         public EmguScreenshot(string file, TimeSpan timestamp) : this(new Mat(file, LoadImageType.Grayscale), timestamp)
         {
         }

@@ -20,7 +20,7 @@ using GameBot.Game.Tetris.Extraction.Matchers;
 
 namespace GameBot.Test.Misc
 {
-    //[Ignore]
+    [Ignore]
     [TestFixture]
     public class MaethuQuantizerTests
     {
@@ -149,49 +149,7 @@ namespace GameBot.Test.Misc
             var pieceMatcher = new TemplateMatcher();
             pieceMatcher.GetProbabilityNextPiece(screenshot, Tetrimino.I);
         }
-
-        [Test]
-        public void RenameTestData()
-        {
-            foreach (var record in ImageTestCaseFactory.Data)
-            {
-                var sb = new StringBuilder();
-
-                if (record.Piece != null)
-                {
-                    sb.Append($"{record.Piece.Tetrimino}{record.Piece.Orientation:D1}{record.Piece.X:D3}{-record.Piece.Y:D3}");
-                }
-                else
-                {
-                    sb.Append(new string('_', 6));
-                }
-
-                sb.Append("_");
-
-                if (record.NextPiece.HasValue)
-                {
-                    sb.Append($"{record.NextPiece.Value}");
-                }
-                else
-                {
-                    sb.Append("_");
-                }
-
-                sb.Append("_");
-
-                sb.Append(new string('_', 2 * 10));
-
-                sb.Append("_");
-
-                sb.Append(string.Join("", record.Keypoints.Select(p => $"{p.X:D3}{p.Y:D3}")));
-
-                // TOXXYY_T_00112233445566778899_000111222333444555666777
-
-                string name = sb.ToString();
-                File.Copy($"Images/test{record.ImageKey}.jpg", $"Images/{name}.jpg");
-            }
-        }
-
+        
         [Test]
         public void TestMe()
         {
@@ -250,31 +208,7 @@ namespace GameBot.Test.Misc
 
         private void Canny(IImage img)
         {
-            //CvInvoke.GaussianBlur(img, img, new Size(3, 3), 0.6, 0.6, BorderType.Default);
             CvInvoke.Canny(img, img, 200, 900, 5);
         }
-
-        /*
-        private void CannyDilate(IImage img)
-        {
-            var dilate = new Image<Gray, byte>(TestImages.dilate);
-
-            //CvInvoke.GaussianBlur(img, img, new Size(3, 3), 0.6, 0.6, BorderType.Default);
-            CvInvoke.Canny(img, img, 70, 70, 3);
-            CvInvoke.Dilate(img, img, dilate, new Point(1, 1), 1, BorderType.Default, new MCvScalar(1));
-            //CvInvoke.Erode(img, img, dilate, new Point(1, 1), 1, BorderType.Default, new Emgu.CV.Structure.MCvScalar(1));
-
-            //var template = new Mat(@"C:\users\winkler\desktop\block.png", LoadImageType.Grayscale);
-            //CvInvoke.MatchTemplate(img, template, img, TemplateMatchingType.CcoeffNormed);
-        }
-
-        private void TemplateMatching(IImage img)
-        {
-            var template = new Image<Gray, byte>(TestImages.block);
-
-            CvInvoke.GaussianBlur(img, img, new Size(3, 3), 0.3, 0.3, BorderType.Default);
-            //CvInvoke.AdaptiveThreshold(img, img, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 5, 5);
-            CvInvoke.MatchTemplate(img, template, img, TemplateMatchingType.CcoeffNormed);
-        }*/
     }
 }
