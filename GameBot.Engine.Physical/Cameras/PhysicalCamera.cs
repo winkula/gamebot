@@ -24,7 +24,7 @@ namespace GameBot.Engine.Physical.Cameras
             _capture.Start();
         }
 
-        public IImage Capture()
+        public Mat Capture()
         {
             var src = new Mat();
 

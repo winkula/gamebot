@@ -20,7 +20,7 @@ namespace GameBot.Test
         public class TestData
         {
             public string ImageKey { get; }
-            public IImage Image { get; }
+            public Mat Image { get; }
             private string ImagePath => $"Images/test{ImageKey}.jpg";
             public Point[] Keypoints { get; }
             public Piece Piece { get; }

@@ -15,8 +15,8 @@ namespace GameBot.Core.Data
         private const int _tileSize = GameBoyConstants.TileSize;
         private static readonly Mat _black;
 
-        public IImage Image { get; }
-        public IImage OriginalImage { get; set; }
+        public Mat Image { get; }
+        public Mat OriginalImage { get; set; }
         public byte[] Pixels { get; }
         public int Width { get; }
         public int Height { get; }
@@ -28,7 +28,7 @@ namespace GameBot.Core.Data
             _black.SetTo(new MCvScalar(0, 0, 0));
         }
 
-        public EmguScreenshot(IImage image, TimeSpan timestamp)
+        public EmguScreenshot(Mat image, TimeSpan timestamp)
         {
             Image = image;
 

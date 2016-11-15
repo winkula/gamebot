@@ -34,7 +34,7 @@ namespace GameBot.Engine.Physical.Quantizers
             _block = block;
         }
 
-        public IImage Quantize(IImage image)
+        public Mat Quantize(Mat image)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();

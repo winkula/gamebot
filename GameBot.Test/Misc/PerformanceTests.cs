@@ -11,7 +11,7 @@ namespace GameBot.Test.Misc
     {   
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private Capture _capture;
-        private IImage _image;
+        private Mat _image;
 
         [TestFixtureSetUp]
         public void Init()

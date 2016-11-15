@@ -13,12 +13,12 @@ namespace GameBot.Core.Data
         /// <summary>
         /// Gets or sets the original underlying EmguCV image.
         /// </summary>
-        IImage OriginalImage { get; set; }
-        
+        Mat OriginalImage { get; set; }
+
         /// <summary>
         /// Gets the processed underlying EmguCV image.
         /// </summary>
-        IImage Image { get; }
+        Mat Image { get; }
 
         /// <summary>
         /// Gets the pixels of the screenshot row by row.

@@ -67,7 +67,7 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
             return probabilitySum / numBlocks;
         }
 
-        private double GetBlockProbability(IImage image, Point tileCoordinates)
+        private double GetBlockProbability(Mat image, Point tileCoordinates)
         {
             // probability that block is outside of the screen is always 0.0
             if (tileCoordinates.X < 0 || tileCoordinates.X >= GameBoyConstants.ScreenWidth / GameBoyConstants.TileSize) return 0.0;

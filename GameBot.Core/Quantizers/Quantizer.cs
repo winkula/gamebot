@@ -34,10 +34,10 @@ namespace GameBot.Core.Quantizers
             Keypoints = new List<Point> { new Point(keypoints[0], keypoints[1]), new Point(keypoints[2], keypoints[3]), new Point(keypoints[4], keypoints[5]), new Point(keypoints[6], keypoints[7]) };
         }
 
-        public override IImage Quantize(IImage image)
+        public override Mat Quantize(Mat image)
         {
             // convert to gray values
-            IImage imageGray = new Mat();
+            Mat imageGray = new Mat();
             if (image.NumberOfChannels > 1)
             {
                 CvInvoke.CvtColor(image, imageGray, ColorConversion.Rgb2Gray);

@@ -91,7 +91,7 @@ namespace GameBot.Game.Tetris.Agents
             _state.Extract();
         }
 
-        public IImage Visualize(IImage image)
+        public Mat Visualize(Mat image)
         {
             if (!_visualize)
             {
@@ -150,7 +150,7 @@ namespace GameBot.Game.Tetris.Agents
             return visualization;
         }
 
-        private void Draw(IImage image, Point tileCoordinates, Color color)
+        private void Draw(Mat image, Point tileCoordinates, Color color)
         {
             const int frameSize = 0;
             var rectangle = new Rectangle(GameBoyConstants.TileSize * tileCoordinates.X + frameSize, GameBoyConstants.TileSize * tileCoordinates.Y + frameSize, GameBoyConstants.TileSize - 2 * frameSize - 1, GameBoyConstants.TileSize - 2 * frameSize - 1);

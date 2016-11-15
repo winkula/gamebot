@@ -26,7 +26,7 @@ namespace GameBot.Engine.Emulated.Cameras
             _emulator = emulator;
         }
 
-        public IImage Capture()
+        public Mat Capture()
         {
             Mat image = new Mat();
 

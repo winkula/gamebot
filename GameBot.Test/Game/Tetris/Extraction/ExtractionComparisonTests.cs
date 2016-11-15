@@ -319,7 +319,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             return null;
         }
 
-        private IScreenshot GetScreenshot(IQuantizer quantizer, IImage image, Point[] keypoints, double shift)
+        private IScreenshot GetScreenshot(IQuantizer quantizer, Mat image, Point[] keypoints, double shift)
         {
             var shiftedKeypoints = ShiftKeypoints(keypoints, shift);
             quantizer.Keypoints = shiftedKeypoints;

@@ -29,7 +29,7 @@ namespace GameBot.Engine.Physical.Quantizers
             _threshold = threshold;
         }
 
-        public IImage Quantize(IImage image)
+        public Mat Quantize(Mat image)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();

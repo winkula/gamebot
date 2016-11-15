@@ -20,7 +20,7 @@ namespace GameBot.Engine.Physical.Quantizers
             Keypoints = new List<Point> { new Point(keypoints[0], keypoints[1]), new Point(keypoints[2], keypoints[3]), new Point(keypoints[4], keypoints[5]), new Point(keypoints[6], keypoints[7]) };
         }
 
-        public override IImage Quantize(IImage image)
+        public override Mat Quantize(Mat image)
         {
             // convert to gray values
             var imageGray = new Mat();

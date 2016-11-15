@@ -229,7 +229,7 @@ namespace GameBot.Robot.Ui
             }
         }
 
-        public void ShowOriginal(IImage original)
+        private void ShowOriginal(Mat original)
         {
             try
             {
@@ -241,7 +241,7 @@ namespace GameBot.Robot.Ui
             }
         }
 
-        public void ShowProcessed(IImage processed)
+        private void ShowProcessed(Mat processed)
         {
             try
             {

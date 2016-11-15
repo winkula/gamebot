@@ -109,17 +109,8 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
 
             // load screenshot
             // we handle to cases (one with more performance for the physical engine, the other for the emulator)
-            Mat originalMat = screenshot.Image as Mat;
-            Image<Gray, byte> originalImage = null;
-            if (originalMat == null)
-            {
-                originalImage = screenshot.Image as Image<Gray, byte>;
-                if (originalImage == null)
-                {
-                    originalImage = new Image<Gray, byte>(screenshot.Image.Bitmap);
-                }
-            }
-
+            Mat originalMat = screenshot.Image;
+            
             // get template and it's mask
             var templateIndex = GetTemplateIndex(piece);
             var template = _templates[templateIndex];
@@ -139,10 +130,7 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
                 {
                     originalMat.CopyTo(combined);
                 }
-                else
-                {
-                    originalImage.CopyTo(combined);
-                }
+
                 combined.ROI = Rectangle.Empty;
                 var reference = combined.Clone();
                 combined.ROI = mainRoi;
@@ -180,16 +168,9 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
 
             // load screenshot
             // we handle to cases (one with more performance for the physical engine, the other for the emulator)
-            Mat originalMat = screenshot.Image as Mat;
+            Mat originalMat = screenshot.Image;
             Image<Gray, byte> originalImage = null;
-            if (originalMat == null)
-            {
-                originalImage = screenshot.Image as Image<Gray, byte>;
-                if (originalImage == null)
-                {
-                    originalImage = new Image<Gray, byte>(screenshot.Image.Bitmap);
-                }
-            }
+            
 
             // get template and it's mask
             var templateIndex = (int)tetrimino;

@@ -14,7 +14,7 @@ namespace GameBot.Core.Quantizers
             _kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(7, 7), new Point(-1, -1));
         }
 
-        public override IImage Quantize(IImage image)
+        public override Mat Quantize(Mat image)
         {
             var dst = base.Quantize(image);
 

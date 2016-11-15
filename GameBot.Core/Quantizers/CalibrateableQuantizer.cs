@@ -43,6 +43,6 @@ namespace GameBot.Core.Quantizers
             }
         }
 
-        public abstract IImage Quantize(IImage image);
+        public abstract Mat Quantize(Mat image);
     }
 }

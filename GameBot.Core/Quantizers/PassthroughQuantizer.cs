@@ -17,7 +17,7 @@ namespace GameBot.Core.Quantizers
             };
         }
 
-        public override IImage Quantize(IImage image)
+        public override Mat Quantize(Mat image)
         {
             return image;
         }

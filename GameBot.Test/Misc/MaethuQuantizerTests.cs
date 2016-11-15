@@ -89,55 +89,7 @@ namespace GameBot.Test.Misc
 
             sw.Stop();
         }
-
-        [Test]
-        public void OpenMorphological()
-        {
-            var data = ImageTestCaseFactory.Data;
-            foreach (var testData in data)
-            {
-                var quantizer = new Quantizer(new AppSettingsConfig());
-                quantizer.ThresholdConstant = 13;
-                quantizer.ThresholdBlockSize = 17;
-                quantizer.Keypoints = testData.Keypoints;
-                var src = quantizer.Quantize(testData.Image);
-
-                //Image<Gray, byte> src = new Image<Gray, byte>(@"C:\Users\Winkler\Desktop\quantizer_output.png");
-                Image<Gray, byte> dst = new Image<Gray, byte>(src.Size.Width, src.Size.Height);
-                var kernel = new ConvolutionKernelF(new float[,]
-                {
-                    { 1, 1, 1, 1, 1, 1, 1 },
-                    { 1, 1, 1, 1, 1, 1, 1 },
-                    { 1, 1, 1, 1, 1, 1, 1 },
-                    { 1, 1, 1, 1, 1, 1, 1 },
-                    { 1, 1, 1, 1, 1, 1, 1 },
-                    { 1, 1, 1, 1, 1, 1, 1 },
-                    { 1, 1, 1, 1, 1, 1, 1 },
-                });
-
-                var sw = new Stopwatch();
-                sw.Start();
-
-                CvInvoke.MorphologyEx(src, dst, MorphOp.Open, kernel, new Point(-1, -1), 1, BorderType.Replicate, new MCvScalar(-1));
-
-                sw.Stop();
-                _logger.Info($"Time for MorphologyEx: {sw.ElapsedMilliseconds}");
-
-                dst.SaveToDesktop("morpho");
-                CvInvoke.Imshow("test", dst);
-                CvInvoke.WaitKey();
-            }
-
-        }
-
-        [Test]
-        public void Roi()
-        {
-            var mat = new Image<Gray, byte>(160, 144);
-
-            CvInvoke.cvSetImageROI(mat.Ptr, new Rectangle(10, 10, 10, 10));
-        }
-
+        
         [Test]
         public void PieceMatcher()
         {
@@ -193,20 +145,20 @@ namespace GameBot.Test.Misc
             CvInvoke.WaitKey(0);
         }
 
-        private void GaussAndAdaptive(IImage img)
+        private void GaussAndAdaptive(Mat img)
         {
             CvInvoke.GaussianBlur(img, img, new Size(3, 3), 0.6, 0.6, BorderType.Default);
             CvInvoke.AdaptiveThreshold(img, img, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 5, 5);
         }
 
-        private void GaussContrastAndAdaptive(IImage img)
+        private void GaussContrastAndAdaptive(Mat img)
         {
             CvInvoke.GaussianBlur(img, img, new Size(3, 3), 0.6, 0.6, BorderType.Default);
             ((Mat)img).ConvertTo(img, DepthType.Default, 2, -200);
             CvInvoke.AdaptiveThreshold(img, img, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 5, 5);
         }
 
-        private void Canny(IImage img)
+        private void Canny(Mat img)
         {
             CvInvoke.Canny(img, img, 200, 900, 5);
         }

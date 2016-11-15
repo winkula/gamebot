@@ -54,14 +54,14 @@ namespace GameBot.Engine.Emulated
             _clock.Start();
         }
 
-        public void Step(Action<IImage> showImage = null, Action<IImage> showProcessedImage = null)
+        public void Step(Action<Mat> showImage = null, Action<Mat> showProcessedImage = null)
         {
             // get image as photo of the gameboy screen (input)
-            IImage image = _camera.Capture();
+            Mat image = _camera.Capture();
             TimeSpan time = _clock.Time;
 
             // process image
-            IImage processed = _quantizer.Quantize(image);
+            Mat processed = _quantizer.Quantize(image);
             
             showImage?.Invoke(image);
 

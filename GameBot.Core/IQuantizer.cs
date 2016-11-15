@@ -19,6 +19,6 @@ namespace GameBot.Core
         /// </summary>
         /// <param name="image">Noisy image or photos of the device's display.</param>
         /// <returns>A quantized image of the device's display.</returns>
-        IImage Quantize(IImage image);
+        Mat Quantize(Mat image);
     }
 }

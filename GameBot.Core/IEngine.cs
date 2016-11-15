@@ -27,7 +27,7 @@ namespace GameBot.Core
         /// <param name="showImage">Callback with the original image.</param>
         /// <param name="showProcessedImage">Callback with the processed image.</param>
         /// <returns>The engines result.</returns>
-        void Step(Action<IImage> showImage = null, Action<IImage> showProcessedImage = null);
+        void Step(Action<Mat> showImage = null, Action<Mat> showProcessedImage = null);
 
         /// <summary>
         /// Resets the underlying agent.
