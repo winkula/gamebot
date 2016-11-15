@@ -113,7 +113,7 @@ namespace GameBot.Game.Tetris.Agents.States
             // execute the drop blocking
             // we must wait until the drop is ended before we can continue
             // TODO: here we could do some precalculations for the next search (and execute the drop asynchronous)???
-            _agent.Executor.Hit(Button.Down, waitDuration);
+            _agent.Executor.Hold(Button.Down, waitDuration);
         }
         
         private void Execute(ICollection<Move> moves)

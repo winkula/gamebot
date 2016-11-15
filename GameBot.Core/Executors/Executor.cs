@@ -26,7 +26,13 @@ namespace GameBot.Core.Executors
             _actuator.Hit(buttons);
         }
 
-        public void Hit(Button button, TimeSpan duration)
+        public void HitWait(Button button, TimeSpan duration)
+        {
+            _actuator.Hit(button);
+            _clock.Sleep((int)duration.TotalMilliseconds);
+        }
+
+        public void Hold(Button button, TimeSpan duration)
         {
             _actuator.Press(button);
             _clock.Sleep((int) duration.TotalMilliseconds);
@@ -41,7 +47,7 @@ namespace GameBot.Core.Executors
             });
         }
 
-        public async void HitAsync(Button button, TimeSpan duration)
+        public async void HoldAsync(Button button, TimeSpan duration)
         {
             await Task.Run(() =>
             {

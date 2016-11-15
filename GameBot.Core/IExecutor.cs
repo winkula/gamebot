@@ -10,41 +10,45 @@ namespace GameBot.Core
     public interface IExecutor
     {
         /// <summary>
-        /// Hits a button for a minimal amount of time.
-        /// This blocks the calling thread.
+        /// Hits a button.
         /// </summary>
         /// <param name="button">The button to hit.</param>
         void Hit(Button button);
 
         /// <summary>
-        /// Hits buttons parallel for a minimal amount of time.
-        /// This blocks the calling thread.
+        /// Hits buttons parallel.
         /// </summary>
         /// <param name="buttons">The buttons to hit.</param>
         void Hit(IEnumerable<Button> buttons);
 
         /// <summary>
-        /// Hits a button for a specifified amount of time.
-        /// This blocks the calling thread.
+        /// Hits a button and waits for the specified duration.
         /// </summary>
         /// <param name="button">The button to hit.</param>
-        /// <param name="duration">The button to hit.</param>
-        void Hit(Button button, TimeSpan duration);
+        /// <param name="duration">The wait duration.</param>
+        void HitWait(Button button, TimeSpan duration);
 
         /// <summary>
-        /// Hits a button for a minimal amount of time.
+        /// Holds a button for a specifified amount of time.
+        /// </summary>
+        /// <param name="button">The button to hold.</param>
+        /// <param name="duration">The hold duration.</param>
+        void Hold(Button button, TimeSpan duration);
+
+        /// <summary>
+        /// Hits a button.
         /// This call is async and doesn't block the calling thread.
         /// </summary>
         /// <param name="button">The button to hit.</param>
         void HitAsync(Button button);
 
         /// <summary>
-        /// Hits a button for a specifified amount of time.
+        /// Holds a button for a specifified amount of time.
         /// This call is async and doesn't block the calling thread.
         /// </summary>
-        /// <param name="button">The button to hit.</param>
-        /// <param name="duration">The button to hit.</param>
-        void HitAsync(Button button, TimeSpan duration);
+        /// <param name="button">The button to hold.</param>
+        /// <param name="duration">The hold duration.</param>
+        void HoldAsync(Button button, TimeSpan duration);
 
         /// <summary>
         /// Presses a button down.

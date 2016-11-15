@@ -78,7 +78,7 @@ namespace GameBot.Test.Core.Executors
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            executor.HitAsync(button, TimeSpan.FromMilliseconds(miliseconds));
+            executor.HoldAsync(button, TimeSpan.FromMilliseconds(miliseconds));
 
             stopwatch.Stop();
 
