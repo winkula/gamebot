@@ -27,6 +27,9 @@ namespace GameBot.Test.Game.Tetris.Searching
             _predictiveSearch = new PredictiveSearch(_heuristic);
             _recursiveSearch = new RecursiveSearch(_heuristic);
             _recursiveSearch.Depth = 2;
+
+            // init lookups
+            var lookups = BoardLookups.Instance;
         }
 
         [TestCase(Tetrimino.O, Tetrimino.S)]
@@ -36,6 +39,9 @@ namespace GameBot.Test.Game.Tetris.Searching
         [TestCase(Tetrimino.L, Tetrimino.O)]
         [TestCase(Tetrimino.J, Tetrimino.T)]
         [TestCase(Tetrimino.T, Tetrimino.J)]
+        [TestCase(Tetrimino.I, Tetrimino.I)]
+        [TestCase(Tetrimino.S, Tetrimino.T)]
+        [TestCase(Tetrimino.Z, Tetrimino.T)]
         public void SimpleSearch(Tetrimino current, Tetrimino next)
         {
             var gameState = new GameState(current, next);

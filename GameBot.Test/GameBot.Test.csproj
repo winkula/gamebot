@@ -154,6 +154,7 @@
     <Compile Include="Core\Data\Commands\HitCommandTests.cs" />
     <Compile Include="Core\Executors\ExecutorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\ExtractionComparisonTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\Extractors\MorphologyExtractorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Matchers\MorphologyMatcherTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Samplers\MoveConfirmationSamplerTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Samplers\NextTetriminoSamplerTests.cs" />

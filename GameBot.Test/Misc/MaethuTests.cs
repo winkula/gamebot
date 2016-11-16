@@ -8,20 +8,14 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using GameBot.Core.Configuration;
 using GameBot.Core.Data;
-using GameBot.Core.Extensions;
-using GameBot.Core.Quantizers;
 using GameBot.Emulation;
-using GameBot.Engine.Physical.Quantizers;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
 
 namespace GameBot.Test.Misc
 {
-    //[Ignore]
+    [Ignore]
     [TestFixture]
     public class MaethuTests
     {
