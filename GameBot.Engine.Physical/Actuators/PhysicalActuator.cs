@@ -13,9 +13,9 @@ namespace GameBot.Engine.Physical.Actuators
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private const int _delayHit = 35;
-        private const int _delayCommand = 40;
-
+        private const int _delayHold = 35;
+        private const int _delayReleased = 40;
+        
         private readonly IPConnection _ipcon;
         private readonly BrickletIndustrialQuadRelay _or1;
         private readonly BrickletIndustrialQuadRelay _or2;
@@ -58,10 +58,10 @@ namespace GameBot.Engine.Physical.Actuators
 
             HandleState(button, true);
             Update();
-            Thread.Sleep(_delayHit);
+            Thread.Sleep(_delayHold);
             HandleState(button, false);
             Update();
-            Thread.Sleep(_delayCommand);
+            Thread.Sleep(_delayReleased);
         }
 
         public void Hit(IEnumerable<Button> buttons)
@@ -74,13 +74,13 @@ namespace GameBot.Engine.Physical.Actuators
                 HandleState(button, true);
             }
             Update();
-            Thread.Sleep(_delayHit);
+            Thread.Sleep(_delayHold);
             foreach (var button in buttonsList)
             {
                 HandleState(button, false);
             }
             Update();
-            Thread.Sleep(_delayCommand);
+            Thread.Sleep(_delayReleased);
         }
 
         public void Press(Button button)

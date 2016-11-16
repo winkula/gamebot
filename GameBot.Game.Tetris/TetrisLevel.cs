@@ -7,7 +7,7 @@ namespace GameBot.Game.Tetris
     /// the level advances by 1. After this, the level advances by 1 for every 10 lines
     /// http://harddrop.com/wiki/Tetris_(Game_Boy)
     /// </summary>
-    public class TetrisLevel
+    public static class TetrisLevel
     {
         // frames per row
         private static readonly int[] _levelSpeeds = { 53, 49, 45, 41, 37, 33, 28, 22, 17, 11, 10, 9, 8, 7, 6, 6, 5, 5, 4, 4, 3 };

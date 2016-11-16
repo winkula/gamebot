@@ -17,12 +17,9 @@ namespace GameBot.Robot.Ui
         [STAThread]
         static void Main()
         {
-            // create folders on desktop
-            // TODO: remove this (only for debugging)
-            string pathDebug = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "debug");
-            string pathTest = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "test");
-            Directory.CreateDirectory(pathDebug);
-            Directory.CreateDirectory(pathTest);
+#if DEBUG
+            CreateFolders();
+#endif
 
             using (var container = new Container())
             {
@@ -66,10 +63,20 @@ namespace GameBot.Robot.Ui
             return assemblyNames.Select(x => Assembly.Load(x)).ToList();
         }
 
+        static void CreateFolders()
+        {
+            // create folders on desktop
+            string pathDebug = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "debug");
+            string pathTest = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "test");
+            Directory.CreateDirectory(pathDebug);
+            Directory.CreateDirectory(pathTest);
+        }
+
         static void ConfigureLogging()
         {
             var config = new LoggingConfiguration();
 
+#if DEBUG
             var traceTarget = new TraceTarget();
             traceTarget.Layout = @"${message}";
             config.AddTarget("debugger", traceTarget);
@@ -81,6 +88,7 @@ namespace GameBot.Robot.Ui
             fileTarget.FileName = path;
             config.AddTarget("file", fileTarget);
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, fileTarget));
+#endif
 
             LogManager.Configuration = config;
         }

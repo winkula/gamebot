@@ -17,10 +17,6 @@ namespace GameBot.Test.Game.Tetris.Extraction
         private int _nextPieceRecognized;
         private int _unknownSpawnedPiece;
         private int _unknownSpawnedPieceRecognized;
-        private int _knownSpawnedPiece;
-        private int _knownSpawnedPieceRecognized;
-        private int _movedPiece;
-        private int _movedPieceRecognized;
 
         private TetrisExtractor _extractor;
 
@@ -104,8 +100,6 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             _logger.Info(BuildSummaryString("Test recognize unknown next piece", _nextPiece, _nextPieceRecognized));
             _logger.Info(BuildSummaryString("Test recognize unknown spawned piece", _unknownSpawnedPiece, _unknownSpawnedPieceRecognized));
-            _logger.Info(BuildSummaryString("Test recognize known spawned piece", _knownSpawnedPiece, _knownSpawnedPieceRecognized));
-            _logger.Info(BuildSummaryString("Test recognize moved piece", _movedPiece, _movedPieceRecognized));
         }
 
         private string BuildSummaryString(string title, int total, int recognized)

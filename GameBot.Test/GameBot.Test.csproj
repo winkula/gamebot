@@ -167,7 +167,7 @@
     <Compile Include="Misc\Playground.cs" />
     <Compile Include="Misc\PerformanceTests.cs" />
     <Compile Include="Engine\Physical\Actuators\PhysicalActuatorTests.cs" />
-    <Compile Include="Misc\MaethuQuantizerTests.cs" />
+    <Compile Include="Misc\MaethuTests.cs" />
     <Compile Include="Misc\PaeduQuantizerTests.cs" />
     <Compile Include="Misc\TinkerforgeTests.cs" />
     <Compile Include="Setup.cs" />

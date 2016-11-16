@@ -44,7 +44,7 @@ namespace GameBot.Emulation
         private const int _displayWidth = GameBoyConstants.ScreenWidth;
         private const int _displayHeight = GameBoyConstants.ScreenHeight;
 
-        private const int _framesAfterButton = 1;
+        private const int _framesAfterButton = 2;
 
         private readonly Random _random = new Random();
         private readonly X80 _cpu;
@@ -544,6 +544,12 @@ namespace GameBot.Emulation
                 ReleaseButtonInternal(button);
                 Execute(_framesAfterButton);
             }
+        }
+
+        public void Show()
+        {
+            CvInvoke.Imshow("Emulator", new Image<Bgr, byte>(Display));
+            CvInvoke.WaitKey();
         }
     }
 }

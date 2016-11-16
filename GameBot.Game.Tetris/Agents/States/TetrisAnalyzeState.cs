@@ -2,7 +2,6 @@
 using GameBot.Game.Tetris.Searching;
 using NLog;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Extraction;
@@ -16,16 +15,16 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private readonly TetrisAgent _agent;
 
-        private Tetrimino? _currentTetrimino;
+        private readonly Tetrimino? _currentTetrimino;
 
         private readonly ISampler<Piece> _currentPieceSampler;
         private readonly ISampler<Tetrimino> _nextPieceSampler;
-        
+
         private Piece _extractedPiece;
         private TimeSpan _extractedPieceTimestamp;
         private Tetrimino? _extractedNextPiece;
         private TimeSpan? _beginTime;
-        
+
         // we can extract the next piece only then, when we already have found the current piece
         private bool CanExtractNextPiece => _extractedPiece != null || _currentPieceSampler.SampleCount > 0;
 
@@ -40,7 +39,7 @@ namespace GameBot.Game.Tetris.Agents.States
             _currentTetrimino = currentTetrimino;
             _currentPieceSampler = new CurrentTetriminoSampler(_agent.ExtractionSamples);
             _nextPieceSampler = new NextTetriminoSampler(_agent.ExtractionSamples);
-            
+
             _agent.ExtractedPiece = null;
             _agent.ExtractedNextPiece = null;
             _agent.TracedPiece = null;
@@ -55,6 +54,7 @@ namespace GameBot.Game.Tetris.Agents.States
             }
 
             int searchHeight = CalulateSearchHeight(_currentTetrimino);
+            _agent.SearchHeight = searchHeight;
             _logger.Info($"Analyze (search height {searchHeight})");
 
             ExtractGameState(searchHeight);
@@ -105,22 +105,27 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 // reject (threshold not reached or piece is touched)
                 _logger.Warn("Reject extracted current piece");
+#if DEBUG
                 _agent.Screenshot.Save(_agent.Quantizer, "reject_cp");
+#endif
                 return;
             }
             if (!currentPiece.IsUntouched)
             {
                 // reject (threshold not reached or piece is touched)
                 _logger.Warn($"Reject extracted current piece: not untouched ({currentPiece.Tetrimino})");
+#if DEBUG
                 _agent.Screenshot.Save(_agent.Quantizer, "reject_cp");
+#endif
                 return;
             }
 
             // add sample
             _logger.Info($"Added sample for extracted current piece ({currentPiece.Tetrimino})");
             _currentPieceSampler.Sample(new ProbabilisticResult<Piece>(currentPiece));
+#if DEBUG
             _agent.Screenshot.Save(_agent.Quantizer, "sample_cp");
-            
+#endif
             if (_currentPieceSampler.IsComplete)
             {
                 // we have enought samples
@@ -138,7 +143,7 @@ namespace GameBot.Game.Tetris.Agents.States
             _extractedPieceTimestamp = _agent.Screenshot.Timestamp;
             _agent.ExtractedPiece = _extractedPiece;
         }
-        
+
         private void ExtractNextPieceSampling()
         {
             // already extracted the piece?
@@ -152,32 +157,35 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 // reject (threshold not reached or piece is touched)
                 _logger.Warn("Reject extracted next piece");
+#if DEBUG
                 _agent.Screenshot.Save(_agent.Quantizer, "reject_np");
+#endif
                 return;
             }
 
             // add sample
             _logger.Info($"Added sample for extracted next piece ({nextPiece})");
             _nextPieceSampler.Sample(new ProbabilisticResult<Tetrimino>(nextPiece.Value));
+#if DEBUG
             _agent.Screenshot.Save(_agent.Quantizer, "sample_np");
-
+#endif
             if (_nextPieceSampler.IsComplete)
             {
                 // we have enought samples
                 // evaluate our "true" result
                 var acceptedNextPiece = _nextPieceSampler.Result;
-                
+
                 _logger.Info($"Accept extracted next piece by sampling ({acceptedNextPiece})");
                 AcceptNextPiece(acceptedNextPiece);
             }
         }
-        
+
         private void AcceptNextPiece(Tetrimino nextPiece)
         {
             _extractedNextPiece = nextPiece;
             _agent.ExtractedNextPiece = _extractedNextPiece;
         }
-        
+
         private void UpdateGlobalGameState()
         {
             _agent.GameState.Piece = _extractedPiece;

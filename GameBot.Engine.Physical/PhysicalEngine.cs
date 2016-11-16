@@ -2,6 +2,7 @@
 using GameBot.Core;
 using GameBot.Core.Data;
 using System;
+using System.Diagnostics;
 
 namespace GameBot.Engine.Physical
 {
@@ -49,7 +50,7 @@ namespace GameBot.Engine.Physical
 
                 // extracts the game state
                 _agent.Extract(screenshot);
-
+                
                 processed = _agent.Visualize(processed);
                 showProcessedImage?.Invoke(processed);
 

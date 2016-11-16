@@ -14,17 +14,178 @@ using GameBot.Core.Configuration;
 using GameBot.Core.Data;
 using GameBot.Core.Extensions;
 using GameBot.Core.Quantizers;
+using GameBot.Emulation;
 using GameBot.Engine.Physical.Quantizers;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
 
 namespace GameBot.Test.Misc
 {
-    [Ignore]
+    //[Ignore]
     [TestFixture]
-    public class MaethuQuantizerTests
+    public class MaethuTests
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        [Test]
+        public void TestFallSpeedLevel0()
+        {
+            var romLoader = new RomLoader();
+            var rom = romLoader.Load("Roms/tetris.gb");
+
+            var emulator = new Emulator();
+            emulator.Load(rom);
+
+            emulator.ExecuteFrames(125);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+
+            for (int i = 0; i < 14; i++)
+            {
+                emulator.Show();
+                emulator.ExecuteFrames(53);
+            }
+        }
+
+        [Test]
+        public void TestDropSpeedLevel0()
+        {
+            var romLoader = new RomLoader();
+            var rom = romLoader.Load("Roms/tetris.gb");
+
+            var emulator = new Emulator();
+            emulator.Load(rom);
+
+            emulator.ExecuteFrames(125);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+
+            emulator.Press(Button.Down);
+
+            for (int i = 0; i < 14; i++)
+            {
+                emulator.Show();
+                emulator.ExecuteFrames(3);
+            }
+        }
+
+        [Test]
+        public void TestFallSpeedLevel9()
+        {
+            var romLoader = new RomLoader();
+            var rom = romLoader.Load("Roms/tetris.gb");
+
+            var emulator = new Emulator();
+            emulator.Load(rom);
+
+            emulator.ExecuteFrames(125);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Down);
+            emulator.Hit(Button.Start);
+
+            for (int i = 0; i < 14; i++)
+            {
+                emulator.Show();
+                emulator.ExecuteFrames(11);
+            }
+        }
+
+        [Test]
+        public void TestDropSpeedLevel9()
+        {
+            var romLoader = new RomLoader();
+            var rom = romLoader.Load("Roms/tetris.gb");
+
+            var emulator = new Emulator();
+            emulator.Load(rom);
+
+            emulator.ExecuteFrames(125);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Down);
+            emulator.Hit(Button.Start);
+            
+            emulator.Press(Button.Down);
+
+            for (int i = 0; i < 14; i++)
+            {
+                emulator.Show();
+                emulator.ExecuteFrames(3);
+            }
+        }
+
+        [Test]
+        public void TestLineRemoveDuration()
+        {
+            var romLoader = new RomLoader();
+            var rom = romLoader.Load("Roms/tetris.gb");
+
+            var emulator = new Emulator();
+            emulator.Load(rom);
+
+            emulator.ExecuteFrames(125);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+
+            // I
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Press(Button.Down);
+            emulator.ExecuteFrames(3 * 17);
+            emulator.Release(Button.Down);
+            emulator.ExecuteFrames(2);
+            
+
+            // S
+            emulator.Hit(Button.Right);
+            emulator.Press(Button.Down);
+            emulator.ExecuteFrames(3 * 17);
+            emulator.Release(Button.Down);
+            emulator.ExecuteFrames(2);
+
+            // O
+            emulator.Hit(Button.Left);
+            emulator.Hit(Button.Left);
+            emulator.Hit(Button.Left);
+            emulator.Hit(Button.Left);
+            emulator.Press(Button.Down);
+            emulator.ExecuteFrames(3 * 17);
+            emulator.Release(Button.Down);
+            emulator.ExecuteFrames(2);
+            
+            // T
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Press(Button.Down);
+            emulator.ExecuteFrames(3 * 17);
+            emulator.Release(Button.Down);
+            emulator.ExecuteFrames(2);
+
+            // J
+            emulator.Hit(Button.A);
+            emulator.Hit(Button.Left);
+            emulator.Press(Button.Down);
+            emulator.ExecuteFrames(3 * 15);
+            emulator.Release(Button.Down);
+
+            emulator.Show();
+            emulator.ExecuteFrames(93);
+            emulator.Show();
+        }
 
         [Test]
         public void TestMatRoi()

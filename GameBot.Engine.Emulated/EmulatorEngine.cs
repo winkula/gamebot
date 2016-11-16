@@ -4,6 +4,7 @@ using GameBot.Core.Data;
 using GameBot.Emulation;
 using NLog;
 using System;
+using System.Diagnostics;
 
 namespace GameBot.Engine.Emulated
 {
@@ -69,7 +70,7 @@ namespace GameBot.Engine.Emulated
             {
                 IScreenshot screenshot = new EmguScreenshot(processed, time);
                 screenshot.OriginalImage = image;
-
+                
                 // extracts the game state
                 _agent.Extract(screenshot);
 

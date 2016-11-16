@@ -29,8 +29,10 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Window));
             this.ImageBoxOriginal = new Emgu.CV.UI.ImageBox();
             this.ImageBoxProcessed = new Emgu.CV.UI.ImageBox();
+            this.Timer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxOriginal)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxProcessed)).BeginInit();
             this.SuspendLayout();
@@ -53,6 +55,12 @@
             this.ImageBoxProcessed.TabIndex = 3;
             this.ImageBoxProcessed.TabStop = false;
             // 
+            // Timer
+            // 
+            this.Timer.Enabled = true;
+            this.Timer.Interval = 50;
+            this.Timer.Tick += new System.EventHandler(this.TimerTick);
+            // 
             // Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -60,6 +68,7 @@
             this.ClientSize = new System.Drawing.Size(389, 277);
             this.Controls.Add(this.ImageBoxProcessed);
             this.Controls.Add(this.ImageBoxOriginal);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Window";
             this.Text = "GameBot.Robot.Ui";
@@ -73,6 +82,7 @@
 
         private Emgu.CV.UI.ImageBox ImageBoxOriginal;
         private Emgu.CV.UI.ImageBox ImageBoxProcessed;
+        private System.Windows.Forms.Timer Timer;
     }
 }
 

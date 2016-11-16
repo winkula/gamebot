@@ -40,6 +40,7 @@ namespace GameBot.Game.Tetris.Agents
         public Piece ExtractedPiece { private get; set; }
         public Piece TracedPiece { private get; set; }
         public Tetrimino? ExtractedNextPiece { private get; set; }
+        public int SearchHeight { private get; set; }
 
         public TetrisAgent(IConfig config, IQuantizer quantizer, IExtractor extractor, ISearch search)
         {
@@ -101,7 +102,7 @@ namespace GameBot.Game.Tetris.Agents
 
             var visualization = new Mat();
             CvInvoke.CvtColor(image, visualization, ColorConversion.Gray2Bgr);
-            
+
             if (GameState?.Board != null)
             {
                 var board = GameState.Board;
@@ -112,7 +113,7 @@ namespace GameBot.Game.Tetris.Agents
                         if (board.IsOccupied(x, y))
                         {
                             var tileCoordinates = Coordinates.BoardToTile(x, y);
-                            Draw(visualization, tileCoordinates, Color.DodgerBlue);
+                            DrawBlock(visualization, tileCoordinates, Color.DodgerBlue);
                         }
                     }
                 }
@@ -124,7 +125,7 @@ namespace GameBot.Game.Tetris.Agents
                 foreach (var block in piece.Shape.Body)
                 {
                     var tileCoordinates = Coordinates.PieceToTile(piece.X + block.X, piece.Y + block.Y);
-                    Draw(visualization, tileCoordinates, Color.Orange);
+                    DrawBlock(visualization, tileCoordinates, Color.Orange);
                 }
             }
             if (ExtractedPiece != null)
@@ -134,7 +135,7 @@ namespace GameBot.Game.Tetris.Agents
                 foreach (var block in piece.Shape.Body)
                 {
                     var tileCoordinates = Coordinates.PieceToTile(piece.X + block.X, piece.Y + block.Y);
-                    Draw(visualization, tileCoordinates, Color.Red);
+                    DrawBlock(visualization, tileCoordinates, Color.Red);
                 }
             }
             if (ExtractedNextPiece != null)
@@ -143,18 +144,29 @@ namespace GameBot.Game.Tetris.Agents
                 foreach (var block in Shape.Get(ExtractedNextPiece.Value).Body)
                 {
                     var tileCoordinates = Coordinates.PieceToTilePreview(block);
-                    Draw(visualization, tileCoordinates, Color.LimeGreen);
+                    DrawBlock(visualization, tileCoordinates, Color.LimeGreen);
                 }
+            }
+            if (SearchHeight > 0)
+            {
+                DrawLine(visualization, SearchHeight, Color.Red);
             }
 
             return visualization;
         }
 
-        private void Draw(Mat image, Point tileCoordinates, Color color)
+        private void DrawBlock(Mat image, Point tileCoordinates, Color color)
         {
             const int frameSize = 0;
             var rectangle = new Rectangle(GameBoyConstants.TileSize * tileCoordinates.X + frameSize, GameBoyConstants.TileSize * tileCoordinates.Y + frameSize, GameBoyConstants.TileSize - 2 * frameSize - 1, GameBoyConstants.TileSize - 2 * frameSize - 1);
             CvInvoke.Rectangle(image, rectangle, new Bgr(color).MCvScalar, 1, LineType.FourConnected);
+        }
+
+        private void DrawLine(Mat image, int height, Color color)
+        {
+            var pointFrom = new Point(2 * GameBoyConstants.TileSize, GameBoyConstants.TileSize * (height + 3));
+            var pointTo = new Point(12 * GameBoyConstants.TileSize - 1, GameBoyConstants.TileSize * (height + 3));
+            CvInvoke.Line(image, pointFrom, pointTo, new Bgr(color).MCvScalar, 1, LineType.FourConnected);
         }
 
         public void Play(IExecutor executor)

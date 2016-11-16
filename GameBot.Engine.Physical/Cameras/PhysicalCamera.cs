@@ -31,17 +31,6 @@ namespace GameBot.Engine.Physical.Cameras
             _capture.Grab();
             _capture.Retrieve(src);
             
-            /*
-            // save every 30th image
-            var tick = DateTime.Now.Ticks;
-            if (tick % 30 == 0)
-            {
-                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Images"));
-                string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Images", $"image{tick}.png");
-                src.Save(path);
-            }
-            */
-
             return src;
         }
     }

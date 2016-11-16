@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using GameBot.Core.Exceptions;
 using NLog;
@@ -46,26 +45,21 @@ namespace GameBot.Robot.Ui
             }
 
             InitializeComponent();
-            FormClosed += (sender, args) => Application.Exit();
 
+            RegisterEvents();
             CheckForIllegalCrossThreadCalls = false;
 
             InitImageBoxes();
+            InitTimer();
             InitForm();
+        }
 
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    var image = _camera.Capture();
-                    ShowOriginal(image);
-                }
-            });
-
+        private void RegisterEvents()
+        {
+            FormClosed += (sender, args) => Application.Exit();
             Load += Loaded;
-            ImageBoxOriginal.MouseClick += MouseClicked;
-            KeyPreview = true;
             KeyPress += KeyPressed;
+            ImageBoxOriginal.MouseClick += MouseClicked;
         }
 
         private void InitImageBoxes()
@@ -88,8 +82,16 @@ namespace GameBot.Robot.Ui
             ImageBoxProcessed.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
         }
 
+        private void InitTimer()
+        {
+            double framerate = _config.Read("Robot.Ui.CamFramerate", 20.0);
+            Timer.Interval = (int)Math.Max(1000 / framerate, 10);
+        }
+
         private void InitForm()
         {
+            KeyPreview = true;
+
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -98,13 +100,6 @@ namespace GameBot.Robot.Ui
             ClientSize = new Size(_originalWidth, _originalHeight);
 
             CenterToScreen();
-        }
-
-        private float Clamp(float value, float min, float max)
-        {
-            if (value < min) return min;
-            if (value > max) return max;
-            return value;
         }
 
         private void KeyPressed(object sender, KeyPressEventArgs e)
@@ -168,7 +163,14 @@ namespace GameBot.Robot.Ui
                 {
                     _logger.Info("Keypoints: " + string.Join(",", _keypointsApplied));
 
-                    var keypointsList = new int[] { _keypointsApplied[0].X, _keypointsApplied[0].Y, _keypointsApplied[1].X, _keypointsApplied[1].Y, _keypointsApplied[2].X, _keypointsApplied[2].Y, _keypointsApplied[3].X, _keypointsApplied[3].Y };
+                    var keypointsList = new[]
+                    {
+                        _keypointsApplied[0].X, _keypointsApplied[0].Y,
+                        _keypointsApplied[1].X, _keypointsApplied[1].Y,
+                        _keypointsApplied[2].X, _keypointsApplied[2].Y,
+                        _keypointsApplied[3].X, _keypointsApplied[3].Y
+                    };
+
                     _config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsList));
                     _config.Save();
 
@@ -186,7 +188,7 @@ namespace GameBot.Robot.Ui
             {
                 _keypointsApplied = _keypoints.Take(_maxKeypointCount).ToList();
 
-                var keypointsList = new [] { _keypointsApplied[0].X, _keypointsApplied[0].Y, _keypointsApplied[1].X, _keypointsApplied[1].Y, _keypointsApplied[2].X, _keypointsApplied[2].Y, _keypointsApplied[3].X, _keypointsApplied[3].Y };
+                var keypointsList = new[] { _keypointsApplied[0].X, _keypointsApplied[0].Y, _keypointsApplied[1].X, _keypointsApplied[1].Y, _keypointsApplied[2].X, _keypointsApplied[2].Y, _keypointsApplied[3].X, _keypointsApplied[3].Y };
 
                 _quantizer.Keypoints = _keypointsApplied;
                 _keypoints.Clear();
@@ -196,17 +198,16 @@ namespace GameBot.Robot.Ui
 
         private void Loaded(object sender, EventArgs e)
         {
-            var t = new Thread(Run);
-            t.IsBackground = true;
+            var t = new Thread(Run) { IsBackground = true };
             t.Start();
         }
 
-        public void Run()
+        private void Run()
         {
             var stopwatch = new Stopwatch();
 
             _engine.Initialize();
-            
+
             while (true)
             {
                 try
@@ -216,9 +217,10 @@ namespace GameBot.Robot.Ui
                     stopwatch.Stop();
                     long ms = stopwatch.ElapsedMilliseconds;
                     stopwatch.Restart();
+
                     if (ms != 0)
                     {
-                        Text = $"GameBot.Robot.Ui ({1000 / ms} fps)";
+                        Text = $"GameBot.Robot.Ui ({ms} ms)";
                     }
                 }
                 catch (GameOverException)
@@ -237,6 +239,7 @@ namespace GameBot.Robot.Ui
             }
             catch (ObjectDisposedException)
             {
+                throw;
                 // ignore
             }
         }
@@ -249,8 +252,15 @@ namespace GameBot.Robot.Ui
             }
             catch (ObjectDisposedException)
             {
+                throw;
                 // ignore
             }
+        }
+
+        private void TimerTick(object sender, EventArgs e)
+        {
+            var image = _camera.Capture();
+            ShowOriginal(image);
         }
     }
 }
