@@ -89,7 +89,7 @@ namespace GameBot.Game.Tetris.Data
 
         public Piece Fall(int distance)
         {
-            if (distance < 0) throw new ArgumentException(nameof(distance));
+            if (distance < 0) throw new ArgumentException("distance can't be negative");
 
             Y -= distance;
             return this;

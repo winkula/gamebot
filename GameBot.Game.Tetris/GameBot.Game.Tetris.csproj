@@ -173,6 +173,7 @@
     <Compile Include="Searching\ISearch.cs" />
     <Compile Include="Searching\SearchResult.cs" />
     <Compile Include="Searching\PredictiveSearch.cs" />
+    <Compile Include="Searching\OnePieceSearch.cs" />
     <Compile Include="Searching\SimpleSearch.cs" />
     <Compile Include="Data\Move.cs" />
     <Compile Include="Data\Board.cs" />

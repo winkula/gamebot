@@ -21,7 +21,6 @@ namespace GameBot.Game.Tetris.Agents.States
         private readonly ISampler<Tetrimino> _nextPieceSampler;
 
         private Piece _extractedPiece;
-        private TimeSpan _extractedPieceTimestamp;
         private Tetrimino? _extractedNextPiece;
         private TimeSpan? _beginTime;
 
@@ -140,7 +139,6 @@ namespace GameBot.Game.Tetris.Agents.States
         private void AcceptCurrentPiece(Piece currentPiece)
         {
             _extractedPiece = currentPiece;
-            _extractedPieceTimestamp = _agent.Screenshot.Timestamp;
             _agent.ExtractedPiece = _extractedPiece;
         }
 
@@ -206,7 +204,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 - _beginTime.Value
                 + Timing.AnalyzeFallDurationPaddingTime;
 
-            int searchHeightTime = TetrisLevel.GetMaxFallDistance(_agent.GameState.Level, passedTime);
+            int searchHeightTime = TetrisLevel.GetFallDistance(_agent.GameState.Level, passedTime);
 
             if (tetrimino.HasValue)
             {

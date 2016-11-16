@@ -4,6 +4,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameBot.Core.Extensions;
 
 namespace GameBot.Game.Tetris.Agents.States
 {
@@ -12,10 +13,10 @@ namespace GameBot.Game.Tetris.Agents.States
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly TetrisAgent _agent;
-        
+
         private readonly ICollection<ICollection<Move>> _pendingMoves;
         private readonly Piece _tracedPiece;
-        
+
         public TetrisExecuteAllState(TetrisAgent agent, IList<Move> pendingMoves, Piece tracedPiece)
         {
             if (agent == null) throw new ArgumentNullException(nameof(agent));
@@ -56,7 +57,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 movesParallel.Add(movesCombined);
             }
 
-            movesParallel.Add(new List<Move> {  Move.Drop });
+            movesParallel.Add(new List<Move> { Move.Drop });
             return movesParallel;
         }
 
@@ -85,6 +86,13 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void ExecuteDrop()
         {
+            // when we were executing button presses, the piece has fallen some rows
+            // this is especially relevant in higher levels when speed is higher
+            // we let the piece fall
+            var executionDuration = Timing.GetExecutionDuration(_pendingMoves.Count);
+            var fallDistance = TetrisLevel.GetFallDistance(_agent.GameState.Level, executionDuration);
+            _agent.GameState.Fall(fallDistance);
+
             // calculates drop distance, score and new level
             var linesBefore = _agent.GameState.Lines;
             var dropDistance = _agent.GameState.Drop();
@@ -98,15 +106,12 @@ namespace GameBot.Game.Tetris.Agents.States
 
                 linesRemoved = _agent.GameState.Lines - linesBefore;
             }
-            
+
             // we subtract a time padding, because we dont want to wait the
             // theoretical drop duration, but the real drop duration
             // (we don't want to miss an important frame in analyze state)  
             var waitDuration = dropDuration - Timing.DropDurationPaddingTime;
-            if (waitDuration < TimeSpan.Zero)
-            {
-                waitDuration = TimeSpan.Zero;
-            }
+            waitDuration = waitDuration.Clamp(TimeSpan.Zero, TimeSpan.MaxValue);
 
             _logger.Info($"Execute Drop (new score {_agent.GameState.Score}, {linesRemoved} lines removed, sleep {waitDuration.Milliseconds} ms)");
 
@@ -115,13 +120,13 @@ namespace GameBot.Game.Tetris.Agents.States
             // TODO: here we could do some precalculations for the next search (and execute the drop asynchronous)???
             _agent.Executor.Hold(Button.Down, waitDuration);
         }
-        
+
         private void Execute(ICollection<Move> moves)
         {
             _logger.Info($"Execute {string.Join(", ", moves)}");
-            
+
             _agent.Executor.Hit(moves.Select(x => x.ToButton()));
-            
+
             var gameStateSimulation = new GameState(_agent.GameState);
 
             foreach (var move in moves)
@@ -131,7 +136,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 _tracedPiece.Apply(move);
                 move.Apply(gameStateSimulation);
             }
-            
+
             UpdateCurrentPiece(_tracedPiece);
         }
 

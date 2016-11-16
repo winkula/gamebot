@@ -15,6 +15,8 @@ namespace GameBot.Game.Tetris
         // For A Type
         public static int GetLevel(int startLevel, int clearedLines)
         {
+            // TODO: add checks
+
             var limit = (startLevel + 1) * 10;
             if (clearedLines < limit) return startLevel;
             return Math.Min(20, clearedLines / 10);
@@ -24,22 +26,25 @@ namespace GameBot.Game.Tetris
         public static int GetFramesPerRow(int level)
         {
             if (level < 0) throw new ArgumentException("Level must not be negative");
+            if (level > 20) throw new ArgumentException("Level can't be bigger than 20");
 
-            if (level > 20) level = 20;
             return _levelSpeeds[level];
         }
 
         public static TimeSpan GetDuration(int level, int rows)
         {
             if (level < 0) throw new ArgumentException("Level must not be negative");
+            if (level > 20) throw new ArgumentException("Level can't be bigger than 20");
 
-            if (level > 20) level = 20;
             return TimeSpan.FromSeconds(rows * _levelSpeeds[level] / TetrisTiming.Framerate);
         }
 
         // how many rows will a tile maximal fall in a specific time span?
-        public static int GetMaxFallDistance(int level, TimeSpan duration)
+        public static int GetFallDistance(int level, TimeSpan duration)
         {
+            if (level < 0) throw new ArgumentException("Level must not be negative");
+            if (level > 20) throw new ArgumentException("Level can't be bigger than 20");
+
             double frames = duration.TotalSeconds * TetrisTiming.Framerate;
             int framePerRow = GetFramesPerRow(level);
 

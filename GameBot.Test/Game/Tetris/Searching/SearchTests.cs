@@ -49,6 +49,21 @@ namespace GameBot.Test.Game.Tetris.Searching
             var result = _simpleSearch.Search(gameState);
             _logger.Info(result.GoalGameState);
         }
+        
+        [Test]
+        public void SimpleSearchRandomBoards()
+        {
+            int maxHeight = 0;
+            for (int i = 0; i < 1000; i++)
+            {
+                var board = TestHelper.GetRandomBoard(maxHeight);
+                var current = Tetriminos.GetRandom();
+                var next = Tetriminos.GetRandom();
+
+                var gameState = new GameState(board, current, next);
+                var result = _simpleSearch.Search(gameState);
+            }
+        }
 
         [TestCase(Tetrimino.T, Tetrimino.J)]
         public void SimpleSearchFull(Tetrimino current, Tetrimino next)
