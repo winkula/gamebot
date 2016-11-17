@@ -74,23 +74,23 @@ namespace GameBot.Test.Game.Tetris.Data
         [TestCase(5, 17)]
         [TestCase(0, 0)]
         [TestCase(9, 18)]
-        public void Occupy(int x, int y)
+        public void Occupy(int posX, int posY)
         {
             var board = new Board();
 
-            Assert.True(board.IsFree(x, y));
+            Assert.True(board.IsFree(posX, posY));
 
-            board.Occupy(x, y);
+            board.Occupy(posX, posY);
 
-            Assert.True(board.IsOccupied(x, y));
+            Assert.True(board.IsOccupied(posX, posY));
 
-            for (int _x = 0; _x < board.Width; _x++)
+            for (int x = 0; x < board.Width; x++)
             {
-                for (int _y = 0; _y < board.Height; _y++)
+                for (int y = 0; y < board.Height; y++)
                 {
-                    if (_x != x || _y != y)
+                    if (x != posX || y != posY)
                     {
-                        Assert.True(board.IsFree(_x, _y));
+                        Assert.True(board.IsFree(x, y));
                     }
                 }
             }
@@ -102,9 +102,9 @@ namespace GameBot.Test.Game.Tetris.Data
         [TestCase(5, 17)]
         [TestCase(0, 0)]
         [TestCase(9, 18)]
-        public void Free(int x, int y)
+        public void Free(int posX, int posY)
         {
-            var board = Build(new[] {
+            var board = TestHelper.BuildBoard(new[] {
                 1,1,1,1,1,1,1,1,1,1,
                 1,1,1,1,1,1,1,1,1,1,
                 1,1,1,1,1,1,1,1,1,1,
@@ -126,20 +126,20 @@ namespace GameBot.Test.Game.Tetris.Data
                 1,1,1,1,1,1,1,1,1,1
             });
 
-            Assert.True(board.IsOccupied(x, y));
+            Assert.True(board.IsOccupied(posX, posY));
 
-            board.Free(x, y);
+            board.Free(posX, posY);
 
-            Assert.True(board.IsFree(x, y));
+            Assert.True(board.IsFree(posX, posY));
 
-            for (int _x = 0; _x < board.Width; _x++)
+            for (int x = 0; x < board.Width; x++)
             {
-                for (int _y = 0; _y < board.Height; _y++)
+                for (int y = 0; y < board.Height; y++)
                 {
-                    _logger.Info(_x + "," + _y);
-                    if (_x != x || _y != y)
+                    _logger.Info(x + "," + y);
+                    if (x != posX || y != posY)
                     {
-                        Assert.True(board.IsOccupied(_x, _y));
+                        Assert.True(board.IsOccupied(x, y));
                     }
                 }
             }
@@ -148,7 +148,7 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void Place()
         {
-            var expected = Build(new[] {
+            var expected = TestHelper.BuildBoard(new[] {
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,1,0,0,0,0,0,
                 0,0,0,0,1,0,0,0,0,0,
@@ -183,7 +183,7 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void CompletedLines()
         {
-            var board = Build(new[] {
+            var board = TestHelper.BuildBoard(new[] {
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
@@ -211,7 +211,7 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void ColumnHeight()
         {
-            var board = Build(new[] {
+            var board = TestHelper.BuildBoard(new[] {
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
@@ -242,15 +242,15 @@ namespace GameBot.Test.Game.Tetris.Data
             Assert.AreEqual(5, board.ColumnHeight(6));
             Assert.AreEqual(0, board.ColumnHeight(7));
             Assert.AreEqual(4, board.ColumnHeight(8));
-            Assert.AreEqual(0, board.ColumnHeight(9));     
-            
-            Assert.AreEqual(7, board.MaximumHeight);  
+            Assert.AreEqual(0, board.ColumnHeight(9));
+
+            Assert.AreEqual(7, board.MaximumHeight);
         }
-        
+
         [Test]
         public void ColumnHoles()
         {
-            var board = Build(new[] {
+            var board = TestHelper.BuildBoard(new[] {
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
@@ -287,7 +287,7 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void RemoveLines1()
         {
-            var board = Build(new[] {
+            var board = TestHelper.BuildBoard(new[] {
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
@@ -308,7 +308,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 1,0,1,1,0,1,0,0,1,0,
                 0,0,1,1,0,1,1,1,0,1
             });
-            var expected = Build(new[] {
+            var expected = TestHelper.BuildBoard(new[] {
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
@@ -328,19 +328,19 @@ namespace GameBot.Test.Game.Tetris.Data
                 0,1,0,1,1,1,1,0,0,0,
                 1,0,1,1,0,1,0,0,1,0,
                 0,0,1,1,0,1,1,1,0,1
-            });            
+            });
             var piece = new Piece(Tetrimino.I).Rotate().Fall(12);
 
-            board.Place(piece);            
+            board.Place(piece);
             board.RemoveLines();
-            
+
             Assert.True(SquaresEqual(expected, board));
         }
-        
+
         [Test]
         public void RemoveLines2()
         {
-            var board = Build(new[] {
+            var board = TestHelper.BuildBoard(new[] {
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
@@ -361,7 +361,7 @@ namespace GameBot.Test.Game.Tetris.Data
                 0,0,0,0,0,0,0,0,0,0,
                 1,1,1,1,0,1,1,1,1,1
             });
-            var expected = Build(new[] {
+            var expected = TestHelper.BuildBoard(new[] {
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
@@ -396,7 +396,7 @@ namespace GameBot.Test.Game.Tetris.Data
         [Test]
         public void Intersects()
         {
-            var board = Build(new[] {
+            var board = TestHelper.BuildBoard(new[] {
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,
@@ -470,22 +470,6 @@ namespace GameBot.Test.Game.Tetris.Data
             _logger.Info(str);
 
             Assert.NotNull(str);
-        }
-
-        private Board Build(int[] squares)
-        {
-            var board = new Board();
-            for (int x = 0; x < board.Width; x++)
-            {
-                for (int y = 0; y < board.Height; y++)
-                {
-                    if (squares[board.Width * (board.Height - 1 - y) + (x)] > 0)
-                    {
-                        board.Occupy(x, y);
-                    }
-                }
-            }
-            return board;
         }
 
         private bool SquaresEqual(Board expected, Board board)

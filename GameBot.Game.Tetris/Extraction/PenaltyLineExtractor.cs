@@ -16,7 +16,7 @@ namespace GameBot.Game.Tetris.Extraction
         public Board Update(IScreenshot screenshot, Board board)
         {
             var newBoard = new Board(board);
-            double p = _matcher.GetProbability(screenshot, 5, 4);
+            double p = _matcher.GetProbabilityBlock(screenshot, 5, 4);
 
             return board;
         }

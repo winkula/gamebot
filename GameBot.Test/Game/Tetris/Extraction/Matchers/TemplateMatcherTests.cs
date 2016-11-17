@@ -69,7 +69,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
                     {
                         var piece = new Piece(Tetrimino.T, orientation, x, y);
 
-                        var probability = _matcher.GetProbability(screenshot, piece);
+                        var probability = _matcher.GetProbabilityCurrentPiece(screenshot, piece);
 
                         Assert.GreaterOrEqual(probability, 0.0);
                         Assert.LessOrEqual(probability, 1.0);

@@ -13,7 +13,7 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public double GetProbability(IScreenshot screenshot, int x, int y)
+        public double GetProbabilityBlock(IScreenshot screenshot, int x, int y)
         {
             if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
             if (x < 0 || x > 19) throw new ArgumentException("invalid x coordinate (out of the board)");
@@ -25,7 +25,7 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
             return GetBlockProbability(dest, coordinates);
         }
 
-        public double GetProbability(IScreenshot screenshot, Piece piece)
+        public double GetProbabilityCurrentPiece(IScreenshot screenshot, Piece piece)
         {
             if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
             if (piece == null) throw new ArgumentNullException(nameof(piece));

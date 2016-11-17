@@ -32,7 +32,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [TestFixtureSetUp]
         public void Init()
         {
-            _config = new AppSettingsConfig();
+            _config = TestHelper.GetFakeConfig().Object;
             _random = new Random(123);
             _quantizer1 = new Quantizer(_config);
         }

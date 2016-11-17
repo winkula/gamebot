@@ -13,12 +13,22 @@ namespace GameBot.Test.Game.Tetris
         [TestCase(18, 4)]
         [TestCase(19, 4)]
         [TestCase(20, 3)]
-        [TestCase(30, 3)]
         public void GetSpeed(int level, int expected)
         {
             var speed = TetrisLevel.GetFramesPerRow(level);
 
             Assert.AreEqual(expected, speed);
+        }
+
+        [TestCase(-1)]
+        [TestCase(21)]
+        [TestCase(35)]
+        public void GetSpeedFails(int level)
+        {
+            Assert.Throws<ArgumentException>(() =>
+            {
+                var speed = TetrisLevel.GetFramesPerRow(level);
+            });
         }
 
         [TestCase(0, 10, 8.873)]

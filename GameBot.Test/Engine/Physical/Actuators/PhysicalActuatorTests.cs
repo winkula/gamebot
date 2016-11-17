@@ -21,19 +21,19 @@ namespace GameBot.Test.Engine.Physical.Actuators
         [TestFixtureSetUp]
         public void Init()
         {
+            _config = TestHelper.GetFakeConfig().Object;
+
             if (!IsBrickdRunning())
             {
                 Assert.Ignore("Brickd is not running.");
             }
-
-            _config = new AppSettingsConfig();
         }
         
         private bool IsBrickdRunning()
         {
             try
             {
-                var actuator = new PhysicalActuator(new AppSettingsConfig());
+                var actuator = new PhysicalActuator(_config);
                 return true;
             }
             catch (TimeoutException)

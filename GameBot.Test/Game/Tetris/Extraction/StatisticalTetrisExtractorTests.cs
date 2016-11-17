@@ -23,7 +23,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [TestFixtureSetUp]
         public void Init()
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
             _extractor = new TetrisExtractor(config);
         }
 

@@ -36,7 +36,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         public void PieceMatchingCurrentPiece(string imageKey, IScreenshot screenshot, Piece currentPieceExpected)
         {
             _currentPiecesTotal++;
-            var probabilityCurrentPiece = _matcher.GetProbability(screenshot, currentPieceExpected);
+            var probabilityCurrentPiece = _matcher.GetProbabilityCurrentPiece(screenshot, currentPieceExpected);
             _logger.Info($"PieceMatchingCurrentPiece: {probabilityCurrentPiece * 100.0:F}");
 
             var currentPieceFound = probabilityCurrentPiece >= _probabilityThreshold;
@@ -53,7 +53,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             {
                 _currentPiecesTotal++;
                 
-                var probabilityCurrentPiece = _matcher.GetProbability(screenshot, new Piece(tetrimino));
+                var probabilityCurrentPiece = _matcher.GetProbabilityCurrentPiece(screenshot, new Piece(tetrimino));
                 _logger.Info($"PieceMatchingCurrentPieceNegatives: {probabilityCurrentPiece * 100.0:F}");
 
                 var currentPieceFound = probabilityCurrentPiece >= _probabilityThreshold;

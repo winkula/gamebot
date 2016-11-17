@@ -1,10 +1,9 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Configuration;
-using GameBot.Game.Tetris.Simulator;
 using SimpleInjector;
 using SimpleInjector.Packaging;
 
-namespace GameBot.Robot.Ui
+namespace GameBot.Game.Tetris.Simulator
 {
     public class Package : IPackage
     {

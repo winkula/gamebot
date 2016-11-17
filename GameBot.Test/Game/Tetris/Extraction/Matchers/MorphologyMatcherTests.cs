@@ -15,8 +15,10 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         [SetUp]
         public void Init()
         {
+            var config = TestHelper.GetFakeConfig().Object;
+
             _matcher = new MorphologyMatcher();
-            _quantizer = new MorphologyQuantizer(new AppSettingsConfig());
+            _quantizer = new MorphologyQuantizer(config);
         }
 
         [TestCase(0, 0, 0.0)]
@@ -39,7 +41,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         {
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_play_2.png", _quantizer);
 
-            var probability = _matcher.GetProbability(screenshot, x, y);
+            var probability = _matcher.GetProbabilityBlock(screenshot, x, y);
 
             Assert.AreEqual(expected, probability);
         }
@@ -50,7 +52,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
             var piece = new Piece(Tetrimino.S);
             var screenshot = TestHelper.GetScreenshot("Screenshots/white.png", _quantizer);
 
-            var probability = _matcher.GetProbability(screenshot, piece);
+            var probability = _matcher.GetProbabilityCurrentPiece(screenshot, piece);
 
             Assert.AreEqual(0.0, probability);
         }
@@ -60,8 +62,8 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         {
             var piece = new Piece(Tetrimino.S);
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_play_1.png", _quantizer);
-            
-            var probability = _matcher.GetProbability(screenshot, piece);
+
+            var probability = _matcher.GetProbabilityCurrentPiece(screenshot, piece);
 
             Assert.AreEqual(1.0, probability);
         }
@@ -72,7 +74,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
             var piece = new Piece(Tetrimino.Z);
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_play_1.png", _quantizer);
 
-            var probability = _matcher.GetProbability(screenshot, piece);
+            var probability = _matcher.GetProbabilityCurrentPiece(screenshot, piece);
 
             Assert.Greater(probability, 0.0);
             Assert.Less(probability, 1.0);
@@ -111,6 +113,27 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
                 var probability = _matcher.GetProbabilityNextPiece(screenshot, tetrimino);
                 Assert.AreEqual(0.0, probability);
             }
+        }
+
+        [Test]
+        public void MatchLotOfBlocks()
+        {
+            var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_play_1.png", _quantizer);
+            
+            int counter = 0;
+            for (int i = 0; i < 100; i++)
+            {
+                for (int x = 0; x < GameBoyConstants.ScreenWidth / GameBoyConstants.TileSize; x++)
+                {
+                    for (int y = 0; y < GameBoyConstants.ScreenHeight / GameBoyConstants.TileSize; y++)
+                    {
+                        _matcher.GetProbabilityBlock(screenshot, x, y);
+                        counter++;
+                    }
+                }
+            }
+
+            Assert.AreEqual(counter, 100 * 18 * 20);
         }
     }
 }

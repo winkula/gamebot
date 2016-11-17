@@ -39,7 +39,7 @@ namespace GameBot.Game.Tetris.Extraction
                     foreach (var pose in tetromino.GetPoses())
                     {
                         var piece = pose.Fall(yDelta);
-                        var probability = _templateMatcher.GetProbability(screenshot, piece);
+                        var probability = _templateMatcher.GetProbabilityCurrentPiece(screenshot, piece);
                         if (probability > bestProbability)
                         {
                             bestProbability = probability;
@@ -74,7 +74,7 @@ namespace GameBot.Game.Tetris.Extraction
                 foreach (var tetromino in Tetriminos.All)
                 {
                     var piece = new Piece(tetromino, 0, 0, -yDelta);
-                    var probability = _templateMatcher.GetProbability(screenshot, piece);
+                    var probability = _templateMatcher.GetProbabilityCurrentPiece(screenshot, piece);
                     if (probability > bestProbability)
                     {
                         bestProbability = probability;
@@ -106,7 +106,7 @@ namespace GameBot.Game.Tetris.Extraction
 
             for (int yDelta = 0; yDelta <= maxFallingDistance; yDelta++)
             {
-                var probability = _templateMatcher.GetProbability(screenshot, testPiece);
+                var probability = _templateMatcher.GetProbabilityCurrentPiece(screenshot, testPiece);
 
                 if (probability > bestProbability)
                 {
@@ -170,7 +170,7 @@ namespace GameBot.Game.Tetris.Extraction
             foreach (var tetrimino in Tetriminos.All)
             {
                 //var piece = new Piece(tetromino, 0, TetrisConstants.NextPieceTemplateTileCoordinates.X, TetrisConstants.NextPieceTemplateTileCoordinates.Y);
-                //var probability = _templateMatcher.GetProbability(screenshot, piece);
+                //var probability = _templateMatcher.GetProbabilityCurrentPiece(screenshot, piece);
                 var probability = _templateMatcher.GetProbabilityNextPiece(screenshot, tetrimino);
                 if (probability > bestProbability)
                 {

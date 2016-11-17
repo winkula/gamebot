@@ -53,8 +53,8 @@ namespace GameBot.Test.Game.Tetris.Searching
         [Test]
         public void SimpleSearchRandomBoards()
         {
-            int maxHeight = 0;
-            for (int i = 0; i < 1000; i++)
+            int maxHeight = 15;
+            for (int i = 0; i < 100; i++)
             {
                 var board = TestHelper.GetRandomBoard(maxHeight);
                 var current = Tetriminos.GetRandom();

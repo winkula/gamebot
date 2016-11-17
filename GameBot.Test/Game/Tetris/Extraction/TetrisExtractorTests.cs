@@ -17,7 +17,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void Constructor()
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
 
             var extractor = new TetrisExtractor(config);
         }
@@ -25,7 +25,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void Extract()
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
 
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
@@ -53,7 +53,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ExtractSpawnedPieceOrigin()
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
@@ -69,7 +69,8 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ExtractPieceSpawnedFalled()
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
+
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
 
@@ -89,7 +90,8 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ExtractPieceSpawnedFalledPieceIsInOrigin()
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
+
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_1.png", DateTime.Now.Subtract(DateTime.MinValue));
 
@@ -108,7 +110,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [TestCase(-2, -8, 0xC800)]
         public void GetPieceMask(int x, int y, int expected)
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
 
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
@@ -121,7 +123,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ConfirmPieceMovement()
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
 
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
@@ -141,7 +143,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void ConfirmPieceMovementWithFallDistance()
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
 
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));
@@ -166,7 +168,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [TestCase(Tetrimino.Z, -1, -6, 1.0 - (4 / 16.0))]
         public void GetProbability(Tetrimino tetrimino, int x, int y, double expectedProbability)
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
 
             var extractor = new TetrisExtractor(config);
             var screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", DateTime.Now.Subtract(DateTime.MinValue));

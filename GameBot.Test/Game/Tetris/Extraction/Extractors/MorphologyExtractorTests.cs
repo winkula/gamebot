@@ -16,7 +16,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Extractors
         [TestFixtureSetUp]
         public void Init()
         {
-            var config = new AppSettingsConfig();
+            var config = TestHelper.GetFakeConfig().Object;
             _extractor = new MorphologyExtractor(config);
             _quantizer = new MorphologyQuantizer(config);
         }

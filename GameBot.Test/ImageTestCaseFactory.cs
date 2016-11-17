@@ -43,9 +43,8 @@ namespace GameBot.Test
                 Screenshot = new EmguScreenshot(quantizedImage, DateTime.Now.Subtract(DateTime.MinValue));
             }
         }
-
-        //private static readonly IQuantizer _quantizer = new Quantizer(new AppSettingsConfig());
-        private static readonly IQuantizer _quantizer = new MorphologyQuantizer(new AppSettingsConfig());
+        
+        private static readonly IQuantizer _quantizer = new MorphologyQuantizer(TestHelper.GetFakeConfig().Object);
 
         private static readonly Point[][] _keypoints =
         {

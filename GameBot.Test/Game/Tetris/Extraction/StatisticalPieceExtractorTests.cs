@@ -8,6 +8,7 @@ using NUnit.Framework;
 
 namespace GameBot.Test.Game.Tetris.Extraction
 {
+    [Ignore]
     [TestFixture]
     public class StatisticalPieceExtractorTests
     {
