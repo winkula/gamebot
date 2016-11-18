@@ -12,7 +12,8 @@ namespace GameBot.Core
     {
         /// <summary>
         /// Extracts the game state.
-        /// This is only needed 
+        /// This is only needed because the Engine wants to separate Extraction and Play.
+        /// Else we could have a single method instead of 'Extract' and 'Play'.
         /// </summary>
         /// <param name="screenshot">The current screenshot of the device's display.</param>
         void Extract(IScreenshot screenshot);
