@@ -1,4 +1,5 @@
-﻿using GameBot.Core.Data;
+﻿using GameBot.Core;
+using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
 
@@ -6,18 +7,22 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
 {
     public class PieceBasedExtractor : IExtractor
     {
-        private const double _thresholdNextPiece = 0.2;
-        private const double _thresholdCurrentPiece = 0.5;
-        private const double _thresholdMovedPiece = 0.5;
+        private readonly double _thresholdNextPiece;
+        private readonly double _thresholdCurrentPiece;
+        private readonly double _thresholdMovedPiece;
 
         private readonly PieceExtractor _pieceExtractor;
 
-        public PieceBasedExtractor()
+        public PieceBasedExtractor(IConfig config)
         {
+            _thresholdNextPiece = config.Read("Game.Tetris.Extractor.ThresholdNextPiece", 0.2);
+            _thresholdCurrentPiece = config.Read("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.5);
+            _thresholdMovedPiece = config.Read("Game.Tetris.Extractor.ThresholdMovedPiece", 0.5);
+
             var matcher = new TemplateMatcher();
             _pieceExtractor = new PieceExtractor(matcher);
         }
-        
+
         public Tetrimino? ExtractNextPiece(IScreenshot screenshot)
         {
 
@@ -41,7 +46,7 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
                     return resultKnown.Result;
                 }
             }
-            
+
             var result = _pieceExtractor.ExtractSpawnedPieceFuzzy(screenshot, maxFallDistance);
             if (result.IsAccepted(_thresholdCurrentPiece))
             {

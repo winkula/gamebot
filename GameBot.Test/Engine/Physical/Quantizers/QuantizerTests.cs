@@ -11,7 +11,7 @@ namespace GameBot.Test.Engine.Physical.Quantizers
     [TestFixture]
     public class QuantizerTests
     {
-        private const bool _adjust = false;
+        private const bool _adjust = true;
 
         [Test]
         public void TestQuantizerFromTestData()

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
+using GameBot.Core.Extensions;
 
 namespace GameBot.Core.Quantizers
 {
@@ -11,6 +12,7 @@ namespace GameBot.Core.Quantizers
     {
         public int ThresholdConstant { get; set; }
         public int ThresholdBlockSize { get; set; }
+        public double NoiseLevel { get; set; } // for testing purposes only
 
         private readonly int _thresholdMaxValue = 255;
         private readonly AdaptiveThresholdType _thresholdAdaptiveThresholdType = AdaptiveThresholdType.MeanC;
@@ -29,6 +31,8 @@ namespace GameBot.Core.Quantizers
             if (ThresholdBlockSize < 0 || ThresholdBlockSize % 2 == 0) throw new ArgumentException("Illegal value for config 'Robot.Quantizer.Threshold.BlockSize'.");
             
             _blurEnabled = config.Read("Robot.Quantizer.Blur", false);
+
+            NoiseLevel = config.Read("Robot.Quantizer.NoiseLevel", 0.0);
 
             // precalculate transformation matrix
             Keypoints = new List<Point> { new Point(keypoints[0], keypoints[1]), new Point(keypoints[2], keypoints[3]), new Point(keypoints[4], keypoints[5]), new Point(keypoints[6], keypoints[7]) };
@@ -56,6 +60,13 @@ namespace GameBot.Core.Quantizers
                 // gauss
                 CvInvoke.GaussianBlur(imageWarped, imageWarped, new Size(3, 3), 0.6, 0.6);
             }
+
+#if DEBUG
+            if (NoiseLevel > 0.0)
+            {
+                imageWarped = imageWarped.AddNoise(NoiseLevel);
+            }
+#endif
 
             // threshold
             var imageBinarized = new Mat(new Size(GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight), DepthType.Default, 1);

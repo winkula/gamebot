@@ -24,76 +24,156 @@ namespace GameBot.Test.Game.Tetris.Extraction
         private static readonly Logger _loggerDetails = LogManager.GetLogger("ExtractionDetails");
         private static readonly Logger _loggerFails = LogManager.GetLogger("Fails");
 
-        private const int _multiplySamplesBy = 10;
+        private const int _multiplySamplesBy = 5;
 
-        private Mock<IConfig> _configMock;
         private Random _random;
-        private IQuantizer _quantizer;
-        private IQuantizer _quantizerMorphology;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            _configMock = TestHelper.GetFakeConfig();
-            _configMock.ConfigValue("Game.Tetris.Extractor.ThresholdNextPiece", 0.6);
-            _configMock.ConfigValue("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.6);
-            _configMock.ConfigValue("Game.Tetris.Extractor.ThresholdMovedPiece", 0.5);
-
             _random = new Random(123);
-            _quantizer = new Quantizer(_configMock.Object);
-            _quantizerMorphology = new MorphologyQuantizer(_configMock.Object);
+        }
+
+        private Tuple<string, IExtractor, IQuantizer> GetCandidate(double threshold)
+        {
+            var configMock = TestHelper.GetFakeConfig();
+
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdNextPiece", threshold);
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdCurrentPiece", threshold);
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdMovedPiece", threshold);
+
+            configMock.ConfigValue("Robot.Quantizer.Threshold.Constant", 13);
+            configMock.ConfigValue("Robot.Quantizer.Threshold.BlockSize", 17);
+
+            var simpleQuantizer = new Quantizer(configMock.Object);
+            var morphologyQuantizer = new MorphologyQuantizer(configMock.Object);
+
+            //var naiveBlockExtractor = new BlockBasedExtractor(configMock.Object);
+            //return new Tuple<string, IExtractor, IQuantizer>("NaiveBlockExtractor", naiveBlockExtractor, morphologyQuantizer);
+
+            //var templateExtractor = new PieceBasedExtractor(configMock.Object);
+            //return new Tuple<string, IExtractor, IQuantizer>("TemplatePieceExtractor", templateExtractor, simpleQuantizer);
+
+            var morphologyExtractor = new MorphologyExtractor(configMock.Object);
+            return new Tuple<string, IExtractor, IQuantizer>("MorphologyBlockExtractor", morphologyExtractor, morphologyQuantizer);
+        }
+
+        private IEnumerable<Tuple<string, IExtractor, IQuantizer>> GetCandidates(double noise)
+        {
+            var configMock = TestHelper.GetFakeConfig();
+
+            configMock.ConfigValue("Robot.Quantizer.Threshold.Constant", 13);
+            configMock.ConfigValue("Robot.Quantizer.Threshold.BlockSize", 17);
+            configMock.ConfigValue("Robot.Quantizer.NoiseLevel", noise);
+
+            var simpleQuantizer = new Quantizer(configMock.Object);
+            var morphologyQuantizer = new MorphologyQuantizer(configMock.Object);
+
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdNextPiece", 0.5);
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.5);
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdMovedPiece", 0.5);
+            var naiveBlockExtractor = new BlockBasedExtractor(configMock.Object);
+            yield return new Tuple<string, IExtractor, IQuantizer>("NaiveBlockExtractor", naiveBlockExtractor, morphologyQuantizer);
+
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdNextPiece", 0.2);
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.5);
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdMovedPiece", 0.5);
+            var templateExtractor = new PieceBasedExtractor(configMock.Object);
+            yield return new Tuple<string, IExtractor, IQuantizer>("TemplatePieceExtractor", templateExtractor, simpleQuantizer);
+
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdNextPiece", 0.6);
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.6);
+            configMock.ConfigValue("Game.Tetris.Extractor.ThresholdMovedPiece", 0.5);
+            var morphologyExtractor = new MorphologyExtractor(configMock.Object);
+            yield return new Tuple<string, IExtractor, IQuantizer>("MorphologyBlockExtractor", morphologyExtractor, morphologyQuantizer);
         }
 
         [Test]
-        public void Compare()
+        public void StatsOfOne()
         {
-            var extractors = new IExtractor[] { /*new BlockBasedExtractor(), new PieceBasedExtractor(),*/ new MorphologyExtractor(_configMock.Object) };
-            var quantizers = new IQuantizer[] { /*_quantizer,*/ _quantizerMorphology };
-            var shifts = new[] { 0, 1, 2, 4, 8 };
-            var noises = new[] { 0.0, 0.25 };
+            var thresholds = Enumerable.Range(0, 11).Select(x => x / 10.0).ToList();
 
             var results = new List<ExtractionComparisonResult>();
-            foreach (var quantizer in quantizers)
-            {
-                foreach (var extractor in extractors)
-                {
-                    foreach (var shift in shifts)
-                    {
-                        foreach (var noise in noises)
-                        {
-                            var input = new ExtractionComparisonInput(extractor, quantizer, shift, noise);
 
-                            // run tests...
-                            AddResults(results, RecognizeNextPiece(input));
-                            AddResults(results, RecognizeCurrentPieceUnknown(input));
-                            AddResults(results, RecognizeCurrentPieceKnown(input));
-                            AddResults(results, RecognizeMove(input));
-                        }
+            foreach (var threshold in thresholds)
+            {
+                var candidate = GetCandidate(threshold);
+
+                var input = new ExtractionComparisonInput(candidate.Item1, candidate.Item2, candidate.Item3, 0, 0.0, threshold);
+
+                // run tests...
+                AddResults(results, RecognizeNextPiece(input));
+                AddResults(results, RecognizeCurrentPieceUnknown(input));
+                AddResults(results, RecognizeCurrentPieceKnown(input));
+                AddResults(results, RecognizeMove(input));
+            }
+
+            _loggerDetails.Info("Threshold;NP_pos;NP_neg;CPU_pos;CPU_neg;CPK_pos;CPK_neg;M");
+            foreach (var grouping in results.GroupBy(x => x.Threshold).ToList())
+            {
+                _loggerDetails.Info($"{grouping.Key};" +
+                                    $"{grouping.Where(x => x.MethodName == "RecognizeNextPiece").Select(x => x.PositivesAccuracy).Average():F};" +
+                                    $"{grouping.Where(x => x.MethodName == "RecognizeNextPiece").Select(x => x.NegativesAccuracy).Average():F};" +
+                                    $"{grouping.Where(x => x.MethodName == "RecognizeCurrentPieceUnknown").Select(x => x.PositivesAccuracy).Average():F};" +
+                                    $"{grouping.Where(x => x.MethodName == "RecognizeCurrentPieceUnknown").Select(x => x.NegativesAccuracy).Average():F};" +
+                                    $"{grouping.Where(x => x.MethodName == "RecognizeCurrentPieceKnown").Select(x => x.PositivesAccuracy).Average():F};" +
+                                    $"{grouping.Where(x => x.MethodName == "RecognizeCurrentPieceKnown").Select(x => x.NegativesAccuracy).Average():F};" +
+                                    $"{grouping.Where(x => x.MethodName == "RecognizeMove").Select(x => x.OverallAccuracy).Average():F}");
+            }
+        }
+
+        [Test]
+        public void CompareAllByNoiseOrShift()
+        {
+            /*
+            var shifts = new[] { 0, 1, 2, 4, 8 };
+            var noises = new[] { 0.0 };
+            */
+
+            var shifts = new[] { 0 };
+            var noises = new[] { 0.0, 0.2, 0.4, 0.6, 0.8 };
+
+
+            var results = new List<ExtractionComparisonResult>();
+
+            foreach (var shift in shifts)
+            {
+                foreach (var noise in noises)
+                {
+                    foreach (var candidate in GetCandidates(noise))
+                    {
+                        var input = new ExtractionComparisonInput(candidate.Item1, candidate.Item2, candidate.Item3, shift, noise, 1);
+
+                        // run tests...
+                        AddResults(results, RecognizeNextPiece(input));
+                        AddResults(results, RecognizeCurrentPieceUnknown(input));
+                        AddResults(results, RecognizeCurrentPieceKnown(input));
+                        AddResults(results, RecognizeMove(input));
                     }
                 }
             }
 
-            if (extractors.Length > 1)
+            if (shifts.Length > 1)
             {
-                _loggerComparison.Info("Shift;BlockBasedExtractor;PieceBasedExtractor;MorphologyExtractor");
+                _loggerComparison.Info("Shift;NaiveBlockExtractor;TemplatePieceExtractor;MorphologyBlockExtractor");
                 foreach (var grouping in results.GroupBy(x => x.Shift).ToList())
                 {
                     _loggerComparison.Info($"{grouping.Key};" +
-                                           $"{grouping.Where(x => x.ExtractorName == "BlockBasedExtractor").Select(x => x.Accuracy).Average():F};" +
-                                           $"{grouping.Where(x => x.ExtractorName == "PieceBasedExtractor").Select(x => x.Accuracy).Average():F};" +
-                                           $"{grouping.Where(x => x.ExtractorName == "MorphologyExtractor").Select(x => x.Accuracy).Average():F}");
+                                           $"{grouping.Where(x => x.CandidateName == "NaiveBlockExtractor").Select(x => x.OverallAccuracy).Average():F};" +
+                                           $"{grouping.Where(x => x.CandidateName == "TemplatePieceExtractor").Select(x => x.OverallAccuracy).Average():F};" +
+                                           $"{grouping.Where(x => x.CandidateName == "MorphologyBlockExtractor").Select(x => x.OverallAccuracy).Average():F}");
                 }
             }
-            if (extractors.Length == 1)
+
+            if (noises.Length > 1)
             {
-                _loggerDetails.Info("Shift;RecognizeNextPiece;RecognizeCurrentPieceUnknown;RecognizeCurrentPieceKnown;RecognizeMove");
-                foreach (var grouping in results.GroupBy(x => x.Shift).ToList())
+                _loggerComparison.Info("Noise;NaiveBlockExtractor;TemplatePieceExtractor;MorphologyBlockExtractor");
+                foreach (var grouping in results.GroupBy(x => x.Noise).ToList())
                 {
-                    _loggerDetails.Info($"{grouping.Key};" +
-                                        $"{grouping.Where(x => x.MethodName == "RecognizeNextPiece").Select(x => x.Accuracy).Average():F};" +
-                                        $"{grouping.Where(x => x.MethodName == "RecognizeCurrentPieceUnknown").Select(x => x.Accuracy).Average():F};" +
-                                        $"{grouping.Where(x => x.MethodName == "RecognizeCurrentPieceKnown").Select(x => x.Accuracy).Average():F};" +
-                                        $"{grouping.Where(x => x.MethodName == "RecognizeMove").Select(x => x.Accuracy).Average():F}");
+                    _loggerComparison.Info($"{grouping.Key};" +
+                                           $"{grouping.Where(x => x.CandidateName == "NaiveBlockExtractor").Select(x => x.OverallAccuracy).Average():F};" +
+                                           $"{grouping.Where(x => x.CandidateName == "TemplatePieceExtractor").Select(x => x.OverallAccuracy).Average():F};" +
+                                           $"{grouping.Where(x => x.CandidateName == "MorphologyBlockExtractor").Select(x => x.OverallAccuracy).Average():F}");
                 }
             }
         }
@@ -121,10 +201,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
                     var nextPiece = input.Extractor.ExtractNextPiece(screenshot);
 
-                    results.Total++;
+                    results.PositivesTotal++;
                     if (test.NextPiece == nextPiece)
                     {
-                        results.Recognized++;
+                        results.PositivesOk++;
                     }
                     else
                     {
@@ -132,7 +212,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
                     }
                 }
             }
-            
+
             var negativeTests = TestDataFactory.Data
                 .Where(x => !x.NextPiece.HasValue)
                 .ToList();
@@ -145,10 +225,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
                     var nextPiece = input.Extractor.ExtractNextPiece(screenshot);
 
-                    results.Total++;
+                    results.NegativesTotal++;
                     if (nextPiece == null)
                     {
-                        results.Recognized++;
+                        results.NegativesOk++;
                     }
                     else
                     {
@@ -178,10 +258,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
                     var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, test.Piece.FallHeight);
 
-                    results.Total++;
+                    results.PositivesTotal++;
                     if (currentPiece != null && currentPiece.Tetrimino == test.Piece.Tetrimino)
                     {
-                        results.Recognized++;
+                        results.PositivesOk++;
                     }
                 }
             }
@@ -201,10 +281,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
                     var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, 0);
 
-                    results.Total++;
+                    results.NegativesTotal++;
                     if (currentPiece == null)
                     {
-                        results.Recognized++;
+                        results.NegativesOk++;
                     }
                 }
             }
@@ -231,10 +311,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
                     var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, test.Piece.Tetrimino,
                         test.Piece.FallHeight);
 
-                    results.Total++;
+                    results.PositivesTotal++;
                     if (currentPiece != null && currentPiece.Tetrimino == test.Piece.Tetrimino)
                     {
-                        results.Recognized++;
+                        results.PositivesOk++;
                     }
                 }
             }
@@ -254,10 +334,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
                     var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, 0);
 
-                    results.Total++;
+                    results.NegativesTotal++;
                     if (currentPiece == null)
                     {
-                        results.Recognized++;
+                        results.NegativesOk++;
                     }
                 }
             }
@@ -290,10 +370,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
                     if (pieceOriginMoved.Equals(pieceOriginNotMoved)) throw new Exception("pieces must be different!");
 
-                    results.Total++;
+                    results.PositivesTotal++;
                     if (recognizedPiece != null && recognizedPiece.Equals(test.Piece) && !moved)
                     {
-                        results.Recognized++;
+                        results.PositivesOk++;
                     }
                 }
             }
@@ -344,9 +424,8 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var shiftedKeypoints = ShiftKeypoints(keypoints, input.Shift);
             quantizer.Keypoints = shiftedKeypoints;
-            
-            var noisedImage = image.AddNoise(input.Noise);
-            var quantized = quantizer.Quantize(noisedImage);
+
+            var quantized = quantizer.Quantize(image);
             var screenshot = new EmguScreenshot(quantized, DateTime.Now.Subtract(DateTime.MinValue));
 
             return screenshot;
@@ -370,17 +449,21 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
     public class ExtractionComparisonInput
     {
+        public string Name { get; set; }
         public IExtractor Extractor { get; }
         public IQuantizer Quantizer { get; }
         public int Shift { get; }
         public double Noise { get; }
+        public double Threshold { get; }
 
-        public ExtractionComparisonInput(IExtractor extractor, IQuantizer quantizer, int shift, double noise)
+        public ExtractionComparisonInput(string name, IExtractor extractor, IQuantizer quantizer, int shift, double noise, double threshold)
         {
+            Name = name;
             Extractor = extractor;
             Quantizer = quantizer;
             Shift = shift;
             Noise = noise;
+            Threshold = threshold;
         }
 
         public override string ToString()
@@ -391,26 +474,40 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
     public class ExtractionComparisonResult
     {
+        public string CandidateName { get; }
         public string MethodName { get; }
         public string ExtractorName { get; }
         public string QuantizerName { get; }
         public int Shift { get; }
+        public double Noise { get; }
+        public double Threshold { get; }
 
-        public int Total { get; set; }
-        public int Recognized { get; set; }
-        public double Accuracy { get; private set; }
+        public int PositivesTotal { get; set; }
+        public int PositivesOk { get; set; }
+        public double PositivesAccuracy { get; set; }
+
+        public int NegativesTotal { get; set; }
+        public int NegativesOk { get; set; }
+        public double NegativesAccuracy { get; set; }
+
+        public double OverallAccuracy { get; set; }
 
         public ExtractionComparisonResult(ExtractionComparisonInput input, string methodName)
         {
+            CandidateName = input.Name;
             MethodName = methodName;
             ExtractorName = input.Extractor.GetType().Name;
             QuantizerName = input.Quantizer.GetType().Name;
             Shift = input.Shift;
+            Noise = input.Noise;
+            Threshold = input.Threshold;
         }
 
         public void Calculate()
         {
-            Accuracy = (double)Recognized / Total;
+            PositivesAccuracy = (double)PositivesOk / PositivesTotal;
+            NegativesAccuracy = (double)NegativesOk / NegativesTotal;
+            OverallAccuracy = (double)(PositivesOk + NegativesOk) / (PositivesTotal + NegativesTotal);
         }
     }
 }

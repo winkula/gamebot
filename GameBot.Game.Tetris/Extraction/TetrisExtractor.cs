@@ -1,22 +1,19 @@
 ﻿using System;
 using GameBot.Core;
 using GameBot.Core.Data;
-using System.Drawing;
 using GameBot.Game.Tetris.Data;
-using System.Collections.Generic;
 
 namespace GameBot.Game.Tetris.Extraction
 {
-    // TODO: remove this class?
     public class TetrisExtractor
     {
         private int MeanThreshold { get; }
         private double MinimalProbability { get; }
-        
+
         public TetrisExtractor(IConfig config)
         {
-            MeanThreshold = 150;
-            MinimalProbability = 0.9375;
+            MeanThreshold = (int)(255 * (1 - config.Read("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.41)));
+            MinimalProbability = config.Read("Game.Tetris.Extractor.ThresholdMovedPiece", 0.9375);
         }
 
         public GameState Extract(IScreenshot screenshot, GameState currentGameState)
@@ -63,7 +60,7 @@ namespace GameBot.Game.Tetris.Extraction
 
         public bool IsBlock(byte mean)
         {
-            return mean < MeanThreshold;
+            return mean <= MeanThreshold;
         }
 
         // x and y are in board coordinates
@@ -132,7 +129,7 @@ namespace GameBot.Game.Tetris.Extraction
             }
             return Piece.FromMask(mask);
         }
-        
+
         // Searches the piece only in the spawning area on top of the board and a specifiec number of tiles below
         // Searches only pieces with the orientation 0
         // returns null, if the piece was not found in the spawning area or the specifiec number of tiles below
@@ -180,7 +177,7 @@ namespace GameBot.Game.Tetris.Extraction
                 throw new ArgumentException("searchHeight must be positive.");
 
             // TODO: upper bound for maxFallDistance
-            
+
             var lastPositionTemp = new Piece(lastPosition);
             var expectedPosition = new Piece(lastPosition).Apply(move);
 
@@ -220,14 +217,14 @@ namespace GameBot.Game.Tetris.Extraction
                 throw new ArgumentException("searchHeight must be positive.");
 
             // TODO: upper bound for maxFallDistance
-            
+
             var lastPositionTemp = new Piece(lastPosition);
             var expectedPosition = new Piece(lastPosition).Apply(move);
 
             double highestProbability = double.NegativeInfinity;
             Piece mostProbablePiece = null;
             moved = false;
-            
+
             for (int i = 0; i <= maxFallDistance; i++)
             {
                 var probabilityExpected = GetProbability(screenshot, expectedPosition);
@@ -271,7 +268,7 @@ namespace GameBot.Game.Tetris.Extraction
                     var coordinates = Coordinates.PieceToTile(expected.X + x, expected.Y + y);
                     var isBlockReal = expected.Shape.IsSquareOccupied(x, y);
                     var isBlockExpected = IsTileBlock(screenshot, coordinates.X, coordinates.Y);
-                    
+
                     if (isBlockReal != isBlockExpected) errors++;
                 }
             }
