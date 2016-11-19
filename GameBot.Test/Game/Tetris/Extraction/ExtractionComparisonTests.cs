@@ -4,13 +4,14 @@ using System.Drawing;
 using System.Linq;
 using Emgu.CV;
 using GameBot.Core;
-using GameBot.Core.Configuration;
 using GameBot.Core.Data;
 using GameBot.Core.Exceptions;
+using GameBot.Core.Extensions;
 using GameBot.Core.Quantizers;
-using GameBot.Engine.Physical.Quantizers;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Extractors;
+using GameBot.Test.Extensions;
+using Moq;
 using NLog;
 using NUnit.Framework;
 
@@ -25,25 +26,32 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
         private const int _multiplySamplesBy = 10;
 
-        private IConfig _config;
+        private Mock<IConfig> _configMock;
         private Random _random;
-        private Quantizer _quantizer1;
+        private IQuantizer _quantizer;
+        private IQuantizer _quantizerMorphology;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            _config = TestHelper.GetFakeConfig().Object;
+            _configMock = TestHelper.GetFakeConfig();
+            _configMock.ConfigValue("Game.Tetris.Extractor.ThresholdNextPiece", 0.6);
+            _configMock.ConfigValue("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.6);
+            _configMock.ConfigValue("Game.Tetris.Extractor.ThresholdMovedPiece", 0.5);
+
             _random = new Random(123);
-            _quantizer1 = new Quantizer(_config);
+            _quantizer = new Quantizer(_configMock.Object);
+            _quantizerMorphology = new MorphologyQuantizer(_configMock.Object);
         }
 
         [Test]
         public void Compare()
         {
-            var extractors = new IExtractor[] {/* new BlockBasedExtractor(),*//* new PieceBasedExtractor(),*/ new MorphologyExtractor(_config) };
-            var quantizers = new IQuantizer[] { _quantizer1 };
-            var shifts = new[] { 0, 1, 2, 3, 4, 8, 16 };
-            
+            var extractors = new IExtractor[] { /*new BlockBasedExtractor(), new PieceBasedExtractor(),*/ new MorphologyExtractor(_configMock.Object) };
+            var quantizers = new IQuantizer[] { /*_quantizer,*/ _quantizerMorphology };
+            var shifts = new[] { 0, 1, 2, 4, 8 };
+            var noises = new[] { 0.0, 0.25 };
+
             var results = new List<ExtractionComparisonResult>();
             foreach (var quantizer in quantizers)
             {
@@ -51,13 +59,16 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 {
                     foreach (var shift in shifts)
                     {
-                        var input = new ExtractionComparisonInput(extractor, quantizer, shift);
+                        foreach (var noise in noises)
+                        {
+                            var input = new ExtractionComparisonInput(extractor, quantizer, shift, noise);
 
-                        // run tests...
-                        AddResults(results, RecognizeNextPiece(input));
-                        AddResults(results, RecognizeCurrentPieceUnknown(input));
-                        AddResults(results, RecognizeCurrentPieceKnown(input));
-                        AddResults(results, RecognizeMove(input));
+                            // run tests...
+                            AddResults(results, RecognizeNextPiece(input));
+                            AddResults(results, RecognizeCurrentPieceUnknown(input));
+                            AddResults(results, RecognizeCurrentPieceKnown(input));
+                            AddResults(results, RecognizeMove(input));
+                        }
                     }
                 }
             }
@@ -97,20 +108,45 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var results = new ExtractionComparisonResult(input, nameof(RecognizeNextPiece));
 
-            var tests = ImageTestCaseFactory.Data
+            var positiveTests = TestDataFactory.Data
                 .Where(x => x.NextPiece.HasValue)
+                .Take(46)
                 .ToList();
 
             for (int i = 0; i < _multiplySamplesBy; i++)
             {
-                foreach (var test in tests)
+                foreach (var test in positiveTests)
                 {
-                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input);
 
                     var nextPiece = input.Extractor.ExtractNextPiece(screenshot);
 
                     results.Total++;
                     if (test.NextPiece == nextPiece)
+                    {
+                        results.Recognized++;
+                    }
+                    else
+                    {
+                        _loggerFails.Warn($"RecognizeNextPiece. Recognized: {nextPiece}, Real: {test.NextPiece}. Testcase {test.ImageKey}. Input {input}");
+                    }
+                }
+            }
+            
+            var negativeTests = TestDataFactory.Data
+                .Where(x => !x.NextPiece.HasValue)
+                .ToList();
+
+            for (int i = 0; i < _multiplySamplesBy; i++)
+            {
+                foreach (var test in negativeTests)
+                {
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input);
+
+                    var nextPiece = input.Extractor.ExtractNextPiece(screenshot);
+
+                    results.Total++;
+                    if (nextPiece == null)
                     {
                         results.Recognized++;
                     }
@@ -128,16 +164,17 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var results = new ExtractionComparisonResult(input, nameof(RecognizeCurrentPieceUnknown));
 
-            var positiveTests = ImageTestCaseFactory.Data
+            var positiveTests = TestDataFactory.Data
                 .Where(x => x.Piece != null)
                 .Where(x => x.Piece.IsUntouched)
+                .Take(34)
                 .ToList();
 
             for (int i = 0; i < _multiplySamplesBy; i++)
             {
                 foreach (var test in positiveTests)
                 {
-                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input);
 
                     var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, test.Piece.FallHeight);
 
@@ -149,7 +186,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 }
             }
 
-            var negativeTests = ImageTestCaseFactory.Data
+            var negativeTests = TestDataFactory.Data
                 .Where(x =>
                     x.Piece == null ||
                     x.Piece.FallHeight >= 3 ||
@@ -160,7 +197,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             {
                 foreach (var test in negativeTests)
                 {
-                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input);
 
                     var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, 0);
 
@@ -168,10 +205,6 @@ namespace GameBot.Test.Game.Tetris.Extraction
                     if (currentPiece == null)
                     {
                         results.Recognized++;
-                    }
-                    else
-                    {
-                        _loggerFails.Warn($"RecognizeCurrentPieceUnknown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Input {input}");
                     }
                 }
             }
@@ -183,16 +216,17 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var results = new ExtractionComparisonResult(input, nameof(RecognizeCurrentPieceKnown));
 
-            var tests = ImageTestCaseFactory.Data
+            var positiveTests = TestDataFactory.Data
                 .Where(x => x.Piece != null)
                 .Where(x => x.Piece.IsUntouched)
+                .Take(34)
                 .ToList();
 
             for (int i = 0; i < _multiplySamplesBy; i++)
             {
-                foreach (var test in tests)
+                foreach (var test in positiveTests)
                 {
-                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input);
 
                     var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, test.Piece.Tetrimino,
                         test.Piece.FallHeight);
@@ -202,14 +236,10 @@ namespace GameBot.Test.Game.Tetris.Extraction
                     {
                         results.Recognized++;
                     }
-                    else
-                    {
-                        _loggerFails.Warn($"RecognizeCurrentPieceKnown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Input {input}");
-                    }
                 }
             }
 
-            var negativeTests = ImageTestCaseFactory.Data
+            var negativeTests = TestDataFactory.Data
                 .Where(x =>
                     x.Piece == null ||
                     x.Piece.FallHeight >= 3 ||
@@ -220,7 +250,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             {
                 foreach (var test in negativeTests)
                 {
-                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input);
 
                     var currentPiece = input.Extractor.ExtractCurrentPiece(screenshot, null, 0);
 
@@ -228,10 +258,6 @@ namespace GameBot.Test.Game.Tetris.Extraction
                     if (currentPiece == null)
                     {
                         results.Recognized++;
-                    }
-                    else
-                    {
-                        _loggerFails.Warn($"RecognizeCurrentPieceKnown. Recognized: {currentPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Input {input}");
                     }
                 }
             }
@@ -243,7 +269,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var results = new ExtractionComparisonResult(input, nameof(RecognizeMove));
 
-            var tests = ImageTestCaseFactory.Data
+            var tests = TestDataFactory.Data
                 .Where(x => x.Piece != null)
                 .ToList();
 
@@ -251,7 +277,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             {
                 foreach (var test in tests)
                 {
-                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input.Shift);
+                    var screenshot = GetScreenshot(input.Quantizer, test.Image, test.Keypoints, input);
 
                     var move = GetValidMove(test);
                     if (!move.HasValue) continue;
@@ -269,17 +295,13 @@ namespace GameBot.Test.Game.Tetris.Extraction
                     {
                         results.Recognized++;
                     }
-                    else
-                    {
-                        _loggerFails.Warn($"RecognizeMove. Recognized: {recognizedPiece}, Real: {test.Piece}. Testcase {test.ImageKey}. Input {input}");
-                    }
                 }
             }
 
             return results;
         }
 
-        private Move? GetValidMove(ImageTestCaseFactory.TestData test)
+        private Move? GetValidMove(TestDataFactory.TestData test)
         {
             var validMoves = (test.Piece.Tetrimino == Tetrimino.O ?
                 new[] { Move.Left, Move.Right } :
@@ -287,10 +309,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
             .OrderBy(x => Guid.NewGuid())
             .ToArray();
 
+            var gamestate = new GameState(new Piece(test.Piece), test.NextPiece);
             foreach (var move in validMoves)
             {
-                var gamestate = new GameState(new Piece(test.Piece), test.NextPiece);
-
                 try
                 {
                     switch (move)
@@ -319,12 +340,13 @@ namespace GameBot.Test.Game.Tetris.Extraction
             return null;
         }
 
-        private IScreenshot GetScreenshot(IQuantizer quantizer, Mat image, Point[] keypoints, double shift)
+        private IScreenshot GetScreenshot(IQuantizer quantizer, Mat image, Point[] keypoints, ExtractionComparisonInput input)
         {
-            var shiftedKeypoints = ShiftKeypoints(keypoints, shift);
+            var shiftedKeypoints = ShiftKeypoints(keypoints, input.Shift);
             quantizer.Keypoints = shiftedKeypoints;
-
-            var quantized = quantizer.Quantize(image);
+            
+            var noisedImage = image.AddNoise(input.Noise);
+            var quantized = quantizer.Quantize(noisedImage);
             var screenshot = new EmguScreenshot(quantized, DateTime.Now.Subtract(DateTime.MinValue));
 
             return screenshot;
@@ -351,17 +373,19 @@ namespace GameBot.Test.Game.Tetris.Extraction
         public IExtractor Extractor { get; }
         public IQuantizer Quantizer { get; }
         public int Shift { get; }
+        public double Noise { get; }
 
-        public ExtractionComparisonInput(IExtractor extractor, IQuantizer quantizer, int shift)
+        public ExtractionComparisonInput(IExtractor extractor, IQuantizer quantizer, int shift, double noise)
         {
             Extractor = extractor;
             Quantizer = quantizer;
             Shift = shift;
+            Noise = noise;
         }
 
         public override string ToString()
         {
-            return $"{{ Shift: {Shift} }}";
+            return $"{{ Shift: {Shift}, Noise: {Noise} }}";
         }
     }
 

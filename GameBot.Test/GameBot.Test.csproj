@@ -153,6 +153,7 @@
     <Compile Include="Core\Data\Commands\PressCommandTests.cs" />
     <Compile Include="Core\Data\Commands\HitCommandTests.cs" />
     <Compile Include="Core\Executors\ExecutorTests.cs" />
+    <Compile Include="Extensions\MockExtensions.cs" />
     <Compile Include="Game\Tetris\Extraction\ExtractionComparisonTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Extractors\MorphologyExtractorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Matchers\MorphologyMatcherTests.cs" />
@@ -169,7 +170,7 @@
     <Compile Include="Misc\PerformanceTests.cs" />
     <Compile Include="Engine\Physical\Actuators\PhysicalActuatorTests.cs" />
     <Compile Include="Misc\MaethuTests.cs" />
-    <Compile Include="Misc\PaeduQuantizerTests.cs" />
+    <Compile Include="Misc\PaeduTests.cs" />
     <Compile Include="Misc\TinkerforgeTests.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="Game\Tetris\Data\CoordinatesTest.cs" />
@@ -189,7 +190,7 @@
     <Compile Include="Game\Tetris\Data\PieceTests.cs" />
     <Compile Include="Game\Tetris\Data\BoardTests.cs" />
     <Compile Include="Game\Tetris\Data\TetrominoTests.cs" />
-    <Compile Include="ImageTestCaseFactory.cs" />
+    <Compile Include="TestDataFactory.cs" />
     <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>

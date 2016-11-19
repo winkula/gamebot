@@ -27,7 +27,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             _extractor = new TetrisExtractor(config);
         }
 
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPiecePositives))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesNextPiecePositives))]
         public void RecognizeNextPiece(string imageKey, IScreenshot screenshot, Tetrimino nextPieceExpected)
         {
             _nextPiece++;
@@ -41,7 +41,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         }
 
         // not relevant because not an issue in A-Type mode
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPieceNegativesNull))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesNextPieceNegativesNull))]
         public void NotRecognizeNextPiece(string imageKey, IScreenshot screenshot)
         {
             var tetromino = _extractor.ExtractNextPiece(screenshot);
@@ -49,7 +49,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             Assert.Null(tetromino);
         }
 
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesSpawnedPiecePositives))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesSpawnedPiecePositives))]
         public void RecognizeUnknownSpawnedPiece(string imageKey, IScreenshot screenshot, Piece currentPieceExpected)
         {
             _unknownSpawnedPiece++;
@@ -63,7 +63,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             _unknownSpawnedPieceRecognized++;
         }
         
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesSpawnedPieceNegativesNull))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesSpawnedPieceNegativesNull))]
         public void NotRecognizeUnknownSpawnedPiece(string imageKey, IScreenshot screenshot)
         {
             _unknownSpawnedPiece++;
@@ -77,19 +77,19 @@ namespace GameBot.Test.Game.Tetris.Extraction
             _unknownSpawnedPieceRecognized++;
         }
         
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesSpawnedPiecePositives))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesSpawnedPiecePositives))]
         public void RecognizeKnownSpawnedPiece(string imageKey, IScreenshot screenshot, Piece currentPieceExpected)
         {
             // TODO: implement?
         }
 
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesTouchedPieces))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesTouchedPieces))]
         public void NotRecognizeKnownSpawnedPiece(string imageKey, IScreenshot screenshot, Piece currentPieceExpected)
         {
             // TODO: implement?
         }
 
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesMovedPiece))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesMovedPiece))]
         public void RecognizeMovedPiece(string imageKey, IScreenshot screenshot, Piece currentPieceExpected, Move move)
         {
             // TODO: implement?

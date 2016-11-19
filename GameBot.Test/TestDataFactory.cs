@@ -3,9 +3,7 @@ using System.Drawing;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core;
-using GameBot.Core.Configuration;
 using GameBot.Core.Data;
-using GameBot.Engine.Physical.Quantizers;
 using GameBot.Game.Tetris.Data;
 using NUnit.Framework;
 using System.Collections;
@@ -15,7 +13,7 @@ using GameBot.Core.Quantizers;
 
 namespace GameBot.Test
 {
-    public class ImageTestCaseFactory
+    public class TestDataFactory
     {
         public class TestData
         {
@@ -43,7 +41,7 @@ namespace GameBot.Test
                 Screenshot = new EmguScreenshot(quantizedImage, DateTime.Now.Subtract(DateTime.MinValue));
             }
         }
-        
+
         private static readonly IQuantizer _quantizer = new MorphologyQuantizer(TestHelper.GetFakeConfig().Object);
 
         private static readonly Point[][] _keypoints =
@@ -51,7 +49,8 @@ namespace GameBot.Test
             new [] { new Point(583,361), new Point(206,358), new Point(569,59), new Point(229,59) }, // series 00
             new [] { new Point(585,360), new Point(207,359), new Point(571,58), new Point(228,57) }, // series 01
             new [] { new Point(593,357), new Point(206,354), new Point(574,53), new Point(230,53) }, // series 02
-            new [] { new Point(590,367), new Point(211,365), new Point(572,67), new Point(235,67) } // series 03
+            new [] { new Point(590,367), new Point(211,365), new Point(572,67), new Point(235,67) }, // series 03
+            new [] { new Point(140,116), new Point(474,119), new Point(164,368), new Point(445,368) } // series 04
         };
 
         public static readonly IEnumerable<TestData> Data = new List<TestData>
@@ -92,7 +91,26 @@ namespace GameBot.Test
             new TestData("0211", new Piece(Tetrimino.S).Fall(4), null, Move.Left),
             new TestData("0212", new Piece(Tetrimino.S).Fall(), null, Move.Right),
 
-            new TestData("0300", null, null) // pause menu
+            new TestData("0300", null, null), // pause menu
+            
+            new TestData("0400", new Piece(Tetrimino.S), Tetrimino.S),
+            new TestData("0401", new Piece(Tetrimino.O), Tetrimino.L),
+            new TestData("0402", new Piece(Tetrimino.Z), Tetrimino.L),
+            new TestData("0403", new Piece(Tetrimino.I), Tetrimino.Z),
+            new TestData("0404", new Piece(Tetrimino.I), Tetrimino.J),
+            new TestData("0405", new Piece(Tetrimino.O), Tetrimino.J),
+            new TestData("0406", new Piece(Tetrimino.T), Tetrimino.I),
+            new TestData("0407", new Piece(Tetrimino.S), Tetrimino.Z),
+            new TestData("0408", new Piece(Tetrimino.O), Tetrimino.S),
+            new TestData("0409", new Piece(Tetrimino.I), Tetrimino.O),
+            new TestData("0410", new Piece(Tetrimino.J), Tetrimino.I),
+            new TestData("0411", new Piece(Tetrimino.T), Tetrimino.T),
+            new TestData("0412", new Piece(Tetrimino.S), Tetrimino.O),
+            new TestData("0413", new Piece(Tetrimino.J), Tetrimino.S),
+            new TestData("0414", new Piece(Tetrimino.I), Tetrimino.J),
+            new TestData("0415", new Piece(Tetrimino.S), Tetrimino.T),
+            new TestData("0416", null, Tetrimino.S),
+            new TestData("0417", new Piece(Tetrimino.Z), Tetrimino.I)
         };
 
         public static IEnumerable TestCasesCurrentPiecePositives => Data
@@ -102,7 +120,7 @@ namespace GameBot.Test
         public static IEnumerable TestCasesCurrentPieceNegativesNull => Data
             .Where(x => x.Piece == null)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot));
-        
+
         public static IEnumerable TestCasesCurrentPieceOriginNegatives => Data
             .Where(x => x.Piece == null || !x.Piece.IsOrigin)
             .Select(x => new TestCaseData(x.ImageKey, x.Screenshot));

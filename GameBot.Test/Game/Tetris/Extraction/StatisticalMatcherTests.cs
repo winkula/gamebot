@@ -32,7 +32,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         }
 
         [Ignore]
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesCurrentPiecePositives))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesCurrentPiecePositives))]
         public void PieceMatchingCurrentPiece(string imageKey, IScreenshot screenshot, Piece currentPieceExpected)
         {
             _currentPiecesTotal++;
@@ -46,7 +46,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         }
 
         [Ignore]
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesCurrentPieceOriginNegatives))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesCurrentPieceOriginNegatives))]
         public void PieceMatchingCurrentPieceNegatives(string imageKey, IScreenshot screenshot)
         {
             foreach (var tetrimino in Tetriminos.All)
@@ -64,7 +64,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         }
 
         [Ignore]
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPiecePositives))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesNextPiecePositives))]
         public void PieceMatchingNextPiecePositives(string imageKey, IScreenshot screenshot, Tetrimino nextPieceExpected)
         {
             _nextPiecesTotal++;
@@ -78,7 +78,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         }
 
         [Ignore]
-        [TestCaseSource(typeof(ImageTestCaseFactory), nameof(ImageTestCaseFactory.TestCasesNextPieceNegativesNull))]
+        [TestCaseSource(typeof(TestDataFactory), nameof(TestDataFactory.TestCasesNextPieceNegativesNull))]
         public void PieceMatchingNextPieceNegatives(string imageKey, IScreenshot screenshot)
         {
             foreach (var tetrimino in Tetriminos.All)

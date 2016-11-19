@@ -8,19 +8,21 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using GameBot.Core.Data;
+using GameBot.Core.Extensions;
 using GameBot.Emulation;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
 
 namespace GameBot.Test.Misc
 {
-    [Ignore]
     [TestFixture]
     public class MaethuTests
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        [Ignore]
         [Test]
         public void TestFallSpeedLevel0()
         {
@@ -42,6 +44,7 @@ namespace GameBot.Test.Misc
             }
         }
 
+        [Ignore]
         [Test]
         public void TestDropSpeedLevel0()
         {
@@ -65,6 +68,7 @@ namespace GameBot.Test.Misc
             }
         }
 
+        [Ignore]
         [Test]
         public void TestFallSpeedLevel9()
         {
@@ -91,6 +95,7 @@ namespace GameBot.Test.Misc
             }
         }
 
+        [Ignore]
         [Test]
         public void TestDropSpeedLevel9()
         {
@@ -119,6 +124,7 @@ namespace GameBot.Test.Misc
             }
         }
 
+        [Ignore]
         [Test]
         public void TestLineRemoveDuration()
         {
@@ -181,6 +187,7 @@ namespace GameBot.Test.Misc
             emulator.Show();
         }
 
+        [Ignore]
         [Test]
         public void TestMatRoi()
         {
@@ -244,7 +251,8 @@ namespace GameBot.Test.Misc
 
             sw.Stop();
         }
-        
+
+        [Ignore]
         [Test]
         public void PieceMatcher()
         {
@@ -256,13 +264,34 @@ namespace GameBot.Test.Misc
             var pieceMatcher = new TemplateMatcher();
             pieceMatcher.GetProbabilityNextPiece(screenshot, Tetrimino.I);
         }
-        
+
+        [Test]
+        public void NoiseTests()
+        {
+            for (int i = 0; i <= 10; i++)
+            {
+                var test = TestDataFactory.Data.First();
+                var noised = test.Image.AddNoise(i / 10.0);
+
+                CvInvoke.Imshow("test", noised);
+                CvInvoke.WaitKey();
+            }
+        }
+
+        [Ignore]
         [Test]
         public void TestMe()
         {
             // source image
-            string path = "Images/tetris_1.jpg";
-            var sourceImage = new Mat(path, LoadImageType.Grayscale);
+            var test = TestDataFactory.Data.First();
+            var sourceImage = test.Image;
+
+            var keypoints = new float[,] {
+                { test.Keypoints[0].X, test.Keypoints[0].Y },
+                { test.Keypoints[1].X, test.Keypoints[1].Y },
+                { test.Keypoints[2].X, test.Keypoints[2].Y },
+                { test.Keypoints[3].X, test.Keypoints[3].Y }
+            };
 
             // open window
             CvInvoke.NamedWindow("Test");
@@ -273,7 +302,7 @@ namespace GameBot.Test.Misc
             var img = new Mat(sourceImage.Size, DepthType.Default, 1);
 
             // calculate transformation matrix
-            Matrix<float> srcKeypoints = new Matrix<float>(new float[,] { { 488, 334 }, { 1030, 333 }, { 435, 813 }, { 1061, 811 } });
+            Matrix<float> srcKeypoints = new Matrix<float>(keypoints);
             Matrix<float> destKeypoints = new Matrix<float>(new float[,] { { 0, 0 }, { GameBoyConstants.ScreenWidth, 0 }, { 0, GameBoyConstants.ScreenHeight }, { GameBoyConstants.ScreenWidth, GameBoyConstants.ScreenHeight } });
             var matrix = CvInvoke.GetPerspectiveTransform(srcKeypoints, destKeypoints);
 
@@ -299,7 +328,7 @@ namespace GameBot.Test.Misc
             CvInvoke.Imshow("Test", img);
             CvInvoke.WaitKey(0);
         }
-
+        
         private void GaussAndAdaptive(Mat img)
         {
             CvInvoke.GaussianBlur(img, img, new Size(3, 3), 0.6, 0.6, BorderType.Default);
