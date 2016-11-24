@@ -5,6 +5,7 @@ using System.Drawing;
 using GameBot.Core.Data;
 using System;
 using Emgu.CV.CvEnum;
+using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Agents.States;
@@ -22,7 +23,7 @@ namespace GameBot.Game.Tetris.Agents
         private bool _continue;
 
         // services and data used by states
-        public IConfig Config { get; private set; }
+        public IConfig Config { get; }
         public IClock Clock { get; private set; }
         public IQuantizer Quantizer { get; private set; }
         public IExecutor Executor { get; private set; }
@@ -36,6 +37,27 @@ namespace GameBot.Game.Tetris.Agents
         // config used by states
         public int CheckSamples { get; }
         public int ExtractionSamples { get; }
+
+        #region timing
+
+        // timing config
+        private readonly TimeSpan _hitTime;
+        private readonly TimeSpan _hitDelayAfter;
+
+        public readonly TimeSpan AnalyzePaddingTime;
+        public readonly TimeSpan DropPaddingTime;
+        public readonly TimeSpan CheckPaddingTime;
+
+        public TimeSpan GetExecutionDuration(int commands)
+        {
+            // the drop command is not counted here, because
+            // it has no delay time (press and release, no hit)
+            commands = Math.Max(0, commands - 1);
+
+            return (_hitTime + _hitDelayAfter).Multiply(commands);
+        }
+
+        #endregion
 
         // for visualization only
         public Piece ExtractedPiece { private get; set; }
@@ -56,9 +78,16 @@ namespace GameBot.Game.Tetris.Agents
             CheckSamples = Config.Read("Game.Tetris.Check.Samples", 1);
             ExtractionSamples = Config.Read("Game.Tetris.Extractor.Samples", 1);
 
+            // init timing config
+            _hitTime = TimeSpan.FromMilliseconds(Config.Read<int>("Robot.Actuator.Hit.Time"));
+            _hitDelayAfter = TimeSpan.FromMilliseconds(Config.Read<int>("Robot.Actuator.Hit.DelayAfter"));
+            AnalyzePaddingTime = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.AnalyzePaddingTime"));
+            DropPaddingTime = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.DropPaddingTime"));
+            CheckPaddingTime = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.CheckPaddingTime")) + _hitDelayAfter;
+
             Init();
         }
-
+        
         private void Init()
         {
             ResetVisualization();

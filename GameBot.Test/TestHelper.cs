@@ -71,28 +71,42 @@ namespace GameBot.Test
             var configMock = new Mock<IConfig>();
 
             configMock.ConfigValue("Game.Tetris.Visualize", true);
+
             configMock.ConfigValue("Game.Tetris.StartLevel", 9);
             configMock.ConfigValue("Game.Tetris.StartFromGameOver", false);
+
             configMock.ConfigValue("Game.Tetris.Check.Enabled", false);
             configMock.ConfigValue("Game.Tetris.Check.Samples", 1);
+
             configMock.ConfigValue("Game.Tetris.Extractor.Samples", 1);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdNextPiece", 0.7);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.7);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdMovedPiece", 0.5);
+
+            configMock.ConfigValue("Game.Tetris.Timing.AnalyzePaddingTime", 50);
+            configMock.ConfigValue("Game.Tetris.Timing.DropPaddingTime", 50);
+            configMock.ConfigValue("Game.Tetris.Timing.CheckPaddingTime", 50);
+
             configMock.ConfigValue("Emulator.Rom.Path", "Roms/tetris.gb");
+
             configMock.ConfigValue("Robot.Engine.Mode", "Emulated");
+
             configMock.ConfigValue("Robot.Camera.Index", 0);
             configMock.ConfigValue("Robot.Camera.RotateImage", false);
             configMock.ConfigValue("Robot.Camera.Noise", false);
+
             configMock.ConfigCollection("Robot.Quantizer.Transformation.KeyPoints", new[] { 0, 0, 160, 0, 0, 144, 160, 144 });
             configMock.ConfigValue("Robot.Quantizer.Threshold.Constant", 13);
             configMock.ConfigValue("Robot.Quantizer.Threshold.BlockSize", 17);
             configMock.ConfigValue("Robot.Quantizer.Blur", false);
+
             configMock.ConfigValue("Robot.Actuator.Host", "localhost");
             configMock.ConfigValue("Robot.Actuator.Port", 4223);
             configMock.ConfigValue("Robot.Actuator.UidMaster", "6JKbWn");
             configMock.ConfigValue("Robot.Actuator.UidRelay1", "mTA");
             configMock.ConfigValue("Robot.Actuator.UidRelay2", "mTC");
+            configMock.ConfigValue("Robot.Actuator.Hit.Time", 35);
+            configMock.ConfigValue("Robot.Actuator.Hit.DelayAfter", 40);
 
             return configMock;
         }

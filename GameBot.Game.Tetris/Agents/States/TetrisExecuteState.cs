@@ -116,7 +116,7 @@ namespace GameBot.Game.Tetris.Agents.States
             // we subtract a time padding, because we dont want to wait the
             // theoretical drop duration, but the real drop duration
             // (we don't want to miss an important frame in analyze state)  
-            var waitDuration = dropDuration - Timing.DropDurationPaddingTime;
+            var waitDuration = dropDuration - _agent.DropPaddingTime;
             if (waitDuration > TimeSpan.Zero)
             {
                 return waitDuration;

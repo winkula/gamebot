@@ -88,7 +88,7 @@ namespace GameBot.Game.Tetris.Agents.States
             // when we were executing button presses, the piece has fallen some rows
             // this is especially relevant in higher levels when speed is higher
             // we let the piece fall
-            var executionDuration = Timing.GetExecutionDuration(_pendingMoves.Count);
+            var executionDuration = _agent.GetExecutionDuration(_pendingMoves.Count);
             var fallDistance = TetrisLevel.GetFallDistance(_agent.GameState.Level, executionDuration);
             _agent.GameState.Fall(fallDistance);
 
@@ -136,7 +136,7 @@ namespace GameBot.Game.Tetris.Agents.States
             // we subtract a time padding, because we dont want to wait the
             // theoretical drop duration, but the real drop duration
             // (we don't want to miss an important frame in analyze state)  
-            var waitDuration = dropDuration - Timing.DropDurationPaddingTime;
+            var waitDuration = dropDuration - _agent.DropPaddingTime;
             if (waitDuration > TimeSpan.Zero)
             {
                 return waitDuration;

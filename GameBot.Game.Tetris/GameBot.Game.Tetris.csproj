@@ -201,7 +201,6 @@
     <Compile Include="Extraction\TetrisExtractor.cs" />
     <Compile Include="Searching\Heuristics\MaxBergmarkHeuristic.cs" />
     <Compile Include="TetrisTiming.cs" />
-    <Compile Include="Timing.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameBot.Core\GameBot.Core.csproj">

@@ -205,7 +205,7 @@ namespace GameBot.Game.Tetris.Agents.States
             // this is the time that passed since the next piece became visible
             var passedTime = _agent.Screenshot.Timestamp
                 - _beginTime.Value
-                + Timing.AnalyzeFallDurationPaddingTime;
+                + _agent.AnalyzePaddingTime;
 
             int searchHeightTime = TetrisLevel.GetFallDistance(_agent.GameState.Level, passedTime);
 
