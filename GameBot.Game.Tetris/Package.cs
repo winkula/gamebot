@@ -25,6 +25,7 @@ namespace GameBot.Game.Tetris
             container.RegisterSingleton<IHeuristic, YiyuanLeeHeuristic>();
             //container.RegisterSingleton<IHeuristic, ExperimentalHeuristic>();
 
+            container.RegisterSingleton<IMatcher, MorphologyMatcher>();
             container.RegisterSingleton<TetrisExtractor>();
             container.RegisterSingleton<PieceExtractor>();
             container.RegisterSingleton<TemplateMatcher>();

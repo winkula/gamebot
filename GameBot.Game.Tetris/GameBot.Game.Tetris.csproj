@@ -152,10 +152,10 @@
     <Compile Include="Extraction\Extractors\PieceBasedExtractor.cs" />
     <Compile Include="Extraction\Extractors\BlockBasedExtractor.cs" />
     <Compile Include="Extraction\Extractors\IExtractor.cs" />
-    <Compile Include="Extraction\IPenaltyLineExtractor.cs" />
+    <Compile Include="Extraction\IBoardExtractor.cs" />
     <Compile Include="Extraction\Matchers\IMatcher.cs" />
     <Compile Include="Extraction\Matchers\MorphologyMatcher.cs" />
-    <Compile Include="Extraction\PenaltyLineExtractor.cs" />
+    <Compile Include="Extraction\BoardExtractor.cs" />
     <Compile Include="Extraction\PieceExtractorBase.cs" />
     <Compile Include="Extraction\Samplers\ISampler.cs" />
     <Compile Include="Extraction\Samplers\MoveConfirmationSampler.cs" />

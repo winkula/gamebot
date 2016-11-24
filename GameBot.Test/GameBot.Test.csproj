@@ -164,7 +164,7 @@
     <Compile Include="Game\Tetris\Extraction\StatisticalPieceExtractorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Matchers\TemplateMatcherTests.cs" />
     <Compile Include="Game\Tetris\Extraction\StatisticalTetrisExtractorTests.cs" />
-    <Compile Include="Game\Tetris\Extraction\PenaltyLineExtractorTests.cs" />
+    <Compile Include="Game\Tetris\Extraction\BoardExtractorTests.cs" />
     <Compile Include="Game\Tetris\Searching\GameStateHashTests.cs" />
     <Compile Include="Misc\Playground.cs" />
     <Compile Include="Misc\PerformanceTests.cs" />
