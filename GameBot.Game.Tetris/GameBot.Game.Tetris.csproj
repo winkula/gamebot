@@ -145,6 +145,8 @@
     <Compile Include="Agents\States\TetrisRepeatState.cs" />
     <Compile Include="Agents\States\TetrisCheckState.cs" />
     <Compile Include="Agents\TetrisAgent.cs" />
+    <Compile Include="Data\Pose.cs" />
+    <Compile Include="Data\TetriminoLookups.cs" />
     <Compile Include="Data\BoardLookups.cs" />
     <Compile Include="Data\Coordinates.cs" />
     <Compile Include="Extraction\Extractors\BaseExtractor.cs" />

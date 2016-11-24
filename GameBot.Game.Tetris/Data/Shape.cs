@@ -114,7 +114,7 @@ namespace GameBot.Game.Tetris.Data
 
         public int TranslationMin { get; }
         public int TranslationMax { get; }
-
+        
         public Shape(Tetrimino tetrimino, int orientation, IEnumerable<Point> body, IEnumerable<Point> head, int translationMin, int translationMax)
         {
             Tetrimino = tetrimino;

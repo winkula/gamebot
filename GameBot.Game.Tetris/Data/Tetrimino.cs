@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GameBot.Game.Tetris.Data
 {
@@ -13,7 +14,7 @@ namespace GameBot.Game.Tetris.Data
         J = 5,
         T = 6
     }
-    
+
     public static class Tetriminos
     {
         public const int AllPossibleOrientations = 19;
@@ -27,7 +28,9 @@ namespace GameBot.Game.Tetris.Data
 
         // Chances found by sampling dozens of emulator tetris game states
         private static readonly double[] _chances = { 0.149, 0.130, 0.196, 0.100, 0.113, 0.145, 0.167 };
-        private static readonly int[][] _orientations = { new[] { 0 }, new[] { 0, 1 }, new[] { 0, 1 }, new[] { 0, 1 }, new[] { 0, 1, 2, 3 }, new[] { 0, 1, 2, 3 }, new[] { 0, 1, 2, 3 } };
+
+        // ordered, so that the bot has to press as little buttons as possible
+        private static readonly int[][] _orientations = { new[] { 0 }, new[] { 0, 1 }, new[] { 0, 1 }, new[] { 0, 1 }, new[] { 0, 1, 3, 2 }, new[] { 0, 1, 3, 2 }, new[] { 0, 1, 3, 2 } };
 
         public static Tetrimino GetRandom(Random random = null)
         {
@@ -50,6 +53,15 @@ namespace GameBot.Game.Tetris.Data
         {
             return _orientations[(int)tetrimino];
         }
+
+        public static IEnumerable<int> GetPossibleTranslations(Tetrimino tetrimino, int orientation = 0)
+        {
+            var shape = Shape.Get(tetrimino, orientation);
+            for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
+            {
+                yield return translation;
+            }
+        }
     }
 
     public static class TetrominoExtensions
@@ -63,69 +75,18 @@ namespace GameBot.Game.Tetris.Data
         {
             return Tetriminos.GetPossibleOrientations(tetrimino);
         }
-        
+
+        public static IEnumerable<int> GetPossibleTranslations(this Tetrimino tetrimino, int orientation = 0)
+        {
+            return Tetriminos.GetPossibleTranslations(tetrimino, orientation);
+        }
+
         // gets all start configurations that are possible for a specified tetrimino
         public static IEnumerable<Piece> GetPoses(this Tetrimino tetrimino)
         {
-            Shape shape;
-
-            // TODO: make static lookup table
-            switch (tetrimino)
-            {
-                case Tetrimino.O:
-                    shape = Shape.Get(tetrimino);
-                    for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                        yield return new Piece(tetrimino, 0, translation);
-                    break;
-                case Tetrimino.I:
-                    foreach (int rotation in new[] { 0, 1 })
-                    {
-                        shape = Shape.Get(tetrimino, rotation);
-                        for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetrimino, rotation, translation);
-                    }
-                    break;
-                case Tetrimino.S:
-                    foreach (int rotation in new[] { 0, 1 })
-                    {
-                        shape = Shape.Get(tetrimino, rotation);
-                        for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetrimino, rotation, translation);
-                    }
-                    break;
-                case Tetrimino.Z:
-                    foreach (int rotation in new[] { 0, 1 })
-                    {
-                        shape = Shape.Get(tetrimino, rotation);
-                        for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetrimino, rotation, translation);
-                    }
-                    break;
-                case Tetrimino.L:
-                    for (int rotation = 0; rotation < 4; rotation++)
-                    {
-                        shape = Shape.Get(tetrimino, rotation);
-                        for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetrimino, rotation, translation);
-                    }
-                    break;
-                case Tetrimino.J:
-                    for (int rotation = 0; rotation < 4; rotation++)
-                    {
-                        shape = Shape.Get(tetrimino, rotation);
-                        for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetrimino, rotation, translation);
-                    }
-                    break;
-                case Tetrimino.T:
-                    for (int rotation = 0; rotation < 4; rotation++)
-                    {
-                        shape = Shape.Get(tetrimino, rotation);
-                        for (int translation = shape.TranslationMin; translation <= shape.TranslationMax; translation++)
-                            yield return new Piece(tetrimino, rotation, translation);
-                    }
-                    break;
-            }
+            return TetriminoLookups.Instance
+                .GetPoses(tetrimino)
+                .Select(x => new Piece(tetrimino, x.Orientation, x.Translation));
         }
     }
 }
