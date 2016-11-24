@@ -5,6 +5,6 @@ namespace GameBot.Game.Tetris.Extraction
 {
     public interface IBoardExtractor
     {
-        Board MultiplayerUpdate(IScreenshot screenshot, Board board);
+        Board UpdateMultiplayer(IScreenshot screenshot, Board board);
     }
 }

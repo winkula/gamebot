@@ -36,8 +36,15 @@ namespace GameBot.Robot.Ui
                 container.Verify();
 
                 ConfigureLogging();
-
-                Application.Run(container.GetInstance<Window>());
+                var logger = LogManager.GetCurrentClassLogger();
+                try
+                {
+                    Application.Run(container.GetInstance<Window>());
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex);
+                }
             }
         }
 
@@ -60,7 +67,7 @@ namespace GameBot.Robot.Ui
 
         static IEnumerable<Assembly> GetAssemblies(params string[] assemblyNames)
         {
-            return assemblyNames.Select(x => Assembly.Load(x)).ToList();
+            return assemblyNames.Select(Assembly.Load).ToList();
         }
 
         static void CreateFolders()
@@ -77,20 +84,39 @@ namespace GameBot.Robot.Ui
             var config = new LoggingConfiguration();
 
 #if DEBUG
-            var traceTarget = new TraceTarget();
-            traceTarget.Layout = @"${message}";
+            var traceTarget = new TraceTarget
+            {
+                Layout = @"${message}"
+            };
             config.AddTarget("debugger", traceTarget);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, traceTarget));
-
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Log.txt");
-            var fileTarget = new FileTarget();
-            fileTarget.Layout = @"${longdate} | ${level:uppercase=true} | ${pad:padding=-58:inner=${logger}} | ${message}";
-            fileTarget.FileName = path;
-            config.AddTarget("file", fileTarget);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, fileTarget));
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, traceTarget));
 #endif
+            var fileTarget = new FileTarget
+            {
+                Layout = @"${longdate} | ${level:uppercase=true} | ${pad:padding=-58:inner=${logger}} | ${message}",
+                FileName = GetLogPath()
+            };
+            config.AddTarget("file", fileTarget);
+            config.LoggingRules.Add(new LoggingRule("*", GetLogLevel(), fileTarget));
 
             LogManager.Configuration = config;
+        }
+
+        static string GetLogPath()
+        {
+            const string filename = "GameBot_Log.txt";
+#if DEBUG
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), filename);
+#endif
+            return filename;
+        }
+
+        static LogLevel GetLogLevel()
+        {
+#if DEBUG
+            return LogLevel.Debug;
+#endif
+            return LogLevel.Error;
         }
     }
 }

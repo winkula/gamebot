@@ -55,7 +55,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_multiplayer_0.png", _quantizer);
             
-            var newBoard = _boardExtractor.MultiplayerUpdate(screenshot, new Board(_initialBoard));
+            var newBoard = _boardExtractor.UpdateMultiplayer(screenshot, new Board(_initialBoard));
             var expected = _initialBoard;
 
             Assert.AreEqual(expected, newBoard);
@@ -66,7 +66,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_multiplayer_1.png", _quantizer);
 
-            var newBoard = _boardExtractor.MultiplayerUpdate(screenshot, new Board(_initialBoard));
+            var newBoard = _boardExtractor.UpdateMultiplayer(screenshot, new Board(_initialBoard));
             var expected = TestHelper.BuildBoard(new[]
             {
                 0,0,0,0,0,0,0,0,0,0,
@@ -98,7 +98,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_multiplayer_2.png", _quantizer);
 
-            var newBoard = _boardExtractor.MultiplayerUpdate(screenshot, new Board(_initialBoard));
+            var newBoard = _boardExtractor.UpdateMultiplayer(screenshot, new Board(_initialBoard));
             var expected = TestHelper.BuildBoard(new[]
             {
                 0,0,0,0,0,0,0,0,0,0,

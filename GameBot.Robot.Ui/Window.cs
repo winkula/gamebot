@@ -3,7 +3,6 @@ using Emgu.CV.UI;
 using GameBot.Core;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -204,7 +203,7 @@ namespace GameBot.Robot.Ui
 
         private void Run()
         {
-            var stopwatch = new Stopwatch();
+            //var stopwatch = new Stopwatch();
 
             _engine.Initialize();
 
@@ -214,14 +213,9 @@ namespace GameBot.Robot.Ui
                 {
                     _engine.Step(ShowOriginal, ShowProcessed);
 
-                    stopwatch.Stop();
-                    long ms = stopwatch.ElapsedMilliseconds;
-                    stopwatch.Restart();
-
-                    if (ms != 0)
-                    {
-                        Text = $"GameBot.Robot.Ui ({ms} ms)";
-                    }
+                    //stopwatch.Stop();
+                    //long ms = stopwatch.ElapsedMilliseconds;
+                    //stopwatch.Restart();
                 }
                 catch (GameOverException)
                 {

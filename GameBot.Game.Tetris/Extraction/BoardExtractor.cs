@@ -1,4 +1,5 @@
-﻿using GameBot.Core.Data;
+﻿using System;
+using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
 
@@ -6,6 +7,8 @@ namespace GameBot.Game.Tetris.Extraction
 {
     public class BoardExtractor : IBoardExtractor
     {
+        private const double _threshold = 0.7;
+
         private readonly IMatcher _matcher;
 
         public BoardExtractor(IMatcher matcher)
@@ -13,7 +16,7 @@ namespace GameBot.Game.Tetris.Extraction
             _matcher = matcher;
         }
 
-        public Board MultiplayerUpdate(IScreenshot screenshot, Board board)
+        public Board UpdateMultiplayer(IScreenshot screenshot, Board board)
         {
             int addedLines = GetAddedLines(screenshot, board);
             if (addedLines > 0)
@@ -26,6 +29,11 @@ namespace GameBot.Game.Tetris.Extraction
             }
 
             return board;
+        }
+
+        public Board Update(IScreenshot screenshot, Board board, Piece piece)
+        {
+            throw new NotImplementedException();
         }
 
         private int FindHolePosition(IScreenshot screenshot, Board board)
@@ -46,11 +54,10 @@ namespace GameBot.Game.Tetris.Extraction
 
         private int GetAddedLines(IScreenshot screenshot, Board board)
         {
-            double threshold = 0.7;
             int numLines = 0;
             for (; numLines < 4; numLines++)
             {
-                if (GetHorizonRaisedProbability(screenshot, board, numLines) < threshold)
+                if (GetHorizonRaisedProbability(screenshot, board, numLines) < _threshold)
                 {
                     break;
                 }
