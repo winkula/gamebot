@@ -115,6 +115,17 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
             return aggregateHeight;
         }
 
+        public int AggregateHeightLastMultiple(Board board, int multiplicator)
+        {
+            int aggregateHeight = 0;
+            for (int x = 0; x < board.Width - 1; x++)
+            {
+                aggregateHeight += board.ColumnHeight(x);
+            }
+            aggregateHeight += board.ColumnHeight(board.Width - 1) * multiplicator;
+            return aggregateHeight;
+        }
+
         public int CompleteLines(Board board)
         {
             return board.CompletedLines;
@@ -135,6 +146,22 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
             int bumpiness = 0;
             int? lastHeight = null;
             for (int x = 0; x < board.Width; x++)
+            {
+                int height = board.ColumnHeight(x);
+                if (lastHeight.HasValue)
+                {
+                    bumpiness += Math.Abs(lastHeight.Value - height);
+                }
+                lastHeight = height;
+            }
+            return bumpiness;
+        }
+
+        public int BumpinessWithoutLastColumn(Board board)
+        {
+            int bumpiness = 0;
+            int? lastHeight = null;
+            for (int x = 0; x < board.Width - 1; x++)
             {
                 int height = board.ColumnHeight(x);
                 if (lastHeight.HasValue)

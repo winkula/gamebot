@@ -24,7 +24,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
         private static readonly Logger _loggerDetails = LogManager.GetLogger("ExtractionDetails");
         private static readonly Logger _loggerFails = LogManager.GetLogger("Fails");
 
-        private const int _multiplySamplesBy = 5;
+        private const int _multiplySamplesBy = 10;
 
         private Random _random;
 
@@ -34,7 +34,59 @@ namespace GameBot.Test.Game.Tetris.Extraction
             _random = new Random(123);
         }
 
-        private Tuple<string, IExtractor, IQuantizer> GetCandidate(double threshold)
+        [Test]
+        public void TestDataAll()
+        {
+            IList<Tuple<int, double>> shiftNoises = new List<Tuple<int, double>>();
+            shiftNoises.Add(new Tuple<int, double>(0, 0.0));
+            shiftNoises.Add(new Tuple<int, double>(1, 0.0));
+            shiftNoises.Add(new Tuple<int, double>(2, 0.0));
+            shiftNoises.Add(new Tuple<int, double>(4, 0.0));
+            shiftNoises.Add(new Tuple<int, double>(8, 0.0));
+            shiftNoises.Add(new Tuple<int, double>(0, 0.2));
+            shiftNoises.Add(new Tuple<int, double>(0, 0.4));
+            shiftNoises.Add(new Tuple<int, double>(0, 0.6));
+            shiftNoises.Add(new Tuple<int, double>(0, 0.8));
+            
+            var thresholds = Enumerable.Range(0, 11).Select(x => x / 10.0).ToList();
+
+            var results = new List<ExtractionComparisonResult>();
+            foreach (var shiftNoise in shiftNoises)
+            {
+                foreach (var threshold in thresholds)
+                {
+                    var shift = shiftNoise.Item1;
+                    var noise = shiftNoise.Item2;
+
+                    var candidate = GetCandidate(threshold, noise);
+
+                    var input = new ExtractionComparisonInput(candidate.Item1, candidate.Item2, candidate.Item3, shift, noise, threshold);
+
+                    // run tests...
+                    AddResults(results, RecognizeNextPiece(input));
+                    AddResults(results, RecognizeCurrentPieceUnknown(input));
+                    AddResults(results, RecognizeCurrentPieceKnown(input));
+                    AddResults(results, RecognizeMove(input));
+                }
+            }
+
+            _loggerDetails.Info("Candidate;Extractor;Method;Threshold;Noise;Shift;PositivesTotal;PositivesOk;NegativesTotal;NegativesOk");
+            foreach (var result in results)
+            {
+                _loggerDetails.Info($"{result.CandidateName};" +
+                                    $"{result.ExtractorName};" +
+                                    $"{result.MethodName};" +
+                                    $"{result.Threshold};" +
+                                    $"{result.Noise};" +
+                                    $"{result.Shift};" +
+                                    $"{result.PositivesTotal};" +
+                                    $"{result.PositivesOk};" +
+                                    $"{result.NegativesTotal};" +
+                                    $"{result.NegativesOk}");
+            }
+        }
+
+        private Tuple<string, IExtractor, IQuantizer> GetCandidate(double threshold, double noise)
         {
             var configMock = TestHelper.GetFakeConfig();
 
@@ -44,18 +96,19 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
             configMock.ConfigValue("Robot.Quantizer.Threshold.Constant", 13);
             configMock.ConfigValue("Robot.Quantizer.Threshold.BlockSize", 17);
+            configMock.ConfigValue("Robot.Quantizer.NoiseLevel", noise);
 
-            var simpleQuantizer = new Quantizer(configMock.Object);
+            //var simpleQuantizer = new Quantizer(configMock.Object);
             var morphologyQuantizer = new MorphologyQuantizer(configMock.Object);
 
-            //var naiveBlockExtractor = new BlockBasedExtractor(configMock.Object);
-            //return new Tuple<string, IExtractor, IQuantizer>("NaiveBlockExtractor", naiveBlockExtractor, morphologyQuantizer);
+            var naiveBlockExtractor = new BlockBasedExtractor(configMock.Object);
+            return new Tuple<string, IExtractor, IQuantizer>("NaiveBlockExtractor", naiveBlockExtractor, morphologyQuantizer);
 
             //var templateExtractor = new PieceBasedExtractor(configMock.Object);
             //return new Tuple<string, IExtractor, IQuantizer>("TemplatePieceExtractor", templateExtractor, simpleQuantizer);
 
-            var morphologyExtractor = new MorphologyExtractor(configMock.Object);
-            return new Tuple<string, IExtractor, IQuantizer>("MorphologyBlockExtractor", morphologyExtractor, morphologyQuantizer);
+            //var morphologyExtractor = new MorphologyExtractor(configMock.Object);
+            //return new Tuple<string, IExtractor, IQuantizer>("MorphologyBlockExtractor", morphologyExtractor, morphologyQuantizer);
         }
 
         private IEnumerable<Tuple<string, IExtractor, IQuantizer>> GetCandidates(double noise)
@@ -91,15 +144,16 @@ namespace GameBot.Test.Game.Tetris.Extraction
         [Test]
         public void StatsOfOne()
         {
+            const double noise = 0.6;
             var thresholds = Enumerable.Range(0, 11).Select(x => x / 10.0).ToList();
 
             var results = new List<ExtractionComparisonResult>();
 
             foreach (var threshold in thresholds)
             {
-                var candidate = GetCandidate(threshold);
+                var candidate = GetCandidate(threshold, noise);
 
-                var input = new ExtractionComparisonInput(candidate.Item1, candidate.Item2, candidate.Item3, 0, 0.0, threshold);
+                var input = new ExtractionComparisonInput(candidate.Item1, candidate.Item2, candidate.Item3, 0, noise, threshold);
 
                 // run tests...
                 AddResults(results, RecognizeNextPiece(input));

@@ -10,13 +10,16 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
         {
             var board = gameState.Board;
 
-            var a = AggregateHeight(board);
+            var a = AggregateHeightLastMultiple(board, 99);
             var c = gameState.Lines;
             var h = Holes(board);
-            var b = Bumpiness(board);
+            var b = BumpinessWithoutLastColumn(board);
             var m = board.MaximumHeight;
 
-            return -0.5 * a + 0.9 * c - 3.0 * h - 0.1 * b;
+            return -0.510066 * a
+                /*+ 0.760666 * c*/
+                - 0.35663 * h
+                - 0.184483 * b;
         }
     }
 }
