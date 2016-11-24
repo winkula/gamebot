@@ -17,12 +17,14 @@ namespace GameBot.Game.Tetris
             container.RegisterSingleton<IAgent, TetrisAgent>();
 
             container.RegisterSingleton<IExtractor, MorphologyExtractor>();
+            container.RegisterSingleton<IBoardExtractor, BoardExtractor>();
 
             //container.RegisterSingleton<ISearch, OnePieceSearch>();
             container.RegisterSingleton<ISearch, SimpleSearch>();
             //container.RegisterSingleton<ISearch, PredictiveSearch>();
 
             container.RegisterSingleton<IHeuristic, YiyuanLeeHeuristic>();
+            //container.RegisterSingleton<IHeuristic, MaxBergmarkHeuristic>();
             //container.RegisterSingleton<IHeuristic, ExperimentalHeuristic>();
 
             container.RegisterSingleton<IMatcher, MorphologyMatcher>();

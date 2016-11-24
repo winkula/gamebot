@@ -24,6 +24,7 @@ namespace GameBot.Game.Tetris.Agents.States
         private Piece _extractedPiece;
         private Tetrimino? _extractedNextPiece;
         private TimeSpan? _beginTime;
+        private Board _extractedBoard;
 
         // we can extract the next piece only then, when we already have found the current piece
         private bool CanExtractNextPiece => _extractedPiece != null || _currentPieceSampler.SampleCount > 0;
@@ -87,11 +88,8 @@ namespace GameBot.Game.Tetris.Agents.States
             if (searchHeight < 0) throw new GameOverException("Search height is negative");
 
             ExtractCurrentPieceSampling(searchHeight);
-
-            if (CanExtractNextPiece)
-            {
-                ExtractNextPieceSampling();
-            }
+            ExtractNextPieceSampling();
+            ExtractBoard();
         }
 
         private void ExtractCurrentPieceSampling(int searchHeight)
@@ -147,6 +145,8 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void ExtractNextPieceSampling()
         {
+            if (!CanExtractNextPiece) return;
+
             // already extracted the piece?
             if (_extractedNextPiece != null) return;
 
@@ -187,10 +187,34 @@ namespace GameBot.Game.Tetris.Agents.States
             _agent.ExtractedNextPiece = _extractedNextPiece;
         }
 
+        private void ExtractBoard()
+        {
+            if (_agent.PlayMultiplayer)
+            {
+                // recognize if lines are spawned from the bottom
+                _agent.GameState.Board = _agent.BoardExtractor.UpdateMultiplayer(_agent.Screenshot, _agent.GameState.Board);
+            }
+
+            if (_agent.CheckEnabled)
+            {
+                if (_extractedPiece == null) return;
+                if (_agent.BoardExtractor.IsHorizonBroken(_agent.Screenshot, _agent.GameState.Board))
+                {
+                    _logger.Info("Extract board");
+
+                    _extractedBoard = _agent.BoardExtractor.Update(_agent.Screenshot, _agent.GameState.Board, _extractedPiece);
+                }
+            }
+        }
+
         private void UpdateGlobalGameState()
         {
             _agent.GameState.Piece = _extractedPiece;
             _agent.GameState.NextPiece = _extractedNextPiece;
+            if (_extractedBoard != null)
+            {
+                _agent.GameState.Board = _extractedBoard;
+            }
         }
 
         private SearchResult Search()

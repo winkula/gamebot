@@ -124,5 +124,74 @@ namespace GameBot.Test.Game.Tetris.Extraction
 
             Assert.AreEqual(expected, newBoard);
         }
+
+        [Test]
+        public void MultiplayerUpdateChangeHole8MultipleLines()
+        {
+            var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_multiplayer_3.png", _quantizer);
+
+            var newBoard = _boardExtractor.UpdateMultiplayer(screenshot, new Board(_initialBoard));
+            var expected = TestHelper.BuildBoard(new[]
+            {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,1,1,0,0,0,
+                0,0,1,1,1,1,1,1,0,0,
+                0,0,1,1,1,1,1,1,0,0,
+                0,1,1,1,0,1,1,1,1,1,
+                1,1,1,1,0,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,0,1,
+                1,1,1,1,1,1,1,1,0,1,
+                1,1,1,1,1,1,1,1,0,1,
+                1,1,1,1,1,1,1,1,0,1
+            });
+
+            Assert.AreEqual(expected, newBoard);
+        }
+
+        [Test]
+        public void Extract1()
+        {
+            var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_multiplayer_3.png", _quantizer);
+            var board = new Board(_initialBoard);
+            var piece = new Piece(Tetrimino.Z).Rotate().Right().Right().Fall(4);
+
+            var free = _boardExtractor.IsHorizonBroken(screenshot, board);
+            Assert.False(free);
+
+            var newBoard = _boardExtractor.Update(screenshot, board, piece);
+            var expected = TestHelper.BuildBoard(new[]
+            {
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,1,1,0,0,0,
+                0,0,1,1,1,1,1,1,0,0,
+                0,0,1,1,1,1,1,1,0,0,
+                0,1,1,1,0,1,1,1,1,1,
+                1,1,1,1,0,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,0,1,
+                1,1,1,1,1,1,1,1,0,1,
+                1,1,1,1,1,1,1,1,0,1,
+                1,1,1,1,1,1,1,1,0,1
+            });
+
+            Assert.AreEqual(expected, newBoard);
+        }
     }
 }

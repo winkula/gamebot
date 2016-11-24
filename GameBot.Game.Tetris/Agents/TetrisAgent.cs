@@ -9,6 +9,7 @@ using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Agents.States;
+using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Extractors;
 
 namespace GameBot.Game.Tetris.Agents
@@ -29,6 +30,7 @@ namespace GameBot.Game.Tetris.Agents
         public IExecutor Executor { get; private set; }
         public IScreenshot Screenshot { get; private set; }
         public IExtractor Extractor { get; private set; }
+        public IBoardExtractor BoardExtractor { get; private set; }
         public ISearch Search { get; private set; }
 
         // data used by states
@@ -37,6 +39,8 @@ namespace GameBot.Game.Tetris.Agents
         // config used by states
         public int CheckSamples { get; }
         public int ExtractionSamples { get; }
+        public bool PlayMultiplayer { get; }
+        public bool CheckEnabled { get; }
 
         #region timing
 
@@ -65,7 +69,7 @@ namespace GameBot.Game.Tetris.Agents
         public Tetrimino? ExtractedNextPiece { private get; set; }
         public int SearchHeight { private get; set; }
 
-        public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExtractor extractor, ISearch search)
+        public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExtractor extractor, IBoardExtractor boardExtractor, ISearch search)
         {
             _visualize = config.Read("Game.Tetris.Visualize", false);
 
@@ -73,10 +77,13 @@ namespace GameBot.Game.Tetris.Agents
             Clock = clock;
             Quantizer = quantizer;
             Extractor = extractor;
+            BoardExtractor = boardExtractor;
             Search = search;
 
-            CheckSamples = Config.Read("Game.Tetris.Check.Samples", 1);
-            ExtractionSamples = Config.Read("Game.Tetris.Extractor.Samples", 1);
+            CheckSamples = config.Read("Game.Tetris.Check.Samples", 1);
+            ExtractionSamples = config.Read("Game.Tetris.Extractor.Samples", 1);
+            PlayMultiplayer = config.Read("Game.Tetris.Multiplayer", false);
+            CheckEnabled = config.Read("Game.Tetris.Check.Enabled", false);
 
             // init timing config
             _hitTime = TimeSpan.FromMilliseconds(Config.Read<int>("Robot.Actuator.Hit.Time"));

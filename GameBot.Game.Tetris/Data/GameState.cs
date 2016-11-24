@@ -6,7 +6,7 @@ namespace GameBot.Game.Tetris.Data
 {
     public class GameState
     {
-        public Board Board { get; }
+        public Board Board { get; set; }
         public Piece Piece { get; set; }
         public Tetrimino? NextPiece { get; set; }
 

@@ -28,14 +28,13 @@ namespace GameBot.Robot.Ui
 
                 var config = new ExeConfig();
                 var engineMode = config.Read("Robot.Engine.Mode", "Emulated");
+                var logLevelString = config.Read("Robot.Ui.LogLevel", "Error");
 
-                if (engineMode == "Emulated")
-                    container.RegisterPackages(GetEmulatedEngineAssembies());
-                if (engineMode == "Physical")
-                    container.RegisterPackages(GetPhysicalEngineAssembies());
+                if (engineMode == "Emulated") container.RegisterPackages(GetEmulatedEngineAssembies());
+                if (engineMode == "Physical") container.RegisterPackages(GetPhysicalEngineAssembies());
                 container.Verify();
 
-                ConfigureLogging();
+                ConfigureLogging(logLevelString);
                 var logger = LogManager.GetCurrentClassLogger();
                 try
                 {
@@ -79,8 +78,9 @@ namespace GameBot.Robot.Ui
             Directory.CreateDirectory(pathTest);
         }
 
-        static void ConfigureLogging()
+        static void ConfigureLogging(string logLevelString)
         {
+            var logLevel = GetLogLevel(logLevelString);
             var config = new LoggingConfiguration();
 
 #if DEBUG
@@ -89,7 +89,7 @@ namespace GameBot.Robot.Ui
                 Layout = @"${message}"
             };
             config.AddTarget("debugger", traceTarget);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, traceTarget));
+            config.LoggingRules.Add(new LoggingRule("*", logLevel, traceTarget));
 #endif
             var fileTarget = new FileTarget
             {
@@ -97,7 +97,7 @@ namespace GameBot.Robot.Ui
                 FileName = GetLogPath()
             };
             config.AddTarget("file", fileTarget);
-            config.LoggingRules.Add(new LoggingRule("*", GetLogLevel(), fileTarget));
+            config.LoggingRules.Add(new LoggingRule("*", logLevel, fileTarget));
 
             LogManager.Configuration = config;
         }
@@ -106,17 +106,24 @@ namespace GameBot.Robot.Ui
         {
             const string filename = "GameBot_Log.txt";
 #if DEBUG
+            // on desktop in debug mode
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), filename);
 #endif
+            // in current folder in release mode
             return filename;
         }
 
-        static LogLevel GetLogLevel()
+        static LogLevel GetLogLevel(string logLevelString)
         {
-#if DEBUG
-            return LogLevel.Debug;
-#endif
-            return LogLevel.Error;
+            try
+            {
+                return LogLevel.FromString(logLevelString);
+            }
+            catch (ArgumentException)
+            {
+                // ignore
+                return LogLevel.Error;
+            }
         }
     }
 }

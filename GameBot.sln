@@ -33,6 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Screenshots", "Screenshots"
 		Screenshots\tetris_multiplayer_0.png = Screenshots\tetris_multiplayer_0.png
 		Screenshots\tetris_multiplayer_1.png = Screenshots\tetris_multiplayer_1.png
 		Screenshots\tetris_multiplayer_2.png = Screenshots\tetris_multiplayer_2.png
+		Screenshots\tetris_multiplayer_3.png = Screenshots\tetris_multiplayer_3.png
 		Screenshots\tetris_play_1.png = Screenshots\tetris_play_1.png
 		Screenshots\tetris_play_2.png = Screenshots\tetris_play_2.png
 		Screenshots\tetris_start.png = Screenshots\tetris_start.png
