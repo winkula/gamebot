@@ -16,7 +16,16 @@ namespace GameBot.Engine.Physical.Clocks
 
         public void Sleep(int miliseconds)
         {
+            if (miliseconds < 0) throw new ArgumentException("miliseconds can't be negative.");
+
             Thread.Sleep(miliseconds);
+        }
+
+        public void Sleep(TimeSpan timeSpan)
+        {
+            if (timeSpan < TimeSpan.Zero) throw new ArgumentException("timeSpan can't be negative.");
+
+            Thread.Sleep((int)timeSpan.TotalMilliseconds);
         }
     }
 }

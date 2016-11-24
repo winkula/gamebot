@@ -137,6 +137,7 @@
     <Compile Include="Data\Commands\ReleaseCommand.cs" />
     <Compile Include="Data\EmguScreenshot.cs" />
     <Compile Include="Data\ICommand.cs" />
+    <Compile Include="Engines\BaseEngine.cs" />
     <Compile Include="Exceptions\GameOverException.cs" />
     <Compile Include="Executors\Executor.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />

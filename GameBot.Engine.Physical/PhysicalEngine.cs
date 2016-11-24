@@ -2,44 +2,24 @@
 using GameBot.Core;
 using GameBot.Core.Data;
 using System;
-using System.Diagnostics;
+using GameBot.Core.Engines;
 
 namespace GameBot.Engine.Physical
 {
-    public class PhysicalEngine : IEngine
+    public class PhysicalEngine : BaseEngine
     {
-        private readonly ICamera _camera;
-        private readonly IClock _clock;
-        private readonly IExecutor _executor;
-        private readonly IQuantizer _quantizer;
-
-        private readonly IAgent _agent;
-
-        public bool Play { get; set; }
-
-        public PhysicalEngine(ICamera camera, IExecutor executor, IQuantizer quantizer, IAgent agent, IClock clock)
+        public PhysicalEngine(ICamera camera, IClock clock, IExecutor executor, IQuantizer quantizer, IAgent agent) : base(camera, clock, executor, quantizer, agent)
         {
-            _camera = camera;
-            _clock = clock;
-            _executor = executor;
-            _quantizer = quantizer;
-
-            _agent = agent;
         }
 
-        public void Initialize()
-        {
-            _clock.Start();
-        }
-
-        public void Step(Action<Mat> showImage = null, Action<Mat> showProcessedImage = null)
+        public override void Step(Action<Mat> showImage = null, Action<Mat> showProcessedImage = null)
         {
             // get image as photo of the gameboy screen (input)
-            Mat image = _camera.Capture();
-            TimeSpan time = _clock.Time;
+            Mat image = Camera.Capture();
+            TimeSpan time = Clock.Time;
 
             // process image
-            Mat processed = _quantizer.Quantize(image);
+            Mat processed = Quantizer.Quantize(image);
 
             showImage?.Invoke(image);
 
@@ -49,24 +29,18 @@ namespace GameBot.Engine.Physical
                 screenshot.OriginalImage = image;
 
                 // extracts the game state
-                _agent.Extract(screenshot);
-                
-                processed = _agent.Visualize(processed);
+                Agent.Extract(screenshot);
+
+                processed = Agent.Visualize(processed);
                 showProcessedImage?.Invoke(processed);
 
                 // presses the buttons
-                _agent.Play(_executor);
+                Agent.Play(Executor);
             }
             else
             {
                 showProcessedImage?.Invoke(processed);
             }
-        }
-
-        public void Reset()
-        {
-            Play = false;
-            _agent.Reset();
         }
     }
 }

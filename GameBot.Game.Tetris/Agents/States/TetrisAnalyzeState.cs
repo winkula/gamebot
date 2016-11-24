@@ -3,6 +3,7 @@ using GameBot.Game.Tetris.Searching;
 using NLog;
 using System;
 using System.Linq;
+using GameBot.Core.Exceptions;
 using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Samplers;
@@ -83,6 +84,8 @@ namespace GameBot.Game.Tetris.Agents.States
         // only then can we start the search and proceed to the execute-state
         private void ExtractGameState(int searchHeight)
         {
+            if (searchHeight < 0) throw new GameOverException("Search height is negative");
+
             ExtractCurrentPieceSampling(searchHeight);
 
             if (CanExtractNextPiece)

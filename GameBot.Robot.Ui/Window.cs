@@ -225,8 +225,8 @@ namespace GameBot.Robot.Ui
                 }
                 catch (GameOverException)
                 {
-                    _logger.Info("Game over");
-                    _engine.Play = false;
+                    _logger.Warn("Game over");
+                    _engine.Reset();
                 }
             }
         }

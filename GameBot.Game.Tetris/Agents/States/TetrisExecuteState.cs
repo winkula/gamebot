@@ -74,33 +74,55 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             // calculates drop distance, score and new level
             var linesBefore = _agent.GameState.Lines;
+            int linesRemoved = 0;
             var dropDistance = _agent.GameState.Drop();
             var dropDuration = TetrisTiming.GetDropDuration(dropDistance);
-            int linesRemoved = 0;
+
+            var holdDownButtonDuration = dropDuration;
+            var lineClearDuration = TimeSpan.Zero;
 
             if (_agent.GameState.Lines > linesBefore)
             {
-                // lines were removed, add extra time
-                dropDuration += TetrisTiming.LineClearDuration;
-
+                // lines were removed
                 linesRemoved = _agent.GameState.Lines - linesBefore;
+
+                // wait additional line clear duration minus padding time
+                lineClearDuration = SubtractPadding(TetrisTiming.LineClearDuration);
             }
-            
-            // we subtract a time padding, because we dont want to wait the
-            // theoretical drop duration, but the real drop duration
-            // (we don't want to miss an important frame in analyze state)  
-            var waitDuration = dropDuration - Timing.DropDurationPaddingTime;
-            if (waitDuration < TimeSpan.Zero)
+            else
             {
-                waitDuration = TimeSpan.Zero;
+                // no lines removed
+                // wait the drop duration minus padding
+                holdDownButtonDuration = SubtractPadding(dropDuration);
             }
 
-            _logger.Info($"Execute Drop (new score {_agent.GameState.Score}, {linesRemoved} lines removed, sleep {waitDuration.Milliseconds} ms)");
+            _logger.Info($"Execute Drop (new score {_agent.GameState.Score}, {linesRemoved} lines removed, drop lasts {dropDuration.Milliseconds} ms)");
 
             // execute the drop blocking
             // we must wait until the drop is ended before we can continue
             // TODO: here we could do some precalculations for the next search (and execute the drop asynchronous)???
-            _agent.Executor.Hold(Button.Down, waitDuration);
+            _agent.Executor.Hold(Button.Down, holdDownButtonDuration);
+            _logger.Info("Drop executed");
+
+            if (lineClearDuration > TimeSpan.Zero)
+            {
+                // sleep and wait until the lines are cleared
+                _agent.Clock.Sleep(lineClearDuration);
+            }
+        }
+
+        private TimeSpan SubtractPadding(TimeSpan dropDuration)
+        {
+            // we subtract a time padding, because we dont want to wait the
+            // theoretical drop duration, but the real drop duration
+            // (we don't want to miss an important frame in analyze state)  
+            var waitDuration = dropDuration - Timing.DropDurationPaddingTime;
+            if (waitDuration > TimeSpan.Zero)
+            {
+                return waitDuration;
+            }
+
+            return TimeSpan.Zero;
         }
         
         private void Execute(Move move)

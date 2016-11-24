@@ -23,6 +23,7 @@ namespace GameBot.Game.Tetris.Agents
 
         // services and data used by states
         public IConfig Config { get; private set; }
+        public IClock Clock { get; private set; }
         public IQuantizer Quantizer { get; private set; }
         public IExecutor Executor { get; private set; }
         public IScreenshot Screenshot { get; private set; }
@@ -42,29 +43,38 @@ namespace GameBot.Game.Tetris.Agents
         public Tetrimino? ExtractedNextPiece { private get; set; }
         public int SearchHeight { private get; set; }
 
-        public TetrisAgent(IConfig config, IQuantizer quantizer, IExtractor extractor, ISearch search)
+        public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExtractor extractor, ISearch search)
         {
             _visualize = config.Read("Game.Tetris.Visualize", false);
 
             Config = config;
+            Clock = clock;
             Quantizer = quantizer;
             Extractor = extractor;
             Search = search;
 
             CheckSamples = Config.Read("Game.Tetris.Check.Samples", 1);
             ExtractionSamples = Config.Read("Game.Tetris.Extractor.Samples", 1);
-            //ExtractionUpperThreshold = Config.Read<double>("Game.Tetris.Extractor.UpperThreshold");
-            //ExtractionLowerThreshold = Config.Read<double>("Game.Tetris.Extractor.LowerThreshold");
 
             Init();
         }
 
         private void Init()
         {
+            ResetVisualization();
+
             var startLevel = Config.Read("Game.Tetris.StartLevel", 0);
             var startFromGameOver = Config.Read("Game.Tetris.StartFromGameOver", false);
 
             SetState(new TetrisStartState(this, startLevel, startFromGameOver));
+        }
+
+        private void ResetVisualization()
+        {
+            ExtractedPiece = null;
+            ExtractedNextPiece = null;
+            TracedPiece = null;
+            SearchHeight = 0;
         }
 
         public void SetState(ITetrisAgentState newState)
