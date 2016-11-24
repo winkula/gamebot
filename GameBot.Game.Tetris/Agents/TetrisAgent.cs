@@ -94,15 +94,16 @@ namespace GameBot.Game.Tetris.Agents
 
             Init();
         }
-        
+
         private void Init()
         {
             ResetVisualization();
 
             var startLevel = Config.Read("Game.Tetris.StartLevel", 0);
+            var heartMode = Config.Read("Game.Tetris.HeartMode", false);
             var startFromGameOver = Config.Read("Game.Tetris.StartFromGameOver", false);
 
-            SetState(new TetrisStartState(this, startLevel, startFromGameOver));
+            SetState(new TetrisStartState(this, startLevel, heartMode, startFromGameOver));
         }
 
         private void ResetVisualization()

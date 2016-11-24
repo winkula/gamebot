@@ -89,7 +89,7 @@ namespace GameBot.Game.Tetris.Agents.States
             // this is especially relevant in higher levels when speed is higher
             // we let the piece fall
             var executionDuration = _agent.GetExecutionDuration(_pendingMoves.Count);
-            var fallDistance = TetrisLevel.GetFallDistance(_agent.GameState.Level, executionDuration);
+            var fallDistance = TetrisLevel.GetFallDistance(_agent.GameState.Level, executionDuration, _agent.GameState.HeartMode);
             _agent.GameState.Fall(fallDistance);
 
             // calculates drop distance, score and new level

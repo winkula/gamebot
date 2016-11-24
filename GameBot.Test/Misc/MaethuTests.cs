@@ -94,6 +94,34 @@ namespace GameBot.Test.Misc
                 emulator.ExecuteFrames(11);
             }
         }
+        
+        [Test]
+        public void TestHeartModeSpeed()
+        {
+            var romLoader = new RomLoader();
+            var rom = romLoader.Load("Roms/tetris.gb");
+
+            var emulator = new Emulator();
+            emulator.Load(rom);
+
+            emulator.ExecuteFrames(125);
+            emulator.Press(Button.Down);
+            emulator.Hit(Button.Start);
+            emulator.Release(Button.Down);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Down);
+            emulator.Hit(Button.Start);
+
+            for (int i = 0; i < 14; i++)
+            {
+                emulator.Show();
+                emulator.ExecuteFrames(4);
+            }
+        }
 
         [Ignore]
         [Test]

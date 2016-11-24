@@ -73,6 +73,7 @@ namespace GameBot.Test
             configMock.ConfigValue("Game.Tetris.Visualize", true);
 
             configMock.ConfigValue("Game.Tetris.StartLevel", 9);
+            configMock.ConfigValue("Game.Tetris.HeartMode", false);
             configMock.ConfigValue("Game.Tetris.StartFromGameOver", false);
 
             configMock.ConfigValue("Game.Tetris.Multiplayer", false);

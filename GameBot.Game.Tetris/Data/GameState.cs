@@ -40,6 +40,8 @@ namespace GameBot.Game.Tetris.Data
             }
         }
 
+        public bool HeartMode { get; set; }
+
         public int Level => TetrisLevel.GetLevel(StartLevel, Lines);
 
         public GameState(GameState old)

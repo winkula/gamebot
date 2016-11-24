@@ -231,7 +231,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 - _beginTime.Value
                 + _agent.AnalyzePaddingTime;
 
-            int searchHeightTime = TetrisLevel.GetFallDistance(_agent.GameState.Level, passedTime);
+            int searchHeightTime = TetrisLevel.GetFallDistance(_agent.GameState.Level, passedTime, _agent.GameState.HeartMode);
 
             if (tetrimino.HasValue)
             {

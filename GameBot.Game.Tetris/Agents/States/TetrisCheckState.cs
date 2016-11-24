@@ -119,7 +119,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 - _tracedPieceTimestamp
                 + _agent.CheckPaddingTime;
 
-            var searchHeightTime = TetrisLevel.GetFallDistance(_agent.GameState.Level, duration);
+            var searchHeightTime = TetrisLevel.GetFallDistance(_agent.GameState.Level, duration, _agent.GameState.HeartMode);
             var searchHeightMax = _agent.GameState.Board.DropDistance(_tracedPiece);
 
             return Math.Min(searchHeightTime, searchHeightMax);

@@ -15,7 +15,8 @@ namespace GameBot.Game.Tetris
         // For A Type
         public static int GetLevel(int startLevel, int clearedLines)
         {
-            // TODO: add checks
+            if (startLevel < 0 || startLevel > 9) throw new ArgumentException("startLevel must be between 0 and 9");
+            if (clearedLines < 0) throw new ArgumentException("clearedLines must not be negative");
 
             var limit = (startLevel + 1) * 10;
             if (clearedLines < limit) return startLevel;
@@ -23,30 +24,48 @@ namespace GameBot.Game.Tetris
         }
 
         // Frames per row
-        public static int GetFramesPerRow(int level)
+        public static int GetFramesPerRow(int level, bool heartMode = false)
         {
             if (level < 0) throw new ArgumentException("Level must not be negative");
             if (level > 20) throw new ArgumentException("Level can't be bigger than 20");
+
+            if (heartMode)
+            {
+                // source: http://www.gamefaqs.com/gameboy/585960-tetris/cheats
+                level = Math.Min(20, level + 10);
+            }
 
             return _levelSpeeds[level];
         }
 
-        public static TimeSpan GetDuration(int level, int rows)
+        public static TimeSpan GetDuration(int level, int rows, bool heartMode = false)
         {
             if (level < 0) throw new ArgumentException("Level must not be negative");
             if (level > 20) throw new ArgumentException("Level can't be bigger than 20");
+
+            if (heartMode)
+            {
+                // source: http://www.gamefaqs.com/gameboy/585960-tetris/cheats
+                level = Math.Min(20, level + 10);
+            }
 
             return TimeSpan.FromSeconds(rows * _levelSpeeds[level] / TetrisTiming.Framerate);
         }
 
         // how many rows will a tile maximal fall in a specific time span?
-        public static int GetFallDistance(int level, TimeSpan duration)
+        public static int GetFallDistance(int level, TimeSpan duration, bool heartMode = false)
         {
             if (level < 0) throw new ArgumentException("Level must not be negative");
             if (level > 20) throw new ArgumentException("Level can't be bigger than 20");
 
+            if (heartMode)
+            {
+                // source: http://www.gamefaqs.com/gameboy/585960-tetris/cheats
+                level = Math.Min(20, level + 10);
+            }
+
             double frames = duration.TotalSeconds * TetrisTiming.Framerate;
-            int framePerRow = GetFramesPerRow(level);
+            int framePerRow = GetFramesPerRow(level, heartMode);
 
             return (int)Math.Ceiling(frames / framePerRow);
         }
