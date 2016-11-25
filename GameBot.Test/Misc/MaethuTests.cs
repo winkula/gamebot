@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using GameBot.Core.Data;
 using GameBot.Core.Extensions;
+using GameBot.Core.Quantizers;
 using GameBot.Emulation;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
@@ -21,6 +22,44 @@ namespace GameBot.Test.Misc
     public class MaethuTests
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        [Test]
+        public void GenerateImagesForDoc()
+        {
+            var testData0500 = TestDataFactory.Data.Single(x => x.ImageKey == "0500");
+            //var testData0413 = TestDataFactory.Data.Single(x => x.ImageKey == "0413");
+            
+            var configMock = TestHelper.GetFakeConfig();
+            //var quantizer = new Quantizer(configMock.Object);
+
+            // simple threshold
+            IQuantizer quantizer = new SimpleThresholdQuantizer { Threshold = 150 };
+            quantizer.Keypoints = testData0500.Keypoints;
+            var quantizedImage = quantizer.Quantize(testData0500.Image);
+            //TestHelper.Show(quantizedImage);
+            TestHelper.Save(quantizedImage, "threshold_simple.png");
+
+            // adaptive threshold
+            quantizer = new Quantizer(configMock.Object) { ThresholdBlockSize = 17, ThresholdConstant = 6 };
+            quantizer.Keypoints = testData0500.Keypoints;
+            quantizedImage = quantizer.Quantize(testData0500.Image);
+            //TestHelper.Show(quantizedImage);
+            TestHelper.Save(quantizedImage, "threshold_adaptive.png");
+            
+            // warp
+            quantizer = new WarpOnlyQuantizer();
+            quantizer.Keypoints = testData0500.Keypoints;
+            quantizedImage = quantizer.Quantize(testData0500.Image);
+            //TestHelper.Show(quantizedImage);
+            TestHelper.Save(quantizedImage, "warp_result.png");
+
+            // morphological
+            quantizer = new MorphologyQuantizer(configMock.Object) { ThresholdBlockSize = 17, ThresholdConstant = 6 };
+            quantizer.Keypoints = testData0500.Keypoints;
+            quantizedImage = quantizer.Quantize(testData0500.Image);
+            //TestHelper.Show(quantizedImage);
+            TestHelper.Save(quantizedImage, "opening_result.png");
+        }
 
         [Ignore]
         [Test]
@@ -95,6 +134,7 @@ namespace GameBot.Test.Misc
             }
         }
         
+        [Ignore]
         [Test]
         public void TestHeartModeSpeed()
         {

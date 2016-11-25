@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core;
@@ -15,7 +12,7 @@ namespace GameBot.Test
 {
     public static class TestHelper
     {
-        private static Random _random = new Random();
+        private static readonly Random _random = new Random();
 
         public static IScreenshot GetScreenshot(string path, IQuantizer quantizer)
         {
@@ -29,6 +26,24 @@ namespace GameBot.Test
         {
             CvInvoke.Imshow("Test", screenshot.Image);
             CvInvoke.WaitKey();
+        }
+
+        public static void Show(Mat mat)
+        {
+            CvInvoke.Imshow("Test", mat);
+            CvInvoke.WaitKey();
+        }
+
+        public static void Save(IScreenshot screenshot, string filename)
+        {
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), filename);
+            screenshot.Image.Save(path);
+        }
+
+        public static void Save(Mat mat, string filename)
+        {
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), filename);
+            mat.Save(path);
         }
 
         public static Board GetRandomBoard(int maxHeight)
@@ -110,6 +125,8 @@ namespace GameBot.Test
             configMock.ConfigValue("Robot.Actuator.UidRelay2", "mTC");
             configMock.ConfigValue("Robot.Actuator.Hit.Time", 35);
             configMock.ConfigValue("Robot.Actuator.Hit.DelayAfter", 40);
+
+            configMock.ConfigValue("Robot.Ui.LogLevel", "Info");
 
             return configMock;
         }

@@ -50,7 +50,8 @@ namespace GameBot.Test
             new [] { new Point(585,360), new Point(207,359), new Point(571,58), new Point(228,57) }, // series 01
             new [] { new Point(593,357), new Point(206,354), new Point(574,53), new Point(230,53) }, // series 02
             new [] { new Point(590,367), new Point(211,365), new Point(572,67), new Point(235,67) }, // series 03
-            new [] { new Point(140,116), new Point(474,119), new Point(164,368), new Point(445,368) } // series 04
+            new [] { new Point(140,116), new Point(474,119), new Point(164,368), new Point(445,368) }, // series 04
+            new [] { new Point(159,99), new Point(490,98), new Point(125,397), new Point(516,395) } // series 05
         };
 
         public static readonly IEnumerable<TestData> Data = new List<TestData>
@@ -110,7 +111,9 @@ namespace GameBot.Test
             new TestData("0414", new Piece(Tetrimino.I), Tetrimino.J),
             new TestData("0415", new Piece(Tetrimino.S), Tetrimino.T),
             new TestData("0416", null, Tetrimino.S),
-            new TestData("0417", new Piece(Tetrimino.Z), Tetrimino.I)
+            new TestData("0417", new Piece(Tetrimino.Z), Tetrimino.I),
+
+            new TestData("0500", new Piece(Tetrimino.Z).Fall(6), Tetrimino.S)
         };
 
         public static IEnumerable TestCasesCurrentPiecePositives => Data

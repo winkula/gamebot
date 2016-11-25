@@ -140,7 +140,6 @@
     <Compile Include="Engines\BaseEngine.cs" />
     <Compile Include="Exceptions\GameOverException.cs" />
     <Compile Include="Executors\Executor.cs" />
-    <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\MatExtensions.cs" />
     <Compile Include="Extensions\ScreenshotExtensions.cs" />
     <Compile Include="Extensions\DoubleExtensions.cs" />
@@ -159,6 +158,8 @@
     <Compile Include="Quantizers\CalibrateableQuantizer.cs" />
     <Compile Include="Quantizers\MorphologyQuantizer.cs" />
     <Compile Include="Quantizers\PassthroughQuantizer.cs" />
+    <Compile Include="Quantizers\WarpOnlyQuantizer.cs" />
+    <Compile Include="Quantizers\SimpleThresholdQuantizer.cs" />
     <Compile Include="Quantizers\Quantizer.cs" />
   </ItemGroup>
   <ItemGroup>
