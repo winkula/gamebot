@@ -20,29 +20,38 @@ namespace GameBot.Robot.Ui
 #if DEBUG
             CreateFolders();
 #endif
+            GameBot();
+        }
+        
+        static void GameBot()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            var config = new ExeConfig();
+            var engineMode = config.Read("Robot.Engine.Mode", "Emulated");
+            var logLevelString = config.Read("Robot.Ui.LogLevel", "Error");
 
             using (var container = new Container())
             {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-
-                var config = new ExeConfig();
-                var engineMode = config.Read("Robot.Engine.Mode", "Emulated");
-                var logLevelString = config.Read("Robot.Ui.LogLevel", "Error");
-
+                // register packages
                 if (engineMode == "Emulated") container.RegisterPackages(GetEmulatedEngineAssembies());
                 if (engineMode == "Physical") container.RegisterPackages(GetPhysicalEngineAssembies());
+
+                // verify packages
                 container.Verify();
 
+                // config logging framework
                 ConfigureLogging(logLevelString);
                 var logger = LogManager.GetCurrentClassLogger();
+
                 try
                 {
                     Application.Run(container.GetInstance<Window>());
                 }
                 catch (Exception ex)
                 {
-                    logger.Error(ex);
+                    logger.Fatal(ex);
                 }
             }
         }

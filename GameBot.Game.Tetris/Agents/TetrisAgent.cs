@@ -41,7 +41,7 @@ namespace GameBot.Game.Tetris.Agents
         public int ExtractionSamples { get; }
         public bool PlayMultiplayer { get; }
         public bool CheckEnabled { get; }
-
+        
         #region timing
 
         // timing config

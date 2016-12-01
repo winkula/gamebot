@@ -38,6 +38,7 @@ namespace GameBot.Test.Misc
             _capture.SetCaptureProperty(CapProp.Fps, 60.0);
         }
 
+        [Ignore]
         [Test]
         public void MeasureFramerate()
         {

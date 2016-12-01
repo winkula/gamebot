@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using GameBot.Game.Tetris.Data;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -11,7 +12,13 @@ namespace GameBot.Test
     public class Setup
     {
         [SetUp]
-        public void ConfigureLogging()
+        public void Init()
+        {
+            ConfigureLogging();
+            InitLookups();
+        }
+
+        private void ConfigureLogging()
         {
             var config = new LoggingConfiguration();
 
@@ -42,6 +49,12 @@ namespace GameBot.Test
             config.LoggingRules.Add(new LoggingRule("Fails", LogLevel.Debug, fileTarget));
 
             LogManager.Configuration = config;
+        }
+
+        private void InitLookups()
+        {
+            var boardLookups = BoardLookups.Instance;
+            var tetriminoLookups = TetriminoLookups.Instance;
         }
     }
 }

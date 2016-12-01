@@ -96,7 +96,7 @@ namespace GameBot.Test
             configMock.ConfigValue("Game.Tetris.Check.Enabled", false);
             configMock.ConfigValue("Game.Tetris.Check.Samples", 1);
 
-            configMock.ConfigValue("Game.Tetris.Extractor.Samples", 1);
+            configMock.ConfigValue("Game.Tetris.Extractor.Samples", 3);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdNextPiece", 0.7);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.7);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdMovedPiece", 0.5);

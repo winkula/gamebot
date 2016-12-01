@@ -116,11 +116,10 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         }
 
         [Test]
-        public void MatchLotOfBlocks()
+        public void MatchMany()
         {
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_play_1.png", _quantizer);
             
-            int counter = 0;
             for (int i = 0; i < 100; i++)
             {
                 for (int x = 0; x < GameBoyConstants.ScreenWidth / GameBoyConstants.TileSize; x++)
@@ -128,12 +127,9 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
                     for (int y = 0; y < GameBoyConstants.ScreenHeight / GameBoyConstants.TileSize; y++)
                     {
                         _matcher.GetProbabilityBlock(screenshot, x, y);
-                        counter++;
                     }
                 }
             }
-
-            Assert.AreEqual(counter, 100 * 18 * 20);
         }
     }
 }

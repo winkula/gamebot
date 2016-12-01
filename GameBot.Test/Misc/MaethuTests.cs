@@ -23,6 +23,7 @@ namespace GameBot.Test.Misc
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        [Ignore]
         [Test]
         public void GenerateImagesForDoc()
         {
@@ -333,6 +334,7 @@ namespace GameBot.Test.Misc
             pieceMatcher.GetProbabilityNextPiece(screenshot, Tetrimino.I);
         }
 
+        [Ignore]
         [Test]
         public void NoiseTests()
         {

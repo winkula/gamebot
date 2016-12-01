@@ -11,12 +11,12 @@ using GameBot.Core.Quantizers;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Extractors;
 using GameBot.Test.Extensions;
-using Moq;
 using NLog;
 using NUnit.Framework;
 
 namespace GameBot.Test.Game.Tetris.Extraction
 {
+    [Ignore]
     [TestFixture]
     public class ExtractionComparisonTests
     {

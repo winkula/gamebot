@@ -8,12 +8,12 @@ using NUnit.Framework;
 
 namespace GameBot.Test.Engine.Physical.Quantizers
 {
-    //[Ignore]
     [TestFixture]
     public class QuantizerTests
     {
         private const bool _adjust = true;
 
+        [Ignore]
         [Test]
         public void TestQuantizerFromTestData()
         {

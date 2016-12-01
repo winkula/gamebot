@@ -75,7 +75,7 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
             
             var roi = new Rectangle(GameBoyConstants.TileSize * tileCoordinates.X, GameBoyConstants.TileSize * tileCoordinates.Y, GameBoyConstants.TileSize, GameBoyConstants.TileSize);
             var imageRoi = new Mat(image, roi);
-
+            
             var mean = CvInvoke.Mean(imageRoi);
             return ((255.0 - mean.V0) / 255.0).Clamp(0.0, 1.0);
         }

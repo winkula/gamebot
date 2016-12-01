@@ -9,7 +9,6 @@ namespace GameBot.Game.Tetris.Extraction
 {
     public class BoardExtractor : IBoardExtractor
     {
-        private const double _thresholdRaisedMultiplayer = 0.85;
         private const double _thresholdBlock = 0.5;
         private const double _thresholdBroken = 0.07;
 
@@ -64,7 +63,7 @@ namespace GameBot.Game.Tetris.Extraction
         public bool IsHorizonBroken(IScreenshot screenshot, Board board)
         {
             var probability = GetHorizonRaisedProbability(screenshot, board);
-            return probability > _thresholdBroken;
+            return probability >= _thresholdBroken;
         }
 
         private int FindHolePosition(IScreenshot screenshot, Board board)
@@ -88,7 +87,8 @@ namespace GameBot.Game.Tetris.Extraction
             int numLines = 0;
             for (; numLines < 4; numLines++)
             {
-                if (GetHorizonRaisedProbability(screenshot, board, numLines) < _thresholdRaisedMultiplayer)
+                var probability = GetHorizonRaisedProbability(screenshot, board, numLines);
+                if (probability < _thresholdBroken)
                 {
                     break;
                 }

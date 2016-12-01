@@ -153,7 +153,9 @@
     <Compile Include="Core\Data\Commands\PressCommandTests.cs" />
     <Compile Include="Core\Data\Commands\HitCommandTests.cs" />
     <Compile Include="Core\Executors\ExecutorTests.cs" />
+    <Compile Include="Engine\Physical\Quantizers\MorphologyQuantizerTests.cs" />
     <Compile Include="Extensions\MockExtensions.cs" />
+    <Compile Include="Game\Tetris\AgentTests.cs" />
     <Compile Include="Game\Tetris\Extraction\ExtractionComparisonTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Extractors\MorphologyExtractorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Matchers\MorphologyMatcherTests.cs" />
