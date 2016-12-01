@@ -72,7 +72,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
@@ -80,7 +80,7 @@ namespace GameBot.Test.Misc
             for (int i = 0; i < 14; i++)
             {
                 emulator.Show();
-                emulator.ExecuteFrames(53);
+                emulator.Execute(53);
             }
         }
 
@@ -94,7 +94,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
@@ -104,7 +104,7 @@ namespace GameBot.Test.Misc
             for (int i = 0; i < 14; i++)
             {
                 emulator.Show();
-                emulator.ExecuteFrames(3);
+                emulator.Execute(3);
             }
         }
 
@@ -118,7 +118,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Right);
@@ -131,7 +131,7 @@ namespace GameBot.Test.Misc
             for (int i = 0; i < 14; i++)
             {
                 emulator.Show();
-                emulator.ExecuteFrames(11);
+                emulator.Execute(11);
             }
         }
         
@@ -145,7 +145,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Press(Button.Down);
             emulator.Hit(Button.Start);
             emulator.Release(Button.Down);
@@ -160,7 +160,7 @@ namespace GameBot.Test.Misc
             for (int i = 0; i < 14; i++)
             {
                 emulator.Show();
-                emulator.ExecuteFrames(4);
+                emulator.Execute(4);
             }
         }
 
@@ -174,7 +174,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Right);
@@ -189,7 +189,7 @@ namespace GameBot.Test.Misc
             for (int i = 0; i < 14; i++)
             {
                 emulator.Show();
-                emulator.ExecuteFrames(3);
+                emulator.Execute(3);
             }
         }
 
@@ -203,7 +203,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
@@ -213,17 +213,17 @@ namespace GameBot.Test.Misc
             emulator.Hit(Button.Right);
             emulator.Hit(Button.Right);
             emulator.Press(Button.Down);
-            emulator.ExecuteFrames(3 * 17);
+            emulator.Execute(3 * 17);
             emulator.Release(Button.Down);
-            emulator.ExecuteFrames(2);
+            emulator.Execute(2);
             
 
             // S
             emulator.Hit(Button.Right);
             emulator.Press(Button.Down);
-            emulator.ExecuteFrames(3 * 17);
+            emulator.Execute(3 * 17);
             emulator.Release(Button.Down);
-            emulator.ExecuteFrames(2);
+            emulator.Execute(2);
 
             // O
             emulator.Hit(Button.Left);
@@ -231,28 +231,28 @@ namespace GameBot.Test.Misc
             emulator.Hit(Button.Left);
             emulator.Hit(Button.Left);
             emulator.Press(Button.Down);
-            emulator.ExecuteFrames(3 * 17);
+            emulator.Execute(3 * 17);
             emulator.Release(Button.Down);
-            emulator.ExecuteFrames(2);
+            emulator.Execute(2);
             
             // T
             emulator.Hit(Button.Right);
             emulator.Hit(Button.Right);
             emulator.Hit(Button.Right);
             emulator.Press(Button.Down);
-            emulator.ExecuteFrames(3 * 17);
+            emulator.Execute(3 * 17);
             emulator.Release(Button.Down);
-            emulator.ExecuteFrames(2);
+            emulator.Execute(2);
 
             // J
             emulator.Hit(Button.A);
             emulator.Hit(Button.Left);
             emulator.Press(Button.Down);
-            emulator.ExecuteFrames(3 * 15);
+            emulator.Execute(3 * 15);
             emulator.Release(Button.Down);
 
             emulator.Show();
-            emulator.ExecuteFrames(93);
+            emulator.Execute(93);
             emulator.Show();
         }
 

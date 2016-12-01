@@ -101,7 +101,7 @@ namespace GameBot.Emulation
             Running = true;
 
             // strange effects appear in the first few frames , skip them
-            Execute(4);
+            ExecuteInternal(4);
         }
 
         private void UpdateModel(bool updateBitmap)
@@ -417,24 +417,16 @@ namespace GameBot.Emulation
         {
             _graphics.DrawImage(Display, 0, 0, _displayWidth, _displayHeight);
         }
-
-        public void ExecuteFrame()
+        
+        public void Execute(int frames)
         {
-            Execute(1);
+            ExecuteInternal(frames);
         }
 
-        public void ExecuteFrames(int n)
+        public void Execute(TimeSpan time)
         {
-            Execute(n);
-        }
-
-        public void Execute()
-        {
-            if (!_anyButtonsPressed)
-            {
-                ExecuteFrames(2);
-            }
-            _anyButtonsPressed = false;
+            int frames = (int)(time.TotalSeconds * _framesPerSecond);
+            ExecuteInternal(frames);
         }
 
         public int GetExecutionDurationInFrames(TimeSpan time)
@@ -442,13 +434,7 @@ namespace GameBot.Emulation
             return (int)(time.TotalSeconds * _framesPerSecond);
         }
 
-        public void Execute(TimeSpan time)
-        {
-            int frames = (int)(time.TotalSeconds * _framesPerSecond);
-            Execute(frames);
-        }
-
-        private void Execute(int frames)
+        private void ExecuteInternal(int frames)
         {
             if (frames > 0)
             {
@@ -495,9 +481,9 @@ namespace GameBot.Emulation
                 _anyButtonsPressed = true;
 
                 PressButtonInternal(button);
-                Execute(_framesAfterButton);
+                ExecuteInternal(_framesAfterButton);
                 ReleaseButtonInternal(button);
-                Execute(_framesAfterButton);
+                ExecuteInternal(_framesAfterButton);
             }
         }
 
@@ -514,13 +500,13 @@ namespace GameBot.Emulation
                 {
                     PressButtonInternal(button);
                 }
-                Execute(_framesAfterButton);
+                ExecuteInternal(_framesAfterButton);
 
                 foreach (var button in buttonsList)
                 {
                     ReleaseButtonInternal(button);
                 }
-                Execute(_framesAfterButton);
+                ExecuteInternal(_framesAfterButton);
             }
         }
 
@@ -531,7 +517,7 @@ namespace GameBot.Emulation
                 _anyButtonsPressed = true;
 
                 PressButtonInternal(button);
-                Execute(_framesAfterButton);
+                //ExecuteInternal(_framesAfterButton);
             }
         }
 
@@ -542,7 +528,7 @@ namespace GameBot.Emulation
                 _anyButtonsPressed = true;
 
                 ReleaseButtonInternal(button);
-                Execute(_framesAfterButton);
+                //ExecuteInternal(_framesAfterButton);
             }
         }
 

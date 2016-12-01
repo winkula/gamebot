@@ -53,7 +53,7 @@ namespace GameBot.Engine.Emulated.Clocks
             {
                 lock (_emulator)
                 {
-                    _emulator.ExecuteFrames(frameStep);
+                    _emulator.Execute(frameStep);
                 }
             }
         }

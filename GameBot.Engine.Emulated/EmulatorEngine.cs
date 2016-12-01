@@ -63,7 +63,7 @@ namespace GameBot.Engine.Emulated
 
             lock (_emulator)
             {
-                _emulator.Execute();
+                _emulator.Execute(2);
             }
         }
     }
