@@ -54,7 +54,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 _beginTime = _agent.Screenshot.Timestamp;
             }
 
-            int searchHeight = CalulateSearchHeight(_currentTetrimino);
+            int searchHeight = CalulateSearchHeight(_currentTetrimino, _beginTime.Value);
             _agent.SearchHeight = searchHeight;
             _logger.Info($"Analyze (search height {searchHeight})");
 
@@ -200,7 +200,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 if (_extractedPiece == null) return;
                 if (_agent.BoardExtractor.IsHorizonBroken(_agent.Screenshot, _agent.GameState.Board))
                 {
-                    _logger.Info("Extract board");
+                    _logger.Info("Game state maybe broken. Analyze board");
 
                     _extractedBoard = _agent.BoardExtractor.Update(_agent.Screenshot, _agent.GameState.Board, _extractedPiece);
                 }
@@ -222,13 +222,11 @@ namespace GameBot.Game.Tetris.Agents.States
             return _agent.Search.Search(_agent.GameState);
         }
 
-        private int CalulateSearchHeight(Tetrimino? tetrimino)
+        private int CalulateSearchHeight(Tetrimino? tetrimino, TimeSpan beginTime)
         {
-            if (!_beginTime.HasValue) throw new Exception("_beginTime is not initialized");
-
             // this is the time that passed since the next piece became visible
             var passedTime = _agent.Screenshot.Timestamp
-                - _beginTime.Value
+                - beginTime
                 + _agent.AnalyzePaddingTime;
 
             int searchHeightTime = TetrisLevel.GetFallDistance(_agent.GameState.Level, passedTime, _agent.GameState.HeartMode);
