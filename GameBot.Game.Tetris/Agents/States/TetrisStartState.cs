@@ -17,7 +17,7 @@ namespace GameBot.Game.Tetris.Agents.States
         private readonly bool _heartMode;
         private readonly bool _startFromGameover;
         private readonly int _startLevel;
-
+        
         public TetrisStartState(TetrisAgent agent, int startLevel, bool heartMode, bool startFromGameOver)
         {
             if (agent == null) throw new ArgumentNullException(nameof(agent));
@@ -26,6 +26,11 @@ namespace GameBot.Game.Tetris.Agents.States
             _heartMode = heartMode;
             _startFromGameover = startFromGameOver;
             _startLevel = startLevel;
+        }
+
+        // constructor, when we start again from game over
+        public TetrisStartState(TetrisAgent agent, GameState gameState) : this(agent, gameState.StartLevel, gameState.HeartMode, true)
+        {
         }
 
         public void Extract()

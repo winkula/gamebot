@@ -5,6 +5,7 @@ using System.Drawing;
 using GameBot.Core.Data;
 using System;
 using Emgu.CV.CvEnum;
+using GameBot.Core.Exceptions;
 using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Data;
@@ -136,7 +137,15 @@ namespace GameBot.Game.Tetris.Agents
         {
             Screenshot = screenshot;
 
-            _state.Extract();
+            try
+            {
+                _state.Extract();
+            }
+            catch (GameOverException)
+            {
+                // game over detected
+                SetStateAndContinue(new TetrisStartState(this, GameState));
+            }
         }
 
         public Mat Visualize(Mat image)
@@ -222,9 +231,20 @@ namespace GameBot.Game.Tetris.Agents
 
             do
             {
-                // every state can directly execute the next state, when it changes
+                // every state can directly execute the next state,
+                // when it changes this flag to true (with SetStateAndContinue)
                 _continue = false;
-                _state.Play();
+
+                try
+                {
+                    _state.Play();
+                }
+                catch (GameOverException)
+                {
+                    // game over detected
+                    SetStateAndContinue(new TetrisStartState(this, GameState));
+                }
+
             } while (_continue);
         }
 

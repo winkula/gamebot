@@ -64,6 +64,16 @@ namespace GameBot.Test.Misc
 
         [Ignore]
         [Test]
+        public void GenerateGameOverReferenceImage()
+        {
+            var configMock = TestHelper.GetFakeConfig();
+
+            var screenshot = TestHelper.GetScreenshot("Screenshots/gameover.png", new MorphologyQuantizer(configMock.Object));
+            TestHelper.Save(screenshot, "gameover_morphological.png");
+        }
+
+        [Ignore]
+        [Test]
         public void TestFallSpeedLevel0()
         {
             var romLoader = new RomLoader();

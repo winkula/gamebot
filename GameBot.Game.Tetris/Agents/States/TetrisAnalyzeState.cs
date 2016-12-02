@@ -13,7 +13,8 @@ namespace GameBot.Game.Tetris.Agents.States
     public class TetrisAnalyzeState : ITetrisAgentState
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
+        private static readonly Logger _pieceLogger = LogManager.GetLogger("PieceLogger");
+        
         private readonly TetrisAgent _agent;
 
         private readonly Tetrimino? _currentTetrimino;
@@ -52,6 +53,14 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 // we can't do this in the constructor, because then we would use the previous screenshot's timestamp
                 _beginTime = _agent.Screenshot.Timestamp;
+            }
+            
+            // try to detect game over
+            if (_agent.BoardExtractor.IsGameOver(_agent.Screenshot))
+            {
+                // gameover detected
+                SetStateGameOver();
+                return;
             }
 
             int searchHeight = CalulateSearchHeight(_currentTetrimino, _beginTime.Value);
@@ -139,6 +148,8 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void AcceptCurrentPiece(Piece currentPiece)
         {
+            _pieceLogger.Info(currentPiece.Tetrimino);
+
             _extractedPiece = currentPiece;
             _agent.ExtractedPiece = _extractedPiece;
         }
@@ -251,6 +262,12 @@ namespace GameBot.Game.Tetris.Agents.States
             var tracedPiece = new Piece(_agent.GameState.Piece);
 
             _agent.SetStateAndContinue(new TetrisExecuteAllState(_agent, moves, tracedPiece));
+        }
+
+        // TODO: move to base-state
+        private void SetStateGameOver()
+        {
+            _agent.SetStateAndContinue(new TetrisStartState(_agent, _agent.GameState));
         }
     }
 }

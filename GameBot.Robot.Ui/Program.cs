@@ -107,13 +107,21 @@ namespace GameBot.Robot.Ui
             };
             config.AddTarget("file", fileTarget);
             config.LoggingRules.Add(new LoggingRule("*", logLevel, fileTarget));
-
+            
+            // TODO: remove this after measurement
+            var fileTargetPieceLogging = new FileTarget
+            {
+                Layout = @"${message}",
+                FileName = GetLogPath("Pieces.txt")
+            };
+            config.AddTarget("file", fileTargetPieceLogging);
+            config.LoggingRules.Add(new LoggingRule("PieceLogger", LogLevel.Info, fileTargetPieceLogging));
+            
             LogManager.Configuration = config;
         }
 
-        static string GetLogPath()
+        static string GetLogPath(string filename = "GameBot_Log.txt")
         {
-            const string filename = "GameBot_Log.txt";
 #if DEBUG
             // on desktop in debug mode
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), filename);

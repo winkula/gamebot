@@ -50,6 +50,36 @@ namespace GameBot.Test.Game.Tetris.Extraction
             });
         }
 
+        [TestCase("Screenshots/tetris_credits.png", false)]
+        [TestCase("Screenshots/tetris_menu.png", false)]
+        [TestCase("Screenshots/tetris_menu.png", false)]
+        [TestCase("Screenshots/tetris_menu_atype.png", false)]
+        [TestCase("Screenshots/tetris_multiplayer_0.png", false)]
+        [TestCase("Screenshots/tetris_play_1.png", false)]
+        [TestCase("Screenshots/tetris_play_2.png", false)]
+        [TestCase("Screenshots/tetris_start.png", false)]
+        [TestCase("Screenshots/white.png", false)]
+        [TestCase("Screenshots/gameover.png", true)]
+        public void IsGameOver(string path, bool expected)
+        {
+            var screenshot = TestHelper.GetScreenshot(path, _quantizer);
+
+            var isGameOver = _boardExtractor.IsGameOver(screenshot);
+
+            Assert.AreEqual(expected, isGameOver);
+        }
+
+        [Test]
+        public void IsGameOverMany()
+        {
+            var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_start.png", _quantizer);
+
+            for (int i = 0; i < 1000; i++)
+            {
+                var isGameOver = _boardExtractor.IsGameOver(screenshot);
+            }
+        }
+
         [Test]
         public void MultiplayerUpdateNoChanges()
         {

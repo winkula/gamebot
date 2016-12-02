@@ -170,7 +170,10 @@ namespace GameBot.Game.Tetris.Data
         {
             int distance = Board.DropDistance(Piece);
             // TODO: check this again!
-            if (distance < 0 && Board.Intersects(Piece)) throw new GameOverException();
+            if (distance < 0 && Board.Intersects(Piece))
+            {
+                throw new GameOverException();
+            }
 
             // let piece fall
             Piece.Fall(distance);
