@@ -261,7 +261,7 @@ namespace GameBot.Game.Tetris.Agents.States
             var moves = results.Moves.ToList();
             var tracedPiece = new Piece(_agent.GameState.Piece);
 
-            _agent.SetStateAndContinue(new TetrisExecuteAllState(_agent, moves, tracedPiece));
+            _agent.SetStateAndContinue(new TetrisExecuteState(_agent, moves, tracedPiece));
         }
 
         // TODO: move to base-state

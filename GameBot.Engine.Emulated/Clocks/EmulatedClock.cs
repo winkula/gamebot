@@ -49,11 +49,12 @@ namespace GameBot.Engine.Emulated.Clocks
         private void SleepInternal(int frames)
         {
             const int frameStep = 3;
-            for (int i = 0; i < frames; i += frameStep)
+            for (int i = frames; i > 0; i -= frameStep)
             {
+                int nextStep = Math.Min(frameStep, i);
                 lock (_emulator)
                 {
-                    _emulator.Execute(frameStep);
+                    _emulator.Execute(nextStep);
                 }
             }
         }

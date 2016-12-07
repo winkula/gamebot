@@ -140,10 +140,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Agents\States\TetrisExecuteAllState.cs" />
-    <Compile Include="Agents\States\TetrisPseudoCheckState.cs" />
-    <Compile Include="Agents\States\TetrisRepeatState.cs" />
-    <Compile Include="Agents\States\TetrisCheckState.cs" />
+    <Compile Include="Agents\States\TetrisExecuteState.cs" />
     <Compile Include="Agents\TetrisAgent.cs" />
     <Compile Include="Data\Pose.cs" />
     <Compile Include="Data\TetriminoLookups.cs" />
@@ -189,7 +186,6 @@
     <Compile Include="Searching\Heuristics\YiyuanLeeHeuristic.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="Agents\States\ITetrisAgentState.cs" />
-    <Compile Include="Agents\States\TetrisExecuteState.cs" />
     <Compile Include="Agents\States\TetrisAnalyzeState.cs" />
     <Compile Include="Agents\States\TetrisStartState.cs" />
     <Compile Include="TetrisConstants.cs" />

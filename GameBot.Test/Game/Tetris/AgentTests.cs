@@ -35,7 +35,7 @@ namespace GameBot.Test.Game.Tetris
         private IScreenshot _screenshot;
         private TetrisAgent _agent;
         private TetrisAnalyzeState _analyzeState;
-        private TetrisExecuteAllState _executeState;
+        private TetrisExecuteState _executeState;
 
         [TestFixtureSetUp]
         public void InitOnce()
@@ -44,7 +44,6 @@ namespace GameBot.Test.Game.Tetris
             _configMock.ConfigValue("Game.Tetris.Extractor.Samples", _numSamples);
             _configMock.ConfigValue("Game.Tetris.Timing.AnalyzePaddingTime", 0);
             _configMock.ConfigValue("Game.Tetris.Timing.DropPaddingTime", 0);
-            _configMock.ConfigValue("Game.Tetris.Timing.CheckPaddingTime", 0);
 
             _quantizer = new MorphologyQuantizer(_configMock.Object);
             _extractor = new MorphologyExtractor(_configMock.Object);
@@ -69,7 +68,7 @@ namespace GameBot.Test.Game.Tetris
             _agent.GameState = new GameState(currentPiece, nextPiece);
 
             _analyzeState = new TetrisAnalyzeState(_agent, currentPiece);
-            _executeState = new TetrisExecuteAllState(_agent, moves, new Piece(currentPiece));
+            _executeState = new TetrisExecuteState(_agent, moves, new Piece(currentPiece));
         }
 
         [Test]

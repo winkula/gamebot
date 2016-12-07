@@ -8,11 +8,18 @@ namespace GameBot.Core
     public interface ICamera
     {
         /// <summary>
-        /// Captures an image.
+        /// Returns the current image from the camera.
         /// </summary>
-        /// <returns>The captured image from the camera as an EmguCV Mat object.</returns>
+        /// <returns>The current image from the camera.</returns>
         Mat Capture();
-        
+
+        /// <summary>
+        /// Ensures that a new image is returned from the camera.
+        /// </summary>
+        /// <param name="predecessor">The last captures image.</param>
+        /// <returns>The current image from the camera.</returns>
+        Mat Capture(Mat predecessor);
+
         /// <summary>
         /// Gets the width of the camera image.
         /// </summary>

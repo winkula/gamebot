@@ -51,7 +51,6 @@ namespace GameBot.Game.Tetris.Agents
 
         public readonly TimeSpan AnalyzePaddingTime;
         public readonly TimeSpan DropPaddingTime;
-        public readonly TimeSpan CheckPaddingTime;
 
         public TimeSpan GetExecutionDuration(int commands)
         {
@@ -80,8 +79,7 @@ namespace GameBot.Game.Tetris.Agents
             Extractor = extractor;
             BoardExtractor = boardExtractor;
             Search = search;
-
-            CheckSamples = config.Read("Game.Tetris.Check.Samples", 1);
+            
             ExtractionSamples = config.Read("Game.Tetris.Extractor.Samples", 1);
             PlayMultiplayer = config.Read("Game.Tetris.Multiplayer", false);
             CheckEnabled = config.Read("Game.Tetris.Check.Enabled", false);
@@ -91,7 +89,6 @@ namespace GameBot.Game.Tetris.Agents
             _hitDelayAfter = TimeSpan.FromMilliseconds(Config.Read<int>("Robot.Actuator.Hit.DelayAfter"));
             AnalyzePaddingTime = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.AnalyzePaddingTime"));
             DropPaddingTime = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.DropPaddingTime"));
-            CheckPaddingTime = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.CheckPaddingTime")) + _hitDelayAfter;
 
             Init();
         }

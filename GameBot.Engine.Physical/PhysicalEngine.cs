@@ -8,6 +8,8 @@ namespace GameBot.Engine.Physical
 {
     public class PhysicalEngine : BaseEngine
     {
+        private Mat _lastImage;
+
         public PhysicalEngine(ICamera camera, IClock clock, IExecutor executor, IQuantizer quantizer, IAgent agent) : base(camera, clock, executor, quantizer, agent)
         {
         }
@@ -15,7 +17,8 @@ namespace GameBot.Engine.Physical
         public override void Step(Action<Mat> showImage = null, Action<Mat> showProcessedImage = null)
         {
             // get image as photo of the gameboy screen (input)
-            Mat image = Camera.Capture();
+            Mat image = Camera.Capture(_lastImage);
+            _lastImage = image;
             TimeSpan time = Clock.Time;
 
             // process image

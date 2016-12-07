@@ -94,7 +94,6 @@ namespace GameBot.Test
             configMock.ConfigValue("Game.Tetris.Multiplayer", false);
 
             configMock.ConfigValue("Game.Tetris.Check.Enabled", false);
-            configMock.ConfigValue("Game.Tetris.Check.Samples", 1);
 
             configMock.ConfigValue("Game.Tetris.Extractor.Samples", 3);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdNextPiece", 0.7);
@@ -103,7 +102,6 @@ namespace GameBot.Test
 
             configMock.ConfigValue("Game.Tetris.Timing.AnalyzePaddingTime", 50);
             configMock.ConfigValue("Game.Tetris.Timing.DropPaddingTime", 50);
-            configMock.ConfigValue("Game.Tetris.Timing.CheckPaddingTime", 50);
 
             configMock.ConfigValue("Emulator.Rom.Path", "Roms/tetris.gb");
 

@@ -1,4 +1,5 @@
-﻿using Emgu.CV;
+﻿using System.Threading;
+using Emgu.CV;
 using GameBot.Core;
 
 namespace GameBot.Engine.Physical.Cameras
@@ -6,6 +7,9 @@ namespace GameBot.Engine.Physical.Cameras
     public class PhysicalCamera : ICamera
     {
         private readonly Capture _capture;
+
+        private readonly object _lock = new object();
+        private Mat _frame;
 
         public int Width => _capture.Width;
         public int Height => _capture.Height;
@@ -22,16 +26,47 @@ namespace GameBot.Engine.Physical.Cameras
                 _capture.FlipVertical = true;
             }
             _capture.Start();
+
+            var thread = new Thread(GrabInternal);
+            thread.Start();
+        }
+
+        private void GrabInternal()
+        {
+            while (true)
+            {
+                var src = new Mat();
+
+                _capture.Grab();
+                _capture.Retrieve(src);
+
+                lock (_lock)
+                {
+                    _frame = src;
+                    Monitor.PulseAll(_lock);
+                }
+            }
         }
 
         public Mat Capture()
         {
-            var src = new Mat();
+            Mat frame;
+            lock (_lock)
+            {
+                frame = _frame;
+            }
+            return frame;
+        }
 
-            _capture.Grab();
-            _capture.Retrieve(src);
-            
-            return src;
+        public Mat Capture(Mat predecessor)
+        {
+            Mat frame;
+            lock (_lock)
+            {
+                Monitor.Wait(_lock);
+                frame = _frame;
+            }
+            return frame;
         }
     }
 }
