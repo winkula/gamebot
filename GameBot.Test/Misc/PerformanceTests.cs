@@ -18,7 +18,7 @@ namespace GameBot.Test.Misc
         [TestFixtureSetUp]
         public void Init()
         {
-            _capture = new Capture(1);
+            _capture = new Capture(0);
             _capture.ImageGrabbed += (sender, args) =>
             {
                 numImagesGrabbed++;
@@ -28,14 +28,14 @@ namespace GameBot.Test.Misc
 
             foreach (var value in Enum.GetValues(typeof(CapProp)))
             {
-                Debug.Write($"Cam {value}:       {_capture.GetCaptureProperty((CapProp) value)}");
+                Debug.WriteLine($"Cam {value}:       {_capture.GetCaptureProperty((CapProp) value)}");
             }
             
             _capture.SetCaptureProperty(CapProp.Focus, 100);
             _capture.SetCaptureProperty(CapProp.Brightness, 1.0);
             _capture.SetCaptureProperty(CapProp.FrameWidth, 320);
             _capture.SetCaptureProperty(CapProp.FrameHeight, 240);
-            _capture.SetCaptureProperty(CapProp.Fps, 60.0);
+            _capture.SetCaptureProperty(CapProp.Fps, 60);
         }
 
         [Ignore]
