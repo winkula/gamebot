@@ -108,15 +108,6 @@ namespace GameBot.Robot.Ui
             config.AddTarget("file", fileTarget);
             config.LoggingRules.Add(new LoggingRule("*", logLevel, fileTarget));
             
-            // TODO: remove this after measurement
-            var fileTargetPieceLogging = new FileTarget
-            {
-                Layout = @"${message}",
-                FileName = GetLogPath("Pieces.txt")
-            };
-            config.AddTarget("file", fileTargetPieceLogging);
-            config.LoggingRules.Add(new LoggingRule("PieceLogger", LogLevel.Info, fileTargetPieceLogging));
-            
             LogManager.Configuration = config;
         }
 
@@ -138,7 +129,7 @@ namespace GameBot.Robot.Ui
             }
             catch (ArgumentException)
             {
-                // ignore
+                // ignore, take error level as default
                 return LogLevel.Error;
             }
         }

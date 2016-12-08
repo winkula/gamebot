@@ -13,7 +13,6 @@ namespace GameBot.Game.Tetris.Agents.States
     public class TetrisAnalyzeState : ITetrisAgentState
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private static readonly Logger _pieceLogger = LogManager.GetLogger("PieceLogger");
 
         private readonly TetrisAgent _agent;
 
@@ -148,8 +147,6 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void AcceptCurrentPiece(Piece currentPiece)
         {
-            _pieceLogger.Info(currentPiece.Tetrimino);
-
             _extractedPiece = currentPiece;
             _agent.ExtractedPiece = _extractedPiece;
         }
