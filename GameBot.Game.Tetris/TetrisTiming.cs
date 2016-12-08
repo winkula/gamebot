@@ -11,7 +11,7 @@ namespace GameBot.Game.Tetris
         public static TimeSpan LineClearDuration => GetDurationFromFrames(91); // ca. 1.5 seconds
         public static TimeSpan EntryDelayDuration => GetDurationFromFrames(2);
 
-        public static TimeSpan GetDropDuration(int rows)
+        public static TimeSpan GetDropDuration(double rows)
         {
             // the speed of the drop is the same as the normal speed in level 20
             // this has been approved experimentally

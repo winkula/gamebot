@@ -38,7 +38,7 @@ namespace GameBot.Game.Tetris
             return _levelSpeeds[level];
         }
 
-        public static TimeSpan GetDuration(int level, int rows, bool heartMode = false)
+        public static TimeSpan GetDuration(int level, double rows, bool heartMode = false)
         {
             if (level < 0) throw new ArgumentException("Level must not be negative");
             if (level > 20) throw new ArgumentException("Level can't be bigger than 20");
@@ -51,9 +51,9 @@ namespace GameBot.Game.Tetris
 
             return TimeSpan.FromSeconds(rows * _levelSpeeds[level] / TetrisTiming.Framerate);
         }
-
+        
         // how many rows will a tile maximal fall in a specific time span?
-        public static int GetFallDistance(int level, TimeSpan duration, bool heartMode = false)
+        public static double GetFallDistance(int level, TimeSpan duration, bool heartMode = false)
         {
             if (level < 0) throw new ArgumentException("Level must not be negative");
             if (level > 20) throw new ArgumentException("Level can't be bigger than 20");
@@ -66,8 +66,8 @@ namespace GameBot.Game.Tetris
 
             double frames = duration.TotalSeconds * TetrisTiming.Framerate;
             int framePerRow = GetFramesPerRow(level, heartMode);
-
-            return (int)Math.Ceiling(frames / framePerRow);
+            
+            return frames / framePerRow;
         }
     }
 }

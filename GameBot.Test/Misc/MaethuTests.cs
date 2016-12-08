@@ -268,6 +268,28 @@ namespace GameBot.Test.Misc
 
         [Ignore]
         [Test]
+        public void TestEntryDelayDuration()
+        {
+            var romLoader = new RomLoader();
+            var rom = romLoader.Load("Roms/tetris.gb");
+
+            var emulator = new Emulator();
+            emulator.Load(rom);
+
+            emulator.Execute(125);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+            
+            emulator.Execute(16 * 53); // just landed after this
+            emulator.Execute(53); // placed
+            emulator.Execute(3);
+            emulator.Show();
+            return;
+        }
+
+        [Ignore]
+        [Test]
         public void TestMatRoi()
         {
             const int count = 100;

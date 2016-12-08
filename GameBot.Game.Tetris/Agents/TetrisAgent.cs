@@ -38,7 +38,6 @@ namespace GameBot.Game.Tetris.Agents
         public GameState GameState { get; set; }
 
         // config used by states
-        public int CheckSamples { get; }
         public int ExtractionSamples { get; }
         public bool PlayMultiplayer { get; }
         public bool CheckEnabled { get; }
@@ -49,8 +48,9 @@ namespace GameBot.Game.Tetris.Agents
         private readonly TimeSpan _hitTime;
         private readonly TimeSpan _hitDelayAfter;
 
-        public readonly TimeSpan AnalyzePaddingTime;
-        public readonly TimeSpan DropPaddingTime;
+        public readonly TimeSpan MoreTimeToAnalyze;
+        public readonly TimeSpan LessFallTimeBeforeDrop;
+        public readonly TimeSpan LessWaitTimeAfterDrop;
 
         public TimeSpan GetExecutionDuration(int commands)
         {
@@ -87,9 +87,10 @@ namespace GameBot.Game.Tetris.Agents
             // init timing config
             _hitTime = TimeSpan.FromMilliseconds(Config.Read<int>("Robot.Actuator.Hit.Time"));
             _hitDelayAfter = TimeSpan.FromMilliseconds(Config.Read<int>("Robot.Actuator.Hit.DelayAfter"));
-            AnalyzePaddingTime = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.AnalyzePaddingTime"));
-            DropPaddingTime = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.DropPaddingTime"));
-
+            MoreTimeToAnalyze = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.MoreTimeToAnalyze"));
+            LessFallTimeBeforeDrop = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.LessFallTimeBeforeDrop"));
+            LessWaitTimeAfterDrop = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.LessWaitTimeAfterDrop"));
+                
             Init();
         }
 

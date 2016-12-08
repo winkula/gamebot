@@ -72,6 +72,7 @@ namespace GameBot.Test.Core.Executors
             var actuatorMock = new Mock<IActuator>();
             var clockMock = new Mock<IClock>();
             clockMock.Setup(x => x.Sleep(It.IsAny<int>())).Callback<int>(Thread.Sleep);
+            clockMock.Setup(x => x.Sleep(It.IsAny<TimeSpan>())).Callback<TimeSpan>(Thread.Sleep);
 
             var executor = new Executor(actuatorMock.Object, clockMock.Object);
 

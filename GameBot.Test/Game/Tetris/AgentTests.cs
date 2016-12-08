@@ -42,8 +42,9 @@ namespace GameBot.Test.Game.Tetris
         {
             _configMock = TestHelper.GetFakeConfig();
             _configMock.ConfigValue("Game.Tetris.Extractor.Samples", _numSamples);
-            _configMock.ConfigValue("Game.Tetris.Timing.AnalyzePaddingTime", 0);
-            _configMock.ConfigValue("Game.Tetris.Timing.DropPaddingTime", 0);
+            _configMock.ConfigValue("Game.Tetris.Timing.MoreTimeToAnalyze", 0);
+            _configMock.ConfigValue("Game.Tetris.Timing.LessWaitTimeAfterDrop", 0);
+            _configMock.ConfigValue("Game.Tetris.Timing.LessFallTimeBeforeDrop", 0);
 
             _quantizer = new MorphologyQuantizer(_configMock.Object);
             _extractor = new MorphologyExtractor(_configMock.Object);

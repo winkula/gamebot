@@ -108,7 +108,7 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 executor.HitWait(Button.Right, _buttonWaitDuration);
             }
-            executor.HitWait(Button.A, _buttonWaitDuration);
+            executor.Hit(Button.A);
         }
 
         private void StartFromGameOver(IExecutor executor)

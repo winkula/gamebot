@@ -14,7 +14,7 @@ namespace GameBot.Game.Tetris.Agents.States
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private static readonly Logger _pieceLogger = LogManager.GetLogger("PieceLogger");
-        
+
         private readonly TetrisAgent _agent;
 
         private readonly Tetrimino? _currentTetrimino;
@@ -54,7 +54,7 @@ namespace GameBot.Game.Tetris.Agents.States
                 // we can't do this in the constructor, because then we would use the previous screenshot's timestamp
                 _beginTime = _agent.Screenshot.Timestamp;
             }
-            
+
             // try to detect game over
             if (_agent.BoardExtractor.IsGameOver(_agent.Screenshot))
             {
@@ -238,9 +238,9 @@ namespace GameBot.Game.Tetris.Agents.States
             // this is the time that passed since the next piece became visible
             var passedTime = _agent.Screenshot.Timestamp
                 - beginTime
-                + _agent.AnalyzePaddingTime;
+                + _agent.MoreTimeToAnalyze;
 
-            int searchHeightTime = TetrisLevel.GetFallDistance(_agent.GameState.Level, passedTime, _agent.GameState.HeartMode);
+            int searchHeightTime = (int)Math.Ceiling(TetrisLevel.GetFallDistance(_agent.GameState.Level, passedTime, _agent.GameState.HeartMode));
 
             if (tetrimino.HasValue)
             {

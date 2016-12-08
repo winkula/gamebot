@@ -100,8 +100,9 @@ namespace GameBot.Test
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.7);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdMovedPiece", 0.5);
 
-            configMock.ConfigValue("Game.Tetris.Timing.AnalyzePaddingTime", 50);
-            configMock.ConfigValue("Game.Tetris.Timing.DropPaddingTime", 50);
+            configMock.ConfigValue("Game.Tetris.Timing.MoreTimeToAnalyze", 50);
+            configMock.ConfigValue("Game.Tetris.Timing.LessWaitTimeAfterDrop", 50);
+            configMock.ConfigValue("Game.Tetris.Timing.LessFallTimeBeforeDrop", 50);
 
             configMock.ConfigValue("Emulator.Rom.Path", "Roms/tetris.gb");
 

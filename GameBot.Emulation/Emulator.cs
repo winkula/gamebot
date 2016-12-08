@@ -39,8 +39,7 @@ namespace GameBot.Emulation
         private const int _displayHeight = GameBoyConstants.ScreenHeight;
 
         private const int _framesAfterButton = 2;
-
-        private readonly Random _random = new Random();
+        
         private readonly X80 _cpu;
         private double _scanLineTicks;
         private readonly uint[] _pixels = new uint[_displayWidth * _displayHeight];
@@ -422,18 +421,7 @@ namespace GameBot.Emulation
                     UpdateModel(false);
                 }
                 UpdateModel(true);
-            }
-            RenderFrame();
-        }
-
-        private void ExecuteWithoutRendering(int frames)
-        {
-            if (frames > 0)
-            {
-                for (int i = 0; i < frames; i++)
-                {
-                    UpdateModel(false);
-                }
+                RenderFrame();
             }
         }
 
