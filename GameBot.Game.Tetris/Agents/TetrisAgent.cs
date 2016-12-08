@@ -142,7 +142,8 @@ namespace GameBot.Game.Tetris.Agents
             catch (GameOverException)
             {
                 // game over detected
-                SetStateAndContinue(new TetrisStartState(this, GameState));
+                //SetStateAndContinue(new TetrisStartState(this, GameState));
+                throw;
             }
         }
 
@@ -240,7 +241,8 @@ namespace GameBot.Game.Tetris.Agents
                 catch (GameOverException)
                 {
                     // game over detected
-                    SetStateAndContinue(new TetrisStartState(this, GameState));
+                    //SetStateAndContinue(new TetrisStartState(this, GameState));
+                    throw;
                 }
 
             } while (_continue);

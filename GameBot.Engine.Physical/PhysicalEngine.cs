@@ -3,11 +3,15 @@ using GameBot.Core;
 using GameBot.Core.Data;
 using System;
 using GameBot.Core.Engines;
+using GameBot.Core.Exceptions;
+using NLog;
 
 namespace GameBot.Engine.Physical
 {
     public class PhysicalEngine : BaseEngine
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        
         private Mat _lastImage;
 
         public PhysicalEngine(ICamera camera, IClock clock, IExecutor executor, IQuantizer quantizer, IAgent agent) : base(camera, clock, executor, quantizer, agent)
@@ -31,14 +35,22 @@ namespace GameBot.Engine.Physical
                 IScreenshot screenshot = new EmguScreenshot(processed, time);
                 screenshot.OriginalImage = image;
 
-                // extracts the game state
-                Agent.Extract(screenshot);
+                try
+                {
+                    // extracts the game state
+                    Agent.Extract(screenshot);
 
-                processed = Agent.Visualize(processed);
-                showProcessedImage?.Invoke(processed);
+                    processed = Agent.Visualize(processed);
+                    showProcessedImage?.Invoke(processed);
 
-                // presses the buttons
-                Agent.Play(Executor);
+                    // presses the buttons
+                    Agent.Play(Executor);
+                }
+                catch (GameOverException)
+                {
+                    _logger.Warn("Game over");
+                    Reset();
+                }
             }
             else
             {

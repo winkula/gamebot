@@ -7,7 +7,6 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-using GameBot.Core.Exceptions;
 using NLog;
 
 namespace GameBot.Robot.Ui
@@ -21,6 +20,7 @@ namespace GameBot.Robot.Ui
         private int _processedWidth;
         private int _processedHeight;
 
+        private readonly IClock _clock;
         private readonly IConfig _config;
         private readonly IEngine _engine;
         private readonly ICamera _camera;
@@ -31,8 +31,9 @@ namespace GameBot.Robot.Ui
         private readonly List<Point> _keypoints = new List<Point>();
         private List<Point> _keypointsApplied = new List<Point>();
 
-        public Window(IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
+        public Window(IClock clock, IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
         {
+            _clock = clock;
             _config = config;
             _engine = engine;
             _camera = camera;
@@ -48,6 +49,7 @@ namespace GameBot.Robot.Ui
             RegisterEvents();
             CheckForIllegalCrossThreadCalls = false;
 
+            InitTitle();
             InitImageBoxes();
             InitTimer();
             InitForm();
@@ -85,6 +87,12 @@ namespace GameBot.Robot.Ui
         {
             double framerate = _config.Read("Robot.Ui.CamFramerate", 20.0);
             Timer.Interval = (int)Math.Max(1000 / framerate, 10);
+        }
+
+        private void InitTitle()
+        {
+            var time = _clock.Time;
+            Text = $@"GameBot - {time:hh\:mm\:ss\.f}";
         }
 
         private void InitForm()
@@ -212,15 +220,11 @@ namespace GameBot.Robot.Ui
                 try
                 {
                     _engine.Step(ShowOriginal, ShowProcessed);
-
-                    //stopwatch.Stop();
-                    //long ms = stopwatch.ElapsedMilliseconds;
-                    //stopwatch.Restart();
                 }
-                catch (GameOverException)
+                catch (Exception ex)
                 {
-                    _logger.Warn("Game over");
-                    _engine.Reset();
+                    _logger.Error(ex);
+                    MessageBox.Show($"An error occured: {ex.Message}. Read the log for details.");
                 }
             }
         }
@@ -254,7 +258,9 @@ namespace GameBot.Robot.Ui
         private void TimerTick(object sender, EventArgs e)
         {
             var image = _camera.Capture();
+
             ShowOriginal(image);
+            InitTitle();
         }
     }
 }

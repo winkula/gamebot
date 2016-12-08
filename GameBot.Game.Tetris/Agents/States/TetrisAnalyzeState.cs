@@ -58,8 +58,7 @@ namespace GameBot.Game.Tetris.Agents.States
             if (_agent.BoardExtractor.IsGameOver(_agent.Screenshot))
             {
                 // gameover detected
-                SetStateGameOver();
-                return;
+                throw new GameOverException();
             }
 
             int searchHeight = CalulateSearchHeight(_currentTetrimino, _beginTime.Value);
@@ -259,12 +258,6 @@ namespace GameBot.Game.Tetris.Agents.States
             var tracedPiece = new Piece(_agent.GameState.Piece);
 
             _agent.SetStateAndContinue(new TetrisExecuteState(_agent, moves, tracedPiece));
-        }
-
-        // TODO: move to base-state
-        private void SetStateGameOver()
-        {
-            _agent.SetStateAndContinue(new TetrisStartState(_agent, _agent.GameState));
         }
     }
 }

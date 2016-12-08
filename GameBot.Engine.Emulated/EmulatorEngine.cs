@@ -4,11 +4,15 @@ using GameBot.Core.Data;
 using GameBot.Emulation;
 using System;
 using GameBot.Core.Engines;
+using GameBot.Core.Exceptions;
+using NLog;
 
 namespace GameBot.Engine.Emulated
 {
     public class EmulatorEngine : BaseEngine
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private readonly IConfig _config;
         private readonly Emulator _emulator;
 
@@ -47,14 +51,22 @@ namespace GameBot.Engine.Emulated
                 IScreenshot screenshot = new EmguScreenshot(processed, time);
                 screenshot.OriginalImage = image;
 
-                // extracts the game state
-                Agent.Extract(screenshot);
+                try
+                {
+                    // extracts the game state
+                    Agent.Extract(screenshot);
 
-                processed = Agent.Visualize(processed);
-                showProcessedImage?.Invoke(processed);
+                    processed = Agent.Visualize(processed);
+                    showProcessedImage?.Invoke(processed);
 
-                // presses the buttons
-                Agent.Play(Executor);
+                    // presses the buttons
+                    Agent.Play(Executor);
+                }
+                catch (GameOverException)
+                {
+                    _logger.Warn("Game over");
+                    Reset();
+                }
             }
             else
             {
