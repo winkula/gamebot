@@ -1,4 +1,5 @@
-﻿using GameBot.Game.Tetris.Data;
+﻿using System;
+using GameBot.Game.Tetris.Data;
 
 namespace GameBot.Game.Tetris.Searching.Heuristics
 {
@@ -10,16 +11,13 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
         {
             var board = gameState.Board;
 
-            var a = AggregateHeightLastMultiple(board, 99);
-            var c = gameState.Lines;
+            //var a = AggregateHeightLastMultiple(board, 99);
+            //var c = gameState.Lines;
             var h = Holes(board);
-            var b = BumpinessWithoutLastColumn(board);
+            var b = Bumpiness(board);
             var m = board.MaximumHeight;
 
-            return -0.510066 * a
-                /*+ 0.760666 * c*/
-                - 0.35663 * h
-                - 0.184483 * b;
+            return -5 * h - b - 10 * Math.Pow(m, 2);
         }
     }
 }

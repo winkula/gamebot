@@ -169,6 +169,7 @@
     </Compile>
     <Compile Include="Searching\BaseSearch.cs" />
     <Compile Include="Searching\Heuristics\IHeuristic.cs" />
+    <Compile Include="Searching\Heuristics\GaHeuristic.cs" />
     <Compile Include="Searching\ISearch.cs" />
     <Compile Include="Searching\SearchResult.cs" />
     <Compile Include="Searching\PredictiveSearch.cs" />

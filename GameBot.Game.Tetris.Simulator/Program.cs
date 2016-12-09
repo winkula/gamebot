@@ -13,20 +13,24 @@ namespace GameBot.Game.Tetris.Simulator
         static void Main(string[] args)
         {
             ConfigureLogging();
-            Simulate();
+            //Simulate();
+            new GeneticAlgorithmProgram().Run();
         }
 
         static void Simulate()
         {
-            var heuristic = new YiyuanLeeHeuristic();
-            //var tetrisSearch = new SimpleSearch(heuristic);
-            var tetrisSearch = new PredictiveSearch(heuristic);
-            tetrisSearch.Cache = true;
+            //var heuristic = new YiyuanLeeHeuristic();
+            var heuristic = new ExperimentalHeuristic();
+
+            var tetrisSearch = new SimpleSearch(heuristic);
+            //var tetrisSearch = new PredictiveSearch(heuristic);
+            //tetrisSearch.Cache = true;
             //var tetrisSearch = new RecursiveSearch(heuristic);
             //tetrisSearch.Depth = 3;
 
             var tetrisSimulator = new TetrisSimulator();
             var engine = new SimulatorEngine(tetrisSearch, tetrisSimulator);
+            engine.FrameUpdateDelay = 1;
             engine.PauseTime = 0;
 
             engine.Run();

@@ -104,6 +104,10 @@
       <HintPath>..\packages\EmguCV.3.0.0\lib\net451\Emgu.Util.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="GAF, Version=2.3.0.22457, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GAF.2.3.0\lib\net45\GAF.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.3.10\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
@@ -126,6 +130,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GeneticAlgorithmProgram.cs" />
+    <Compile Include="TetrisFitnessFunction.cs" />
     <Compile Include="SimulatorEngine.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="Program.cs" />

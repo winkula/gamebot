@@ -6,7 +6,12 @@ namespace GameBot.Game.Tetris.Simulator
     {
         public TetrisSimulator()
         {
-            GameState = new GameState(new Piece(), Tetriminos.GetRandom());
+            var board = new Board();
+            var piece = new Piece();
+            var nextPiece = Tetriminos.GetRandom();
+
+            GameState = new GameState(board, piece, nextPiece);
+            GameState.StartLevel = 9;
         }
 
         public GameState GameState { get; }
