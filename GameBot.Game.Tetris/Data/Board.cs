@@ -30,12 +30,10 @@ namespace GameBot.Game.Tetris.Data
         {
             get
             {
-                if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
                 return (Columns[x] & (1 << y)) > 0;
             }
             set
             {
-                if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
                 if (value)
                 {
                     // set one bit
@@ -135,21 +133,29 @@ namespace GameBot.Game.Tetris.Data
 
         public bool IsOccupied(int x, int y)
         {
-            return this[x, y] == true;
+            if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
+
+            return this[x, y];
         }
 
         public bool IsFree(int x, int y)
         {
+            if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
+
             return this[x, y] == false;
         }
 
         public void Occupy(int x, int y)
         {
+            if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
+
             this[x, y] = true;
         }
 
         public void Free(int x, int y)
         {
+            if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
+
             this[x, y] = false;
         }
 
@@ -159,11 +165,21 @@ namespace GameBot.Game.Tetris.Data
 
             return BoardLookups.Instance.GetColumnHeight(Columns[x]);
         }
+        
+        public int ColumnHeightUnchecked(int x)
+        {
+            return BoardLookups.Instance.GetColumnHeight(Columns[x]);
+        }
 
         public int ColumnHoles(int x)
         {
             if (x >= Width) throw new ArgumentException("x must be lower than the width of the board");
 
+            return BoardLookups.Instance.GetColumnHoles(Columns[x]);
+        }
+        
+        public int ColumnHolesUnchecked(int x)
+        {
             return BoardLookups.Instance.GetColumnHoles(Columns[x]);
         }
 
@@ -183,6 +199,17 @@ namespace GameBot.Game.Tetris.Data
                 if (IsOccupied(positionX, positionY)) throw new ArgumentException("Square is already occupied");
 
                 Occupy(positionX, positionY);
+            }
+            Pieces++;
+        }
+
+        public void PlaceUnchecked(Piece piece)
+        {
+            foreach (var block in piece.Shape.Body)
+            {
+                int positionX = Coordinates.PieceOrigin.X + piece.X + block.X;
+                int positionY = Coordinates.PieceOrigin.Y + piece.Y + block.Y;
+                this[positionX, positionY] = true; // occupy unchecked
             }
             Pieces++;
         }
@@ -214,6 +241,7 @@ namespace GameBot.Game.Tetris.Data
             for (int x = 0; x < Width; x++)
             {
                 // clear square on completed line
+                if (!SquareExists(x, yCompleteLine)) throw new ArgumentException($"square with coordinates {x}, {yCompleteLine} not in board");
                 this[x, yCompleteLine] = false;
 
                 // copy from above

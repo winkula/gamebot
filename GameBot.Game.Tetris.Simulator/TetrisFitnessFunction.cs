@@ -1,7 +1,6 @@
 ﻿using GameBot.Core.Exceptions;
 using GameBot.Game.Tetris.Searching;
 using System;
-using System.Linq;
 using GameBot.Game.Tetris.Searching.Heuristics;
 
 namespace GameBot.Game.Tetris.Simulator
@@ -68,7 +67,7 @@ namespace GameBot.Game.Tetris.Simulator
         private void Update()
         {
             var result = _search.Search(_simulator.GameState);
-            if (result != null && result.Moves.Any())
+            if (result != null)
             {
                 foreach (var move in result.Moves)
                 {

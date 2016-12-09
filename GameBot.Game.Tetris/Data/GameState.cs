@@ -197,6 +197,28 @@ namespace GameBot.Game.Tetris.Data
 
             return distance;
         }
+        
+        public void DropUnchecked(int distance)
+        {
+            // let piece fall
+            Piece.Fall(distance);
+            Board.PlaceUnchecked(Piece);
+            Piece = null;
+
+            // remove lines
+            int lines = Board.RemoveLines();
+            Lines += lines;
+
+            // calculate score
+            Score += TetrisScore.GetSoftdropScore(distance);
+            Score += TetrisScore.GetLineScore(lines, Level);
+
+            if (NextPiece.HasValue)
+            {
+                Piece = new Piece(NextPiece.Value);
+                NextPiece = Tetriminos.GetRandom();
+            }
+        }
 
         public void Left()
         {

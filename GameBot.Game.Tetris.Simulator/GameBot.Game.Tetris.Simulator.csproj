@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GeneticAlgorithmProgram.cs" />
+    <Compile Include="SimulatorProgram.cs" />
     <Compile Include="TetrisFitnessFunction.cs" />
     <Compile Include="SimulatorEngine.cs" />
     <Compile Include="Package.cs" />

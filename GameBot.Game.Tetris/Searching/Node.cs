@@ -20,15 +20,15 @@ namespace GameBot.Game.Tetris.Searching
         {
             if (GameState.Piece != null)
             {
-                foreach (var pose in GameState.Piece.Tetrimino.GetPoses())
+                foreach (var newPiece in GameState.Piece.Tetrimino.GetPoses())
                 {
-                    var newPiece = pose;
-                    if (GameState.Board.CanDrop(newPiece))
+                    var dropDistance = GameState.Board.DropDistance(newPiece);
+                    if (dropDistance >= 0)
                     {
                         var successor = new GameState(GameState, newPiece);
-                        var fall = successor.Drop();
+                        successor.DropUnchecked(dropDistance);
 
-                        yield return new Node(successor, this) { Way = new Way(pose.Orientation, pose.X, fall) };
+                        yield return new Node(successor, this) { Way = new Way(newPiece.Orientation, newPiece.X, dropDistance) };
                     }
                 }
             }

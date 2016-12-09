@@ -32,6 +32,11 @@ namespace GameBot.Game.Tetris.Data
         // ordered, so that the bot has to press as little buttons as possible
         private static readonly int[][] _orientations = { new[] { 0 }, new[] { 0, 1 }, new[] { 0, 1 }, new[] { 0, 1 }, new[] { 0, 1, 3, 2 }, new[] { 0, 1, 3, 2 }, new[] { 0, 1, 3, 2 } };
 
+        public static Tetrimino GetPureRandom(Random random = null)
+        {
+            return (Tetrimino)(random ?? _random).Next(All.Length);
+        }
+
         public static Tetrimino GetRandom(Random random = null)
         {
             var p = (random ?? _random).NextDouble();

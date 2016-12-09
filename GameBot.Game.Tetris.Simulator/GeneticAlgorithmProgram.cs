@@ -22,7 +22,7 @@ namespace GameBot.Game.Tetris.Simulator
             ElitismPercentage = 20;
             ChromosomeLength = 4 * 16;
             PopulationSize = 20;
-            NumGenerations = 10000;
+            NumGenerations = 1000;
         }
 
         private void Init()

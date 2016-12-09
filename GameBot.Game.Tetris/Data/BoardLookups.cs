@@ -4,6 +4,8 @@ namespace GameBot.Game.Tetris.Data
 {
     public class BoardLookups
     {
+        private const int _size = 0x80000; // hex!
+
         private static BoardLookups _instance;
         public static BoardLookups Instance => _instance ?? (_instance = new BoardLookups());
 
@@ -13,16 +15,16 @@ namespace GameBot.Game.Tetris.Data
 
         private BoardLookups()
         {
-            _columnHeights = new int[0x7FFFF + 1];
-            _columnHoles = new int[0x7FFFF + 1];
-            _linePosition = new int[0x7FFFF + 1];
+            _columnHeights = new int[_size];
+            _columnHoles = new int[_size];
+            _linePosition = new int[_size];
 
             Init();
         }
 
         private void Init()
         {
-            for (int i = 1; i < 0x7FFFF + 1; i++)
+            for (int i = 1; i < _size; i++)
             {
                 CalculateHeights(i);
                 CalculateHoles(i);
