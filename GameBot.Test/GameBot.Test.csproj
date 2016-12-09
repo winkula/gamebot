@@ -169,6 +169,7 @@
     <Compile Include="Game\Tetris\Extraction\StatisticalTetrisExtractorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\BoardExtractorTests.cs" />
     <Compile Include="Game\Tetris\Searching\GameStateHashTests.cs" />
+    <Compile Include="Misc\ContourTests.cs" />
     <Compile Include="Misc\Playground.cs" />
     <Compile Include="Engine\Physical\Cameras\CapturePerformanceTests.cs" />
     <Compile Include="Engine\Physical\Actuators\PhysicalActuatorTests.cs" />

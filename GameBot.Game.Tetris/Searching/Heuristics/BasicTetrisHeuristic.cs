@@ -165,7 +165,7 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
             int holes = 0;
             for (int x = 0; x < board.Width; x++)
             {
-                holes += board.ColumnHoles(x);
+                holes += board.ColumnHolesUnchecked(x);
             }
             return holes;
         }

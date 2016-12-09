@@ -15,6 +15,7 @@ using GameBot.Core.Quantizers;
 using GameBot.Emulation;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
+using GameBot.Game.Tetris.Searching.Heuristics;
 
 namespace GameBot.Test.Misc
 {
@@ -60,6 +61,29 @@ namespace GameBot.Test.Misc
             quantizedImage = quantizer.Quantize(testData0500.Image);
             //TestHelper.Show(quantizedImage);
             TestHelper.Save(quantizedImage, "opening_result.png");
+        }
+        
+        [Ignore]
+        [Test]
+        public void TestManyScorings()
+        {
+            var gameStates = Enumerable.Range(0, 22 * 22 * 7 * 22)
+                .Select(x => new Board().Random())
+                .Select(x => new GameState(x))
+                .ToList();
+
+            var heuristic = new YiyuanLeeHeuristic();
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            foreach (var gs in gameStates)
+            {
+                var score = heuristic.Score(gs);
+            }
+
+            sw.Stop();
+            Debug.WriteLine(sw.ElapsedMilliseconds);
         }
 
         [Ignore]

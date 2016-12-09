@@ -183,6 +183,14 @@ namespace GameBot.Game.Tetris.Data
             return BoardLookups.Instance.GetColumnHoles(Columns[x]);
         }
 
+        public void FillColumn(int x, int height)
+        {
+            if (x < 0 || x >= Width) throw new ArgumentException();
+            if (height < 0 || height > Height) throw new ArgumentException();
+
+            Columns[x] = ~(~0 << height);
+        }
+
         public bool SquareExists(int x, int y)
         {
             return x >= 0 && x < Width && y >= 0 && y < Height;
