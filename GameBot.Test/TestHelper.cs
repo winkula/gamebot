@@ -111,6 +111,8 @@ namespace GameBot.Test
             configMock.ConfigValue("Robot.Camera.Index", 0);
             configMock.ConfigValue("Robot.Camera.RotateImage", false);
             configMock.ConfigValue("Robot.Camera.Noise", false);
+            configMock.ConfigValue("Robot.Camera.FrameWidth", 640.0);
+            configMock.ConfigValue("Robot.Camera.FrameHeight", 480.0);
 
             configMock.ConfigCollection("Robot.Quantizer.Transformation.KeyPoints", new[] { 0, 0, 160, 0, 0, 144, 160, 144 });
             configMock.ConfigValue("Robot.Quantizer.Threshold.Constant", 13);

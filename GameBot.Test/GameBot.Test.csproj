@@ -170,7 +170,7 @@
     <Compile Include="Game\Tetris\Extraction\BoardExtractorTests.cs" />
     <Compile Include="Game\Tetris\Searching\GameStateHashTests.cs" />
     <Compile Include="Misc\Playground.cs" />
-    <Compile Include="Misc\PerformanceTests.cs" />
+    <Compile Include="Engine\Physical\Cameras\CapturePerformanceTests.cs" />
     <Compile Include="Engine\Physical\Actuators\PhysicalActuatorTests.cs" />
     <Compile Include="Misc\MaethuTests.cs" />
     <Compile Include="Misc\PaeduTests.cs" />

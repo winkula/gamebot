@@ -205,27 +205,29 @@ namespace GameBot.Robot.Ui
 
         private void Loaded(object sender, EventArgs e)
         {
-            var t = new Thread(Run) { IsBackground = true };
-            t.Start();
+            var mainThread = new Thread(Run) { IsBackground = true };
+            mainThread.Start();
         }
 
         private void Run()
         {
-            //var stopwatch = new Stopwatch();
-
-            _engine.Initialize();
-
-            while (true)
+            try
             {
-                try
+                _engine.Initialize();
+
+                while (true)
                 {
                     _engine.Step(ShowOriginal, ShowProcessed);
                 }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex);
-                    MessageBox.Show($"An error occured: {ex.Message}. Read the log for details.");
-                }
+            }
+            catch (ThreadAbortException)
+            {
+                // ignore
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+                MessageBox.Show($"{ex.Message}\nRead the log for details.", "Error");
             }
         }
 
@@ -237,8 +239,10 @@ namespace GameBot.Robot.Ui
             }
             catch (ObjectDisposedException)
             {
+#if DEBUG
                 throw;
-                // ignore
+#endif
+                // ignore in release version
             }
         }
 
@@ -250,8 +254,10 @@ namespace GameBot.Robot.Ui
             }
             catch (ObjectDisposedException)
             {
+#if DEBUG
                 throw;
-                // ignore
+#endif
+                // ignore in release version
             }
         }
 
