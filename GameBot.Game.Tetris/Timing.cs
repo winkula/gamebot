@@ -10,8 +10,8 @@ namespace GameBot.Game.Tetris
         private static readonly TimeSpan _delayHold = TimeSpan.FromMilliseconds(35);
         private static readonly TimeSpan _delayRelease = TimeSpan.FromMilliseconds(40);
 
-        public static TimeSpan AnalyzeFallDurationPaddingTime = TimeSpan.FromMilliseconds(50);
-        public static TimeSpan DropDurationPaddingTime = TimeSpan.FromMilliseconds(50);
+        public static TimeSpan AnalyzeFallDurationPaddingTime = TimeSpan.FromMilliseconds(200);
+        public static TimeSpan DropDurationPaddingTime = TimeSpan.FromMilliseconds(200);
 
         public static TimeSpan CheckFallDurationPaddingTime = TimeSpan.FromMilliseconds(50) + _delayRelease;
 

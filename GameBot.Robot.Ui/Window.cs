@@ -84,7 +84,7 @@ namespace GameBot.Robot.Ui
 
         private void InitTimer()
         {
-            double framerate = _config.Read("Robot.Ui.CamFramerate", 20.0);
+            double framerate = _config.Read("Robot.Ui.CamFramerate", 20);
             Timer.Interval = (int)Math.Max(1000 / framerate, 10);
         }
 
