@@ -6,7 +6,7 @@ namespace GameBot.Game.Tetris.Data
 {
     public class GameState
     {
-        public Board Board { get; }
+        public Board Board { get; set; }
         public Piece Piece { get; set; }
         public Tetrimino? NextPiece { get; set; }
 
@@ -39,6 +39,8 @@ namespace GameBot.Game.Tetris.Data
                 _startLevel = value;
             }
         }
+
+        public bool HeartMode { get; set; }
 
         public int Level => TetrisLevel.GetLevel(StartLevel, Lines);
 
@@ -168,7 +170,10 @@ namespace GameBot.Game.Tetris.Data
         {
             int distance = Board.DropDistance(Piece);
             // TODO: check this again!
-            if (distance < 0 && Board.Intersects(Piece)) throw new GameOverException();
+            if (distance < 0 && Board.Intersects(Piece))
+            {
+                throw new GameOverException();
+            }
 
             // let piece fall
             Piece.Fall(distance);
@@ -191,6 +196,28 @@ namespace GameBot.Game.Tetris.Data
             }
 
             return distance;
+        }
+        
+        public void DropUnchecked(int distance)
+        {
+            // let piece fall
+            Piece.Fall(distance);
+            Board.PlaceUnchecked(Piece);
+            Piece = null;
+
+            // remove lines
+            int lines = Board.RemoveLines();
+            Lines += lines;
+
+            // calculate score
+            Score += TetrisScore.GetSoftdropScore(distance);
+            Score += TetrisScore.GetLineScore(lines, Level);
+
+            if (NextPiece.HasValue)
+            {
+                Piece = new Piece(NextPiece.Value);
+                NextPiece = Tetriminos.GetRandom();
+            }
         }
 
         public void Left()

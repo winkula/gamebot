@@ -20,24 +20,39 @@ namespace GameBot.Robot.Ui
 #if DEBUG
             CreateFolders();
 #endif
+            GameBot();
+        }
+        
+        static void GameBot()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            var config = new ExeConfig();
+            var engineMode = config.Read("Robot.Engine.Mode", "Emulated");
+            var logLevelString = config.Read("Robot.Ui.LogLevel", "Error");
 
             using (var container = new Container())
             {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
+                // register packages
+                if (engineMode == "Emulated") container.RegisterPackages(GetEmulatedEngineAssembies());
+                if (engineMode == "Physical") container.RegisterPackages(GetPhysicalEngineAssembies());
 
-                var config = new ExeConfig();
-                var engineMode = config.Read("Robot.Engine.Mode", "Emulated");
-
-                if (engineMode == "Emulated")
-                    container.RegisterPackages(GetEmulatedEngineAssembies());
-                if (engineMode == "Physical")
-                    container.RegisterPackages(GetPhysicalEngineAssembies());
+                // verify packages
                 container.Verify();
 
-                ConfigureLogging();
+                // config logging framework
+                ConfigureLogging(logLevelString);
+                var logger = LogManager.GetCurrentClassLogger();
 
-                Application.Run(container.GetInstance<Window>());
+                try
+                {
+                    Application.Run(container.GetInstance<Window>());
+                }
+                catch (Exception ex)
+                {
+                    logger.Fatal(ex);
+                }
             }
         }
 
@@ -60,7 +75,7 @@ namespace GameBot.Robot.Ui
 
         static IEnumerable<Assembly> GetAssemblies(params string[] assemblyNames)
         {
-            return assemblyNames.Select(x => Assembly.Load(x)).ToList();
+            return assemblyNames.Select(Assembly.Load).ToList();
         }
 
         static void CreateFolders()
@@ -72,25 +87,51 @@ namespace GameBot.Robot.Ui
             Directory.CreateDirectory(pathTest);
         }
 
-        static void ConfigureLogging()
+        static void ConfigureLogging(string logLevelString)
         {
+            var logLevel = GetLogLevel(logLevelString);
             var config = new LoggingConfiguration();
 
 #if DEBUG
-            var traceTarget = new TraceTarget();
-            traceTarget.Layout = @"${message}";
+            var traceTarget = new TraceTarget
+            {
+                Layout = @"${message}"
+            };
             config.AddTarget("debugger", traceTarget);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, traceTarget));
-
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameBot_Log.txt");
-            var fileTarget = new FileTarget();
-            fileTarget.Layout = @"${longdate} | ${level:uppercase=true} | ${pad:padding=-58:inner=${logger}} | ${message}";
-            fileTarget.FileName = path;
-            config.AddTarget("file", fileTarget);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, fileTarget));
+            config.LoggingRules.Add(new LoggingRule("*", logLevel, traceTarget));
 #endif
-
+            var fileTarget = new FileTarget
+            {
+                Layout = @"${longdate} | ${level:uppercase=true} | ${pad:padding=-58:inner=${logger}} | ${message}",
+                FileName = GetLogPath()
+            };
+            config.AddTarget("file", fileTarget);
+            config.LoggingRules.Add(new LoggingRule("*", logLevel, fileTarget));
+            
             LogManager.Configuration = config;
+        }
+
+        static string GetLogPath(string filename = "GameBot_Log.txt")
+        {
+#if DEBUG
+            // on desktop in debug mode
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), filename);
+#endif
+            // in current folder in release mode
+            return filename;
+        }
+
+        static LogLevel GetLogLevel(string logLevelString)
+        {
+            try
+            {
+                return LogLevel.FromString(logLevelString);
+            }
+            catch (ArgumentException)
+            {
+                // ignore, take error level as default
+                return LogLevel.Error;
+            }
         }
     }
 }

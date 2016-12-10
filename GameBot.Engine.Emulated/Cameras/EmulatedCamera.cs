@@ -43,6 +43,11 @@ namespace GameBot.Engine.Emulated.Cameras
             return image;
         }
 
+        public Mat Capture(Mat predecessor)
+        {
+            return Capture();
+        }
+
         private void AddNoise(Mat image)
         {
             const double noiseLevel = 0.75;

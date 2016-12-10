@@ -14,23 +14,30 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private readonly TetrisAgent _agent;
 
+        private readonly bool _heartMode;
         private readonly bool _startFromGameover;
         private readonly int _startLevel;
         
-        public TetrisStartState(TetrisAgent agent, int startLevel, bool startFromGameOver)
+        public TetrisStartState(TetrisAgent agent, int startLevel, bool heartMode, bool startFromGameOver)
         {
             if (agent == null) throw new ArgumentNullException(nameof(agent));
 
             _agent = agent;
+            _heartMode = heartMode;
             _startFromGameover = startFromGameOver;
             _startLevel = startLevel;
+        }
+
+        // constructor, when we start again from game over
+        public TetrisStartState(TetrisAgent agent, GameState gameState) : this(agent, gameState.StartLevel, gameState.HeartMode, true)
+        {
         }
 
         public void Extract()
         {
             // do nothing
         }
-        
+
         public void Play()
         {
             if (IsStartScreenVisble())
@@ -49,13 +56,13 @@ namespace GameBot.Game.Tetris.Agents.States
                     // restart from game over screen (good for testing multiple games)
                     StartFromMenu(_agent.Executor);
                 }
-                
+
                 // init game state
-                _agent.GameState = new GameState { StartLevel = _startLevel };
+                _agent.GameState = new GameState { StartLevel = _startLevel, HeartMode = _heartMode };
                 SetStateAnalyze();
             }
         }
-        
+
         private bool IsStartScreenVisble()
         {
             var random = new Random();
@@ -68,21 +75,25 @@ namespace GameBot.Game.Tetris.Agents.States
             _agent.SetState(new TetrisAnalyzeState(_agent));
         }
 
-        private void StartFromMenu(IExecutor actuator)
+        private void StartFromMenu(IExecutor executor)
         {
+            if (_heartMode) executor.Press(Button.Down);
+
             // start 1 player mode
-            actuator.HitWait(Button.Start, _buttonWaitDuration);
+            executor.HitWait(Button.Start, _buttonWaitDuration);
+
+            if (_heartMode) executor.Release(Button.Down);
 
             // choose a-type
-            actuator.HitWait(Button.A, _buttonWaitDuration);
+            executor.HitWait(Button.A, _buttonWaitDuration);
 
             // choose music
-            actuator.HitWait(Button.Right, _buttonWaitDuration);
-            actuator.HitWait(Button.Down, _buttonWaitDuration);
-            actuator.HitWait(Button.A, _buttonWaitDuration);
+            executor.HitWait(Button.Right, _buttonWaitDuration);
+            executor.HitWait(Button.Down, _buttonWaitDuration);
+            executor.HitWait(Button.A, _buttonWaitDuration);
 
             // select level
-            SelectLevel(actuator, _startLevel);
+            SelectLevel(executor, _startLevel);
         }
 
         private void SelectLevel(IExecutor executor, int startLevel)
@@ -97,7 +108,7 @@ namespace GameBot.Game.Tetris.Agents.States
             {
                 executor.HitWait(Button.Right, _buttonWaitDuration);
             }
-            executor.HitWait(Button.A, _buttonWaitDuration);
+            executor.Hit(Button.A);
         }
 
         private void StartFromGameOver(IExecutor executor)

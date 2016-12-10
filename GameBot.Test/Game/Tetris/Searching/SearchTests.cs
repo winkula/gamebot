@@ -1,9 +1,11 @@
-﻿using GameBot.Game.Tetris.Data;
+﻿using System.Diagnostics;
+using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Searching.Heuristics;
 using NLog;
 using NUnit.Framework;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GameBot.Test.Game.Tetris.Searching
 {
@@ -25,6 +27,7 @@ namespace GameBot.Test.Game.Tetris.Searching
 
             _simpleSearch = new SimpleSearch(_heuristic);
             _predictiveSearch = new PredictiveSearch(_heuristic);
+            _predictiveSearch.Cache = false;
             _recursiveSearch = new RecursiveSearch(_heuristic);
             _recursiveSearch.Depth = 2;
 
@@ -89,12 +92,34 @@ namespace GameBot.Test.Game.Tetris.Searching
         [TestCase(Tetrimino.L, Tetrimino.O)]
         [TestCase(Tetrimino.J, Tetrimino.T)]
         [TestCase(Tetrimino.T, Tetrimino.J)]
+        [TestCase(Tetrimino.O, Tetrimino.O)]
+        [TestCase(Tetrimino.I, Tetrimino.I)]
         public void PredictiveSearch(Tetrimino current, Tetrimino next)
         {
             var gameState = new GameState(current, next);
-
+            
             var result = _predictiveSearch.Search(gameState);
-            _logger.Info(result.GoalGameState);
+            
+            //_logger.Info(result.GoalGameState);
+        }
+
+        [Test]
+        public void PredictiveSearchAllSeven_Parallel()
+        {
+            Tetrimino current = Tetriminos.GetRandom();
+
+            Task<SearchResult>[] tasks = new Task<SearchResult>[Tetriminos.All.Length];
+            foreach (var next in Tetriminos.All)
+            {
+                tasks[(int) next] = Task.Factory.StartNew(() =>
+                {
+                    var gameState = new GameState(current, next);
+
+                    return _predictiveSearch.Search(gameState);
+                });
+            }
+
+            Task.WaitAll(tasks);
         }
 
         [TestCase(Tetrimino.O, Tetrimino.S)]

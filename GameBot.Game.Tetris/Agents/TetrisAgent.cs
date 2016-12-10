@@ -5,9 +5,12 @@ using System.Drawing;
 using GameBot.Core.Data;
 using System;
 using Emgu.CV.CvEnum;
+using GameBot.Core.Exceptions;
+using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Agents.States;
+using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Extractors;
 
 namespace GameBot.Game.Tetris.Agents
@@ -22,19 +25,43 @@ namespace GameBot.Game.Tetris.Agents
         private bool _continue;
 
         // services and data used by states
-        public IConfig Config { get; private set; }
+        public IConfig Config { get; }
+        public IClock Clock { get; private set; }
         public IQuantizer Quantizer { get; private set; }
         public IExecutor Executor { get; private set; }
         public IScreenshot Screenshot { get; private set; }
         public IExtractor Extractor { get; private set; }
+        public IBoardExtractor BoardExtractor { get; private set; }
         public ISearch Search { get; private set; }
 
         // data used by states
         public GameState GameState { get; set; }
 
         // config used by states
-        public int CheckSamples { get; }
         public int ExtractionSamples { get; }
+        public bool PlayMultiplayer { get; }
+        public bool CheckEnabled { get; }
+        
+        #region timing
+
+        // timing config
+        private readonly TimeSpan _hitTime;
+        private readonly TimeSpan _hitDelayAfter;
+
+        public readonly TimeSpan MoreTimeToAnalyze;
+        public readonly TimeSpan LessFallTimeBeforeDrop;
+        public readonly TimeSpan LessWaitTimeAfterDrop;
+
+        public TimeSpan GetExecutionDuration(int commands)
+        {
+            // the drop command is not counted here, because
+            // it has no delay time (press and release, no hit)
+            commands = Math.Max(0, commands - 1);
+
+            return (_hitTime + _hitDelayAfter).Multiply(commands);
+        }
+
+        #endregion
 
         // for visualization only
         public Piece ExtractedPiece { private get; set; }
@@ -42,29 +69,48 @@ namespace GameBot.Game.Tetris.Agents
         public Tetrimino? ExtractedNextPiece { private get; set; }
         public int SearchHeight { private get; set; }
 
-        public TetrisAgent(IConfig config, IQuantizer quantizer, IExtractor extractor, ISearch search)
+        public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExtractor extractor, IBoardExtractor boardExtractor, ISearch search)
         {
             _visualize = config.Read("Game.Tetris.Visualize", false);
 
             Config = config;
+            Clock = clock;
             Quantizer = quantizer;
             Extractor = extractor;
+            BoardExtractor = boardExtractor;
             Search = search;
+            
+            ExtractionSamples = config.Read("Game.Tetris.Extractor.Samples", 1);
+            PlayMultiplayer = config.Read("Game.Tetris.Multiplayer", false);
+            CheckEnabled = config.Read("Game.Tetris.Check.Enabled", false);
 
-            CheckSamples = Config.Read("Game.Tetris.Check.Samples", 1);
-            ExtractionSamples = Config.Read("Game.Tetris.Extractor.Samples", 1);
-            //ExtractionUpperThreshold = Config.Read<double>("Game.Tetris.Extractor.UpperThreshold");
-            //ExtractionLowerThreshold = Config.Read<double>("Game.Tetris.Extractor.LowerThreshold");
-
+            // init timing config
+            _hitTime = TimeSpan.FromMilliseconds(Config.Read<int>("Robot.Actuator.Hit.Time"));
+            _hitDelayAfter = TimeSpan.FromMilliseconds(Config.Read<int>("Robot.Actuator.Hit.DelayAfter"));
+            MoreTimeToAnalyze = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.MoreTimeToAnalyze"));
+            LessFallTimeBeforeDrop = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.LessFallTimeBeforeDrop"));
+            LessWaitTimeAfterDrop = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.LessWaitTimeAfterDrop"));
+                
             Init();
         }
 
         private void Init()
         {
+            ResetVisualization();
+
             var startLevel = Config.Read("Game.Tetris.StartLevel", 0);
+            var heartMode = Config.Read("Game.Tetris.HeartMode", false);
             var startFromGameOver = Config.Read("Game.Tetris.StartFromGameOver", false);
 
-            SetState(new TetrisStartState(this, startLevel, startFromGameOver));
+            SetState(new TetrisStartState(this, startLevel, heartMode, startFromGameOver));
+        }
+
+        private void ResetVisualization()
+        {
+            ExtractedPiece = null;
+            ExtractedNextPiece = null;
+            TracedPiece = null;
+            SearchHeight = 0;
         }
 
         public void SetState(ITetrisAgentState newState)
@@ -89,7 +135,16 @@ namespace GameBot.Game.Tetris.Agents
         {
             Screenshot = screenshot;
 
-            _state.Extract();
+            try
+            {
+                _state.Extract();
+            }
+            catch (GameOverException)
+            {
+                // game over detected
+                //SetStateAndContinue(new TetrisStartState(this, GameState));
+                throw;
+            }
         }
 
         public Mat Visualize(Mat image)
@@ -175,9 +230,21 @@ namespace GameBot.Game.Tetris.Agents
 
             do
             {
-                // every state can directly execute the next state, when it changes
+                // every state can directly execute the next state,
+                // when it changes this flag to true (with SetStateAndContinue)
                 _continue = false;
-                _state.Play();
+
+                try
+                {
+                    _state.Play();
+                }
+                catch (GameOverException)
+                {
+                    // game over detected
+                    //SetStateAndContinue(new TetrisStartState(this, GameState));
+                    throw;
+                }
+
             } while (_continue);
         }
 

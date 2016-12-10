@@ -71,7 +71,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Window";
-            this.Text = "GameBot.Robot.Ui";
+            this.Text = "GameBot";
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxOriginal)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxProcessed)).EndInit();
             this.ResumeLayout(false);

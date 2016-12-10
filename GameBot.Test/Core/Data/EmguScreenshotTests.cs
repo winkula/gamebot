@@ -141,5 +141,14 @@ namespace GameBot.Test.Core.Data
                 screenshot.GetTileMean(0, 18);
             });
         }
+
+        [Test]
+        public void ConstructMany()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                IScreenshot screenshot = new EmguScreenshot("Screenshots/tetris_play_2.png", TimeSpan.Zero);
+            }
+        }
     }
 }

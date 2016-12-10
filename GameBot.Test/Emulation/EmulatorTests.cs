@@ -71,7 +71,7 @@ namespace GameBot.Test.Emulation
             foreach (var input in inputs)
             {
                 emulator.Hit(input.Button);
-                emulator.Execute(TimeSpan.FromSeconds(input.Duration));
+                emulator.Execute((TimeSpan) TimeSpan.FromSeconds(input.Duration));
                 if (saveImages)
                 {
                     SaveImage(emulator.Display);

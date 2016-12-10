@@ -13,10 +13,11 @@ namespace GameBot.Test.Engine.Physical.Quantizers
     {
         private const bool _adjust = true;
 
+        [Ignore]
         [Test]
         public void TestQuantizerFromTestData()
         {
-            var test1 = TestDataFactory.Data.First(x => x.ImageKey == "0102");
+            var test1 = TestDataFactory.Data.First(x => x.ImageKey == "0500");
 
             string path = $"Images/test{test1.ImageKey}.jpg";
             var keypoints = new float[,] {

@@ -140,11 +140,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Agents\States\TetrisExecuteAllState.cs" />
-    <Compile Include="Agents\States\TetrisPseudoCheckState.cs" />
-    <Compile Include="Agents\States\TetrisRepeatState.cs" />
-    <Compile Include="Agents\States\TetrisCheckState.cs" />
+    <Compile Include="Agents\States\TetrisExecuteState.cs" />
     <Compile Include="Agents\TetrisAgent.cs" />
+    <Compile Include="Data\Pose.cs" />
+    <Compile Include="Data\TetriminoLookups.cs" />
     <Compile Include="Data\BoardLookups.cs" />
     <Compile Include="Data\Coordinates.cs" />
     <Compile Include="Extraction\Extractors\BaseExtractor.cs" />
@@ -152,10 +151,10 @@
     <Compile Include="Extraction\Extractors\PieceBasedExtractor.cs" />
     <Compile Include="Extraction\Extractors\BlockBasedExtractor.cs" />
     <Compile Include="Extraction\Extractors\IExtractor.cs" />
-    <Compile Include="Extraction\IPenaltyLineExtractor.cs" />
+    <Compile Include="Extraction\IBoardExtractor.cs" />
     <Compile Include="Extraction\Matchers\IMatcher.cs" />
     <Compile Include="Extraction\Matchers\MorphologyMatcher.cs" />
-    <Compile Include="Extraction\PenaltyLineExtractor.cs" />
+    <Compile Include="Extraction\BoardExtractor.cs" />
     <Compile Include="Extraction\PieceExtractorBase.cs" />
     <Compile Include="Extraction\Samplers\ISampler.cs" />
     <Compile Include="Extraction\Samplers\MoveConfirmationSampler.cs" />
@@ -170,6 +169,8 @@
     </Compile>
     <Compile Include="Searching\BaseSearch.cs" />
     <Compile Include="Searching\Heuristics\IHeuristic.cs" />
+    <Compile Include="Searching\Heuristics\GaHeuristic.cs" />
+    <Compile Include="Searching\Heuristics\ContourHeuristic.cs" />
     <Compile Include="Searching\ISearch.cs" />
     <Compile Include="Searching\SearchResult.cs" />
     <Compile Include="Searching\PredictiveSearch.cs" />
@@ -187,7 +188,6 @@
     <Compile Include="Searching\Heuristics\YiyuanLeeHeuristic.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="Agents\States\ITetrisAgentState.cs" />
-    <Compile Include="Agents\States\TetrisExecuteState.cs" />
     <Compile Include="Agents\States\TetrisAnalyzeState.cs" />
     <Compile Include="Agents\States\TetrisStartState.cs" />
     <Compile Include="TetrisConstants.cs" />
@@ -201,7 +201,6 @@
     <Compile Include="Extraction\TetrisExtractor.cs" />
     <Compile Include="Searching\Heuristics\MaxBergmarkHeuristic.cs" />
     <Compile Include="TetrisTiming.cs" />
-    <Compile Include="Timing.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameBot.Core\GameBot.Core.csproj">

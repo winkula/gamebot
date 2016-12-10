@@ -3,6 +3,7 @@ using GameBot.Game.Tetris.Searching;
 using NLog;
 using System;
 using System.Linq;
+using GameBot.Core.Exceptions;
 using GameBot.Core.Extensions;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Samplers;
@@ -23,6 +24,7 @@ namespace GameBot.Game.Tetris.Agents.States
         private Piece _extractedPiece;
         private Tetrimino? _extractedNextPiece;
         private TimeSpan? _beginTime;
+        private Board _extractedBoard;
 
         // we can extract the next piece only then, when we already have found the current piece
         private bool CanExtractNextPiece => _extractedPiece != null || _currentPieceSampler.SampleCount > 0;
@@ -52,7 +54,14 @@ namespace GameBot.Game.Tetris.Agents.States
                 _beginTime = _agent.Screenshot.Timestamp;
             }
 
-            int searchHeight = CalulateSearchHeight(_currentTetrimino);
+            // try to detect game over
+            if (_agent.BoardExtractor.IsGameOver(_agent.Screenshot))
+            {
+                // gameover detected
+                throw new GameOverException();
+            }
+
+            int searchHeight = CalulateSearchHeight(_currentTetrimino, _beginTime.Value);
             _agent.SearchHeight = searchHeight;
             _logger.Info($"Analyze (search height {searchHeight})");
 
@@ -83,12 +92,11 @@ namespace GameBot.Game.Tetris.Agents.States
         // only then can we start the search and proceed to the execute-state
         private void ExtractGameState(int searchHeight)
         {
-            ExtractCurrentPieceSampling(searchHeight);
+            if (searchHeight < 0) throw new GameOverException("Search height is negative");
 
-            if (CanExtractNextPiece)
-            {
-                ExtractNextPieceSampling();
-            }
+            ExtractCurrentPieceSampling(searchHeight);
+            ExtractNextPieceSampling();
+            ExtractBoard();
         }
 
         private void ExtractCurrentPieceSampling(int searchHeight)
@@ -144,6 +152,8 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void ExtractNextPieceSampling()
         {
+            if (!CanExtractNextPiece) return;
+
             // already extracted the piece?
             if (_extractedNextPiece != null) return;
 
@@ -184,10 +194,34 @@ namespace GameBot.Game.Tetris.Agents.States
             _agent.ExtractedNextPiece = _extractedNextPiece;
         }
 
+        private void ExtractBoard()
+        {
+            if (_agent.PlayMultiplayer)
+            {
+                // recognize if lines are spawned from the bottom
+                _agent.GameState.Board = _agent.BoardExtractor.UpdateMultiplayer(_agent.Screenshot, _agent.GameState.Board);
+            }
+
+            if (_agent.CheckEnabled)
+            {
+                if (_extractedPiece == null) return;
+                if (_agent.BoardExtractor.IsHorizonBroken(_agent.Screenshot, _agent.GameState.Board))
+                {
+                    _logger.Info("Game state maybe broken. Analyze board");
+
+                    _extractedBoard = _agent.BoardExtractor.Update(_agent.Screenshot, _agent.GameState.Board, _extractedPiece);
+                }
+            }
+        }
+
         private void UpdateGlobalGameState()
         {
             _agent.GameState.Piece = _extractedPiece;
             _agent.GameState.NextPiece = _extractedNextPiece;
+            if (_extractedBoard != null)
+            {
+                _agent.GameState.Board = _extractedBoard;
+            }
         }
 
         private SearchResult Search()
@@ -195,16 +229,14 @@ namespace GameBot.Game.Tetris.Agents.States
             return _agent.Search.Search(_agent.GameState);
         }
 
-        private int CalulateSearchHeight(Tetrimino? tetrimino)
+        private int CalulateSearchHeight(Tetrimino? tetrimino, TimeSpan beginTime)
         {
-            if (!_beginTime.HasValue) throw new Exception("_beginTime is not initialized");
-
             // this is the time that passed since the next piece became visible
             var passedTime = _agent.Screenshot.Timestamp
-                - _beginTime.Value
-                + Timing.AnalyzeFallDurationPaddingTime;
+                - beginTime
+                + _agent.MoreTimeToAnalyze;
 
-            int searchHeightTime = TetrisLevel.GetFallDistance(_agent.GameState.Level, passedTime);
+            int searchHeightTime = (int)Math.Ceiling(TetrisLevel.GetFallDistance(_agent.GameState.Level, passedTime, _agent.GameState.HeartMode));
 
             if (tetrimino.HasValue)
             {
@@ -225,7 +257,7 @@ namespace GameBot.Game.Tetris.Agents.States
             var moves = results.Moves.ToList();
             var tracedPiece = new Piece(_agent.GameState.Piece);
 
-            _agent.SetStateAndContinue(new TetrisExecuteAllState(_agent, moves, tracedPiece));
+            _agent.SetStateAndContinue(new TetrisExecuteState(_agent, moves, tracedPiece));
         }
     }
 }

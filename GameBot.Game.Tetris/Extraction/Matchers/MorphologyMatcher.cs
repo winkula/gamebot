@@ -72,10 +72,10 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
             // probability that block is outside of the screen is always 0.0
             if (tileCoordinates.X < 0 || tileCoordinates.X >= GameBoyConstants.ScreenWidth / GameBoyConstants.TileSize) return 0.0;
             if (tileCoordinates.Y < 0 || tileCoordinates.Y >= GameBoyConstants.ScreenHeight / GameBoyConstants.TileSize) return 0.0;
-
+            
             var roi = new Rectangle(GameBoyConstants.TileSize * tileCoordinates.X, GameBoyConstants.TileSize * tileCoordinates.Y, GameBoyConstants.TileSize, GameBoyConstants.TileSize);
-            var imageRoi = new Mat((Mat)image, roi);
-
+            var imageRoi = new Mat(image, roi);
+            
             var mean = CvInvoke.Mean(imageRoi);
             return ((255.0 - mean.V0) / 255.0).Clamp(0.0, 1.0);
         }

@@ -3,12 +3,10 @@ using Emgu.CV.UI;
 using GameBot.Core;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-using GameBot.Core.Exceptions;
 using NLog;
 
 namespace GameBot.Robot.Ui
@@ -22,6 +20,7 @@ namespace GameBot.Robot.Ui
         private int _processedWidth;
         private int _processedHeight;
 
+        private readonly IClock _clock;
         private readonly IConfig _config;
         private readonly IEngine _engine;
         private readonly ICamera _camera;
@@ -32,8 +31,9 @@ namespace GameBot.Robot.Ui
         private readonly List<Point> _keypoints = new List<Point>();
         private List<Point> _keypointsApplied = new List<Point>();
 
-        public Window(IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
+        public Window(IClock clock, IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
         {
+            _clock = clock;
             _config = config;
             _engine = engine;
             _camera = camera;
@@ -49,6 +49,7 @@ namespace GameBot.Robot.Ui
             RegisterEvents();
             CheckForIllegalCrossThreadCalls = false;
 
+            InitTitle();
             InitImageBoxes();
             InitTimer();
             InitForm();
@@ -86,6 +87,12 @@ namespace GameBot.Robot.Ui
         {
             double framerate = _config.Read("Robot.Ui.CamFramerate", 20);
             Timer.Interval = (int)Math.Max(1000 / framerate, 10);
+        }
+
+        private void InitTitle()
+        {
+            var time = _clock.Time;
+            Text = $@"GameBot - {time:hh\:mm\:ss\.f}";
         }
 
         private void InitForm()
@@ -198,36 +205,29 @@ namespace GameBot.Robot.Ui
 
         private void Loaded(object sender, EventArgs e)
         {
-            var t = new Thread(Run) { IsBackground = true };
-            t.Start();
+            var mainThread = new Thread(Run) { IsBackground = true };
+            mainThread.Start();
         }
 
         private void Run()
         {
-            var stopwatch = new Stopwatch();
-
-            _engine.Initialize();
-
-            while (true)
+            try
             {
-                try
+                _engine.Initialize();
+
+                while (true)
                 {
                     _engine.Step(ShowOriginal, ShowProcessed);
-
-                    stopwatch.Stop();
-                    long ms = stopwatch.ElapsedMilliseconds;
-                    stopwatch.Restart();
-
-                    if (ms != 0)
-                    {
-                        Text = $"GameBot.Robot.Ui ({ms} ms)";
-                    }
                 }
-                catch (GameOverException)
-                {
-                    _logger.Info("Game over");
-                    _engine.Play = false;
-                }
+            }
+            catch (ThreadAbortException)
+            {
+                // ignore
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+                MessageBox.Show($"{ex.Message}\nRead the log for details.", "Error");
             }
         }
 
@@ -239,8 +239,10 @@ namespace GameBot.Robot.Ui
             }
             catch (ObjectDisposedException)
             {
+#if DEBUG
                 throw;
-                // ignore
+#endif
+                // ignore in release version
             }
         }
 
@@ -252,15 +254,19 @@ namespace GameBot.Robot.Ui
             }
             catch (ObjectDisposedException)
             {
+#if DEBUG
                 throw;
-                // ignore
+#endif
+                // ignore in release version
             }
         }
 
         private void TimerTick(object sender, EventArgs e)
         {
             var image = _camera.Capture();
+
             ShowOriginal(image);
+            InitTitle();
         }
     }
 }

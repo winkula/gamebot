@@ -12,13 +12,13 @@ namespace GameBot.Engine.Physical.Actuators
     public class PhysicalActuator : IActuator, IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-        private const int _delayHold = 35;
-        private const int _delayReleased = 40;
         
         private readonly IPConnection _ipcon;
         private readonly BrickletIndustrialQuadRelay _or1;
         private readonly BrickletIndustrialQuadRelay _or2;
+
+        private readonly int _hitTime;
+        private readonly int _hitDelayAfter;
 
         private int _state1;
         private int _state2;
@@ -29,6 +29,9 @@ namespace GameBot.Engine.Physical.Actuators
         public PhysicalActuator(IConfig config)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
+
+            _hitTime = config.Read<int>("Robot.Actuator.Hit.Time");
+            _hitDelayAfter = config.Read<int>("Robot.Actuator.Hit.DelayAfter");
 
             var host = config.Read<string>("Robot.Actuator.Host");
             var port = config.Read<int>("Robot.Actuator.Port");
@@ -58,10 +61,10 @@ namespace GameBot.Engine.Physical.Actuators
 
             HandleState(button, true);
             Update();
-            Thread.Sleep(_delayHold);
+            Thread.Sleep(_hitTime);
             HandleState(button, false);
             Update();
-            Thread.Sleep(_delayReleased);
+            Thread.Sleep(_hitDelayAfter);
         }
 
         public void Hit(IEnumerable<Button> buttons)
@@ -74,13 +77,13 @@ namespace GameBot.Engine.Physical.Actuators
                 HandleState(button, true);
             }
             Update();
-            Thread.Sleep(_delayHold);
+            Thread.Sleep(_hitTime);
             foreach (var button in buttonsList)
             {
                 HandleState(button, false);
             }
             Update();
-            Thread.Sleep(_delayReleased);
+            Thread.Sleep(_hitDelayAfter);
         }
 
         public void Press(Button button)

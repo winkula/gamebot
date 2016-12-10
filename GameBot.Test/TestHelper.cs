@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using GameBot.Core;
@@ -15,7 +12,7 @@ namespace GameBot.Test
 {
     public static class TestHelper
     {
-        private static Random _random = new Random();
+        private static readonly Random _random = new Random();
 
         public static IScreenshot GetScreenshot(string path, IQuantizer quantizer)
         {
@@ -29,6 +26,24 @@ namespace GameBot.Test
         {
             CvInvoke.Imshow("Test", screenshot.Image);
             CvInvoke.WaitKey();
+        }
+
+        public static void Show(Mat mat)
+        {
+            CvInvoke.Imshow("Test", mat);
+            CvInvoke.WaitKey();
+        }
+
+        public static void Save(IScreenshot screenshot, string filename)
+        {
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), filename);
+            screenshot.Image.Save(path);
+        }
+
+        public static void Save(Mat mat, string filename)
+        {
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), filename);
+            mat.Save(path);
         }
 
         public static Board GetRandomBoard(int maxHeight)
@@ -71,28 +86,48 @@ namespace GameBot.Test
             var configMock = new Mock<IConfig>();
 
             configMock.ConfigValue("Game.Tetris.Visualize", true);
+
             configMock.ConfigValue("Game.Tetris.StartLevel", 9);
+            configMock.ConfigValue("Game.Tetris.HeartMode", false);
             configMock.ConfigValue("Game.Tetris.StartFromGameOver", false);
+
+            configMock.ConfigValue("Game.Tetris.Multiplayer", false);
+
             configMock.ConfigValue("Game.Tetris.Check.Enabled", false);
-            configMock.ConfigValue("Game.Tetris.Check.Samples", 1);
-            configMock.ConfigValue("Game.Tetris.Extractor.Samples", 1);
+
+            configMock.ConfigValue("Game.Tetris.Extractor.Samples", 3);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdNextPiece", 0.7);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdCurrentPiece", 0.7);
             configMock.ConfigValue("Game.Tetris.Extractor.ThresholdMovedPiece", 0.5);
+
+            configMock.ConfigValue("Game.Tetris.Timing.MoreTimeToAnalyze", 50);
+            configMock.ConfigValue("Game.Tetris.Timing.LessWaitTimeAfterDrop", 50);
+            configMock.ConfigValue("Game.Tetris.Timing.LessFallTimeBeforeDrop", 50);
+
             configMock.ConfigValue("Emulator.Rom.Path", "Roms/tetris.gb");
+
             configMock.ConfigValue("Robot.Engine.Mode", "Emulated");
+
             configMock.ConfigValue("Robot.Camera.Index", 0);
             configMock.ConfigValue("Robot.Camera.RotateImage", false);
             configMock.ConfigValue("Robot.Camera.Noise", false);
+            configMock.ConfigValue("Robot.Camera.FrameWidth", 640.0);
+            configMock.ConfigValue("Robot.Camera.FrameHeight", 480.0);
+
             configMock.ConfigCollection("Robot.Quantizer.Transformation.KeyPoints", new[] { 0, 0, 160, 0, 0, 144, 160, 144 });
             configMock.ConfigValue("Robot.Quantizer.Threshold.Constant", 13);
             configMock.ConfigValue("Robot.Quantizer.Threshold.BlockSize", 17);
             configMock.ConfigValue("Robot.Quantizer.Blur", false);
+
             configMock.ConfigValue("Robot.Actuator.Host", "localhost");
             configMock.ConfigValue("Robot.Actuator.Port", 4223);
             configMock.ConfigValue("Robot.Actuator.UidMaster", "6JKbWn");
             configMock.ConfigValue("Robot.Actuator.UidRelay1", "mTA");
             configMock.ConfigValue("Robot.Actuator.UidRelay2", "mTC");
+            configMock.ConfigValue("Robot.Actuator.Hit.Time", 35);
+            configMock.ConfigValue("Robot.Actuator.Hit.DelayAfter", 40);
+
+            configMock.ConfigValue("Robot.Ui.LogLevel", "Info");
 
             return configMock;
         }

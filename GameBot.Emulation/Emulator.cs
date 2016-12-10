@@ -1,25 +1,4 @@
-﻿/*
- * Game Boy Emulator
- * Copyright (C) 2008 Michael Birken
- * 
- * This file is part of Game Boy Emulator.
- *
- * Game Boy Emulator is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published 
- * by the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * Game Boy Emulator is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- */
-
-using GameBot.Core;
+﻿using GameBot.Core;
 using GameBot.Core.Data;
 using System;
 using System.Collections.Generic;
@@ -28,25 +7,39 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 using Emgu.CV;
-using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using GameBot.Core.Extensions;
 
 namespace GameBot.Emulation
 {
+    /// <summary>
+    /// Game Boy Emulator
+    /// Copyright (C) 2008 Michael Birken
+    /// 
+    /// This file is part of Game Boy Emulator.
+    ///
+    /// Game Boy Emulator is free software; you can redistribute it and/or modify
+    /// it under the terms of the GNU Lesser General Public License as published 
+    /// by the Free Software Foundation; either version 3 of the License, or
+    /// (at your option) any later version.
+    ///
+    /// Game Boy Emulator is distributed in the hope that it will be useful,
+    /// but WITHOUT ANY WARRANTY; without even the implied warranty of
+    /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    /// GNU Lesser General Public License for more details.
+    ///
+    /// You should have received a copy of the GNU Lesser General Public License
+    /// along with this program.  If not, see http://www.gnu.org/licenses/.
+    /// </summary>
     public class Emulator
     {
-        private const int _framesPerSecond = 60;
-        private const int _maxFramesSkipped = 10;
+        private const double _framesPerSecond = 59.73;
 
         private const int _displayWidth = GameBoyConstants.ScreenWidth;
         private const int _displayHeight = GameBoyConstants.ScreenHeight;
 
         private const int _framesAfterButton = 2;
-
-        private readonly Random _random = new Random();
+        
         private readonly X80 _cpu;
         private double _scanLineTicks;
         private readonly uint[] _pixels = new uint[_displayWidth * _displayHeight];
@@ -56,29 +49,14 @@ namespace GameBot.Emulation
 
         public bool Running { get; private set; }
         public int Frames { get; private set; }
-        public TimeSpan Time => TimeSpan.FromSeconds((double)Frames / _framesPerSecond);
+        public TimeSpan Time => TimeSpan.FromSeconds(Frames / _framesPerSecond);
         public Bitmap Display => _bitmap;
-
-        //public Mat DisplayMat
-        //{
-        //    get
-        //    {
-        //        byte[] buffer = _bitmap.ToByteArray(ImageFormat.Bmp);
-        //        var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
-        //        return new Mat(new Size(_displayWidth, _displayHeight), DepthType.Cv8U, 3, ptr, 3);
-        //    }
-        //}
-
+        
         public Game Game { get; private set; }
-        private Size DisplaySize => new Size(_displayWidth, _displayHeight);
 
-        private bool _anyButtonsPressed = false;
-        private readonly double _errorProbability;
-
-        public Emulator(double errorProbability = 0)
+        public Emulator()
         {
             _cpu = new X80();
-            _errorProbability = errorProbability;
 
             _graphics = Graphics.FromImage(new Bitmap(_displayWidth, _displayHeight));
             _graphics.CompositingQuality = CompositingQuality.HighSpeed;
@@ -101,7 +79,7 @@ namespace GameBot.Emulation
             Running = true;
 
             // strange effects appear in the first few frames , skip them
-            Execute(4);
+            ExecuteInternal(4);
         }
 
         private void UpdateModel(bool updateBitmap)
@@ -417,24 +395,16 @@ namespace GameBot.Emulation
         {
             _graphics.DrawImage(Display, 0, 0, _displayWidth, _displayHeight);
         }
-
-        public void ExecuteFrame()
+        
+        public void Execute(int frames)
         {
-            Execute(1);
+            ExecuteInternal(frames);
         }
 
-        public void ExecuteFrames(int n)
+        public void Execute(TimeSpan time)
         {
-            Execute(n);
-        }
-
-        public void Execute()
-        {
-            if (!_anyButtonsPressed)
-            {
-                ExecuteFrames(2);
-            }
-            _anyButtonsPressed = false;
+            int frames = GetExecutionDurationInFrames(time);
+            ExecuteInternal(frames);
         }
 
         public int GetExecutionDurationInFrames(TimeSpan time)
@@ -442,13 +412,7 @@ namespace GameBot.Emulation
             return (int)(time.TotalSeconds * _framesPerSecond);
         }
 
-        public void Execute(TimeSpan time)
-        {
-            int frames = (int)(time.TotalSeconds * _framesPerSecond);
-            Execute(frames);
-        }
-
-        private void Execute(int frames)
+        private void ExecuteInternal(int frames)
         {
             if (frames > 0)
             {
@@ -457,18 +421,7 @@ namespace GameBot.Emulation
                     UpdateModel(false);
                 }
                 UpdateModel(true);
-            }
-            RenderFrame();
-        }
-
-        private void ExecuteWithoutRendering(int frames)
-        {
-            if (frames > 0)
-            {
-                for (int i = 0; i < frames; i++)
-                {
-                    UpdateModel(false);
-                }
+                RenderFrame();
             }
         }
 
@@ -482,22 +435,14 @@ namespace GameBot.Emulation
             _cpu.KeyChanged(button, false);
         }
 
-        private bool IsError()
-        {
-            var value = _random.NextDouble();
-            return value < _errorProbability;
-        }
-
         public void Hit(Button button)
         {
-            if (Running && !IsError())
+            if (Running)
             {
-                _anyButtonsPressed = true;
-
                 PressButtonInternal(button);
-                Execute(_framesAfterButton);
+                ExecuteInternal(_framesAfterButton);
                 ReleaseButtonInternal(button);
-                Execute(_framesAfterButton);
+                ExecuteInternal(_framesAfterButton);
             }
         }
 
@@ -506,43 +451,37 @@ namespace GameBot.Emulation
             if (buttons == null) throw new ArgumentNullException(nameof(buttons));
             var buttonsList = buttons.ToList();
 
-            if (Running && !IsError())
+            if (Running)
             {
-                _anyButtonsPressed = true;
-
                 foreach (var button in buttonsList)
                 {
                     PressButtonInternal(button);
                 }
-                Execute(_framesAfterButton);
+                ExecuteInternal(_framesAfterButton);
 
                 foreach (var button in buttonsList)
                 {
                     ReleaseButtonInternal(button);
                 }
-                Execute(_framesAfterButton);
+                ExecuteInternal(_framesAfterButton);
             }
         }
 
         public void Press(Button button)
         {
-            if (Running && !IsError())
+            if (Running)
             {
-                _anyButtonsPressed = true;
-
                 PressButtonInternal(button);
-                Execute(_framesAfterButton);
+                //ExecuteInternal(_framesAfterButton);
             }
         }
 
         public void Release(Button button)
         {
-            if (Running && !IsError())
+            if (Running)
             {
-                _anyButtonsPressed = true;
-
                 ReleaseButtonInternal(button);
-                Execute(_framesAfterButton);
+                //ExecuteInternal(_framesAfterButton);
             }
         }
 

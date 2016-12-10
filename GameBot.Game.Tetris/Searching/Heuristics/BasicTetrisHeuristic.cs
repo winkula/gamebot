@@ -5,8 +5,37 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
 {
     public abstract class BasicTetrisHeuristic : IHeuristic
     {
+        protected int CalculatedAggregateHeight;
+        protected int CalculatedHoles;
+        protected int CalculatedBumpiness;
+        
         // Heuristic from here: https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
         public abstract double Score(GameState gameState);
+
+        protected void CalculateFast(Board board)
+        {
+            CalculatedAggregateHeight = 0;
+            CalculatedHoles = 0;
+            CalculatedBumpiness = 0;
+
+            int? lastHeight = null;
+
+            for (int x = 0; x < board.Width; x++)
+            {
+                int height = board.ColumnHeightUnchecked(x);
+
+                CalculatedAggregateHeight += height;
+
+                CalculatedHoles += board.ColumnHolesUnchecked(x);
+
+                if (lastHeight.HasValue)
+                {
+                    CalculatedBumpiness += Math.Abs(lastHeight.Value - height);
+                }
+
+                lastHeight = height;
+            }
+        }
 
         protected int Threshold(int value, int min)
         {
@@ -115,6 +144,17 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
             return aggregateHeight;
         }
 
+        public int AggregateHeightLastMultiple(Board board, int multiplicator)
+        {
+            int aggregateHeight = 0;
+            for (int x = 0; x < board.Width - 1; x++)
+            {
+                aggregateHeight += board.ColumnHeight(x);
+            }
+            aggregateHeight += board.ColumnHeight(board.Width - 1) * multiplicator;
+            return aggregateHeight;
+        }
+
         public int CompleteLines(Board board)
         {
             return board.CompletedLines;
@@ -125,7 +165,7 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
             int holes = 0;
             for (int x = 0; x < board.Width; x++)
             {
-                holes += board.ColumnHoles(x);
+                holes += board.ColumnHolesUnchecked(x);
             }
             return holes;
         }
@@ -135,6 +175,22 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
             int bumpiness = 0;
             int? lastHeight = null;
             for (int x = 0; x < board.Width; x++)
+            {
+                int height = board.ColumnHeight(x);
+                if (lastHeight.HasValue)
+                {
+                    bumpiness += Math.Abs(lastHeight.Value - height);
+                }
+                lastHeight = height;
+            }
+            return bumpiness;
+        }
+
+        public int BumpinessWithoutLastColumn(Board board)
+        {
+            int bumpiness = 0;
+            int? lastHeight = null;
+            for (int x = 0; x < board.Width - 1; x++)
             {
                 int height = board.ColumnHeight(x);
                 if (lastHeight.HasValue)

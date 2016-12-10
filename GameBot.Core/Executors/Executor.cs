@@ -29,13 +29,13 @@ namespace GameBot.Core.Executors
         public void HitWait(Button button, TimeSpan duration)
         {
             _actuator.Hit(button);
-            _clock.Sleep((int)duration.TotalMilliseconds);
+            _clock.Sleep(duration);
         }
 
         public void Hold(Button button, TimeSpan duration)
         {
             _actuator.Press(button);
-            _clock.Sleep((int) duration.TotalMilliseconds);
+            _clock.Sleep(duration);
             _actuator.Release(button);
         }
 
@@ -52,7 +52,7 @@ namespace GameBot.Core.Executors
             await Task.Run(() =>
             {
                 _actuator.Press(button);
-                _clock.Sleep((int)duration.TotalMilliseconds);
+                _clock.Sleep(duration);
                 _actuator.Release(button);
             });
         }

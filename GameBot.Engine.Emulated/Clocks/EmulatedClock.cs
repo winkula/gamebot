@@ -31,23 +31,32 @@ namespace GameBot.Engine.Emulated.Clocks
 
         public void Sleep(int miliseconds)
         {
-            var time = TimeSpan.FromMilliseconds(miliseconds);
-            var frames = _emulator.GetExecutionDurationInFrames(time);
+            if (miliseconds < 0) throw new ArgumentException("miliseconds can't be negative.");
 
+            var timeSpan = TimeSpan.FromMilliseconds(miliseconds);
+            var frames = _emulator.GetExecutionDurationInFrames(timeSpan);
+            SleepInternal(frames);
+        }
+
+        public void Sleep(TimeSpan timeSpan)
+        {
+            if (timeSpan < TimeSpan.Zero) throw new ArgumentException("timeSpan can't be negative.");
+
+            var frames = _emulator.GetExecutionDurationInFrames(timeSpan);
+            SleepInternal(frames);
+        }
+
+        private void SleepInternal(int frames)
+        {
             const int frameStep = 3;
-            for (int i = 0; i < frames; i += frameStep)
+            for (int i = frames; i > 0; i -= frameStep)
             {
+                int nextStep = Math.Min(frameStep, i);
                 lock (_emulator)
                 {
-                    _emulator.ExecuteFrames(frameStep);
+                    _emulator.Execute(nextStep);
                 }
             }
-
-            /*
-            lock (_emulator)
-            {
-                _emulator.Execute(time);
-            }*/
         }
     }
 }

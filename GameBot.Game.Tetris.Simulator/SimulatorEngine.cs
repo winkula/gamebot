@@ -22,6 +22,7 @@ namespace GameBot.Game.Tetris.Simulator
 
         // in ms
         public int PauseTime { get; set; }
+        public int FrameUpdateDelay { get; set; }
 
         public SimulatorEngine(ISearch search, TetrisSimulator simulator)
         {
@@ -30,6 +31,8 @@ namespace GameBot.Game.Tetris.Simulator
 
             _search = search;
             _simulator = simulator;
+
+            FrameUpdateDelay = 60;
         }
 
         public void Run()
@@ -39,7 +42,7 @@ namespace GameBot.Game.Tetris.Simulator
             int round = 0;
             while (true)
             {
-                const int updateEvery = 60;
+                int updateEvery = FrameUpdateDelay;
                 try
                 {
                     if (round % updateEvery == 0)

@@ -11,9 +11,11 @@ using System.IO;
 using System.Linq;
 using GameBot.Core.Data;
 using GameBot.Core.Extensions;
+using GameBot.Core.Quantizers;
 using GameBot.Emulation;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
+using GameBot.Game.Tetris.Searching.Heuristics;
 
 namespace GameBot.Test.Misc
 {
@@ -21,6 +23,78 @@ namespace GameBot.Test.Misc
     public class MaethuTests
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        [Ignore]
+        [Test]
+        public void GenerateImagesForDoc()
+        {
+            var testData0500 = TestDataFactory.Data.Single(x => x.ImageKey == "0500");
+            //var testData0413 = TestDataFactory.Data.Single(x => x.ImageKey == "0413");
+            
+            var configMock = TestHelper.GetFakeConfig();
+            //var quantizer = new Quantizer(configMock.Object);
+
+            // simple threshold
+            IQuantizer quantizer = new SimpleThresholdQuantizer { Threshold = 150 };
+            quantizer.Keypoints = testData0500.Keypoints;
+            var quantizedImage = quantizer.Quantize(testData0500.Image);
+            //TestHelper.Show(quantizedImage);
+            TestHelper.Save(quantizedImage, "threshold_simple.png");
+
+            // adaptive threshold
+            quantizer = new Quantizer(configMock.Object) { ThresholdBlockSize = 17, ThresholdConstant = 6 };
+            quantizer.Keypoints = testData0500.Keypoints;
+            quantizedImage = quantizer.Quantize(testData0500.Image);
+            //TestHelper.Show(quantizedImage);
+            TestHelper.Save(quantizedImage, "threshold_adaptive.png");
+            
+            // warp
+            quantizer = new WarpOnlyQuantizer();
+            quantizer.Keypoints = testData0500.Keypoints;
+            quantizedImage = quantizer.Quantize(testData0500.Image);
+            //TestHelper.Show(quantizedImage);
+            TestHelper.Save(quantizedImage, "warp_result.png");
+
+            // morphological
+            quantizer = new MorphologyQuantizer(configMock.Object) { ThresholdBlockSize = 17, ThresholdConstant = 6 };
+            quantizer.Keypoints = testData0500.Keypoints;
+            quantizedImage = quantizer.Quantize(testData0500.Image);
+            //TestHelper.Show(quantizedImage);
+            TestHelper.Save(quantizedImage, "opening_result.png");
+        }
+        
+        [Ignore]
+        [Test]
+        public void TestManyScorings()
+        {
+            var gameStates = Enumerable.Range(0, 22 * 22 * 7 * 22)
+                .Select(x => new Board().Random())
+                .Select(x => new GameState(x))
+                .ToList();
+
+            var heuristic = new YiyuanLeeHeuristic();
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            foreach (var gs in gameStates)
+            {
+                var score = heuristic.Score(gs);
+            }
+
+            sw.Stop();
+            Debug.WriteLine(sw.ElapsedMilliseconds);
+        }
+
+        [Ignore]
+        [Test]
+        public void GenerateGameOverReferenceImage()
+        {
+            var configMock = TestHelper.GetFakeConfig();
+
+            var screenshot = TestHelper.GetScreenshot("Screenshots/gameover.png", new MorphologyQuantizer(configMock.Object));
+            TestHelper.Save(screenshot, "gameover_morphological.png");
+        }
 
         [Ignore]
         [Test]
@@ -32,7 +106,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
@@ -40,7 +114,7 @@ namespace GameBot.Test.Misc
             for (int i = 0; i < 14; i++)
             {
                 emulator.Show();
-                emulator.ExecuteFrames(53);
+                emulator.Execute(53);
             }
         }
 
@@ -54,7 +128,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
@@ -64,7 +138,7 @@ namespace GameBot.Test.Misc
             for (int i = 0; i < 14; i++)
             {
                 emulator.Show();
-                emulator.ExecuteFrames(3);
+                emulator.Execute(3);
             }
         }
 
@@ -78,7 +152,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Right);
@@ -91,7 +165,36 @@ namespace GameBot.Test.Misc
             for (int i = 0; i < 14; i++)
             {
                 emulator.Show();
-                emulator.ExecuteFrames(11);
+                emulator.Execute(11);
+            }
+        }
+        
+        [Ignore]
+        [Test]
+        public void TestHeartModeSpeed()
+        {
+            var romLoader = new RomLoader();
+            var rom = romLoader.Load("Roms/tetris.gb");
+
+            var emulator = new Emulator();
+            emulator.Load(rom);
+
+            emulator.Execute(125);
+            emulator.Press(Button.Down);
+            emulator.Hit(Button.Start);
+            emulator.Release(Button.Down);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Right);
+            emulator.Hit(Button.Down);
+            emulator.Hit(Button.Start);
+
+            for (int i = 0; i < 14; i++)
+            {
+                emulator.Show();
+                emulator.Execute(4);
             }
         }
 
@@ -105,7 +208,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Right);
@@ -120,7 +223,7 @@ namespace GameBot.Test.Misc
             for (int i = 0; i < 14; i++)
             {
                 emulator.Show();
-                emulator.ExecuteFrames(3);
+                emulator.Execute(3);
             }
         }
 
@@ -134,7 +237,7 @@ namespace GameBot.Test.Misc
             var emulator = new Emulator();
             emulator.Load(rom);
 
-            emulator.ExecuteFrames(125);
+            emulator.Execute(125);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
             emulator.Hit(Button.Start);
@@ -144,17 +247,17 @@ namespace GameBot.Test.Misc
             emulator.Hit(Button.Right);
             emulator.Hit(Button.Right);
             emulator.Press(Button.Down);
-            emulator.ExecuteFrames(3 * 17);
+            emulator.Execute(3 * 17);
             emulator.Release(Button.Down);
-            emulator.ExecuteFrames(2);
+            emulator.Execute(2);
             
 
             // S
             emulator.Hit(Button.Right);
             emulator.Press(Button.Down);
-            emulator.ExecuteFrames(3 * 17);
+            emulator.Execute(3 * 17);
             emulator.Release(Button.Down);
-            emulator.ExecuteFrames(2);
+            emulator.Execute(2);
 
             // O
             emulator.Hit(Button.Left);
@@ -162,29 +265,51 @@ namespace GameBot.Test.Misc
             emulator.Hit(Button.Left);
             emulator.Hit(Button.Left);
             emulator.Press(Button.Down);
-            emulator.ExecuteFrames(3 * 17);
+            emulator.Execute(3 * 17);
             emulator.Release(Button.Down);
-            emulator.ExecuteFrames(2);
+            emulator.Execute(2);
             
             // T
             emulator.Hit(Button.Right);
             emulator.Hit(Button.Right);
             emulator.Hit(Button.Right);
             emulator.Press(Button.Down);
-            emulator.ExecuteFrames(3 * 17);
+            emulator.Execute(3 * 17);
             emulator.Release(Button.Down);
-            emulator.ExecuteFrames(2);
+            emulator.Execute(2);
 
             // J
             emulator.Hit(Button.A);
             emulator.Hit(Button.Left);
             emulator.Press(Button.Down);
-            emulator.ExecuteFrames(3 * 15);
+            emulator.Execute(3 * 15);
             emulator.Release(Button.Down);
 
             emulator.Show();
-            emulator.ExecuteFrames(93);
+            emulator.Execute(93);
             emulator.Show();
+        }
+
+        [Ignore]
+        [Test]
+        public void TestEntryDelayDuration()
+        {
+            var romLoader = new RomLoader();
+            var rom = romLoader.Load("Roms/tetris.gb");
+
+            var emulator = new Emulator();
+            emulator.Load(rom);
+
+            emulator.Execute(125);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+            emulator.Hit(Button.Start);
+            
+            emulator.Execute(16 * 53); // just landed after this
+            emulator.Execute(53); // placed
+            emulator.Execute(3);
+            emulator.Show();
+            return;
         }
 
         [Ignore]
@@ -265,6 +390,7 @@ namespace GameBot.Test.Misc
             pieceMatcher.GetProbabilityNextPiece(screenshot, Tetrimino.I);
         }
 
+        [Ignore]
         [Test]
         public void NoiseTests()
         {

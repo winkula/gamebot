@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 
@@ -28,12 +30,10 @@ namespace GameBot.Game.Tetris.Data
         {
             get
             {
-                if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
                 return (Columns[x] & (1 << y)) > 0;
             }
             set
             {
-                if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
                 if (value)
                 {
                     // set one bit
@@ -133,21 +133,29 @@ namespace GameBot.Game.Tetris.Data
 
         public bool IsOccupied(int x, int y)
         {
-            return this[x, y] == true;
+            if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
+
+            return this[x, y];
         }
 
         public bool IsFree(int x, int y)
         {
+            if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
+
             return this[x, y] == false;
         }
 
         public void Occupy(int x, int y)
         {
+            if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
+
             this[x, y] = true;
         }
 
         public void Free(int x, int y)
         {
+            if (!SquareExists(x, y)) throw new ArgumentException($"square with coordinates {x}, {y} not in board");
+
             this[x, y] = false;
         }
 
@@ -157,12 +165,30 @@ namespace GameBot.Game.Tetris.Data
 
             return BoardLookups.Instance.GetColumnHeight(Columns[x]);
         }
+        
+        public int ColumnHeightUnchecked(int x)
+        {
+            return BoardLookups.Instance.GetColumnHeight(Columns[x]);
+        }
 
         public int ColumnHoles(int x)
         {
             if (x >= Width) throw new ArgumentException("x must be lower than the width of the board");
 
             return BoardLookups.Instance.GetColumnHoles(Columns[x]);
+        }
+        
+        public int ColumnHolesUnchecked(int x)
+        {
+            return BoardLookups.Instance.GetColumnHoles(Columns[x]);
+        }
+
+        public void FillColumn(int x, int height)
+        {
+            if (x < 0 || x >= Width) throw new ArgumentException();
+            if (height < 0 || height > Height) throw new ArgumentException();
+
+            Columns[x] = ~(~0 << height);
         }
 
         public bool SquareExists(int x, int y)
@@ -181,6 +207,17 @@ namespace GameBot.Game.Tetris.Data
                 if (IsOccupied(positionX, positionY)) throw new ArgumentException("Square is already occupied");
 
                 Occupy(positionX, positionY);
+            }
+            Pieces++;
+        }
+
+        public void PlaceUnchecked(Piece piece)
+        {
+            foreach (var block in piece.Shape.Body)
+            {
+                int positionX = Coordinates.PieceOrigin.X + piece.X + block.X;
+                int positionY = Coordinates.PieceOrigin.Y + piece.Y + block.Y;
+                this[positionX, positionY] = true; // occupy unchecked
             }
             Pieces++;
         }
@@ -212,6 +249,7 @@ namespace GameBot.Game.Tetris.Data
             for (int x = 0; x < Width; x++)
             {
                 // clear square on completed line
+                if (!SquareExists(x, yCompleteLine)) throw new ArgumentException($"square with coordinates {x}, {yCompleteLine} not in board");
                 this[x, yCompleteLine] = false;
 
                 // copy from above
@@ -275,6 +313,45 @@ namespace GameBot.Game.Tetris.Data
         public bool CanDrop(Piece piece)
         {
             return DropDistance(piece) >= 0;
+        }
+
+        // this is used in multiplayer mode
+        public void InsertLinesBottom(int numLines, int holePosition)
+        {
+            if (numLines < 0 || numLines > 4) throw new ArgumentException("numLines must be between 0 and 4");
+            if (holePosition < 0 || holePosition >= Width) throw new ArgumentException("holePosition must be a valid x coordinate on the board");
+
+            if (numLines > 0)
+            {
+                // move board up
+                for (int x = 0; x < Width; x++)
+                {
+                    Columns[x] <<= numLines;
+                }
+
+                // insert new lines
+                for (int y = 0; y < numLines; y++)
+                {
+                    for (int x = 0; x < Width; x++)
+                    {
+                        if (x != holePosition)
+                        {
+                            Occupy(x, y);
+                        }
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<Point> GetHorizon(int height)
+        {
+            if (height < 0) throw new ArgumentException("height must be non negative");
+
+            for (int x = 0; x < Width; x++)
+            {
+                var columnHeight = ColumnHeight(x);
+                yield return new Point(x, columnHeight + height);
+            }
         }
 
         public override int GetHashCode()

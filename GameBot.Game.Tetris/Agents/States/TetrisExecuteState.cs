@@ -12,14 +12,11 @@ namespace GameBot.Game.Tetris.Agents.States
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly TetrisAgent _agent;
-        
-        private readonly Queue<Move> _pendingMoves;
+
+        private readonly ICollection<ICollection<Move>> _pendingMoves;
         private readonly Piece _tracedPiece;
-        private readonly TimeSpan _tracedPieceTimestamp;
 
-        private readonly bool _checkCommands;
-
-        public TetrisExecuteState(TetrisAgent agent, Queue<Move> pendingMoves, Piece tracedPiece, TimeSpan tracedPieceTimestamp)
+        public TetrisExecuteState(TetrisAgent agent, IList<Move> pendingMoves, Piece tracedPiece)
         {
             if (agent == null) throw new ArgumentNullException(nameof(agent));
             if (pendingMoves == null) throw new ArgumentNullException(nameof(pendingMoves));
@@ -31,11 +28,36 @@ namespace GameBot.Game.Tetris.Agents.States
             if (agent.GameState.NextPiece == null) throw new ArgumentNullException(nameof(agent.GameState.NextPiece));
 
             _agent = agent;
-            _pendingMoves = pendingMoves;
-            _tracedPiece = tracedPiece;
-            _tracedPieceTimestamp = tracedPieceTimestamp;
 
-            _checkCommands = _agent.Config.Read("Game.Tetris.Check.Enabled", false);
+            _pendingMoves = GetMovesParallel(pendingMoves);
+            _tracedPiece = new Piece(tracedPiece);
+        }
+
+        private ICollection<ICollection<Move>> GetMovesParallel(IList<Move> moves)
+        {
+            var movesParallel = new List<ICollection<Move>>();
+
+            var rotations = moves.Where(x => x == Move.Rotate || x == Move.RotateCounterclockwise).ToList();
+            var translations = moves.Where(x => x == Move.Left || x == Move.Right).ToList();
+
+            for (int i = 0; i < Math.Max(rotations.Count, translations.Count); i++)
+            {
+                var movesCombined = new List<Move>();
+
+                if (rotations.Count > i)
+                {
+                    movesCombined.Add(rotations[i]);
+                }
+                if (translations.Count > i)
+                {
+                    movesCombined.Add(translations[i]);
+                }
+
+                movesParallel.Add(movesCombined);
+            }
+
+            movesParallel.Add(new List<Move> { Move.Drop });
+            return movesParallel;
         }
 
         public void Extract()
@@ -45,115 +67,98 @@ namespace GameBot.Game.Tetris.Agents.States
 
         public void Play()
         {
-            // next move to execute
-            var move = _pendingMoves.Dequeue();
-
-            if (move == Move.Drop)
+            foreach (var parallelMoves in _pendingMoves)
             {
-                if (_pendingMoves.Any()) throw new Exception("Drop must be the last move to execute");
-                
-                ExecuteDrop();
-                SetStateAnalyze();
-            }
-            else
-            {
-                Execute(move);
+                // next move to execute
+                if (!parallelMoves.Any()) throw new Exception("Must contain any moves");
 
-                if (_checkCommands)
+                if (parallelMoves.All(x => x == Move.Drop))
                 {
-                    SetStateCheck(move);
+                    ExecuteDrop();
+                    SetStateAnalyze();
+                    return;
                 }
-                else
-                {
-                    SetStatePseudoCheck(move);
-                }
+
+                Execute(parallelMoves);
             }
         }
 
         private void ExecuteDrop()
         {
+            // when we were executing button presses, the piece has fallen some rows
+            // this is especially relevant in higher levels when speed is higher
+            // we let the piece fall
+            var alreadyPastTime = _agent.GetExecutionDuration(_pendingMoves.Count) + _agent.LessFallTimeBeforeDrop;
+            var alreadyFallenDistance = TetrisLevel.GetFallDistance(_agent.GameState.Level, alreadyPastTime, _agent.GameState.HeartMode);
+            
             // calculates drop distance, score and new level
             var linesBefore = _agent.GameState.Lines;
-            var dropDistance = _agent.GameState.Drop();
-            var dropDuration = TetrisTiming.GetDropDuration(dropDistance);
             int linesRemoved = 0;
+            // we add one because the current line needs also to be dropped
+            var dropDistance = Math.Max(1.0 + _agent.GameState.Drop() - alreadyFallenDistance, 0.0);
+            var dropDuration = TetrisTiming.GetDropDuration(dropDistance);
+            var waitDuration = TetrisTiming.EntryDelayDuration;
 
             if (_agent.GameState.Lines > linesBefore)
             {
-                // lines were removed, add extra time
-                dropDuration += TetrisTiming.LineClearDuration;
-
+                // lines were removed
                 linesRemoved = _agent.GameState.Lines - linesBefore;
-            }
-            
-            // we subtract a time padding, because we dont want to wait the
-            // theoretical drop duration, but the real drop duration
-            // (we don't want to miss an important frame in analyze state)  
-            var waitDuration = dropDuration - Timing.DropDurationPaddingTime;
-            if (waitDuration < TimeSpan.Zero)
-            {
-                waitDuration = TimeSpan.Zero;
+
+                // additinally wait the line clear duration
+                waitDuration += TetrisTiming.LineClearDuration;
             }
 
-            _logger.Info($"Execute Drop (new score {_agent.GameState.Score}, {linesRemoved} lines removed, sleep {waitDuration.Milliseconds} ms)");
+            _logger.Info($"Execute Drop (new score {_agent.GameState.Score}, {linesRemoved} lines removed, drop lasts {dropDuration.Milliseconds} ms)");
 
             // execute the drop blocking
             // we must wait until the drop is ended before we can continue
             // TODO: here we could do some precalculations for the next search (and execute the drop asynchronous)???
-            _agent.Executor.Hold(Button.Down, waitDuration);
+            _agent.Executor.Hold(Button.Down, dropDuration);
+            _logger.Info("Drop executed");
+
+            // sleep and wait until the lines are cleared
+            WaitDrop(waitDuration);
         }
-        
-        private void Execute(Move move)
+
+        private void WaitDrop(TimeSpan duration)
         {
-            _logger.Info($"Execute {move}");
-            _agent.TracedPiece = new Piece(_tracedPiece).Apply(move);
-
-            var gameStateSimulation = new GameState(_agent.GameState);
-            switch (move)
+            // we subtract a time padding, because we dont want to wait the
+            // theoretical drop duration, but the real drop duration
+            // (we don't want to miss an important frame in analyze state)  
+            var waitDuration = duration - _agent.LessWaitTimeAfterDrop;
+            if (waitDuration > TimeSpan.Zero)
             {
-                case Move.Left:
-                    _agent.Executor.Hit(Button.Left);
-                    gameStateSimulation.Left();
-                    break;
-
-                case Move.Right:
-                    _agent.Executor.Hit(Button.Right);
-                    gameStateSimulation.Right();
-                    break;
-
-                case Move.Rotate:
-                    _agent.Executor.Hit(Button.A); // clockwise rotation
-                    gameStateSimulation.Rotate();
-                    break;
-
-                case Move.RotateCounterclockwise:
-                    _agent.Executor.Hit(Button.B); // counterclockwise rotation
-                    gameStateSimulation.RotateCounterclockwise();
-                    break;
-
-                case Move.Drop:
-                    throw new ApplicationException("no drop allowed here!");
+                _agent.Clock.Sleep(waitDuration);
             }
         }
 
-        private void SetStateCheck(Move lastMove)
+        private void Execute(ICollection<Move> moves)
         {
-            if (lastMove == Move.Drop) throw new Exception("Can't check drop");
+            _logger.Info($"Execute {string.Join(", ", moves)}");
 
-            _agent.SetState(new TetrisCheckState(_agent, lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
+            _agent.Executor.Hit(moves.Select(x => x.ToButton()));
+
+            var gameStateSimulation = new GameState(_agent.GameState);
+
+            foreach (var move in moves)
+            {
+                if (move == Move.Drop) throw new Exception("Drop not allowed here");
+
+                _tracedPiece.Apply(move);
+                move.Apply(gameStateSimulation);
+            }
+
+            UpdateCurrentPiece(_tracedPiece);
         }
 
-        private void SetStatePseudoCheck(Move lastMove)
+        private void UpdateCurrentPiece(Piece newPiece)
         {
-            if (lastMove == Move.Drop) throw new Exception("Can't check drop");
-
-            _agent.SetStateAndContinue(new TetrisPseudoCheckState(_agent, lastMove, _pendingMoves, _tracedPiece, _tracedPieceTimestamp));
+            _agent.TracedPiece = newPiece;
+            _agent.GameState.Piece = new Piece(newPiece);
         }
 
         private void SetStateAnalyze()
         {
-            if (_pendingMoves.Any()) throw new Exception("Not all moves were executed");
-
             _agent.SetState(new TetrisAnalyzeState(_agent, _agent.GameState.Piece.Tetrimino));
         }
     }
