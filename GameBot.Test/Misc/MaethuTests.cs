@@ -76,7 +76,7 @@ namespace GameBot.Test.Misc
 
             var sw = new Stopwatch();
             sw.Start();
-
+            
             foreach (var gs in gameStates)
             {
                 var score = heuristic.Score(gs);

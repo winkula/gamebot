@@ -40,6 +40,11 @@ namespace GameBot.Game.Tetris.Simulator
                     {
                         break;
                     }
+
+                    if (_simulator.GameState.Score >= 999999)
+                    {
+                        break;
+                    }
                 }
                 catch (GameOverException)
                 {
