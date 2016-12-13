@@ -130,14 +130,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GeneticAlgorithmProgram.cs" />
-    <Compile Include="SimulatorProgram.cs" />
-    <Compile Include="TetrisFitnessFunction.cs" />
     <Compile Include="SimulatorEngine.cs" />
-    <Compile Include="Package.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TetrisSimulator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

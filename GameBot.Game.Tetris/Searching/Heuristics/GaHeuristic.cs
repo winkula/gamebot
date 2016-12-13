@@ -22,10 +22,10 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
         {
             CalculateFast(gameState.Board);
             return
-                -_heightWeigth * CalculatedAggregateHeight
+                _heightWeigth * CalculatedAggregateHeight
                 + _linesWeight * gameState.Lines
-                - _holesWeight * CalculatedHoles
-                - _bumpinessWeight * CalculatedBumpiness;
+                + _holesWeight * CalculatedHoles
+                + _bumpinessWeight * CalculatedBumpiness;
         }
     }
 }
