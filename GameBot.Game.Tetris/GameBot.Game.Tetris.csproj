@@ -140,6 +140,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\StartCommand.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\HighscoreCommand.cs" />
+    <Compile Include="Commands\SelectLevelCommand.cs" />
     <Compile Include="Extraction\ScreenExtractor.cs" />
     <Compile Include="Extraction\IScreenExtractor.cs" />
     <Compile Include="States\BaseState.cs" />

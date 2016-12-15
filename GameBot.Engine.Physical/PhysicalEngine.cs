@@ -1,9 +1,6 @@
 ﻿using Emgu.CV;
 using GameBot.Core;
-using GameBot.Core.Data;
-using System;
 using GameBot.Core.Engines;
-using GameBot.Core.Exceptions;
 using NLog;
 
 namespace GameBot.Engine.Physical
@@ -18,44 +15,19 @@ namespace GameBot.Engine.Physical
         {
         }
 
-        public override void Step(Action<Mat> showImage = null, Action<Mat> showProcessedImage = null)
+        protected override Mat Capture()
         {
-            // get image as photo of the gameboy screen (input)
             Mat image = Camera.Capture(_lastImage);
             _lastImage = image;
-            TimeSpan time = Clock.Time;
 
-            // process image
-            Mat processed = Quantizer.Quantize(image);
+            return image;
+        }
 
-            showImage?.Invoke(image);
+        protected override void OnGameOver()
+        {
+            _logger.Warn("Game over");
 
-            if (Play)
-            {
-                IScreenshot screenshot = new EmguScreenshot(processed, time);
-                screenshot.OriginalImage = image;
-
-                try
-                {
-                    // extracts the game state
-                    Agent.Extract(screenshot);
-
-                    processed = Agent.Visualize(processed);
-                    showProcessedImage?.Invoke(processed);
-
-                    // presses the buttons
-                    Agent.Play(Executor);
-                }
-                catch (GameOverException)
-                {
-                    _logger.Warn("Game over");
-                    Reset();
-                }
-            }
-            else
-            {
-                showProcessedImage?.Invoke(processed);
-            }
+            base.OnGameOver();
         }
     }
 }

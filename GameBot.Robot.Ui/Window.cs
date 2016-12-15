@@ -2,9 +2,7 @@
 using Emgu.CV.UI;
 using GameBot.Core;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using NLog;
@@ -26,14 +24,9 @@ namespace GameBot.Robot.Ui
         private readonly IEngine _engine;
         private readonly ICamera _camera;
         private readonly IActuator _actuator;
-        private readonly IQuantizer _quantizer;
 
-        private readonly KeyHandler _keyHandler = new KeyHandler();
-
-        private bool _enabledKeypoints;
-        private const int _maxKeypointCount = 4;
-        private readonly List<Point> _keypoints = new List<Point>();
-        //private List<Point> _keypointsApplied = new List<Point>();
+        private readonly KeyHandler _keyHandler;
+        private readonly Calibrator _calibrator;
 
         public Window(IClock clock, IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
         {
@@ -42,7 +35,9 @@ namespace GameBot.Robot.Ui
             _engine = engine;
             _camera = camera;
             _actuator = actuator;
-            _quantizer = quantizer;
+
+            _keyHandler = new KeyHandler();
+            _calibrator = new Calibrator(config, quantizer);
 
             InitializeComponent();
 
@@ -73,10 +68,10 @@ namespace GameBot.Robot.Ui
             _keyHandler.OnKeyDown(Keys.R, () =>
             {
                 _logger.Info("Reset");
-                _engine.Reset();
+                _engine.Play = false;
+                _engine.Send("reset");
             });
-            _keyHandler.OnKeyDown(Keys.K, ClearKeypoints);
-            _keyHandler.OnKeyUp(Keys.K, SaveKeypoints);
+            _keyHandler.OnKeyDown(Keys.K, () => _calibrator.ClearKeypoints());
 
             _keyHandler.OnKeyDown(Keys.Up, () => _actuator.Hit(Button.Up));
             _keyHandler.OnKeyDown(Keys.Down, () => _actuator.Press(Button.Down));
@@ -89,15 +84,21 @@ namespace GameBot.Robot.Ui
 
             _keyHandler.OnKeyDown(Keys.Enter, () => _actuator.Hit(Button.Start));
             _keyHandler.OnKeyDown(Keys.Back, () => _actuator.Hit(Button.Select));
+
+            _keyHandler.OnKeyDown(Keys.L, () => _engine.Send("select level"));
+            _keyHandler.OnKeyDown(Keys.H, () => _engine.Send("highscore"));
+            _keyHandler.OnKeyDown(Keys.M, () => _engine.Send("menu"));
         }
 
         private void RegisterEvents()
         {
+            Load += (s, e) => new Thread(Run) { IsBackground = true }.Start();
+
             FormClosed += (sender, args) => Application.Exit();
-            Load += Loaded;
             KeyDown += (s, e) => _keyHandler.KeyDown(e.KeyCode);
             KeyUp += (s, e) => _keyHandler.KeyUp(e.KeyCode);
-            ImageBoxOriginal.MouseClick += MouseClicked;
+
+            ImageBoxOriginal.MouseClick += (s, e) => _calibrator.AddKeypoint(new Point(e.X, e.Y));
         }
 
         private void InitImageBoxes()
@@ -147,53 +148,6 @@ namespace GameBot.Robot.Ui
             CenterToScreen();
         }
 
-        private void ClearKeypoints()
-        {
-            // clear
-            _logger.Info("Reset keypoints");
-            _keypoints.Clear();
-            _enabledKeypoints = true;
-        }
-
-        private void SaveKeypoints()
-        {
-            // save
-            if (_keypoints.Count >= _maxKeypointCount)
-            {
-                _logger.Info("Keypoints: " + string.Join(",", _keypoints));
-
-                var keypointsArray = new[]
-                {
-                    _keypoints[0].X, _keypoints[0].Y,
-                    _keypoints[1].X, _keypoints[1].Y,
-                    _keypoints[2].X, _keypoints[2].Y,
-                    _keypoints[3].X, _keypoints[3].Y
-                };
-
-                _quantizer.Keypoints = _keypoints.ToList();
-
-                _config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsArray));
-                _config.Save();
-
-                _logger.Info("Saved configuration");
-            }
-            _enabledKeypoints = false;
-        }
-
-        private void MouseClicked(object sender, MouseEventArgs e)
-        {
-            if (_enabledKeypoints && _keypoints.Count < _maxKeypointCount)
-            {
-                _keypoints.Add(new Point(e.X, e.Y));
-            }
-        }
-
-        private void Loaded(object sender, EventArgs e)
-        {
-            var mainThread = new Thread(Run) { IsBackground = true };
-            mainThread.Start();
-        }
-
         private void Run()
         {
             try
@@ -222,12 +176,13 @@ namespace GameBot.Robot.Ui
             {
                 ImageBoxOriginal.Image = original;
             }
-            catch (ObjectDisposedException)
+            catch (ObjectDisposedException ex)
             {
+                // ignore in release version
+                _logger.Error(ex);
 #if DEBUG
                 throw;
 #endif
-                // ignore in release version
             }
         }
 
@@ -237,12 +192,13 @@ namespace GameBot.Robot.Ui
             {
                 ImageBoxProcessed.Image = processed;
             }
-            catch (ObjectDisposedException)
+            catch (ObjectDisposedException ex)
             {
+                // ignore in release version
+                _logger.Error(ex);
 #if DEBUG
                 throw;
 #endif
-                // ignore in release version
             }
         }
 

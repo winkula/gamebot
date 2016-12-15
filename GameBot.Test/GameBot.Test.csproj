@@ -157,6 +157,7 @@
     <Compile Include="Engine\Physical\Quantizers\MorphologyQuantizerTests.cs" />
     <Compile Include="Extensions\MockExtensions.cs" />
     <Compile Include="Game\Tetris\AgentTests.cs" />
+    <Compile Include="Game\Tetris\Commands\HighscoreCommandTests.cs" />
     <Compile Include="Game\Tetris\Extraction\ScreenExtractorTests.cs" />
     <Compile Include="Game\Tetris\Extraction\ExtractionComparisonTests.cs" />
     <Compile Include="Game\Tetris\Extraction\Extractors\MorphologyExtractorTests.cs" />

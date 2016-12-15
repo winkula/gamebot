@@ -28,10 +28,11 @@ namespace GameBot.Core
         /// <param name="showProcessedImage">Callback with the processed image.</param>
         /// <returns>The engines result.</returns>
         void Step(Action<Mat> showImage = null, Action<Mat> showProcessedImage = null);
-
+        
         /// <summary>
-        /// Resets the underlying agent.
+        /// Sends a message to the underlying agent.
         /// </summary>
-        void Reset();
+        /// <param name="message">The message to send.</param>
+        void Send(string message);
     }
 }

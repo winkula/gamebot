@@ -6,12 +6,13 @@ namespace GameBot.Core.Quantizers
 {
     public class WarpOnlyQuantizer : CalibrateableQuantizer
     {
-        private readonly ThresholdType _thresholdType = ThresholdType.Binary;
-
+        private readonly ThresholdType _thresholdType;
+        
         public double Threshold { get; set; }
 
         public WarpOnlyQuantizer()
         {
+            _thresholdType = ThresholdType.Binary;
             Threshold = 255.0 / 2;
         }
 

@@ -10,7 +10,7 @@ namespace GameBot.Core.Quantizers
     {
         protected Mat Transform { get; private set; }
 
-        private IList<Point> _keypoints;
+        private ICollection<Point> _keypoints;
         public IEnumerable<Point> Keypoints
         {
             get

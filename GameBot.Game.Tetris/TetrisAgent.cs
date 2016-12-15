@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
@@ -7,6 +8,7 @@ using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Core.Exceptions;
 using GameBot.Core.Extensions;
+using GameBot.Game.Tetris.Commands;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Extractors;
@@ -15,7 +17,6 @@ using GameBot.Game.Tetris.States;
 
 namespace GameBot.Game.Tetris
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class TetrisAgent : IAgent
     {
         private readonly bool _visualize;
@@ -38,11 +39,18 @@ namespace GameBot.Game.Tetris
         // data used by states
         public GameState GameState { get; set; }
 
-        // config used by states
-        public int ExtractionSamples { get; }
-        public bool IsMultiplayer { get; }
-        public bool CheckEnabled { get; }
-        
+        #region config
+
+        public bool IsVisualize => Config.Read("Game.Tetris.Visualize", false);
+        public int StartLevel => Config.Read("Game.Tetris.StartLevel", 0);
+        public int ExtractionSamples => Config.Read("Game.Tetris.Extractor.Samples", 1);
+        public bool IsMultiplayer => Config.Read("Game.Tetris.Multiplayer", false);
+        public bool CheckEnabled => Config.Read("Game.Tetris.Check.Enabled", false);
+        public bool IsHeartMode => Config.Read("Game.Tetris.HeartMode", false);
+        public bool IsStartFromGameOver => Config.Read("Game.Tetris.StartFromGameOver", false);
+
+        #endregion
+
         #region timing
 
         // timing config
@@ -70,21 +78,18 @@ namespace GameBot.Game.Tetris
         public Tetrimino? ExtractedNextPiece { private get; set; }
         public int SearchHeight { private get; set; }
 
-        public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExtractor extractor, IBoardExtractor boardExtractor, IScreenExtractor screenExtractor, ISearch search)
+        public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExecutor exceutor, IExtractor extractor, IBoardExtractor boardExtractor, IScreenExtractor screenExtractor, ISearch search)
         {
-            _visualize = config.Read("Game.Tetris.Visualize", false);
-
             Config = config;
             Clock = clock;
             Quantizer = quantizer;
+            Executor = exceutor;
             Extractor = extractor;
             BoardExtractor = boardExtractor;
             ScreenExtractor = screenExtractor;
             Search = search;
-            
-            ExtractionSamples = config.Read("Game.Tetris.Extractor.Samples", 1);
-            IsMultiplayer = config.Read("Game.Tetris.Multiplayer", false);
-            CheckEnabled = config.Read("Game.Tetris.Check.Enabled", false);
+
+            _visualize = IsVisualize;
 
             // init timing config
             _hitTime = TimeSpan.FromMilliseconds(Config.Read<int>("Robot.Actuator.Hit.Time"));
@@ -92,30 +97,26 @@ namespace GameBot.Game.Tetris
             MoreTimeToAnalyze = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.MoreTimeToAnalyze"));
             LessFallTimeBeforeDrop = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.LessFallTimeBeforeDrop"));
             LessWaitTimeAfterDrop = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.LessWaitTimeAfterDrop"));
-                
+
             Init();
         }
 
         private void Init()
         {
             ResetVisualization();
-
-            var startLevel = Config.Read("Game.Tetris.StartLevel", 0);
-            var heartMode = Config.Read("Game.Tetris.HeartMode", false);
-            var startFromGameOver = Config.Read("Game.Tetris.StartFromGameOver", false);
-
+            
             // init game state and agent state
             if (IsMultiplayer)
             {
-                // TODO: does the level even play a role in multiplayer mode?
-                GameState = new GameState { StartLevel = startLevel, HeartMode = heartMode };
-                SetState(new ReadyState(this));
+                // TODO: is it correct that the game in multiplayer mode starts always in level 0?
+                GameState = new GameState { StartLevel = 0, HeartMode = false };
             }
             else
             {
-                GameState = new GameState { StartLevel = startLevel, HeartMode = heartMode };
-                SetState(new StartState(this, startLevel, heartMode, startFromGameOver));
+                GameState = new GameState { StartLevel = StartLevel, HeartMode = IsHeartMode };
             }
+
+            SetState(new ReadyState(this));
         }
 
         private void ResetVisualization()
@@ -147,7 +148,7 @@ namespace GameBot.Game.Tetris
         public void Extract(IScreenshot screenshot)
         {
             Screenshot = screenshot;
-            
+
             do
             {
                 // every state can directly execute the next state,
@@ -247,8 +248,6 @@ namespace GameBot.Game.Tetris
 
         public void Play(IExecutor executor)
         {
-            Executor = executor;
-
             do
             {
                 // every state can directly execute the next state,
@@ -269,9 +268,26 @@ namespace GameBot.Game.Tetris
             } while (_continue);
         }
 
-        public void Reset()
+        public void Send(IEnumerable<string> messages)
         {
-            Init();
+            foreach (var message in messages)
+            {
+                switch (message)
+                {
+                    case "reset":
+                        Init();
+                        break;
+                    case "select level":
+                        new SelectLevelCommand(Executor, StartLevel).Execute();
+                        break;
+                    case "highscore":
+                        new HighscoreCommand(Executor, "BOT").Execute();
+                        break;
+                    case "menu":
+                        new StartCommand(Executor, IsHeartMode).Execute();
+                        break;
+                }
+            }
         }
     }
 }

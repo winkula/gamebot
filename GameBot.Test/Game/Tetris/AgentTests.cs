@@ -67,7 +67,7 @@ namespace GameBot.Test.Game.Tetris
             var nextPiece = Tetrimino.L;
             var moves = new List<Move> { Move.Left, Move.Rotate, Move.Drop };
 
-            _agent = new TetrisAgent(_configMock.Object, _clockMock.Object, _quantizer, _extractor, _boardExtractor, _screenExtractor, _search);
+            _agent = new TetrisAgent(_configMock.Object, _clockMock.Object, _quantizer, _executorMock.Object, _extractor, _boardExtractor, _screenExtractor, _search);
             _agent.GameState = new GameState(currentPiece, nextPiece);
 
             _analyzeState = new AnalyzeState(_agent, TimeSpan.Zero, currentPiece);
