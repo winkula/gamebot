@@ -29,9 +29,8 @@ namespace GameBot.Game.Tetris.Ga.FitnessFunctions
             var heuristic = new GaHeuristic(p1, p2, p3, p4);
             var search = new SimpleSearch(heuristic);
             var maxHeight = SimulateAvg(search, _games, _pieces);
-
-            return 0.01 + (maxHeight / 1000.0);
-            //return (19.0 - maxHeight) / 19.0;
+            
+            return (20.0 - maxHeight) / 20.0;
         }
 
         private double SimulateAvg(ISearch search, int games, int pieces)
@@ -78,8 +77,8 @@ namespace GameBot.Game.Tetris.Ga.FitnessFunctions
                 }
             }
 
-            return simulator.GameState.Lines;
-            //return maxHeight;
+            //return simulator.GameState.Lines;
+            return maxHeight;
         }
     }
 }

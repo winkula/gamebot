@@ -1,6 +1,5 @@
 ﻿using GameBot.Core.Exceptions;
 using GameBot.Game.Tetris.Searching;
-using NLog;
 using System;
 using System.Diagnostics;
 using System.IO;

@@ -1,24 +1,21 @@
-﻿using GameBot.Core.Data;
-using GameBot.Game.Tetris.Data;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameBot.Core.Data;
+using GameBot.Game.Tetris.Data;
+using NLog;
 
-namespace GameBot.Game.Tetris.Agents.States
+namespace GameBot.Game.Tetris.States
 {
-    public class TetrisExecuteState : ITetrisAgentState
+    public class ExecuteState : BaseState
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-        private readonly TetrisAgent _agent;
-
+        
         private readonly ICollection<ICollection<Move>> _pendingMoves;
         private readonly Piece _tracedPiece;
 
-        public TetrisExecuteState(TetrisAgent agent, IList<Move> pendingMoves, Piece tracedPiece)
+        public ExecuteState(TetrisAgent agent, IList<Move> pendingMoves, Piece tracedPiece) : base(agent)
         {
-            if (agent == null) throw new ArgumentNullException(nameof(agent));
             if (pendingMoves == null) throw new ArgumentNullException(nameof(pendingMoves));
             if (!pendingMoves.Any()) throw new ArgumentException("pendingMoves contains no elements");
             if (tracedPiece == null) throw new ArgumentNullException(nameof(tracedPiece));
@@ -26,9 +23,7 @@ namespace GameBot.Game.Tetris.Agents.States
             if (agent.GameState == null) throw new ArgumentNullException(nameof(agent.GameState));
             if (agent.GameState.Piece == null) throw new ArgumentNullException(nameof(agent.GameState.Piece));
             if (agent.GameState.NextPiece == null) throw new ArgumentNullException(nameof(agent.GameState.NextPiece));
-
-            _agent = agent;
-
+            
             _pendingMoves = GetMovesParallel(pendingMoves);
             _tracedPiece = new Piece(tracedPiece);
         }
@@ -60,12 +55,12 @@ namespace GameBot.Game.Tetris.Agents.States
             return movesParallel;
         }
 
-        public void Extract()
+        public override void Extract()
         {
             // do nothing
         }
 
-        public void Play()
+        public override void Play()
         {
             foreach (var parallelMoves in _pendingMoves)
             {
@@ -88,32 +83,32 @@ namespace GameBot.Game.Tetris.Agents.States
             // when we were executing button presses, the piece has fallen some rows
             // this is especially relevant in higher levels when speed is higher
             // we let the piece fall
-            var alreadyPastTime = _agent.GetExecutionDuration(_pendingMoves.Count) + _agent.LessFallTimeBeforeDrop;
-            var alreadyFallenDistance = TetrisLevel.GetFallDistance(_agent.GameState.Level, alreadyPastTime, _agent.GameState.HeartMode);
+            var alreadyPastTime = Agent.GetExecutionDuration(_pendingMoves.Count) + Agent.LessFallTimeBeforeDrop;
+            var alreadyFallenDistance = TetrisLevel.GetFallDistance(Agent.GameState.Level, alreadyPastTime, Agent.GameState.HeartMode);
             
             // calculates drop distance, score and new level
-            var linesBefore = _agent.GameState.Lines;
+            var linesBefore = Agent.GameState.Lines;
             int linesRemoved = 0;
             // we add one because the current line needs also to be dropped
-            var dropDistance = Math.Max(1.0 + _agent.GameState.Drop() - alreadyFallenDistance, 0.0);
+            var dropDistance = Math.Max(1.0 + Agent.GameState.Drop() - alreadyFallenDistance, 0.0);
             var dropDuration = TetrisTiming.GetDropDuration(dropDistance);
             var waitDuration = TetrisTiming.EntryDelayDuration;
 
-            if (_agent.GameState.Lines > linesBefore)
+            if (Agent.GameState.Lines > linesBefore)
             {
                 // lines were removed
-                linesRemoved = _agent.GameState.Lines - linesBefore;
+                linesRemoved = Agent.GameState.Lines - linesBefore;
 
                 // additinally wait the line clear duration
                 waitDuration += TetrisTiming.LineClearDuration;
             }
 
-            _logger.Info($"Execute Drop (new score {_agent.GameState.Score}, {linesRemoved} lines removed, drop lasts {dropDuration.Milliseconds} ms)");
+            _logger.Info($"Execute Drop (new score {Agent.GameState.Score}, {linesRemoved} lines removed, drop lasts {dropDuration.Milliseconds} ms)");
 
             // execute the drop blocking
             // we must wait until the drop is ended before we can continue
             // TODO: here we could do some precalculations for the next search (and execute the drop asynchronous)???
-            _agent.Executor.Hold(Button.Down, dropDuration);
+            Agent.Executor.Hold(Button.Down, dropDuration);
             _logger.Info("Drop executed");
 
             // sleep and wait until the lines are cleared
@@ -125,10 +120,10 @@ namespace GameBot.Game.Tetris.Agents.States
             // we subtract a time padding, because we dont want to wait the
             // theoretical drop duration, but the real drop duration
             // (we don't want to miss an important frame in analyze state)  
-            var waitDuration = duration - _agent.LessWaitTimeAfterDrop;
+            var waitDuration = duration - Agent.LessWaitTimeAfterDrop;
             if (waitDuration > TimeSpan.Zero)
             {
-                _agent.Clock.Sleep(waitDuration);
+                Agent.Clock.Sleep(waitDuration);
             }
         }
 
@@ -136,9 +131,9 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             _logger.Info($"Execute {string.Join(", ", moves)}");
 
-            _agent.Executor.Hit(moves.Select(x => x.ToButton()));
+            Agent.Executor.Hit(moves.Select(x => x.ToButton()));
 
-            var gameStateSimulation = new GameState(_agent.GameState);
+            var gameStateSimulation = new GameState(Agent.GameState);
 
             foreach (var move in moves)
             {
@@ -153,13 +148,13 @@ namespace GameBot.Game.Tetris.Agents.States
 
         private void UpdateCurrentPiece(Piece newPiece)
         {
-            _agent.TracedPiece = newPiece;
-            _agent.GameState.Piece = new Piece(newPiece);
+            Agent.TracedPiece = newPiece;
+            Agent.GameState.Piece = new Piece(newPiece);
         }
 
         private void SetStateAnalyze()
         {
-            _agent.SetState(new TetrisAnalyzeState(_agent, _agent.GameState.Piece.Tetrimino));
+            SetState(new AnalyzeState(Agent, Agent.Clock.Time, Agent.GameState.Piece.Tetrimino));
         }
     }
 }

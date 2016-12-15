@@ -30,7 +30,7 @@ namespace GameBot.Game.Tetris.Ga.Operators
         public TetrisCrossover(double crossOverProbability, ReplacementMethod replacementMethod)
         {
             CrossoverProbability = crossOverProbability;
-            AllowDuplicates = false;
+            AllowDuplicates = true;
             ReplacementMethod = replacementMethod;
             RequiresEvaluatedPopulation = true;
             
@@ -122,7 +122,6 @@ namespace GameBot.Game.Tetris.Ga.Operators
 
             while (_numberOfChildrenToGenerate > 0)
             {
-
                 //emergency exit
                 if (maxLoop <= 0)
                 {
@@ -193,11 +192,11 @@ namespace GameBot.Game.Tetris.Ga.Operators
                 var vect1 = new Vector4(p1).Normalize();
                 var vect2 = new Vector4(p2).Normalize();
 
-                var mixedGreater = vect1.Multiply(fitness1Normlized).Add(vect2.Multiply(fitness2Normlized)).Normalize();
-                var mixedSmaller = vect1.Multiply(fitness2Normlized).Add(vect2.Multiply(fitness1Normlized)).Normalize();
+                var byFitness = vect1.Multiply(fitness1Normlized).Add(vect2.Multiply(fitness2Normlized)).Normalize();
+                var fair = vect1.Multiply(0.5).Add(vect2.Multiply(0.5)).Normalize();
 
-                cg1.AddRangeCloned(mixedGreater.ToChromosome().Genes);
-                cg2.AddRangeCloned(mixedSmaller.ToChromosome().Genes);
+                cg1.AddRangeCloned(byFitness.ToChromosome().Genes);
+                cg2.AddRangeCloned(fair.ToChromosome().Genes);
             }
             else
             {

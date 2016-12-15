@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using NLog;
+using Button = GameBot.Core.Data.Button;
 
 namespace GameBot.Robot.Ui
 {
@@ -27,9 +28,12 @@ namespace GameBot.Robot.Ui
         private readonly IActuator _actuator;
         private readonly IQuantizer _quantizer;
 
+        private readonly KeyHandler _keyHandler = new KeyHandler();
+
+        private bool _enabledKeypoints;
         private const int _maxKeypointCount = 4;
         private readonly List<Point> _keypoints = new List<Point>();
-        private List<Point> _keypointsApplied = new List<Point>();
+        //private List<Point> _keypointsApplied = new List<Point>();
 
         public Window(IClock clock, IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
         {
@@ -39,13 +43,10 @@ namespace GameBot.Robot.Ui
             _camera = camera;
             _actuator = actuator;
             _quantizer = quantizer;
-            if (quantizer == null)
-            {
-                _logger.Warn("Quantizer is not calibrateable");
-            }
 
             InitializeComponent();
 
+            DefineActions();
             RegisterEvents();
             CheckForIllegalCrossThreadCalls = false;
 
@@ -55,11 +56,47 @@ namespace GameBot.Robot.Ui
             InitForm();
         }
 
+        private void DefineActions()
+        {
+            _keyHandler.OnKeyDown(Keys.Escape, Application.Exit);
+
+            _keyHandler.OnKeyDown(Keys.P, () =>
+            {
+                _logger.Info("Play");
+                _engine.Play = true;
+            });
+            _keyHandler.OnKeyDown(Keys.S, () =>
+            {
+                _logger.Info("Stop");
+                _engine.Play = false;
+            });
+            _keyHandler.OnKeyDown(Keys.R, () =>
+            {
+                _logger.Info("Reset");
+                _engine.Reset();
+            });
+            _keyHandler.OnKeyDown(Keys.K, ClearKeypoints);
+            _keyHandler.OnKeyUp(Keys.K, SaveKeypoints);
+
+            _keyHandler.OnKeyDown(Keys.Up, () => _actuator.Hit(Button.Up));
+            _keyHandler.OnKeyDown(Keys.Down, () => _actuator.Press(Button.Down));
+            _keyHandler.OnKeyUp(Keys.Down, () => _actuator.Release(Button.Down));
+            _keyHandler.OnKeyDown(Keys.Left, () => _actuator.Hit(Button.Left));
+            _keyHandler.OnKeyDown(Keys.Right, () => _actuator.Hit(Button.Right));
+
+            _keyHandler.OnKeyDown(Keys.Y, () => _actuator.Hit(Button.A));
+            _keyHandler.OnKeyDown(Keys.X, () => _actuator.Hit(Button.B));
+
+            _keyHandler.OnKeyDown(Keys.Enter, () => _actuator.Hit(Button.Start));
+            _keyHandler.OnKeyDown(Keys.Back, () => _actuator.Hit(Button.Select));
+        }
+
         private void RegisterEvents()
         {
             FormClosed += (sender, args) => Application.Exit();
             Load += Loaded;
-            KeyPress += KeyPressed;
+            KeyDown += (s, e) => _keyHandler.KeyDown(e.KeyCode);
+            KeyUp += (s, e) => _keyHandler.KeyUp(e.KeyCode);
             ImageBoxOriginal.MouseClick += MouseClicked;
         }
 
@@ -92,7 +129,8 @@ namespace GameBot.Robot.Ui
         private void InitTitle()
         {
             var time = _clock.Time;
-            Text = $@"GameBot - {time:hh\:mm\:ss\.f}";
+            var playState = _engine.Play ? "Play" : "Pause";
+            Text = $@"GameBot - {time:hh\:mm\:ss\.f} - [{playState}]";
         }
 
         private void InitForm()
@@ -109,97 +147,44 @@ namespace GameBot.Robot.Ui
             CenterToScreen();
         }
 
-        private void KeyPressed(object sender, KeyPressEventArgs e)
+        private void ClearKeypoints()
         {
-            if (e.KeyChar == 'y')
-            {
-                _actuator.Hit(Core.Data.Button.A);
-            }
-            if (e.KeyChar == 'x')
-            {
-                _actuator.Hit(Core.Data.Button.B);
-            }
-            if (e.KeyChar == 'a')
-            {
-                _actuator.Hit(Core.Data.Button.Left);
-            }
-            if (e.KeyChar == 'd')
-            {
-                _actuator.Hit(Core.Data.Button.Right);
-            }
-            if (e.KeyChar == 'w')
-            {
-                _actuator.Hit(Core.Data.Button.Up);
-            }
-            if (e.KeyChar == 's')
-            {
-                _actuator.Hit(Core.Data.Button.Down);
-            }
-            if (e.KeyChar == 'c')
-            {
-                _actuator.Hit(Core.Data.Button.Start);
-            }
-            if (e.KeyChar == 'v')
-            {
-                _actuator.Hit(Core.Data.Button.Select);
-            }
-            if (e.KeyChar == 'r')
-            {
-                _engine.Reset();
-            }
+            // clear
+            _logger.Info("Reset keypoints");
+            _keypoints.Clear();
+            _enabledKeypoints = true;
+        }
 
-            if (e.KeyChar == 'p')
+        private void SaveKeypoints()
+        {
+            // save
+            if (_keypoints.Count >= _maxKeypointCount)
             {
-                _engine.Play = !_engine.Play;
-                _logger.Info(_engine.Play ? "Play Agent" : "Pause Agent");
-            }
-            if (e.KeyChar == 'q')
-            {
-                Application.Exit();
-            }
-            if (e.KeyChar == 'k')
-            {
-                // clear
-                _keypoints.Clear();
-                _logger.Info("Reset temporary keypoints");
-            }
-            if (e.KeyChar == 's')
-            {
-                // save
-                if (_keypointsApplied.Count == _maxKeypointCount)
+                _logger.Info("Keypoints: " + string.Join(",", _keypoints));
+
+                var keypointsArray = new[]
                 {
-                    _logger.Info("Keypoints: " + string.Join(",", _keypointsApplied));
+                    _keypoints[0].X, _keypoints[0].Y,
+                    _keypoints[1].X, _keypoints[1].Y,
+                    _keypoints[2].X, _keypoints[2].Y,
+                    _keypoints[3].X, _keypoints[3].Y
+                };
 
-                    var keypointsList = new[]
-                    {
-                        _keypointsApplied[0].X, _keypointsApplied[0].Y,
-                        _keypointsApplied[1].X, _keypointsApplied[1].Y,
-                        _keypointsApplied[2].X, _keypointsApplied[2].Y,
-                        _keypointsApplied[3].X, _keypointsApplied[3].Y
-                    };
+                _quantizer.Keypoints = _keypoints.ToList();
 
-                    _config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsList));
-                    _config.Save();
+                _config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsArray));
+                _config.Save();
 
-                    _logger.Info("Saved configuration");
-                }
+                _logger.Info("Saved configuration");
             }
+            _enabledKeypoints = false;
         }
 
         private void MouseClicked(object sender, MouseEventArgs e)
         {
-            _keypoints.Add(new Point(e.X, e.Y));
-            _logger.Info($"Added keypoint ({e.X}, {e.Y})");
-
-            if (_keypoints.Count >= _maxKeypointCount && _quantizer != null)
+            if (_enabledKeypoints && _keypoints.Count < _maxKeypointCount)
             {
-                _keypointsApplied = _keypoints.Take(_maxKeypointCount).ToList();
-
-                var keypointsList = new[] { _keypointsApplied[0].X, _keypointsApplied[0].Y, _keypointsApplied[1].X, _keypointsApplied[1].Y, _keypointsApplied[2].X, _keypointsApplied[2].Y, _keypointsApplied[3].X, _keypointsApplied[3].Y };
-
-                _quantizer.Keypoints = _keypointsApplied;
-                _keypoints.Clear();
-                _logger.Info($"Applied keypoints {string.Join(",", keypointsList)}");
+                _keypoints.Add(new Point(e.X, e.Y));
             }
         }
 

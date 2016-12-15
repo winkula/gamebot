@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
+﻿using System.Linq;
 using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
@@ -13,32 +10,14 @@ namespace GameBot.Game.Tetris.Extraction
     {
         private const double _thresholdBlock = 0.5;
         private const double _thresholdBroken = 0.07;
-        private const double _thresholdGameover = 0.05; // TODO: test with real screenshots?
 
         private readonly IMatcher _matcher;
-
-        private static readonly Mat _gameoverReferenceImage;
-
-        static BoardExtractor()
-        {
-            _gameoverReferenceImage = new Mat("Screenshots/gameover_ref.png", LoadImageType.Grayscale);
-        }
-
+        
         public BoardExtractor(IMatcher matcher)
         {
             _matcher = matcher;
         }
-
-        public bool IsGameOver(IScreenshot screenshot)
-        {
-            var result = new Mat();
-
-            CvInvoke.AbsDiff(screenshot.Image, _gameoverReferenceImage, result);
-            var mean = CvInvoke.Mean(result);
-
-            return mean.V0 <= _thresholdGameover * 255;
-        }
-
+        
         public Board UpdateMultiplayer(IScreenshot screenshot, Board board)
         {
             int addedLines = GetAddedLines(screenshot, board);

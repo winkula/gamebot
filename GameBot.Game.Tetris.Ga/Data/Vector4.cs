@@ -67,7 +67,7 @@ namespace GameBot.Game.Tetris.Ga.Data
         public Vector4 Normalize()
         {
             var length = Length;
-            if (length == 0.0) return new Vector4(1, 1, 1, 1);
+            if (length == 0.0) return new Vector4(0.5, 0.5, 0.5, 0.5);
 
             var factor = 1.0 / length;
             return Multiply(factor);

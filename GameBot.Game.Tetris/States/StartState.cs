@@ -1,44 +1,39 @@
-﻿using GameBot.Core;
+﻿using System;
+using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using NLog;
-using System;
 
-namespace GameBot.Game.Tetris.Agents.States
+namespace GameBot.Game.Tetris.States
 {
-    public class TetrisStartState : ITetrisAgentState
+    public class StartState : BaseState
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly TimeSpan _buttonWaitDuration = TimeSpan.FromMilliseconds(100);
-
-        private readonly TetrisAgent _agent;
-
+        
         private readonly bool _heartMode;
         private readonly bool _startFromGameover;
         private readonly int _startLevel;
         
-        public TetrisStartState(TetrisAgent agent, int startLevel, bool heartMode, bool startFromGameOver)
+        public StartState(TetrisAgent agent, int startLevel, bool heartMode, bool startFromGameOver) : base(agent)
         {
-            if (agent == null) throw new ArgumentNullException(nameof(agent));
-
-            _agent = agent;
             _heartMode = heartMode;
             _startFromGameover = startFromGameOver;
             _startLevel = startLevel;
         }
 
         // constructor, when we start again from game over
-        public TetrisStartState(TetrisAgent agent, GameState gameState) : this(agent, gameState.StartLevel, gameState.HeartMode, true)
+        public StartState(TetrisAgent agent, GameState gameState) : this(agent, gameState.StartLevel, gameState.HeartMode, true)
         {
         }
 
-        public void Extract()
+        public override void Extract()
         {
             // do nothing
         }
 
-        public void Play()
+        public override void Play()
         {
             if (IsStartScreenVisble())
             {
@@ -47,18 +42,16 @@ namespace GameBot.Game.Tetris.Agents.States
                     _logger.Info("Game started from game over screen");
 
                     // handle start menu
-                    StartFromGameOver(_agent.Executor);
+                    StartFromGameOver(Agent.Executor);
                 }
                 else
                 {
                     _logger.Info("Game started from start menu");
 
                     // restart from game over screen (good for testing multiple games)
-                    StartFromMenu(_agent.Executor);
+                    StartFromMenu(Agent.Executor);
                 }
 
-                // init game state
-                _agent.GameState = new GameState { StartLevel = _startLevel, HeartMode = _heartMode };
                 SetStateAnalyze();
             }
         }
@@ -67,12 +60,12 @@ namespace GameBot.Game.Tetris.Agents.States
         {
             var random = new Random();
             var randomTime = 2.5 + random.NextDouble();
-            return _agent.Screenshot.Timestamp >= TimeSpan.FromSeconds(randomTime);
+            return Screenshot.Timestamp >= TimeSpan.FromSeconds(randomTime);
         }
 
         private void SetStateAnalyze()
         {
-            _agent.SetState(new TetrisAnalyzeState(_agent));
+            SetState(new AnalyzeState(Agent, Agent.Clock.Time));
         }
 
         private void StartFromMenu(IExecutor executor)

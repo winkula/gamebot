@@ -1,19 +1,19 @@
-﻿using Emgu.CV;
+﻿using System;
+using System.Drawing;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using GameBot.Core;
-using System.Drawing;
 using GameBot.Core.Data;
-using System;
-using Emgu.CV.CvEnum;
 using GameBot.Core.Exceptions;
 using GameBot.Core.Extensions;
-using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Data;
-using GameBot.Game.Tetris.Agents.States;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Extractors;
+using GameBot.Game.Tetris.Searching;
+using GameBot.Game.Tetris.States;
 
-namespace GameBot.Game.Tetris.Agents
+namespace GameBot.Game.Tetris
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class TetrisAgent : IAgent
@@ -21,7 +21,7 @@ namespace GameBot.Game.Tetris.Agents
         private readonly bool _visualize;
 
         // state informations
-        private ITetrisAgentState _state;
+        private IState _state;
         private bool _continue;
 
         // services and data used by states
@@ -32,6 +32,7 @@ namespace GameBot.Game.Tetris.Agents
         public IScreenshot Screenshot { get; private set; }
         public IExtractor Extractor { get; private set; }
         public IBoardExtractor BoardExtractor { get; private set; }
+        public IScreenExtractor ScreenExtractor { get; private set; }
         public ISearch Search { get; private set; }
 
         // data used by states
@@ -39,7 +40,7 @@ namespace GameBot.Game.Tetris.Agents
 
         // config used by states
         public int ExtractionSamples { get; }
-        public bool PlayMultiplayer { get; }
+        public bool IsMultiplayer { get; }
         public bool CheckEnabled { get; }
         
         #region timing
@@ -69,7 +70,7 @@ namespace GameBot.Game.Tetris.Agents
         public Tetrimino? ExtractedNextPiece { private get; set; }
         public int SearchHeight { private get; set; }
 
-        public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExtractor extractor, IBoardExtractor boardExtractor, ISearch search)
+        public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExtractor extractor, IBoardExtractor boardExtractor, IScreenExtractor screenExtractor, ISearch search)
         {
             _visualize = config.Read("Game.Tetris.Visualize", false);
 
@@ -78,10 +79,11 @@ namespace GameBot.Game.Tetris.Agents
             Quantizer = quantizer;
             Extractor = extractor;
             BoardExtractor = boardExtractor;
+            ScreenExtractor = screenExtractor;
             Search = search;
             
             ExtractionSamples = config.Read("Game.Tetris.Extractor.Samples", 1);
-            PlayMultiplayer = config.Read("Game.Tetris.Multiplayer", false);
+            IsMultiplayer = config.Read("Game.Tetris.Multiplayer", false);
             CheckEnabled = config.Read("Game.Tetris.Check.Enabled", false);
 
             // init timing config
@@ -102,7 +104,18 @@ namespace GameBot.Game.Tetris.Agents
             var heartMode = Config.Read("Game.Tetris.HeartMode", false);
             var startFromGameOver = Config.Read("Game.Tetris.StartFromGameOver", false);
 
-            SetState(new TetrisStartState(this, startLevel, heartMode, startFromGameOver));
+            // init game state and agent state
+            if (IsMultiplayer)
+            {
+                // TODO: does the level even play a role in multiplayer mode?
+                GameState = new GameState { StartLevel = startLevel, HeartMode = heartMode };
+                SetState(new ReadyState(this));
+            }
+            else
+            {
+                GameState = new GameState { StartLevel = startLevel, HeartMode = heartMode };
+                SetState(new StartState(this, startLevel, heartMode, startFromGameOver));
+            }
         }
 
         private void ResetVisualization()
@@ -113,7 +126,7 @@ namespace GameBot.Game.Tetris.Agents
             SearchHeight = 0;
         }
 
-        public void SetState(ITetrisAgentState newState)
+        public void SetState(IState newState)
         {
             if (newState == null)
                 throw new ArgumentNullException(nameof(newState));
@@ -122,7 +135,7 @@ namespace GameBot.Game.Tetris.Agents
             _continue = false;
         }
 
-        public void SetStateAndContinue(ITetrisAgentState newState)
+        public void SetStateAndContinue(IState newState)
         {
             if (newState == null)
                 throw new ArgumentNullException(nameof(newState));
@@ -134,17 +147,25 @@ namespace GameBot.Game.Tetris.Agents
         public void Extract(IScreenshot screenshot)
         {
             Screenshot = screenshot;
+            
+            do
+            {
+                // every state can directly execute the next state,
+                // when it changes this flag to true (with SetStateAndContinue)
+                _continue = false;
 
-            try
-            {
-                _state.Extract();
-            }
-            catch (GameOverException)
-            {
-                // game over detected
-                //SetStateAndContinue(new TetrisStartState(this, GameState));
-                throw;
-            }
+                try
+                {
+                    _state.Extract();
+                }
+                catch (GameOverException)
+                {
+                    // game over detected
+                    //SetStateAndContinue(new StartState(this, GameState));
+                    throw;
+                }
+
+            } while (_continue);
         }
 
         public Mat Visualize(Mat image)
@@ -241,7 +262,7 @@ namespace GameBot.Game.Tetris.Agents
                 catch (GameOverException)
                 {
                     // game over detected
-                    //SetStateAndContinue(new TetrisStartState(this, GameState));
+                    //SetStateAndContinue(new StartState(this, GameState));
                     throw;
                 }
 

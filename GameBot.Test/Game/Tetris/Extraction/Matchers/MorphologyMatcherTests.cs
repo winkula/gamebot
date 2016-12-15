@@ -1,5 +1,4 @@
 ﻿using GameBot.Core;
-using GameBot.Core.Configuration;
 using GameBot.Core.Quantizers;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;

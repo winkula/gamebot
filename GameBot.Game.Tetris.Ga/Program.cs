@@ -10,13 +10,13 @@ namespace GameBot.Game.Tetris.Ga
 {
     class Program
     {
-        private static double CrossoverProbability = 0.8;
-        private static double MutationProbability = 0.2;
+        private static double CrossoverProbability = 0.85;
+        private static double MutationProbability = 0.3;
         private static int ElitismPercentage = 10;
-        private static int PopulationSize = 100;
-        private static int NumGenerations = 10000;
+        private static int PopulationSize = 500;
+        private static int NumGenerations = 100;
         private static bool ReevaluateAll = false;
-        private static ParentSelectionMethod ParentSelectionMethod = ParentSelectionMethod.StochasticUniversalSampling;
+        private static ParentSelectionMethod ParentSelectionMethod = ParentSelectionMethod.TournamentSelection;
         private static bool EvaluateInParallel = true;
         
         static void Main(string[] args)
@@ -53,7 +53,7 @@ namespace GameBot.Game.Tetris.Ga
         static void Populate(Population population)
         {
             var r = new Random();
-            for (int i = 0; i < PopulationSize - 1; i++)
+            for (int i = 0; i < PopulationSize; i++)
             { 
                 population.Solutions.Add(new Vector4(r).Normalize().ToChromosome());
             }
@@ -61,12 +61,7 @@ namespace GameBot.Game.Tetris.Ga
 
         static double EvaluateFitness(Chromosome chromosome)
         {
-            //Console.WriteLine("Evaluating...");
-
-            //var vec = new Vector4(chromosome).Normalize();
-            //return 1.0 - System.Math.Abs(System.Math.Abs(System.Math.Abs(vec.W - vec.X) - vec.Y) - vec.Z) / 1.1;
-
-            return new TetrisFitnessFunction(10, 100).EvaluateFitness(chromosome);
+            return new TetrisFitnessFunction(100, 100).EvaluateFitness(chromosome);
         }
 
         static bool TerminateAlgorithm(Population population, int currentGeneration, long currentEvaluation)
