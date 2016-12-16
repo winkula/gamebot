@@ -14,7 +14,7 @@ namespace GameBot.Game.Tetris.States
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         
-        private readonly Tetrimino? _currentTetrimino;
+        private Tetrimino? _currentTetrimino;
 
         private readonly ISampler<Piece> _currentPieceSampler;
         private readonly ISampler<Tetrimino> _nextPieceSampler;
@@ -22,7 +22,8 @@ namespace GameBot.Game.Tetris.States
         private readonly TimeSpan _beginTime;
         private Piece _extractedPiece;
         private Tetrimino? _extractedNextPiece;
-        private Board _extractedBoard;
+
+        private bool _boardChecked;
 
         // we can extract the next piece only then, when we already have found the current piece
         private bool CanExtractNextPiece => _extractedPiece != null || _currentPieceSampler.SampleCount > 0;
@@ -80,9 +81,44 @@ namespace GameBot.Game.Tetris.States
         {
             if (searchHeight < 0) throw new GameOverException("Search height is negative");
 
-            ExtractCurrentPieceSampling(searchHeight);
-            ExtractNextPieceSampling();
-            ExtractBoard();
+            if (Agent.Extractor.DetectPiece(Screenshot, searchHeight))
+            {
+                if (!_boardChecked)
+                {
+                    // we only want to check the board once per analyze phase
+                    ExtractBoard(searchHeight);
+                    _boardChecked = true;
+                }
+
+                ExtractCurrentPieceSampling(searchHeight);
+                ExtractNextPieceSampling();
+            }
+        }
+
+        private void ExtractBoard(int searchHeight)
+        {
+            if (Agent.IsMultiplayer)
+            {
+                // recognize if lines are spawned from the bottom
+                // TODO: catch exception of make further pre checks
+                Agent.GameState.Board = Agent.BoardExtractor.UpdateMultiplayer(Screenshot, Agent.GameState.Board);
+            }
+
+            if (Agent.CheckEnabled)
+            {
+                if (Agent.BoardExtractor.IsHorizonBroken(Screenshot, Agent.GameState.Board))
+                {
+                    _logger.Info("Game state maybe broken. Analyze board");
+
+                    // we have to newly recoginze the current piece
+                    // maybe we missed one and the assumption over the current piece will be wrong
+                    var piece = Agent.Extractor.ExtractCurrentPiece(Screenshot, null, searchHeight);
+                    _currentTetrimino = piece.Tetrimino;
+
+                    // TODO: update board in method UpdateGlobalGameState
+                    Agent.GameState.Board = Agent.BoardExtractor.Update(Screenshot, Agent.GameState.Board, piece);
+                }
+            }
         }
 
         private void ExtractCurrentPieceSampling(int searchHeight)
@@ -179,35 +215,11 @@ namespace GameBot.Game.Tetris.States
             _extractedNextPiece = nextPiece;
             Agent.ExtractedNextPiece = _extractedNextPiece;
         }
-
-        private void ExtractBoard()
-        {
-            if (Agent.IsMultiplayer)
-            {
-                // recognize if lines are spawned from the bottom
-                Agent.GameState.Board = Agent.BoardExtractor.UpdateMultiplayer(Screenshot, Agent.GameState.Board);
-            }
-
-            if (Agent.CheckEnabled)
-            {
-                if (_extractedPiece == null) return;
-                if (Agent.BoardExtractor.IsHorizonBroken(Screenshot, Agent.GameState.Board))
-                {
-                    _logger.Info("Game state maybe broken. Analyze board");
-
-                    _extractedBoard = Agent.BoardExtractor.Update(Screenshot, Agent.GameState.Board, _extractedPiece);
-                }
-            }
-        }
-
+        
         private void UpdateGlobalGameState()
         {
             Agent.GameState.Piece = _extractedPiece;
             Agent.GameState.NextPiece = _extractedNextPiece;
-            if (_extractedBoard != null)
-            {
-                Agent.GameState.Board = _extractedBoard;
-            }
         }
 
         private SearchResult Search()

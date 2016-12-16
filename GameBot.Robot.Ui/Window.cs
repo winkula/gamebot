@@ -171,7 +171,12 @@ namespace GameBot.Robot.Ui
             catch (Exception ex)
             {
                 _logger.Error(ex);
-                MessageBox.Show($"{ex.Message}\nRead the log for details.", "Error");
+#if DEBUG
+                throw;
+#endif
+#if RELEASE
+                MessageBox.Show($"{ex.Message}\nRead the log for details.", "Error");           
+#endif
             }
         }
 

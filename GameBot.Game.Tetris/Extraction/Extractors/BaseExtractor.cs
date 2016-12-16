@@ -8,6 +8,7 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
     public abstract class BaseExtractor : IExtractor
     {
         protected readonly double ThresholdNextPiece;
+        protected readonly double ThresholdDetectPieceBlock = 0.5; // TODO: move to config!
         protected readonly double ThresholdCurrentPiece;
         protected readonly double ThresholdMovedPiece;
 
@@ -33,6 +34,19 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
             }
 
             return null;
+        }
+
+        public bool DetectPiece(IScreenshot screenshot, int maxFallDistance)
+        {
+            var origin = Coordinates.PieceOrigin;
+
+            for (int i = 0; i < maxFallDistance + 1 && origin.Y - i >= 0; i++)
+            {
+                var probability = Matcher.GetProbabilityBoardBlock(screenshot, origin.X, origin.Y - i);
+                if (probability >= ThresholdDetectPieceBlock) return true;
+            }
+
+            return false;
         }
 
         public virtual Piece ExtractCurrentPiece(IScreenshot screenshot, Tetrimino? tetrimino, int maxFallDistance)

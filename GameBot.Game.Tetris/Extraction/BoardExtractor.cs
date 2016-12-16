@@ -49,7 +49,7 @@ namespace GameBot.Game.Tetris.Extraction
                         break;
                     }
 
-                    if (_matcher.GetProbabilityBlock(screenshot, x, y) >= _thresholdBlock)
+                    if (_matcher.GetProbabilityBoardBlock(screenshot, x, y) >= _thresholdBlock)
                     {
                         newBoard.Occupy(x, y);
                     }
@@ -71,7 +71,7 @@ namespace GameBot.Game.Tetris.Extraction
             double bestProbability = double.PositiveInfinity;
             for (int x = 0; x < board.Width; x++)
             {
-                var probability = _matcher.GetProbabilityBlock(screenshot, x, 0);
+                var probability = _matcher.GetProbabilityBoardBlock(screenshot, x, 0);
                 if (probability < bestProbability)
                 {
                     bestProbability = probability;
@@ -103,7 +103,7 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 if (block.Y < board.Height)
                 {
-                    probabilitySum += _matcher.GetProbabilityBlock(screenshot, block.X, block.Y);
+                    probabilitySum += _matcher.GetProbabilityBoardBlock(screenshot, block.X, block.Y);
                 }
             }
 

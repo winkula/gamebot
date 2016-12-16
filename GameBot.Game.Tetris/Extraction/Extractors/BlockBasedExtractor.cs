@@ -18,6 +18,11 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
             return _tetrisExtractor.ExtractNextPiece(screenshot);
         }
 
+        public bool DetectPiece(IScreenshot screenshot, int maxFallDistance)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Piece ExtractCurrentPiece(IScreenshot screenshot, Tetrimino? tetrimino, int maxFallDistance)
         {
             if (tetrimino.HasValue)
