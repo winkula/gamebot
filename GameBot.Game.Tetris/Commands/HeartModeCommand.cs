@@ -4,14 +4,14 @@ using GameBot.Core.Data;
 
 namespace GameBot.Game.Tetris.Commands
 {
-    public class StartCommand : ICommand
+    public class HeartModeCommand : ICommand
     {
         private static readonly TimeSpan _buttonWaitDuration = TimeSpan.FromMilliseconds(100);
 
         private readonly IExecutor _executor;
         private readonly bool _heartMode;
 
-        public StartCommand(IExecutor executor, bool heartMode)
+        public HeartModeCommand(IExecutor executor, bool heartMode)
         {
             if (executor == null) throw new ArgumentNullException(nameof(executor));
             

@@ -88,6 +88,11 @@ namespace GameBot.Robot.Ui
             _keyHandler.OnKeyDown(Keys.L, () => _engine.Send("select level"));
             _keyHandler.OnKeyDown(Keys.H, () => _engine.Send("highscore"));
             _keyHandler.OnKeyDown(Keys.M, () => _engine.Send("menu"));
+            _keyHandler.OnKeyDown(Keys.G, () =>
+            {
+                _engine.Play = true;
+                _engine.Send("start from game over");
+            });
         }
 
         private void RegisterEvents()

@@ -44,6 +44,7 @@ namespace GameBot.Game.Tetris.States
 
         public override void Extract()
         {
+            // detect game over
             base.Extract();
 
             int searchHeight = CalulateSearchHeight(_currentTetrimino);

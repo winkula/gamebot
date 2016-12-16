@@ -47,7 +47,6 @@ namespace GameBot.Game.Tetris
         public bool IsMultiplayer => Config.Read("Game.Tetris.Multiplayer", false);
         public bool CheckEnabled => Config.Read("Game.Tetris.Check.Enabled", false);
         public bool IsHeartMode => Config.Read("Game.Tetris.HeartMode", false);
-        public bool IsStartFromGameOver => Config.Read("Game.Tetris.StartFromGameOver", false);
 
         #endregion
 
@@ -162,8 +161,8 @@ namespace GameBot.Game.Tetris
                 catch (GameOverException)
                 {
                     // game over detected
-                    //SetStateAndContinue(new StartState(this, GameState));
-                    throw;
+                    SetState(new GameOverState(this));
+                    throw; // let the engine decide what to do
                 }
 
             } while (_continue);
@@ -261,8 +260,8 @@ namespace GameBot.Game.Tetris
                 catch (GameOverException)
                 {
                     // game over detected
-                    //SetStateAndContinue(new StartState(this, GameState));
-                    throw;
+                    SetState(new GameOverState(this));
+                    throw; // let the engine decide what to do
                 }
 
             } while (_continue);
@@ -281,10 +280,13 @@ namespace GameBot.Game.Tetris
                         new SelectLevelCommand(Executor, StartLevel).Execute();
                         break;
                     case "highscore":
-                        new HighscoreCommand(Executor, "BOT").Execute();
+                        new HighscoreCommand(Executor, "THEBOT").Execute();
                         break;
                     case "menu":
-                        new StartCommand(Executor, IsHeartMode).Execute();
+                        new HeartModeCommand(Executor, IsHeartMode).Execute();
+                        break;
+                    case "start from game over":
+                        new StartFromGameOverCommand(Executor).Execute();
                         break;
                 }
             }
