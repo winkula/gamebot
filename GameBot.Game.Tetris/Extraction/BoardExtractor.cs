@@ -108,7 +108,7 @@ namespace GameBot.Game.Tetris.Extraction
                     bestPosition = x;
                 }
             }
-            return new ProbabilisticResult<int>(bestPosition, bestProbability);
+            return new ProbabilisticResult<int>(bestPosition, 1 - bestProbability);
         }
 
         private int GetAddedLines(IScreenshot screenshot, Board board, double threshold)

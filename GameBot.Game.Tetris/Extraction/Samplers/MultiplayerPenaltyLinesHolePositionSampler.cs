@@ -54,12 +54,14 @@ namespace GameBot.Game.Tetris.Extraction.Samplers
         {
             get
             {
-                return _samples
-                    .GroupBy(x => x.Result, y => y.Result)
-                    .Select(x => new { Value = x.Key, Number = x.Count() })
+                var samplesOrderedGrouped = _samples
+                    .GroupBy(x => x.Result, y => y.Probability)
+                    .Select(x => new { Position = x.Key, Number = x.Count(), ProbabilityAvg = x.Average() })
                     .OrderByDescending(x => x.Number)
-                    .First()
-                    .Value;
+                    .ThenByDescending(x => x.ProbabilityAvg)
+                    .ToList();
+                var pos = samplesOrderedGrouped.First().Position;
+                return pos;
             }
         }
     }

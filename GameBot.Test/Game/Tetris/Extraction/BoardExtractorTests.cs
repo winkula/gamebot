@@ -60,6 +60,7 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var newBoard = _boardExtractor.MultiplayerAddLines(board, lines, position.Result);
             var expected = _initialBoard;
 
+            Assert.AreEqual(0, lines);
             Assert.AreEqual(expected, newBoard);
         }
 
@@ -96,6 +97,8 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 0,1,1,1,1,1,1,1,1,1
             });
 
+            Assert.AreEqual(1, lines);
+            Assert.AreEqual(0, position.Result);
             Assert.AreEqual(expected, newBoard);
         }
 
@@ -132,6 +135,8 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 1,1,1,1,1,1,0,1,1,1
             });
 
+            Assert.AreEqual(1, lines);
+            Assert.AreEqual(6, position.Result);
             Assert.AreEqual(expected, newBoard);
         }
 
@@ -168,6 +173,8 @@ namespace GameBot.Test.Game.Tetris.Extraction
                 1,1,1,1,1,1,1,1,0,1
             });
 
+            Assert.AreEqual(4, lines);
+            Assert.AreEqual(8, position.Result);
             Assert.AreEqual(expected, newBoard);
         }
 

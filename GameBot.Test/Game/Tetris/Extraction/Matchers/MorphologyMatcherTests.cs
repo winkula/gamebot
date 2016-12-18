@@ -1,5 +1,6 @@
 ﻿using GameBot.Core;
 using GameBot.Core.Quantizers;
+using GameBot.Game.Tetris;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
 using NUnit.Framework;
@@ -121,9 +122,9 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
             
             for (int i = 0; i < 100; i++)
             {
-                for (int x = 0; x < GameBoyConstants.ScreenWidth / GameBoyConstants.TileSize; x++)
+                for (int x = 0; x < TetrisConstants.DefaultBoardWidth; x++)
                 {
-                    for (int y = 0; y < GameBoyConstants.ScreenHeight / GameBoyConstants.TileSize; y++)
+                    for (int y = 0; y < TetrisConstants.DefaultBoardHeight; y++)
                     {
                         _matcher.GetProbabilityBoardBlock(screenshot, x, y);
                     }
