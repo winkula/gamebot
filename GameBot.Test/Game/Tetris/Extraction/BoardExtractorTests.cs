@@ -52,8 +52,12 @@ namespace GameBot.Test.Game.Tetris.Extraction
         public void MultiplayerUpdateNoChanges()
         {
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_multiplayer_0.png", _quantizer);
-            
-            var newBoard = _boardExtractor.UpdateMultiplayer(screenshot, new Board(_initialBoard));
+
+            var board = new Board(_initialBoard);
+            var lines = _boardExtractor.MultiplayerRaisedLines(screenshot, board);
+            var position = _boardExtractor.MultiplayerHolePosition(screenshot, board);
+
+            var newBoard = _boardExtractor.MultiplayerAddLines(board, lines, position.Result);
             var expected = _initialBoard;
 
             Assert.AreEqual(expected, newBoard);
@@ -64,7 +68,11 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_multiplayer_1.png", _quantizer);
 
-            var newBoard = _boardExtractor.UpdateMultiplayer(screenshot, new Board(_initialBoard));
+            var board = new Board(_initialBoard);
+            var lines = _boardExtractor.MultiplayerRaisedLines(screenshot, board);
+            var position = _boardExtractor.MultiplayerHolePosition(screenshot, board);
+
+            var newBoard = _boardExtractor.MultiplayerAddLines(board, lines, position.Result);
             var expected = TestHelper.BuildBoard(new[]
             {
                 0,0,0,0,0,0,0,0,0,0,
@@ -95,8 +103,12 @@ namespace GameBot.Test.Game.Tetris.Extraction
         public void MultiplayerUpdateChangeHole6()
         {
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_multiplayer_2.png", _quantizer);
+            var board = new Board(_initialBoard);
 
-            var newBoard = _boardExtractor.UpdateMultiplayer(screenshot, new Board(_initialBoard));
+            var lines = _boardExtractor.MultiplayerRaisedLines(screenshot, board);
+            var position = _boardExtractor.MultiplayerHolePosition(screenshot, board);
+
+            var newBoard = _boardExtractor.MultiplayerAddLines(board, lines, position.Result);
             var expected = TestHelper.BuildBoard(new[]
             {
                 0,0,0,0,0,0,0,0,0,0,
@@ -128,7 +140,11 @@ namespace GameBot.Test.Game.Tetris.Extraction
         {
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_multiplayer_3.png", _quantizer);
 
-            var newBoard = _boardExtractor.UpdateMultiplayer(screenshot, new Board(_initialBoard));
+            var board = new Board(_initialBoard);
+            var lines = _boardExtractor.MultiplayerRaisedLines(screenshot, board);
+            var position = _boardExtractor.MultiplayerHolePosition(screenshot, board);
+
+            var newBoard = _boardExtractor.MultiplayerAddLines(board, lines, position.Result);
             var expected = TestHelper.BuildBoard(new[]
             {
                 0,0,0,0,0,0,0,0,0,0,

@@ -12,6 +12,7 @@ using GameBot.Game.Tetris.Commands;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Extractors;
+using GameBot.Game.Tetris.Extraction.Samplers;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.States;
 
@@ -39,11 +40,17 @@ namespace GameBot.Game.Tetris
         // data used by states
         public GameState GameState { get; set; }
 
+        #region multiplayer only
+
+        public ISampler<int> MultiplayerHoleSampler { get; private set; }
+
+        #endregion
+
         #region config
 
         public bool IsVisualize => Config.Read("Game.Tetris.Visualize", false);
         public int StartLevel => Config.Read("Game.Tetris.StartLevel", 0);
-        public int ExtractionSamples => Config.Read("Game.Tetris.Extractor.Samples", 1);
+        public int NumSamples => Config.Read("Game.Tetris.Extractor.Samples", 1);
         public bool IsMultiplayer => Config.Read("Game.Tetris.Multiplayer", false);
         public bool CheckEnabled => Config.Read("Game.Tetris.Check.Enabled", false);
         public bool IsHeartMode => Config.Read("Game.Tetris.HeartMode", false);
@@ -71,11 +78,15 @@ namespace GameBot.Game.Tetris
 
         #endregion
 
+        #region visualization
+
         // for visualization only
         public Piece ExtractedPiece { private get; set; }
         public Piece TracedPiece { private get; set; }
         public Tetrimino? ExtractedNextPiece { private get; set; }
         public int SearchHeight { private get; set; }
+
+        #endregion
 
         public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExecutor exceutor, IExtractor extractor, IBoardExtractor boardExtractor, IScreenExtractor screenExtractor, ISearch search)
         {
@@ -103,10 +114,12 @@ namespace GameBot.Game.Tetris
         private void Init()
         {
             ResetVisualization();
-            
+
             // init game state and agent state
             if (IsMultiplayer)
             {
+                MultiplayerHoleSampler = new MultiplayerPenaltyLinesHolePositionSampler(NumSamples);
+
                 // TODO: is it correct that the game in multiplayer mode starts always in level 0?
                 GameState = new GameState { StartLevel = 0, HeartMode = false };
             }

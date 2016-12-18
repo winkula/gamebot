@@ -145,6 +145,7 @@
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\HighscoreCommand.cs" />
     <Compile Include="Commands\SelectLevelCommand.cs" />
+    <Compile Include="Extraction\Samplers\MultiplayerPenaltyLinesHolePositionSampler.cs" />
     <Compile Include="Extraction\ScreenExtractor.cs" />
     <Compile Include="Extraction\IScreenExtractor.cs" />
     <Compile Include="States\BaseState.cs" />

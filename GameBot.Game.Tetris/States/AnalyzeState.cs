@@ -23,20 +23,24 @@ namespace GameBot.Game.Tetris.States
         private Piece _extractedPiece;
         private Tetrimino? _extractedNextPiece;
 
-        private bool _boardChecked;
-
         // we can extract the next piece only then, when we already have found the current piece
-        private bool CanExtractNextPiece => _extractedPiece != null || _currentPieceSampler.SampleCount > 0;
+        private bool CanExtractNextPiece =>
+            _extractedPiece != null ||
+            _currentPieceSampler.SampleCount > 0;
 
         // extraction is complete, when we have both pieces (current and next)
-        private bool ExtractionComplete => _extractedPiece != null && _extractedNextPiece.HasValue;
+        private bool _holeSamplingComplete = true;
+        private bool ExtractionComplete =>
+            _extractedPiece != null &&
+            _extractedNextPiece.HasValue &&
+            _holeSamplingComplete;
 
         public AnalyzeState(TetrisAgent agent, TimeSpan beginTime, Tetrimino? currentTetrimino = null) : base(agent)
         {
             _beginTime = beginTime;
             _currentTetrimino = currentTetrimino;
-            _currentPieceSampler = new CurrentTetriminoSampler(Agent.ExtractionSamples);
-            _nextPieceSampler = new NextTetriminoSampler(Agent.ExtractionSamples);
+            _currentPieceSampler = new CurrentTetriminoSampler(Agent.NumSamples);
+            _nextPieceSampler = new NextTetriminoSampler(Agent.NumSamples);
 
             Agent.ExtractedPiece = null;
             Agent.ExtractedNextPiece = null;
@@ -81,35 +85,16 @@ namespace GameBot.Game.Tetris.States
         {
             if (searchHeight < 0) throw new GameOverException("Search height is negative");
 
-            /*
-            if (Agent.Extractor.DetectPiece(Screenshot, searchHeight))
-            {
-                //if (!_boardChecked)
-                {
-                    // we only want to check the board once per analyze phase
-                    ExtractBoard(searchHeight);
-                    //_boardChecked = true;
-                }
-            }
-            */
+            AutoCorrect(searchHeight);
 
             ExtractCurrentPieceSampling(searchHeight);
             ExtractNextPieceSampling();
-            ExtractBoard(searchHeight);
+
+            DetectAddedLinesMultiplayer();
         }
 
-        private void ExtractBoard(int searchHeight)
+        private void AutoCorrect(int searchHeight)
         {
-            if (Agent.IsMultiplayer)
-            {
-                if (_extractedPiece == null) return;
-
-                // recognize if lines are spawned from the bottom
-                // TODO: catch exception of make further pre checks
-                _logger.Info("Update board in multiplayer mode");
-                Agent.GameState.Board = Agent.BoardExtractor.UpdateMultiplayer(Screenshot, Agent.GameState.Board);
-            }
-
             if (Agent.CheckEnabled)
             {
                 if (Agent.BoardExtractor.IsHorizonBroken(Screenshot, Agent.GameState.Board))
@@ -125,6 +110,40 @@ namespace GameBot.Game.Tetris.States
 
                         // TODO: update board in method UpdateGlobalGameState
                         Agent.GameState.Board = Agent.BoardExtractor.Update(Screenshot, Agent.GameState.Board, piece);
+                    }
+                }
+            }
+        }
+
+        private void DetectAddedLinesMultiplayer()
+        {
+            if (Agent.IsMultiplayer)
+            {
+                if (_extractedPiece == null) return;
+
+                // recognize if lines are spawned from the bottom
+                var addedLines = Agent.BoardExtractor.MultiplayerRaisedLines(Screenshot, Agent.GameState.Board);
+                if (addedLines > 0)
+                {
+                    // we detected added lines...
+                    _holeSamplingComplete = false;
+
+                    if (!Agent.MultiplayerHoleSampler.IsComplete)
+                    {
+                        // we sample hole position
+                        var holePositionResult = Agent.BoardExtractor.MultiplayerHolePosition(Screenshot, Agent.GameState.Board);
+                        Agent.MultiplayerHoleSampler.Sample(holePositionResult);
+                    }
+
+                    if (Agent.MultiplayerHoleSampler.IsComplete)
+                    {
+                        // sampling complete, we update the board
+                        var holePosition = Agent.MultiplayerHoleSampler.Result;
+                        var newBoard = Agent.BoardExtractor.MultiplayerAddLines(Agent.GameState.Board, addedLines, holePosition);
+                        Agent.GameState.Board = newBoard;
+
+                        _holeSamplingComplete = true;
+                        _logger.Info("Update board in multiplayer mode");
                     }
                 }
             }

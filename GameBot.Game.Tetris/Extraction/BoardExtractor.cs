@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
@@ -13,20 +14,32 @@ namespace GameBot.Game.Tetris.Extraction
         private const double _thresholdRaisedMultiplayer = 0.6;
 
         private readonly IMatcher _matcher;
-        
+
         public BoardExtractor(IMatcher matcher)
         {
             _matcher = matcher;
         }
-        
-        public Board UpdateMultiplayer(IScreenshot screenshot, Board board)
+
+        public int MultiplayerRaisedLines(IScreenshot screenshot, Board board)
         {
-            int addedLines = GetAddedLines(screenshot, board, _thresholdRaisedMultiplayer);
-            if (addedLines > 0)
+            return GetAddedLines(screenshot, board, _thresholdRaisedMultiplayer);
+        }
+
+        public ProbabilisticResult<int> MultiplayerHolePosition(IScreenshot screenshot, Board board)
+        {
+            return FindHolePositionProbabilistic(screenshot, board);
+        }
+
+        public Board MultiplayerAddLines(Board board, int raisedLines, int holePosition)
+        {
+            if (board == null) throw new ArgumentNullException(nameof(board));
+            if (raisedLines < 0 || raisedLines > 4) throw new ArgumentException("raisedLines must be between 0 and 4");
+            if (holePosition < 0 || holePosition >= TetrisConstants.DefaultBoardWidth) throw new ArgumentException("holePosition out of range (out of board)");
+            
+            if (raisedLines > 0)
             {
-                int holePosition = FindHolePosition(screenshot, board);
                 var newBoard = new Board(board);
-                newBoard.InsertLinesBottom(addedLines, holePosition);
+                newBoard.InsertLinesBottom(raisedLines, holePosition);
 
                 return newBoard;
             }
@@ -80,6 +93,22 @@ namespace GameBot.Game.Tetris.Extraction
                 }
             }
             return bestPosition;
+        }
+
+        private ProbabilisticResult<int> FindHolePositionProbabilistic(IScreenshot screenshot, Board board)
+        {
+            int bestPosition = 0;
+            double bestProbability = double.PositiveInfinity;
+            for (int x = 0; x < board.Width; x++)
+            {
+                var probability = _matcher.GetProbabilityBoardBlock(screenshot, x, 0);
+                if (probability < bestProbability)
+                {
+                    bestProbability = probability;
+                    bestPosition = x;
+                }
+            }
+            return new ProbabilisticResult<int>(bestPosition, bestProbability);
         }
 
         private int GetAddedLines(IScreenshot screenshot, Board board, double threshold)
