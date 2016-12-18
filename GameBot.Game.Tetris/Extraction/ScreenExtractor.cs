@@ -8,8 +8,8 @@ namespace GameBot.Game.Tetris.Extraction
 {
     public class ScreenExtractor : IScreenExtractor
     {
-        private const double _thresholdGameoverSingleplayer = 0.05; // TODO: test with real screenshots?
-        private const double _thresholdGameoverMultiplayer = 0.05; // TODO: test with real screenshots?
+        private const double _thresholdGameoverSingleplayer = 0.1; // TODO: test with real screenshots?
+        private const double _thresholdGameoverMultiplayer = 0.1; // TODO: test with real screenshots?
         private const double _thresholdStartMultiplayer = 0.05; // TODO: test with real screenshots?
         
         private static readonly Mat _gameoverSingleplayerReferenceImage;

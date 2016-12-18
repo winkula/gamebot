@@ -21,9 +21,9 @@ namespace GameBot.Game.Tetris.Simulator
 
         static void Simulate()
         {
-            var heuristic = new GaHeuristic(-0.10974, -0.02329, -0.48643, -0.21246);
+            //var heuristic = new GaHeuristic(-0.10974, -0.02329, -0.48643, -0.21246);
             //var heuristic = new YiyuanLeeHeuristic();
-            //var heuristic = new ExperimentalHeuristic();
+            var heuristic = new ExperimentalHeuristic();
 
             var tetrisSearch = new SimpleSearch(heuristic);
             //var tetrisSearch = new PredictiveSearch(heuristic);
@@ -35,8 +35,8 @@ namespace GameBot.Game.Tetris.Simulator
             {
                 var tetrisSimulator = new TetrisSimulator();
                 var engine = new SimulatorEngine(tetrisSearch, tetrisSimulator);
-                engine.FrameUpdateDelay = 200;
-                engine.PauseTime = 0;
+                engine.FrameUpdateDelay = 1;
+                engine.PauseTime = 500;
 
                 engine.Run();
             }

@@ -72,10 +72,12 @@ namespace GameBot.Game.Tetris.Simulator
                     Update();
                     Render();
                     
+                    /*
                     if (_simulator.GameState.Board.MaximumHeight >= _maxHeight)
                     {
                         throw new GameOverException();
                     }
+                    */
 
                     round++;
                 }

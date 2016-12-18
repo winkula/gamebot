@@ -41,6 +41,11 @@ namespace GameBot.Game.Tetris.Commands
                     _executor.HitWait(Button.A, _buttonWaitDuration);
                 }
 
+                var distDown = DistanceDown(character);
+                Down(distDown);
+
+                // TODO: write with up and down to be faster!
+                /*
                 var distUp = DistanceUp(character);
                 var distDown = DistanceDown(character);
 
@@ -51,15 +56,12 @@ namespace GameBot.Game.Tetris.Commands
                 else
                 {
                     Down(distDown);
-                }
+                }*/
 
                 first = false;
             }
 
-            if (_name.Length < 6)
-            {
-                _executor.Hit(Button.Start);
-            }
+            _executor.Hit(Button.Start);
         }
 
         private int DistanceUp(char character)

@@ -10,14 +10,35 @@ namespace GameBot.Game.Tetris.Searching.Heuristics
         public override double Score(GameState gameState)
         {
             var board = gameState.Board;
+            CalculateFast(board);
 
-            //var a = AggregateHeightLastMultiple(board, 99);
-            //var c = gameState.Lines;
-            var h = Holes(board);
-            var b = Bumpiness(board);
-            var m = board.MaximumHeight;
+            /*
+            var a = CalculatedAggregateHeight;
+            var lines = gameState.Lines;
+            var h = CalculatedHoles;
+            var b = BumpinessWithoutLastColumn(board);
+            */
 
-            return -5 * h - b - 10 * Math.Pow(m, 2);
+            
+
+            var score = 
+                -0.510066 * CalculatedAggregateHeight
+                + 0.760666 * gameState.Lines
+                - 0.7 * CalculatedHoles
+                - 0.184483 * BumpinessWithoutLastColumn(board);
+
+            int tetrisBonus = 0;
+            if (gameState.Lines == 3)
+            {
+                tetrisBonus = 100;
+            }
+            else if (gameState.Lines == 4)
+            {
+                tetrisBonus = 300;
+            }
+            var penalty = -80 * board.ColumnHeight(9);
+
+            return score + penalty + tetrisBonus;
         }
     }
 }

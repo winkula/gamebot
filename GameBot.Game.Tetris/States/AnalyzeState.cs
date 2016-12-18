@@ -13,7 +13,7 @@ namespace GameBot.Game.Tetris.States
     public class AnalyzeState : BaseState
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        
+
         private Tetrimino? _currentTetrimino;
 
         private readonly ISampler<Piece> _currentPieceSampler;
@@ -81,26 +81,32 @@ namespace GameBot.Game.Tetris.States
         {
             if (searchHeight < 0) throw new GameOverException("Search height is negative");
 
+            /*
             if (Agent.Extractor.DetectPiece(Screenshot, searchHeight))
             {
-                if (!_boardChecked)
+                //if (!_boardChecked)
                 {
                     // we only want to check the board once per analyze phase
                     ExtractBoard(searchHeight);
-                    _boardChecked = true;
+                    //_boardChecked = true;
                 }
-
-                ExtractCurrentPieceSampling(searchHeight);
-                ExtractNextPieceSampling();
             }
+            */
+
+            ExtractCurrentPieceSampling(searchHeight);
+            ExtractNextPieceSampling();
+            ExtractBoard(searchHeight);
         }
 
         private void ExtractBoard(int searchHeight)
         {
             if (Agent.IsMultiplayer)
             {
+                if (_extractedPiece == null) return;
+
                 // recognize if lines are spawned from the bottom
                 // TODO: catch exception of make further pre checks
+                _logger.Info("Update board in multiplayer mode");
                 Agent.GameState.Board = Agent.BoardExtractor.UpdateMultiplayer(Screenshot, Agent.GameState.Board);
             }
 
@@ -108,15 +114,18 @@ namespace GameBot.Game.Tetris.States
             {
                 if (Agent.BoardExtractor.IsHorizonBroken(Screenshot, Agent.GameState.Board))
                 {
-                    _logger.Info("Game state maybe broken. Analyze board");
-
                     // we have to newly recoginze the current piece
                     // maybe we missed one and the assumption over the current piece will be wrong
                     var piece = Agent.Extractor.ExtractCurrentPiece(Screenshot, null, searchHeight);
-                    _currentTetrimino = piece.Tetrimino;
+                    if (piece != null)
+                    {
+                        _logger.Info("Game state maybe broken. Analyze board");
 
-                    // TODO: update board in method UpdateGlobalGameState
-                    Agent.GameState.Board = Agent.BoardExtractor.Update(Screenshot, Agent.GameState.Board, piece);
+                        _currentTetrimino = piece.Tetrimino;
+
+                        // TODO: update board in method UpdateGlobalGameState
+                        Agent.GameState.Board = Agent.BoardExtractor.Update(Screenshot, Agent.GameState.Board, piece);
+                    }
                 }
             }
         }
@@ -215,7 +224,7 @@ namespace GameBot.Game.Tetris.States
             _extractedNextPiece = nextPiece;
             Agent.ExtractedNextPiece = _extractedNextPiece;
         }
-        
+
         private void UpdateGlobalGameState()
         {
             Agent.GameState.Piece = _extractedPiece;
