@@ -1,18 +1,17 @@
 ﻿using GameBot.Core.Exceptions;
 using GameBot.Game.Tetris.Searching;
-using NLog;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using GameBot.Game.Tetris.Simulators;
 
 namespace GameBot.Game.Tetris.Simulator
 {
     public class SimulatorEngine
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private static readonly Logger _loggerTime = LogManager.GetLogger("time");
+        private int _maxHeight = 10;
 
         private readonly Stopwatch _stopwatch;
         private readonly Stopwatch _stopwatchRound;
@@ -71,8 +70,12 @@ namespace GameBot.Game.Tetris.Simulator
                     }
 
                     Update();
-                    _logger.Info($"Round {round + 1}");
                     Render();
+                    
+                    if (_simulator.GameState.Board.MaximumHeight >= _maxHeight)
+                    {
+                        throw new GameOverException();
+                    }
 
                     round++;
                 }
@@ -102,8 +105,7 @@ namespace GameBot.Game.Tetris.Simulator
                 Console.WriteLine($@" Score calculated {predictiveSearch.ScoreCalculated,10} times");
                 Console.WriteLine($@" Score looked up  {predictiveSearch.ScoreLookedUp,10} times");
             }
-
-            _loggerTime.Info(_stopwatchRound.ElapsedMilliseconds);
+            
             Console.WriteLine($"Game State:\n{_simulator.GameState}");
 
             _stopwatchRound.Restart();
@@ -123,7 +125,7 @@ namespace GameBot.Game.Tetris.Simulator
 
         private void Render()
         {
-            _logger.Info(_simulator.GameState);
+            //_logger.Info(_simulator.GameState);
             if (PauseTime > 0)
             {
                 Thread.Sleep(PauseTime);
@@ -132,7 +134,6 @@ namespace GameBot.Game.Tetris.Simulator
 
         private void LogResults(int rounds, long time)
         {
-            _logger.Error("Game over");
             Console.WriteLine("Game over");
 
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Simulator_Results.csv");
@@ -141,11 +142,11 @@ namespace GameBot.Game.Tetris.Simulator
             {
                 using (var writer = File.CreateText(path))
                 {
-                    writer.WriteLine("Rounds,Lines,Score,Level,Time");
+                    writer.WriteLine("Pieces;Lines;Score;Level;Time");
                 }
             }
 
-            string message = $"{rounds},{_simulator.GameState.Lines},{_simulator.GameState.Score},{_simulator.GameState.Level},{time}\n";
+            string message = $"{rounds};{_simulator.GameState.Lines};{_simulator.GameState.Score};{_simulator.GameState.Level};{time}\n";
             File.AppendAllText(path, message);
         }
     }

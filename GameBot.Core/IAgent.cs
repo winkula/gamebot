@@ -1,4 +1,5 @@
-﻿using Emgu.CV;
+﻿using System.Collections.Generic;
+using Emgu.CV;
 using GameBot.Core.Data;
 
 namespace GameBot.Core
@@ -33,8 +34,9 @@ namespace GameBot.Core
         void Play(IExecutor executor);
         
         /// <summary>
-        /// Resets the internal state of the agent.
+        /// Send messages to the agent.
         /// </summary>
-        void Reset();
+        /// <param name="messages">The messages.</param>
+        void Send(IEnumerable<string> messages);
     }
 }

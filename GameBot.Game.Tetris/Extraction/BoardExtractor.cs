@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
+﻿using System.Linq;
 using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
@@ -13,32 +10,14 @@ namespace GameBot.Game.Tetris.Extraction
     {
         private const double _thresholdBlock = 0.5;
         private const double _thresholdBroken = 0.07;
-        private const double _thresholdGameover = 0.05; // TODO: test with real screenshots?
 
         private readonly IMatcher _matcher;
-
-        private static readonly Mat _gameoverReferenceImage;
-
-        static BoardExtractor()
-        {
-            _gameoverReferenceImage = new Mat("Screenshots/gameover_ref.png", LoadImageType.Grayscale);
-        }
-
+        
         public BoardExtractor(IMatcher matcher)
         {
             _matcher = matcher;
         }
-
-        public bool IsGameOver(IScreenshot screenshot)
-        {
-            var result = new Mat();
-
-            CvInvoke.AbsDiff(screenshot.Image, _gameoverReferenceImage, result);
-            var mean = CvInvoke.Mean(result);
-
-            return mean.V0 <= _thresholdGameover * 255;
-        }
-
+        
         public Board UpdateMultiplayer(IScreenshot screenshot, Board board)
         {
             int addedLines = GetAddedLines(screenshot, board);
@@ -70,7 +49,7 @@ namespace GameBot.Game.Tetris.Extraction
                         break;
                     }
 
-                    if (_matcher.GetProbabilityBlock(screenshot, x, y) >= _thresholdBlock)
+                    if (_matcher.GetProbabilityBoardBlock(screenshot, x, y) >= _thresholdBlock)
                     {
                         newBoard.Occupy(x, y);
                     }
@@ -92,7 +71,7 @@ namespace GameBot.Game.Tetris.Extraction
             double bestProbability = double.PositiveInfinity;
             for (int x = 0; x < board.Width; x++)
             {
-                var probability = _matcher.GetProbabilityBlock(screenshot, x, 0);
+                var probability = _matcher.GetProbabilityBoardBlock(screenshot, x, 0);
                 if (probability < bestProbability)
                 {
                     bestProbability = probability;
@@ -124,7 +103,7 @@ namespace GameBot.Game.Tetris.Extraction
             {
                 if (block.Y < board.Height)
                 {
-                    probabilitySum += _matcher.GetProbabilityBlock(screenshot, block.X, block.Y);
+                    probabilitySum += _matcher.GetProbabilityBoardBlock(screenshot, block.X, block.Y);
                 }
             }
 

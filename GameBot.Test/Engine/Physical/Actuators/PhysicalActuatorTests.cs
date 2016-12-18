@@ -5,7 +5,6 @@ using GameBot.Engine.Physical.Actuators;
 using NUnit.Framework;
 using System.Threading;
 using GameBot.Core;
-using GameBot.Core.Configuration;
 using NLog;
 using TimeoutException = Tinkerforge.TimeoutException;
 

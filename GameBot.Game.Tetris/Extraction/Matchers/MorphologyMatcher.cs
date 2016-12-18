@@ -13,11 +13,11 @@ namespace GameBot.Game.Tetris.Extraction.Matchers
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public double GetProbabilityBlock(IScreenshot screenshot, int x, int y)
+        public double GetProbabilityBoardBlock(IScreenshot screenshot, int x, int y)
         {
             if (screenshot == null) throw new ArgumentNullException(nameof(screenshot));
-            if (x < 0 || x > 19) throw new ArgumentException("invalid x coordinate (out of the board)");
-            if (y < 0 || y > 17) throw new ArgumentException("invalid y coordinate (out of the board)");
+            if (x < 0 || x >= TetrisConstants.DefaultBoardWidth) throw new ArgumentException($"invalid x coordinate {x} (out of the board)");
+            if (y < 0 || y >= TetrisConstants.DefaultBoardHeight) throw new ArgumentException($"invalid y coordinate {y} (out of the board)");
 
             var dest = screenshot.Image;
             var coordinates = Coordinates.BoardToTile(x, y);

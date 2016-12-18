@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using GameBot.Core.Configuration;
 using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction;

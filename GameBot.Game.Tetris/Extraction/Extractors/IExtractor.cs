@@ -16,6 +16,14 @@ namespace GameBot.Game.Tetris.Extraction.Extractors
         Tetrimino? ExtractNextPiece(IScreenshot screenshot);
 
         /// <summary>
+        /// Detects if the new current piece is already visible on screen.
+        /// </summary>
+        /// <param name="screenshot">The screenshot.</param>
+        /// <param name="maxFallDistance">The maximal fall distance.</param>
+        /// <returns><code>true</code>, if a piece was detected.</returns>
+        bool DetectPiece(IScreenshot screenshot, int maxFallDistance);
+        
+        /// <summary>
         /// Extracts the current piece from the board. The tetrimino can be provided, if known.
         /// Only untouched (origin orientation an x coordinate) pieces are accepted.
         /// </summary>

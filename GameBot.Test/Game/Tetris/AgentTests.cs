@@ -4,14 +4,14 @@ using System.Diagnostics;
 using GameBot.Core;
 using GameBot.Core.Data;
 using GameBot.Core.Quantizers;
-using GameBot.Game.Tetris.Agents;
-using GameBot.Game.Tetris.Agents.States;
+using GameBot.Game.Tetris;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Extractors;
 using GameBot.Game.Tetris.Extraction.Matchers;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Searching.Heuristics;
+using GameBot.Game.Tetris.States;
 using GameBot.Test.Extensions;
 using Moq;
 using NUnit.Framework;
@@ -30,12 +30,13 @@ namespace GameBot.Test.Game.Tetris
         private IQuantizer _quantizer;
         private IExtractor _extractor;
         private IBoardExtractor _boardExtractor;
+        private IScreenExtractor _screenExtractor;
         private ISearch _search;
 
         private IScreenshot _screenshot;
         private TetrisAgent _agent;
-        private TetrisAnalyzeState _analyzeState;
-        private TetrisExecuteState _executeState;
+        private AnalyzeState _analyzeState;
+        private ExecuteState _executeState;
 
         [TestFixtureSetUp]
         public void InitOnce()
@@ -49,6 +50,7 @@ namespace GameBot.Test.Game.Tetris
             _quantizer = new MorphologyQuantizer(_configMock.Object);
             _extractor = new MorphologyExtractor(_configMock.Object);
             _boardExtractor = new BoardExtractor(new MorphologyMatcher());
+            _screenExtractor = new ScreenExtractor();
             _search = new SimpleSearch(new YiyuanLeeHeuristic());
 
             _clockMock = new Mock<IClock>();
@@ -65,11 +67,11 @@ namespace GameBot.Test.Game.Tetris
             var nextPiece = Tetrimino.L;
             var moves = new List<Move> { Move.Left, Move.Rotate, Move.Drop };
 
-            _agent = new TetrisAgent(_configMock.Object, _clockMock.Object, _quantizer, _extractor, _boardExtractor, _search);
+            _agent = new TetrisAgent(_configMock.Object, _clockMock.Object, _quantizer, _executorMock.Object, _extractor, _boardExtractor, _screenExtractor, _search);
             _agent.GameState = new GameState(currentPiece, nextPiece);
 
-            _analyzeState = new TetrisAnalyzeState(_agent, currentPiece);
-            _executeState = new TetrisExecuteState(_agent, moves, new Piece(currentPiece));
+            _analyzeState = new AnalyzeState(_agent, TimeSpan.Zero, currentPiece);
+            _executeState = new ExecuteState(_agent, moves, new Piece(currentPiece));
         }
 
         [Test]

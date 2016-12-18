@@ -2,12 +2,11 @@
 using Emgu.CV.UI;
 using GameBot.Core;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using NLog;
+using Button = GameBot.Core.Data.Button;
 
 namespace GameBot.Robot.Ui
 {
@@ -25,11 +24,9 @@ namespace GameBot.Robot.Ui
         private readonly IEngine _engine;
         private readonly ICamera _camera;
         private readonly IActuator _actuator;
-        private readonly IQuantizer _quantizer;
 
-        private const int _maxKeypointCount = 4;
-        private readonly List<Point> _keypoints = new List<Point>();
-        private List<Point> _keypointsApplied = new List<Point>();
+        private readonly KeyHandler _keyHandler;
+        private readonly Calibrator _calibrator;
 
         public Window(IClock clock, IConfig config, IEngine engine, ICamera camera, IActuator actuator, IQuantizer quantizer)
         {
@@ -38,14 +35,13 @@ namespace GameBot.Robot.Ui
             _engine = engine;
             _camera = camera;
             _actuator = actuator;
-            _quantizer = quantizer;
-            if (quantizer == null)
-            {
-                _logger.Warn("Quantizer is not calibrateable");
-            }
+
+            _keyHandler = new KeyHandler();
+            _calibrator = new Calibrator(config, quantizer);
 
             InitializeComponent();
 
+            DefineActions();
             RegisterEvents();
             CheckForIllegalCrossThreadCalls = false;
 
@@ -55,12 +51,59 @@ namespace GameBot.Robot.Ui
             InitForm();
         }
 
+        private void DefineActions()
+        {
+            _keyHandler.OnKeyDown(Keys.Escape, Application.Exit);
+
+            _keyHandler.OnKeyDown(Keys.P, () =>
+            {
+                _logger.Info("Play");
+                _engine.Play = true;
+            });
+            _keyHandler.OnKeyDown(Keys.S, () =>
+            {
+                _logger.Info("Stop");
+                _engine.Play = false;
+            });
+            _keyHandler.OnKeyDown(Keys.R, () =>
+            {
+                _logger.Info("Reset");
+                _engine.Play = false;
+                _engine.Send("reset");
+            });
+            _keyHandler.OnKeyDown(Keys.K, () => _calibrator.ClearKeypoints());
+
+            _keyHandler.OnKeyDown(Keys.Up, () => _actuator.Hit(Button.Up));
+            _keyHandler.OnKeyDown(Keys.Down, () => _actuator.Press(Button.Down));
+            _keyHandler.OnKeyUp(Keys.Down, () => _actuator.Release(Button.Down));
+            _keyHandler.OnKeyDown(Keys.Left, () => _actuator.Hit(Button.Left));
+            _keyHandler.OnKeyDown(Keys.Right, () => _actuator.Hit(Button.Right));
+
+            _keyHandler.OnKeyDown(Keys.Y, () => _actuator.Hit(Button.A));
+            _keyHandler.OnKeyDown(Keys.X, () => _actuator.Hit(Button.B));
+
+            _keyHandler.OnKeyDown(Keys.Enter, () => _actuator.Hit(Button.Start));
+            _keyHandler.OnKeyDown(Keys.Back, () => _actuator.Hit(Button.Select));
+
+            _keyHandler.OnKeyDown(Keys.L, () => _engine.Send("select level"));
+            _keyHandler.OnKeyDown(Keys.H, () => _engine.Send("highscore"));
+            _keyHandler.OnKeyDown(Keys.M, () => _engine.Send("menu"));
+            _keyHandler.OnKeyDown(Keys.G, () =>
+            {
+                _engine.Play = true;
+                _engine.Send("start from game over");
+            });
+        }
+
         private void RegisterEvents()
         {
+            Load += (s, e) => new Thread(Run) { IsBackground = true }.Start();
+
             FormClosed += (sender, args) => Application.Exit();
-            Load += Loaded;
-            KeyPress += KeyPressed;
-            ImageBoxOriginal.MouseClick += MouseClicked;
+            KeyDown += (s, e) => _keyHandler.KeyDown(e.KeyCode);
+            KeyUp += (s, e) => _keyHandler.KeyUp(e.KeyCode);
+
+            ImageBoxOriginal.MouseClick += (s, e) => _calibrator.AddKeypoint(new Point(e.X, e.Y));
         }
 
         private void InitImageBoxes()
@@ -85,14 +128,15 @@ namespace GameBot.Robot.Ui
 
         private void InitTimer()
         {
-            double framerate = _config.Read("Robot.Ui.CamFramerate", 20);
+            double framerate = _config.Read("Robot.Ui.CamFramerate", 20.0);
             Timer.Interval = (int)Math.Max(1000 / framerate, 10);
         }
 
         private void InitTitle()
         {
             var time = _clock.Time;
-            Text = $@"GameBot - {time:hh\:mm\:ss\.f}";
+            var playState = _engine.Play ? "Play" : "Pause";
+            Text = $@"GameBot - {time:hh\:mm\:ss\.f} - [{playState}]";
         }
 
         private void InitForm()
@@ -107,106 +151,6 @@ namespace GameBot.Robot.Ui
             ClientSize = new Size(_originalWidth, _originalHeight);
 
             CenterToScreen();
-        }
-
-        private void KeyPressed(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == 'y')
-            {
-                _actuator.Hit(Core.Data.Button.A);
-            }
-            if (e.KeyChar == 'x')
-            {
-                _actuator.Hit(Core.Data.Button.B);
-            }
-            if (e.KeyChar == 'a')
-            {
-                _actuator.Hit(Core.Data.Button.Left);
-            }
-            if (e.KeyChar == 'd')
-            {
-                _actuator.Hit(Core.Data.Button.Right);
-            }
-            if (e.KeyChar == 'w')
-            {
-                _actuator.Hit(Core.Data.Button.Up);
-            }
-            if (e.KeyChar == 's')
-            {
-                _actuator.Hit(Core.Data.Button.Down);
-            }
-            if (e.KeyChar == 'c')
-            {
-                _actuator.Hit(Core.Data.Button.Start);
-            }
-            if (e.KeyChar == 'v')
-            {
-                _actuator.Hit(Core.Data.Button.Select);
-            }
-            if (e.KeyChar == 'r')
-            {
-                _engine.Reset();
-            }
-
-            if (e.KeyChar == 'p')
-            {
-                _engine.Play = !_engine.Play;
-                _logger.Info(_engine.Play ? "Play Agent" : "Pause Agent");
-            }
-            if (e.KeyChar == 'q')
-            {
-                Application.Exit();
-            }
-            if (e.KeyChar == 'k')
-            {
-                // clear
-                _keypoints.Clear();
-                _logger.Info("Reset temporary keypoints");
-            }
-            if (e.KeyChar == 's')
-            {
-                // save
-                if (_keypointsApplied.Count == _maxKeypointCount)
-                {
-                    _logger.Info("Keypoints: " + string.Join(",", _keypointsApplied));
-
-                    var keypointsList = new[]
-                    {
-                        _keypointsApplied[0].X, _keypointsApplied[0].Y,
-                        _keypointsApplied[1].X, _keypointsApplied[1].Y,
-                        _keypointsApplied[2].X, _keypointsApplied[2].Y,
-                        _keypointsApplied[3].X, _keypointsApplied[3].Y
-                    };
-
-                    _config.Write("Robot.Quantizer.Transformation.KeyPoints", string.Join(",", keypointsList));
-                    _config.Save();
-
-                    _logger.Info("Saved configuration");
-                }
-            }
-        }
-
-        private void MouseClicked(object sender, MouseEventArgs e)
-        {
-            _keypoints.Add(new Point(e.X, e.Y));
-            _logger.Info($"Added keypoint ({e.X}, {e.Y})");
-
-            if (_keypoints.Count >= _maxKeypointCount && _quantizer != null)
-            {
-                _keypointsApplied = _keypoints.Take(_maxKeypointCount).ToList();
-
-                var keypointsList = new[] { _keypointsApplied[0].X, _keypointsApplied[0].Y, _keypointsApplied[1].X, _keypointsApplied[1].Y, _keypointsApplied[2].X, _keypointsApplied[2].Y, _keypointsApplied[3].X, _keypointsApplied[3].Y };
-
-                _quantizer.Keypoints = _keypointsApplied;
-                _keypoints.Clear();
-                _logger.Info($"Applied keypoints {string.Join(",", keypointsList)}");
-            }
-        }
-
-        private void Loaded(object sender, EventArgs e)
-        {
-            var mainThread = new Thread(Run) { IsBackground = true };
-            mainThread.Start();
         }
 
         private void Run()
@@ -227,7 +171,12 @@ namespace GameBot.Robot.Ui
             catch (Exception ex)
             {
                 _logger.Error(ex);
-                MessageBox.Show($"{ex.Message}\nRead the log for details.", "Error");
+#if DEBUG
+                throw;
+#endif
+#if RELEASE
+                MessageBox.Show($"{ex.Message}\nRead the log for details.", "Error");           
+#endif
             }
         }
 
@@ -237,12 +186,13 @@ namespace GameBot.Robot.Ui
             {
                 ImageBoxOriginal.Image = original;
             }
-            catch (ObjectDisposedException)
+            catch (ObjectDisposedException ex)
             {
+                // ignore in release version
+                _logger.Error(ex);
 #if DEBUG
                 throw;
 #endif
-                // ignore in release version
             }
         }
 
@@ -252,12 +202,13 @@ namespace GameBot.Robot.Ui
             {
                 ImageBoxProcessed.Image = processed;
             }
-            catch (ObjectDisposedException)
+            catch (ObjectDisposedException ex)
             {
+                // ignore in release version
+                _logger.Error(ex);
 #if DEBUG
                 throw;
 #endif
-                // ignore in release version
             }
         }
 

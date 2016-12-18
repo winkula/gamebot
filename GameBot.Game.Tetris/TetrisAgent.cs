@@ -1,27 +1,28 @@
-﻿using Emgu.CV;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using GameBot.Core;
-using System.Drawing;
 using GameBot.Core.Data;
-using System;
-using Emgu.CV.CvEnum;
 using GameBot.Core.Exceptions;
 using GameBot.Core.Extensions;
-using GameBot.Game.Tetris.Searching;
+using GameBot.Game.Tetris.Commands;
 using GameBot.Game.Tetris.Data;
-using GameBot.Game.Tetris.Agents.States;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Extractors;
+using GameBot.Game.Tetris.Searching;
+using GameBot.Game.Tetris.States;
 
-namespace GameBot.Game.Tetris.Agents
+namespace GameBot.Game.Tetris
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class TetrisAgent : IAgent
     {
         private readonly bool _visualize;
 
         // state informations
-        private ITetrisAgentState _state;
+        private IState _state;
         private bool _continue;
 
         // services and data used by states
@@ -32,16 +33,23 @@ namespace GameBot.Game.Tetris.Agents
         public IScreenshot Screenshot { get; private set; }
         public IExtractor Extractor { get; private set; }
         public IBoardExtractor BoardExtractor { get; private set; }
+        public IScreenExtractor ScreenExtractor { get; private set; }
         public ISearch Search { get; private set; }
 
         // data used by states
         public GameState GameState { get; set; }
 
-        // config used by states
-        public int ExtractionSamples { get; }
-        public bool PlayMultiplayer { get; }
-        public bool CheckEnabled { get; }
-        
+        #region config
+
+        public bool IsVisualize => Config.Read("Game.Tetris.Visualize", false);
+        public int StartLevel => Config.Read("Game.Tetris.StartLevel", 0);
+        public int ExtractionSamples => Config.Read("Game.Tetris.Extractor.Samples", 1);
+        public bool IsMultiplayer => Config.Read("Game.Tetris.Multiplayer", false);
+        public bool CheckEnabled => Config.Read("Game.Tetris.Check.Enabled", false);
+        public bool IsHeartMode => Config.Read("Game.Tetris.HeartMode", false);
+
+        #endregion
+
         #region timing
 
         // timing config
@@ -69,20 +77,18 @@ namespace GameBot.Game.Tetris.Agents
         public Tetrimino? ExtractedNextPiece { private get; set; }
         public int SearchHeight { private get; set; }
 
-        public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExtractor extractor, IBoardExtractor boardExtractor, ISearch search)
+        public TetrisAgent(IConfig config, IClock clock, IQuantizer quantizer, IExecutor exceutor, IExtractor extractor, IBoardExtractor boardExtractor, IScreenExtractor screenExtractor, ISearch search)
         {
-            _visualize = config.Read("Game.Tetris.Visualize", false);
-
             Config = config;
             Clock = clock;
             Quantizer = quantizer;
+            Executor = exceutor;
             Extractor = extractor;
             BoardExtractor = boardExtractor;
+            ScreenExtractor = screenExtractor;
             Search = search;
-            
-            ExtractionSamples = config.Read("Game.Tetris.Extractor.Samples", 1);
-            PlayMultiplayer = config.Read("Game.Tetris.Multiplayer", false);
-            CheckEnabled = config.Read("Game.Tetris.Check.Enabled", false);
+
+            _visualize = IsVisualize;
 
             // init timing config
             _hitTime = TimeSpan.FromMilliseconds(Config.Read<int>("Robot.Actuator.Hit.Time"));
@@ -90,19 +96,26 @@ namespace GameBot.Game.Tetris.Agents
             MoreTimeToAnalyze = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.MoreTimeToAnalyze"));
             LessFallTimeBeforeDrop = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.LessFallTimeBeforeDrop"));
             LessWaitTimeAfterDrop = TimeSpan.FromMilliseconds(Config.Read<int>("Game.Tetris.Timing.LessWaitTimeAfterDrop"));
-                
+
             Init();
         }
 
         private void Init()
         {
             ResetVisualization();
+            
+            // init game state and agent state
+            if (IsMultiplayer)
+            {
+                // TODO: is it correct that the game in multiplayer mode starts always in level 0?
+                GameState = new GameState { StartLevel = 0, HeartMode = false };
+            }
+            else
+            {
+                GameState = new GameState { StartLevel = StartLevel, HeartMode = IsHeartMode };
+            }
 
-            var startLevel = Config.Read("Game.Tetris.StartLevel", 0);
-            var heartMode = Config.Read("Game.Tetris.HeartMode", false);
-            var startFromGameOver = Config.Read("Game.Tetris.StartFromGameOver", false);
-
-            SetState(new TetrisStartState(this, startLevel, heartMode, startFromGameOver));
+            SetState(new ReadyState(this));
         }
 
         private void ResetVisualization()
@@ -113,7 +126,7 @@ namespace GameBot.Game.Tetris.Agents
             SearchHeight = 0;
         }
 
-        public void SetState(ITetrisAgentState newState)
+        public void SetState(IState newState)
         {
             if (newState == null)
                 throw new ArgumentNullException(nameof(newState));
@@ -122,7 +135,7 @@ namespace GameBot.Game.Tetris.Agents
             _continue = false;
         }
 
-        public void SetStateAndContinue(ITetrisAgentState newState)
+        public void SetStateAndContinue(IState newState)
         {
             if (newState == null)
                 throw new ArgumentNullException(nameof(newState));
@@ -135,16 +148,24 @@ namespace GameBot.Game.Tetris.Agents
         {
             Screenshot = screenshot;
 
-            try
+            do
             {
-                _state.Extract();
-            }
-            catch (GameOverException)
-            {
-                // game over detected
-                //SetStateAndContinue(new TetrisStartState(this, GameState));
-                throw;
-            }
+                // every state can directly execute the next state,
+                // when it changes this flag to true (with SetStateAndContinue)
+                _continue = false;
+
+                try
+                {
+                    _state.Extract();
+                }
+                catch (GameOverException)
+                {
+                    // game over detected
+                    SetState(new GameOverState(this));
+                    throw; // let the engine decide what to do
+                }
+
+            } while (_continue);
         }
 
         public Mat Visualize(Mat image)
@@ -226,8 +247,6 @@ namespace GameBot.Game.Tetris.Agents
 
         public void Play(IExecutor executor)
         {
-            Executor = executor;
-
             do
             {
                 // every state can directly execute the next state,
@@ -241,16 +260,36 @@ namespace GameBot.Game.Tetris.Agents
                 catch (GameOverException)
                 {
                     // game over detected
-                    //SetStateAndContinue(new TetrisStartState(this, GameState));
-                    throw;
+                    SetState(new GameOverState(this));
+                    throw; // let the engine decide what to do
                 }
 
             } while (_continue);
         }
 
-        public void Reset()
+        public void Send(IEnumerable<string> messages)
         {
-            Init();
+            foreach (var message in messages)
+            {
+                switch (message)
+                {
+                    case "reset":
+                        Init();
+                        break;
+                    case "select level":
+                        new SelectLevelCommand(Executor, StartLevel).Execute();
+                        break;
+                    case "highscore":
+                        new HighscoreCommand(Executor, "THEBOT").Execute();
+                        break;
+                    case "menu":
+                        new HeartModeCommand(Executor, IsHeartMode).Execute();
+                        break;
+                    case "start from game over":
+                        new StartFromGameOverCommand(Executor).Execute();
+                        break;
+                }
+            }
         }
     }
 }

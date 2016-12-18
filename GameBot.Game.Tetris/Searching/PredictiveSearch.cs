@@ -31,12 +31,14 @@ namespace GameBot.Game.Tetris.Searching
                 // not found
                 ScoreCalculated++;
                 score = ScoreProbabilisticMinimum(node);
+                //score = ScoreProbabilisticExpected(node);
                 _dictionary.Add(node, score);
                 return score;
             }
 
             ScoreCalculated++;
             return ScoreProbabilisticMinimum(node);
+            //return ScoreProbabilisticExpected(node);
         }
     }
 }

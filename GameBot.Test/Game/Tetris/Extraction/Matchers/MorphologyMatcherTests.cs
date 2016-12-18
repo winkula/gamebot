@@ -1,5 +1,4 @@
 ﻿using GameBot.Core;
-using GameBot.Core.Configuration;
 using GameBot.Core.Quantizers;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
@@ -41,7 +40,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
         {
             var screenshot = TestHelper.GetScreenshot("Screenshots/tetris_play_2.png", _quantizer);
 
-            var probability = _matcher.GetProbabilityBlock(screenshot, x, y);
+            var probability = _matcher.GetProbabilityBoardBlock(screenshot, x, y);
 
             Assert.AreEqual(expected, probability);
         }
@@ -126,7 +125,7 @@ namespace GameBot.Test.Game.Tetris.Extraction.Matchers
                 {
                     for (int y = 0; y < GameBoyConstants.ScreenHeight / GameBoyConstants.TileSize; y++)
                     {
-                        _matcher.GetProbabilityBlock(screenshot, x, y);
+                        _matcher.GetProbabilityBoardBlock(screenshot, x, y);
                     }
                 }
             }

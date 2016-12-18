@@ -1,5 +1,4 @@
 ﻿using GameBot.Core;
-using GameBot.Game.Tetris.Agents;
 using GameBot.Game.Tetris.Extraction;
 using GameBot.Game.Tetris.Extraction.Extractors;
 using GameBot.Game.Tetris.Extraction.Matchers;
@@ -18,6 +17,7 @@ namespace GameBot.Game.Tetris
 
             container.RegisterSingleton<IExtractor, MorphologyExtractor>();
             container.RegisterSingleton<IBoardExtractor, BoardExtractor>();
+            container.RegisterSingleton<IScreenExtractor, ScreenExtractor>();
 
             //container.RegisterSingleton<ISearch, OnePieceSearch>();
             container.RegisterSingleton<ISearch, SimpleSearch>();

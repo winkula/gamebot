@@ -1,21 +1,20 @@
 ﻿using GameBot.Game.Tetris.Data;
 
-namespace GameBot.Game.Tetris.Simulator
+namespace GameBot.Game.Tetris.Simulators
 {
     public class TetrisSimulator
     {
-        public TetrisSimulator()
+        public GameState GameState { get; }
+
+        public TetrisSimulator(GameState gameState = null)
         {
             var board = new Board();
             var piece = new Piece();
             var nextPiece = Tetriminos.GetRandom();
 
-            GameState = new GameState(board, piece, nextPiece);
-            GameState.StartLevel = 9;
+            GameState = gameState ?? new GameState(board, piece, nextPiece) { StartLevel = 9 };
         }
 
-        public GameState GameState { get; }
-        
         public void Simulate(Move move)
         {
             switch (move)

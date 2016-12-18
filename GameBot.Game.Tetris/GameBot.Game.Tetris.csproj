@@ -140,8 +140,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Agents\States\TetrisExecuteState.cs" />
-    <Compile Include="Agents\TetrisAgent.cs" />
+    <Compile Include="Commands\StartFromGameOverCommand.cs" />
+    <Compile Include="Commands\HeartModeCommand.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\HighscoreCommand.cs" />
+    <Compile Include="Commands\SelectLevelCommand.cs" />
+    <Compile Include="Extraction\ScreenExtractor.cs" />
+    <Compile Include="Extraction\IScreenExtractor.cs" />
+    <Compile Include="States\BaseState.cs" />
+    <Compile Include="States\GameOverState.cs" />
+    <Compile Include="States\ReadyState.cs" />
+    <Compile Include="States\ExecuteState.cs" />
+    <Compile Include="TetrisAgent.cs" />
     <Compile Include="Data\Pose.cs" />
     <Compile Include="Data\TetriminoLookups.cs" />
     <Compile Include="Data\BoardLookups.cs" />
@@ -187,9 +197,9 @@
     <Compile Include="Searching\Heuristics\ExperimentalHeuristic.cs" />
     <Compile Include="Searching\Heuristics\YiyuanLeeHeuristic.cs" />
     <Compile Include="Package.cs" />
-    <Compile Include="Agents\States\ITetrisAgentState.cs" />
-    <Compile Include="Agents\States\TetrisAnalyzeState.cs" />
-    <Compile Include="Agents\States\TetrisStartState.cs" />
+    <Compile Include="States\IState.cs" />
+    <Compile Include="States\AnalyzeState.cs" />
+    <Compile Include="Simulators\TetrisSimulator.cs" />
     <Compile Include="TetrisConstants.cs" />
     <Compile Include="TetrisLevel.cs" />
     <Compile Include="TetrisScore.cs" />

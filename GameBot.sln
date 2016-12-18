@@ -29,6 +29,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Screenshots", "Screenshots"
 	ProjectSection(SolutionItems) = preProject
 		Screenshots\gameover.png = Screenshots\gameover.png
 		Screenshots\gameover_ref.png = Screenshots\gameover_ref.png
+		Screenshots\multiplayer_gameover.png = Screenshots\multiplayer_gameover.png
+		Screenshots\multiplayer_gameover_ref.png = Screenshots\multiplayer_gameover_ref.png
+		Screenshots\multiplayer_start.png = Screenshots\multiplayer_start.png
+		Screenshots\multiplayer_start_ref.png = Screenshots\multiplayer_start_ref.png
 		Screenshots\tetris_credits.png = Screenshots\tetris_credits.png
 		Screenshots\tetris_menu.png = Screenshots\tetris_menu.png
 		Screenshots\tetris_menu_atype.png = Screenshots\tetris_menu_atype.png
@@ -97,6 +101,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ImagePlay", "ImagePlay", "{
 	ProjectSection(SolutionItems) = preProject
 		ImagePlay\tetris_tile_recognition.ipj = ImagePlay\tetris_tile_recognition.ipj
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Game.Tetris.Ga", "GameBot.Game.Tetris.Ga\GameBot.Game.Tetris.Ga.csproj", "{3B7ED95A-FD33-4027-B59B-0C6E42660649}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBot.Measurements", "GameBot.Measurements\GameBot.Measurements.csproj", "{27F10C1A-A566-48E6-88A5-C684B5284E74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -204,6 +212,30 @@ Global
 		{DC648E81-1876-48F8-87EA-8228BAFAEE96}.Release|x64.Build.0 = Release|Any CPU
 		{DC648E81-1876-48F8-87EA-8228BAFAEE96}.Release|x86.ActiveCfg = Release|x86
 		{DC648E81-1876-48F8-87EA-8228BAFAEE96}.Release|x86.Build.0 = Release|x86
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Debug|x64.Build.0 = Debug|Any CPU
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Debug|x86.ActiveCfg = Debug|x86
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Debug|x86.Build.0 = Debug|x86
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Release|x64.ActiveCfg = Release|Any CPU
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Release|x64.Build.0 = Release|Any CPU
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Release|x86.ActiveCfg = Release|x86
+		{3B7ED95A-FD33-4027-B59B-0C6E42660649}.Release|x86.Build.0 = Release|x86
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Debug|x64.Build.0 = Debug|Any CPU
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Debug|x86.ActiveCfg = Debug|x86
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Debug|x86.Build.0 = Debug|x86
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Release|x64.ActiveCfg = Release|Any CPU
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Release|x64.Build.0 = Release|Any CPU
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Release|x86.ActiveCfg = Release|x86
+		{27F10C1A-A566-48E6-88A5-C684B5284E74}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

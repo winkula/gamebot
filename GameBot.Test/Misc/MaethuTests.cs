@@ -76,7 +76,7 @@ namespace GameBot.Test.Misc
 
             var sw = new Stopwatch();
             sw.Start();
-
+            
             foreach (var gs in gameStates)
             {
                 var score = heuristic.Score(gs);
@@ -92,8 +92,8 @@ namespace GameBot.Test.Misc
         {
             var configMock = TestHelper.GetFakeConfig();
 
-            var screenshot = TestHelper.GetScreenshot("Screenshots/gameover.png", new MorphologyQuantizer(configMock.Object));
-            TestHelper.Save(screenshot, "gameover_morphological.png");
+            var screenshot = TestHelper.GetScreenshot("Screenshots/multiplayer_gameover.png", new MorphologyQuantizer(configMock.Object));
+            TestHelper.Save(screenshot, "multiplayer_gameover_ref.png");
         }
 
         [Ignore]

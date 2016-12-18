@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using GameBot.Game.Tetris.Data;
+﻿using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Searching;
 using GameBot.Game.Tetris.Searching.Heuristics;
 using NLog;

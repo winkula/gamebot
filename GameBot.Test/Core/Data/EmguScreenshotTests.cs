@@ -3,7 +3,6 @@ using Emgu.CV.CvEnum;
 using GameBot.Core.Data;
 using NUnit.Framework;
 using System;
-using System.Drawing;
 
 namespace GameBot.Test.Core.Data
 {

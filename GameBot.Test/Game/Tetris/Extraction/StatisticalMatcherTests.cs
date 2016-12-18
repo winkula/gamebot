@@ -1,5 +1,4 @@
-﻿using Emgu.CV;
-using GameBot.Core.Data;
+﻿using GameBot.Core.Data;
 using GameBot.Game.Tetris.Data;
 using GameBot.Game.Tetris.Extraction.Matchers;
 using NLog;
