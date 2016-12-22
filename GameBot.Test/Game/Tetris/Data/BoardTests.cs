@@ -600,8 +600,9 @@ namespace GameBot.Test.Game.Tetris.Data
         {
             var board = TestHelper.BuildBoard(initialBoard);
             var expected = TestHelper.BuildBoard(expectedBoard);
+            var gameState = new GameState(board);
 
-            board.InsertLinesBottom(numLines, holePosition);
+            gameState.SpawnLines(numLines, holePosition);
 
             Assert.AreEqual(expected, board);
         }

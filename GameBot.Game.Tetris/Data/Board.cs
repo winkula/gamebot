@@ -316,28 +316,23 @@ namespace GameBot.Game.Tetris.Data
         }
 
         // this is used in multiplayer mode
-        public void InsertLinesBottom(int numLines, int holePosition)
+        internal void SpawnLines(int numLines, int holePosition)
         {
             if (numLines < 0 || numLines > 4) throw new ArgumentException("numLines must be between 0 and 4");
             if (holePosition < 0 || holePosition >= Width) throw new ArgumentException("holePosition must be a valid x coordinate on the board");
 
             if (numLines > 0)
             {
-                // move board up
                 for (int x = 0; x < Width; x++)
                 {
+                    // move board up
                     Columns[x] <<= numLines;
-                }
 
-                // insert new lines
-                for (int y = 0; y < numLines; y++)
-                {
-                    for (int x = 0; x < Width; x++)
+                    if (x != holePosition)
                     {
-                        if (x != holePosition)
-                        {
-                            Occupy(x, y);
-                        }
+                        // insert new lines
+                        int r = int.MaxValue >> (31 - numLines);
+                        Columns[x] |= r;
                     }
                 }
             }

@@ -39,7 +39,7 @@ namespace GameBot.Game.Tetris.Extraction
             if (raisedLines > 0)
             {
                 var newBoard = new Board(board);
-                newBoard.InsertLinesBottom(raisedLines, holePosition);
+                newBoard.SpawnLines(raisedLines, holePosition);
 
                 return newBoard;
             }

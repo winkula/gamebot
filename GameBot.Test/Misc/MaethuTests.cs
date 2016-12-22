@@ -5,6 +5,7 @@ using GameBot.Core;
 using NLog;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -24,18 +25,22 @@ namespace GameBot.Test.Misc
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        [Ignore]
+        //[Ignore]
         [Test]
         public void GenerateImagesForDoc()
         {
-            var testData0500 = TestDataFactory.Data.Single(x => x.ImageKey == "0500");
+            //var testData0500 = TestDataFactory.Data.Single(x => x.ImageKey == "0500");
             //var testData0413 = TestDataFactory.Data.Single(x => x.ImageKey == "0413");
-            
+
+            var image = new Mat(@"C:\Users\Winkler\Desktop\orig.png", LoadImageType.AnyColor);
+            var keypoints = new List<Point> {new Point(140, 116), new Point(477, 120), new Point(163, 370), new Point(447, 369)};
+            var testData0500 = new { Keypoints = keypoints, Image = image };
+
             var configMock = TestHelper.GetFakeConfig();
             //var quantizer = new Quantizer(configMock.Object);
 
             // simple threshold
-            IQuantizer quantizer = new SimpleThresholdQuantizer { Threshold = 150 };
+            IQuantizer quantizer = new SimpleThresholdQuantizer { Threshold = 220 };
             quantizer.Keypoints = testData0500.Keypoints;
             var quantizedImage = quantizer.Quantize(testData0500.Image);
             //TestHelper.Show(quantizedImage);

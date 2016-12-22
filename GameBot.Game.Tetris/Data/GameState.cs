@@ -252,6 +252,14 @@ namespace GameBot.Game.Tetris.Data
             Piece.RotateCounterclockwise();
         }
 
+        public void SpawnLines(int numLines, int holePosition)
+        {
+            Board.SpawnLines(numLines, holePosition);
+
+            if (Board.Intersects(Piece))
+                throw new GameOverException("SpawnLines not possible");
+        }
+
         public GameState ResetLinesAndScore()
         {
             Lines = 0;

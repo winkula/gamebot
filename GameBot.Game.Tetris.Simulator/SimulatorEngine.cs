@@ -22,6 +22,7 @@ namespace GameBot.Game.Tetris.Simulator
         // in ms
         public int PauseTime { get; set; }
         public int FrameUpdateDelay { get; set; }
+        public bool Multiplayer { get; set; }
 
         public SimulatorEngine(ISearch search, TetrisSimulator simulator)
         {
@@ -39,6 +40,7 @@ namespace GameBot.Game.Tetris.Simulator
             _stopwatch.Start();
             _stopwatchRound.Start();
             int round = 0;
+            int multiplayerHolePosition = new Random().Next(0, 9);
             while (true)
             {
                 int updateEvery = FrameUpdateDelay;
@@ -69,7 +71,7 @@ namespace GameBot.Game.Tetris.Simulator
                         WriteStatus(round, "<..");
                     }
 
-                    Update();
+                    Update(round, multiplayerHolePosition);
                     Render();
                     
                     /*
@@ -113,14 +115,21 @@ namespace GameBot.Game.Tetris.Simulator
             _stopwatchRound.Restart();
         }
 
-        private void Update()
+        private void Update(int round, int multiplayerHolePosition)
         {
             var result = _search.Search(_simulator.GameState);
-            if (result != null && result.Moves.Any())
+            if (result == null) throw new GameOverException();
+
+            if (result.Moves.Any())
             {
                 foreach (var move in result.Moves)
                 {
                     _simulator.Simulate(move);
+                }
+
+                if (Multiplayer && round > 0 && round % 10 == 0)
+                {
+                    _simulator.GameState.SpawnLines(4, multiplayerHolePosition);
                 }
             }
         }
