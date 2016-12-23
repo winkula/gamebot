@@ -148,6 +148,7 @@
     <Compile Include="Extraction\Samplers\MultiplayerPenaltyLinesHolePositionSampler.cs" />
     <Compile Include="Extraction\ScreenExtractor.cs" />
     <Compile Include="Extraction\IScreenExtractor.cs" />
+    <Compile Include="Searching\Heuristics\ElTetrisHeuristic.cs" />
     <Compile Include="States\BaseState.cs" />
     <Compile Include="States\GameOverState.cs" />
     <Compile Include="States\ReadyState.cs" />
@@ -186,7 +187,7 @@
     <Compile Include="Searching\SearchResult.cs" />
     <Compile Include="Searching\PredictiveSearch.cs" />
     <Compile Include="Searching\OnePieceSearch.cs" />
-    <Compile Include="Searching\SimpleSearch.cs" />
+    <Compile Include="Searching\TwoPieceSearch.cs" />
     <Compile Include="Data\Move.cs" />
     <Compile Include="Data\Board.cs" />
     <Compile Include="Data\Way.cs" />

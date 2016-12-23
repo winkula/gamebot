@@ -51,7 +51,7 @@ namespace GameBot.Test.Game.Tetris
             _extractor = new MorphologyExtractor(_configMock.Object);
             _boardExtractor = new BoardExtractor(new MorphologyMatcher());
             _screenExtractor = new ScreenExtractor();
-            _search = new SimpleSearch(new YiyuanLeeHeuristic());
+            _search = new TwoPieceSearch(new YiyuanLeeHeuristic());
 
             _clockMock = new Mock<IClock>();
             _executorMock = new Mock<IExecutor>();

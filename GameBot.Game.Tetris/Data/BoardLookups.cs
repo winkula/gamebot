@@ -12,12 +12,16 @@ namespace GameBot.Game.Tetris.Data
         private readonly int[] _columnHeights;
         private readonly int[] _columnHoles;
         private readonly int[] _linePosition;
+        private readonly int[] _columnTransitions;
+        private readonly int[] _cellCount;
 
         private BoardLookups()
         {
             _columnHeights = new int[_size];
             _columnHoles = new int[_size];
             _linePosition = new int[_size];
+            _columnTransitions = new int[_size];
+            _cellCount = new int[_size];
 
             Init();
         }
@@ -29,6 +33,8 @@ namespace GameBot.Game.Tetris.Data
                 CalculateHeights(i);
                 CalculateHoles(i);
                 CalculateLinePosition(i);
+                CalculateColumnTransitions(i);
+                CalculateCellCount(i);
             }
         }
 
@@ -69,19 +75,61 @@ namespace GameBot.Game.Tetris.Data
             }
         }
 
-        public int GetColumnHeight(int column)
+        private void CalculateColumnTransitions(int i)
         {
-            return _columnHeights[column];
+            int transitions = 0;
+            bool lastIsBlock = true;
+            for (int y = 0; y < 32; y++)
+            {
+                var isBlock = (i & (1 << y)) > 0;
+                if (lastIsBlock != isBlock)
+                {
+                    transitions++;
+                }
+
+                lastIsBlock = isBlock;
+            }
+
+            _columnTransitions[i] = transitions;
         }
 
-        public int GetColumnHoles(int column)
+        private void CalculateCellCount(int i)
         {
-            return _columnHoles[column];
+            int count = 0;
+            for (int y = 0; y < 32; y++)
+            {
+                if ((i & (1 << y)) > 0)
+                {
+                    count++;
+                }
+            }
+
+            _cellCount[i] = count;
         }
 
-        public int GetLinePosition(int columns)
+        public int GetColumnHeight(int columnMask)
         {
-            return _linePosition[columns];
+            return _columnHeights[columnMask];
+        }
+
+        public int GetColumnHoles(int columnMask)
+        {
+            return _columnHoles[columnMask];
+        }
+
+        public int GetLinePosition(int columnMask)
+        {
+            return _linePosition[columnMask];
+        }
+
+        public int GetColumnTransitions(int columnMask)
+        {
+            return _columnTransitions[columnMask];
+        }
+
+        public int GetCellCount(int columnMask)
+        {
+            return _cellCount[columnMask];
         }
     }
 }

@@ -27,7 +27,7 @@ namespace GameBot.Game.Tetris.Ga.FitnessFunctions
             var p4 = chromosome.Genes[3].RealValue;
 
             var heuristic = new GaHeuristic(p1, p2, p3, p4);
-            var search = new SimpleSearch(heuristic);
+            var search = new TwoPieceSearch(heuristic);
             var maxHeight = SimulateAvg(search, _games, _pieces);
             
             return (20.0 - maxHeight) / 20.0;

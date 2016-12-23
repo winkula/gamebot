@@ -2,9 +2,9 @@
 
 namespace GameBot.Game.Tetris.Searching
 {
-    public class SimpleSearch : BaseSearch
+    public class TwoPieceSearch : BaseSearch
     {
-        public SimpleSearch(IHeuristic heuristic) : base(heuristic)
+        public TwoPieceSearch(IHeuristic heuristic) : base(heuristic)
         {
         }
     }

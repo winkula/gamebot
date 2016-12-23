@@ -15,7 +15,7 @@ namespace GameBot.Test.Game.Tetris.Searching
 
         private IHeuristic _heuristic;
 
-        private SimpleSearch _simpleSearch;
+        private TwoPieceSearch _twoPieceSearch;
         private PredictiveSearch _predictiveSearch;
         private RecursiveSearch _recursiveSearch;
 
@@ -24,7 +24,7 @@ namespace GameBot.Test.Game.Tetris.Searching
         {
             _heuristic = new YiyuanLeeHeuristic();
 
-            _simpleSearch = new SimpleSearch(_heuristic);
+            _twoPieceSearch = new TwoPieceSearch(_heuristic);
             _predictiveSearch = new PredictiveSearch(_heuristic);
             _predictiveSearch.Cache = false;
             _recursiveSearch = new RecursiveSearch(_heuristic);
@@ -48,7 +48,7 @@ namespace GameBot.Test.Game.Tetris.Searching
         {
             var gameState = new GameState(current, next);
             
-            var result = _simpleSearch.Search(gameState);
+            var result = _twoPieceSearch.Search(gameState);
             _logger.Info(result.GoalGameState);
         }
         
@@ -63,14 +63,14 @@ namespace GameBot.Test.Game.Tetris.Searching
                 var next = Tetriminos.GetRandom();
 
                 var gameState = new GameState(board, current, next);
-                var result = _simpleSearch.Search(gameState);
+                var result = _twoPieceSearch.Search(gameState);
             }
         }
 
         [TestCase(Tetrimino.T, Tetrimino.J)]
         public void SimpleSearchFull(Tetrimino current, Tetrimino next)
         {
-            var simpleSearchLocal = new SimpleSearch(new YiyuanLeeHeuristic());
+            var simpleSearchLocal = new TwoPieceSearch(new YiyuanLeeHeuristic());
 
             var gameState = new GameState(current, next);
             _logger.Info(gameState);

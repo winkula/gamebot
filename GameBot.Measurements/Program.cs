@@ -31,7 +31,7 @@ namespace GameBot.Measurements
                 .ToList();
 
             var heuristic = new YiyuanLeeHeuristic();
-            var search = new SimpleSearch(heuristic);
+            var search = new TwoPieceSearch(heuristic);
 
             var sw = new Stopwatch();
             sw.Start();

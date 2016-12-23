@@ -24,8 +24,9 @@ namespace GameBot.Game.Tetris.Data
         /// The least significant bit is the square with the coordinate y = 0.
         /// This implementation allows fast lookups of the column height or other values relevant to the board heuristic.
         /// </summary>
-        private int[] Columns { get; }
-
+        internal int[] Columns { get; }
+        internal const int FullColumnMask = 0x7FFFF;
+        
         private bool this[int x, int y]
         {
             get
@@ -161,26 +162,38 @@ namespace GameBot.Game.Tetris.Data
 
         public int ColumnHeight(int x)
         {
-            if (x >= Width) throw new ArgumentException("x must be lower than the width of the board");
+            if (x < 0 || x >= Width) throw new ArgumentException($"{x} is an invalid column");
 
             return BoardLookups.Instance.GetColumnHeight(Columns[x]);
         }
-        
-        public int ColumnHeightUnchecked(int x)
+
+        internal int ColumnHeightUnchecked(int x)
         {
             return BoardLookups.Instance.GetColumnHeight(Columns[x]);
         }
 
         public int ColumnHoles(int x)
         {
-            if (x >= Width) throw new ArgumentException("x must be lower than the width of the board");
+            if (x < 0 || x >= Width) throw new ArgumentException($"{x} is an invalid column");
 
             return BoardLookups.Instance.GetColumnHoles(Columns[x]);
         }
         
-        public int ColumnHolesUnchecked(int x)
+        internal int ColumnHolesUnchecked(int x)
         {
             return BoardLookups.Instance.GetColumnHoles(Columns[x]);
+        }
+
+        public int ColumnTransitions(int x)
+        {
+            if (x < 0 || x >= Width) throw new ArgumentException($"{x} is an invalid column");
+
+            return BoardLookups.Instance.GetColumnTransitions(Columns[x]);
+        }
+
+        internal int ColumnTransitionsUnchecked(int x)
+        {
+            return BoardLookups.Instance.GetColumnTransitions(Columns[x]);
         }
 
         public void FillColumn(int x, int height)
@@ -211,7 +224,7 @@ namespace GameBot.Game.Tetris.Data
             Pieces++;
         }
 
-        public void PlaceUnchecked(Piece piece)
+        internal void PlaceUnchecked(Piece piece)
         {
             foreach (var block in piece.Shape.Body)
             {

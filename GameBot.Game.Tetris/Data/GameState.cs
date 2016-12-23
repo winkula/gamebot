@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GameBot.Core.Exceptions;
 using System.Text;
 
@@ -10,6 +11,8 @@ namespace GameBot.Game.Tetris.Data
         public Piece Piece { get; set; }
         public Tetrimino? NextPiece { get; set; }
 
+        internal Stack<Piece> Pieces = new Stack<Piece>();
+        
         public int Lines { get; private set; }
 
         // max score is 999'999
@@ -54,7 +57,8 @@ namespace GameBot.Game.Tetris.Data
             StartLevel = old.StartLevel;
         }
 
-        public GameState(GameState old, Piece piece)
+        // this constructor is only used in the search
+        internal GameState(GameState old, Piece piece)
         {
             Board = new Board(old.Board);
             Piece = piece;
@@ -62,6 +66,7 @@ namespace GameBot.Game.Tetris.Data
             Lines += old.Lines;
             Score += old.Score;
             StartLevel = old.StartLevel;
+            Pieces = new Stack<Piece>(old.Pieces);
         }
 
         public GameState(Piece piece, Tetrimino? nextPiece)
@@ -92,12 +97,12 @@ namespace GameBot.Game.Tetris.Data
         // TODO: use drop distance here?
         private bool IsPieceLanded => Board.Intersects(new Piece(Piece).Fall());
         
-        public bool Fall()
+        public bool FallAndLand()
         {
-            return Fall(Tetriminos.GetRandom());
+            return FallAndLand(Tetriminos.GetRandom());
         }
 
-        public bool Fall(Tetrimino next)
+        public bool FallAndLand(Tetrimino next)
         {
             // TODO: check this again!
             if (Board.DropDistance(Piece) < 0 && Board.Intersects(Piece)) throw new GameOverException();
@@ -125,12 +130,12 @@ namespace GameBot.Game.Tetris.Data
             return fallen;
         }
 
-        public bool Fall(int distance)
+        public bool FallAndLand(int distance)
         {
-            return Fall(distance, Tetriminos.GetRandom());
+            return FallAndLand(distance, Tetriminos.GetRandom());
         }
 
-        public bool Fall(int distance, Tetrimino next)
+        public bool FallAndLand(int distance, Tetrimino next)
         {
             if (distance < 0) throw new ArgumentException("distance can't be negative");
 
@@ -158,7 +163,7 @@ namespace GameBot.Game.Tetris.Data
             
             return fallen;
         }
-
+        
         // returns the fallen distance of the piece
         public int Drop()
         {
@@ -198,11 +203,12 @@ namespace GameBot.Game.Tetris.Data
             return distance;
         }
         
-        public void DropUnchecked(int distance)
+        internal void DropUnchecked(int distance)
         {
             // let piece fall
             Piece.Fall(distance);
             Board.PlaceUnchecked(Piece);
+            Pieces.Push(new Piece(Piece)); // we need to remember the dropped pieces for the landing height feature (heuristic)
             Piece = null;
 
             // remove lines
@@ -212,7 +218,7 @@ namespace GameBot.Game.Tetris.Data
             // calculate score
             Score += TetrisScore.GetSoftdropScore(distance);
             Score += TetrisScore.GetLineScore(lines, Level);
-
+            
             if (NextPiece.HasValue)
             {
                 Piece = new Piece(NextPiece.Value);
@@ -250,6 +256,14 @@ namespace GameBot.Game.Tetris.Data
                 throw new GameOverException("RotateCounterclockwise not possible");
 
             Piece.RotateCounterclockwise();
+        }
+
+        public void Fall()
+        {
+            if (Board.Intersects(new Piece(Piece).Fall()))
+                throw new GameOverException("Fall not possible");
+
+            Piece.Fall();
         }
 
         public void SpawnLines(int numLines, int holePosition)

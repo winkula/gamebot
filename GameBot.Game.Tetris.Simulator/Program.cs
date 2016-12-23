@@ -11,7 +11,7 @@ namespace GameBot.Game.Tetris.Simulator
 {
     class Program
     {
-        private const int _games = 50;
+        private const int _games = 100;
         
         static void Main(string[] args)
         {
@@ -22,11 +22,13 @@ namespace GameBot.Game.Tetris.Simulator
         static void Simulate()
         {
             //var heuristic = new GaHeuristic(-0.10974, -0.02329, -0.48643, -0.21246);
-            var heuristic = new YiyuanLeeHeuristic();
+            //var heuristic = new YiyuanLeeHeuristic();
+            var heuristic = new ElTetrisHeuristic();
             //var heuristic = new ExperimentalHeuristic();
             //var heuristic = new MaxBergmarkHeuristic();
 
-            var tetrisSearch = new SimpleSearch(heuristic);
+            var tetrisSearch = new TwoPieceSearch(heuristic);
+            //var tetrisSearch = new OnePieceSearch(heuristic);
             //var tetrisSearch = new PredictiveSearch(heuristic);
             //tetrisSearch.Cache = true;
             //var tetrisSearch = new RecursiveSearch(heuristic);
@@ -34,11 +36,15 @@ namespace GameBot.Game.Tetris.Simulator
 
             for (int i = 0; i < _games; i++)
             {
+                Console.WriteLine($"Game {i + 1}");
+
                 var tetrisSimulator = new TetrisSimulator();
                 var engine = new SimulatorEngine(tetrisSearch, tetrisSimulator);
                 engine.FrameUpdateDelay = 1;
-                engine.PauseTime = 100;
-                engine.Multiplayer = true;
+                engine.PauseTime = 0;
+                engine.Multiplayer = false;
+                //engine.MaxHeight = 10;
+                engine.Render = false;
 
                 engine.Run();
             }

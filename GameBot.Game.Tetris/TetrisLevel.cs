@@ -52,7 +52,7 @@ namespace GameBot.Game.Tetris
             return TimeSpan.FromSeconds(rows * _levelSpeeds[level] / TetrisTiming.Framerate);
         }
         
-        // how many rows will a tile maximal fall in a specific time span?
+        // how many rows will a tile excatly fall in a specific time span?
         public static double GetFallDistance(int level, TimeSpan duration, bool heartMode = false)
         {
             if (level < 0) throw new ArgumentException("Level must not be negative");

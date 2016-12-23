@@ -20,7 +20,7 @@ namespace GameBot.Game.Tetris
             container.RegisterSingleton<IScreenExtractor, ScreenExtractor>();
 
             //container.RegisterSingleton<ISearch, OnePieceSearch>();
-            container.RegisterSingleton<ISearch, SimpleSearch>();
+            container.RegisterSingleton<ISearch, TwoPieceSearch>();
             //container.RegisterSingleton<ISearch, PredictiveSearch>();
 
             container.RegisterSingleton<IHeuristic, YiyuanLeeHeuristic>();

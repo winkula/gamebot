@@ -80,6 +80,23 @@ namespace GameBot.Test
             }
             return board;
         }
+        
+        public static Board BuildBoard(int width, int height, int[] squares)
+        {
+            var board = new Board(width, height);
+            for (int x = 0; x < board.Width; x++)
+            {
+                for (int y = 0; y < board.Height; y++)
+                {
+                    int index = (height - y - 1) * width + x;
+                    if (squares[index] == 1)
+                    {
+                        board.Occupy(x, y);
+                    }
+                }
+            }
+            return board;
+        }
 
         public static Mock<IConfig> GetFakeConfig()
         {

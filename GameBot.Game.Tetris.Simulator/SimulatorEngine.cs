@@ -11,8 +11,6 @@ namespace GameBot.Game.Tetris.Simulator
 {
     public class SimulatorEngine
     {
-        private int _maxHeight = 10;
-
         private readonly Stopwatch _stopwatch;
         private readonly Stopwatch _stopwatchRound;
 
@@ -23,6 +21,8 @@ namespace GameBot.Game.Tetris.Simulator
         public int PauseTime { get; set; }
         public int FrameUpdateDelay { get; set; }
         public bool Multiplayer { get; set; }
+        public bool Render { get; set; }
+        public int MaxHeight { get; set; }
 
         public SimulatorEngine(ISearch search, TetrisSimulator simulator)
         {
@@ -32,7 +32,9 @@ namespace GameBot.Game.Tetris.Simulator
             _search = search;
             _simulator = simulator;
 
+            Render = true;
             FrameUpdateDelay = 60;
+            MaxHeight = int.MaxValue;
         }
 
         public void Run()
@@ -43,43 +45,19 @@ namespace GameBot.Game.Tetris.Simulator
             int multiplayerHolePosition = new Random().Next(0, 9);
             while (true)
             {
-                int updateEvery = FrameUpdateDelay;
+                if (Render)
+                {
+                    RenderBoard(round);
+                }
                 try
                 {
-                    if (round % updateEvery == 0)
-                    {
-                        WriteStatus(round, ">..");
-                    }
-                    else if (round % updateEvery == 1 * updateEvery / 6)
-                    {
-                        WriteStatus(round, ".>.");
-                    }
-                    else if (round % updateEvery == 2 * updateEvery / 6)
-                    {
-                        WriteStatus(round, "..>");
-                    }
-                    else if (round % updateEvery == 3 * updateEvery / 6)
-                    {
-                        WriteStatus(round, "..<");
-                    }
-                    else if (round % updateEvery == 4 * updateEvery / 6)
-                    {
-                        WriteStatus(round, ".<.");
-                    }
-                    else if (round % updateEvery == 5 * updateEvery / 6)
-                    {
-                        WriteStatus(round, "<..");
-                    }
-
                     Update(round, multiplayerHolePosition);
-                    Render();
-                    
-                    /*
-                    if (_simulator.GameState.Board.MaximumHeight >= _maxHeight)
+                    Pause();
+
+                    if (_simulator.GameState.Board.MaximumHeight > MaxHeight)
                     {
                         throw new GameOverException();
                     }
-                    */
 
                     round++;
                 }
@@ -90,6 +68,36 @@ namespace GameBot.Game.Tetris.Simulator
                 }
             }
             _stopwatch.Stop();
+        }
+
+        private void RenderBoard(int round)
+        {
+            int updateEvery = FrameUpdateDelay;
+
+            if (round % updateEvery == 0)
+            {
+                WriteStatus(round, ">..");
+            }
+            else if (round % updateEvery == 1 * updateEvery / 6)
+            {
+                WriteStatus(round, ".>.");
+            }
+            else if (round % updateEvery == 2 * updateEvery / 6)
+            {
+                WriteStatus(round, "..>");
+            }
+            else if (round % updateEvery == 3 * updateEvery / 6)
+            {
+                WriteStatus(round, "..<");
+            }
+            else if (round % updateEvery == 4 * updateEvery / 6)
+            {
+                WriteStatus(round, ".<.");
+            }
+            else if (round % updateEvery == 5 * updateEvery / 6)
+            {
+                WriteStatus(round, "<..");
+            }
         }
 
         private void WriteStatus(int round, string animation)
@@ -120,23 +128,16 @@ namespace GameBot.Game.Tetris.Simulator
             var result = _search.Search(_simulator.GameState);
             if (result == null) throw new GameOverException();
 
-            if (result.Moves.Any())
+            _simulator.SimulateRealtime(result.Moves.ToList(), 75);
+            
+            if (Multiplayer && round > 0 && round % 10 == 0)
             {
-                foreach (var move in result.Moves)
-                {
-                    _simulator.Simulate(move);
-                }
-
-                if (Multiplayer && round > 0 && round % 10 == 0)
-                {
-                    _simulator.GameState.SpawnLines(4, multiplayerHolePosition);
-                }
+                _simulator.GameState.SpawnLines(4, multiplayerHolePosition);
             }
         }
 
-        private void Render()
+        private void Pause()
         {
-            //_logger.Info(_simulator.GameState);
             if (PauseTime > 0)
             {
                 Thread.Sleep(PauseTime);
