@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 namespace GameBot.Test.Misc
 {
+    [Ignore]
     [TestFixture]
     public class ContourTests
     {

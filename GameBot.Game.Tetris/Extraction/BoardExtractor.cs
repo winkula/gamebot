@@ -30,23 +30,6 @@ namespace GameBot.Game.Tetris.Extraction
             return FindHolePositionProbabilistic(screenshot, board);
         }
 
-        public Board MultiplayerAddLines(Board board, int raisedLines, int holePosition)
-        {
-            if (board == null) throw new ArgumentNullException(nameof(board));
-            if (raisedLines < 0 || raisedLines > 4) throw new ArgumentException("raisedLines must be between 0 and 4");
-            if (holePosition < 0 || holePosition >= TetrisConstants.DefaultBoardWidth) throw new ArgumentException("holePosition out of range (out of board)");
-            
-            if (raisedLines > 0)
-            {
-                var newBoard = new Board(board);
-                newBoard.SpawnLines(raisedLines, holePosition);
-
-                return newBoard;
-            }
-
-            return board;
-        }
-
         public Board Update(IScreenshot screenshot, Board board, Piece piece)
         {
             var newBoard = new Board();

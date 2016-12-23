@@ -139,7 +139,10 @@ namespace GameBot.Game.Tetris.States
                     {
                         // sampling complete, we update the board
                         var holePosition = Agent.MultiplayerHoleSampler.Result;
-                        var newBoard = Agent.BoardExtractor.MultiplayerAddLines(Agent.GameState.Board, addedLines, holePosition);
+                        
+                        // add lines in internal board state
+                        var newBoard = new Board(Agent.GameState.Board);
+                        newBoard.SpawnLines(addedLines, holePosition);
                         Agent.GameState.Board = newBoard;
 
                         _holeSamplingComplete = true;

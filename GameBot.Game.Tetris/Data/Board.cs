@@ -329,7 +329,7 @@ namespace GameBot.Game.Tetris.Data
         }
 
         // this is used in multiplayer mode
-        internal void SpawnLines(int numLines, int holePosition)
+        public void SpawnLines(int numLines, int holePosition)
         {
             if (numLines < 0 || numLines > 4) throw new ArgumentException("numLines must be between 0 and 4");
             if (holePosition < 0 || holePosition >= Width) throw new ArgumentException("holePosition must be a valid x coordinate on the board");

@@ -57,7 +57,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var lines = _boardExtractor.MultiplayerRaisedLines(screenshot, board);
             var position = _boardExtractor.MultiplayerHolePosition(screenshot, board);
 
-            var newBoard = _boardExtractor.MultiplayerAddLines(board, lines, position.Result);
+            var newBoard = new Board(board);
+            newBoard.SpawnLines(lines, position.Result);
+
             var expected = _initialBoard;
 
             Assert.AreEqual(0, lines);
@@ -73,7 +75,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var lines = _boardExtractor.MultiplayerRaisedLines(screenshot, board);
             var position = _boardExtractor.MultiplayerHolePosition(screenshot, board);
 
-            var newBoard = _boardExtractor.MultiplayerAddLines(board, lines, position.Result);
+            var newBoard = new Board(board);
+            newBoard.SpawnLines(lines, position.Result);
+
             var expected = TestHelper.BuildBoard(new[]
             {
                 0,0,0,0,0,0,0,0,0,0,
@@ -111,7 +115,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var lines = _boardExtractor.MultiplayerRaisedLines(screenshot, board);
             var position = _boardExtractor.MultiplayerHolePosition(screenshot, board);
 
-            var newBoard = _boardExtractor.MultiplayerAddLines(board, lines, position.Result);
+            var newBoard = new Board(board);
+            newBoard.SpawnLines(lines, position.Result);
+
             var expected = TestHelper.BuildBoard(new[]
             {
                 0,0,0,0,0,0,0,0,0,0,
@@ -149,7 +155,9 @@ namespace GameBot.Test.Game.Tetris.Extraction
             var lines = _boardExtractor.MultiplayerRaisedLines(screenshot, board);
             var position = _boardExtractor.MultiplayerHolePosition(screenshot, board);
 
-            var newBoard = _boardExtractor.MultiplayerAddLines(board, lines, position.Result);
+            var newBoard = new Board(board);
+            newBoard.SpawnLines(lines, position.Result);
+
             var expected = TestHelper.BuildBoard(new[]
             {
                 0,0,0,0,0,0,0,0,0,0,

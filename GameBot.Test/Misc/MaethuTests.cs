@@ -25,7 +25,7 @@ namespace GameBot.Test.Misc
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        //[Ignore]
+        [Ignore]
         [Test]
         public void GenerateImagesForDoc()
         {
