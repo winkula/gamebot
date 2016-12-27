@@ -28,9 +28,9 @@ namespace GameBot.Game.Tetris.Ga.FitnessFunctions
 
             var heuristic = new GaHeuristic(p1, p2, p3, p4);
             var search = new TwoPieceSearch(heuristic);
-            var maxHeight = SimulateAvg(search, _games, _pieces);
-            
-            return (20.0 - maxHeight) / 20.0;
+            var lines = SimulateAvg(search, _games, _pieces);
+
+            return System.Math.Min((1.0 + lines) / 1000000.0, 1.0);
         }
 
         private double SimulateAvg(ISearch search, int games, int pieces)
@@ -45,10 +45,10 @@ namespace GameBot.Game.Tetris.Ga.FitnessFunctions
 
         private double Simulate(ISearch search, int pieces)
         {
-            var simulator = new TetrisSimulator();
+            var simulator = new TetrisSimulator().InHeartMode();
 
             int round = 0;
-            int maxHeight = 0;
+            //int maxHeight = 0;
             while (true)
             {
                 try
@@ -57,15 +57,12 @@ namespace GameBot.Game.Tetris.Ga.FitnessFunctions
                     var result = search.Search(simulator.GameState);
                     if (result == null) throw new GameOverException();
 
-                    foreach (var move in result.Moves)
-                    {
-                        simulator.Simulate(move);
-                    }
+                    simulator.SimulateRealtime(result.Moves.ToList(), 75);
 
                     round++;
 
-                    maxHeight = System.Math.Max(simulator.GameState.Board.MaximumHeight, maxHeight);
-                    
+                    //maxHeight = System.Math.Max(simulator.GameState.Board.MaximumHeight, maxHeight);
+
                     if (round >= pieces)
                     {
                         break;
@@ -77,8 +74,8 @@ namespace GameBot.Game.Tetris.Ga.FitnessFunctions
                 }
             }
 
-            //return simulator.GameState.Lines;
-            return maxHeight;
+            return simulator.GameState.Lines;
+            //return maxHeight;
         }
     }
 }

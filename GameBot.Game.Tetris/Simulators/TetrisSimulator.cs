@@ -7,7 +7,7 @@ namespace GameBot.Game.Tetris.Simulators
 {
     public class TetrisSimulator
     {
-        public GameState GameState { get; }
+        public GameState GameState { get; private set; }
 
         public TetrisSimulator(GameState gameState = null)
         {
@@ -18,6 +18,16 @@ namespace GameBot.Game.Tetris.Simulators
             GameState = gameState ?? new GameState(board, piece, nextPiece) { StartLevel = 9 };
         }
 
+        public TetrisSimulator InHeartMode()
+        {
+            var board = new Board();
+            var piece = new Piece();
+            var nextPiece = Tetriminos.GetRandom();
+
+            GameState = new GameState(board, piece, nextPiece) {StartLevel = 9, HeartMode = true};
+            return this;
+        }
+        
         public void Simulate(Move move)
         {
             switch (move)

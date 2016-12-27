@@ -21,9 +21,9 @@ namespace GameBot.Game.Tetris.Simulator
 
         static void Simulate()
         {
-            //var heuristic = new GaHeuristic(-0.10974, -0.02329, -0.48643, -0.21246);
+          var heuristic = new GaHeuristic(-0.317854214844296, - 0.548457056926845 ,- 0.434173510009484, - 0.640044465657585);
             //var heuristic = new YiyuanLeeHeuristic();
-            var heuristic = new ElTetrisHeuristic();
+            //var heuristic = new ElTetrisHeuristic();
             //var heuristic = new ExperimentalHeuristic();
             //var heuristic = new MaxBergmarkHeuristic();
 
